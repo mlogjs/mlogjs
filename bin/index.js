@@ -13,7 +13,7 @@ const app = new App({
   cmds: [
     {
       name: "compile file",
-      description: "Compiles your Javascript to Mlog!",
+      description: "Compiles your Javascript to Mlog! If the ouput file is not specified, it will copy the generated code into your clipboard.",
       args: [
         { name: "input", type: "string", required: true },
         { name: "output", type: "string" },
