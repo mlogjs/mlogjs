@@ -10,14 +10,13 @@
   "author": "str1z",
   "license": "MIT",
   "dependencies": {
-    "cliful": "^0.0.3",
+    "cliful": "^0.0.4",
     "clipboardy": "^2.3.0",
     "esprima": "^4.0.1"
   },
   "bin": {
     "mlogcc": "bin/index.js"
   },
-  "devDependencies": {},
   "repository": {
     "type": "git",
     "url": "https://github.com/str1z/mlogcc"
