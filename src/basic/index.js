@@ -62,6 +62,10 @@ module.exports = {
     if (argument instanceof Literal) return new Literal(c, ops[operator][1](argument.value));
     return c.write("op", ops[operator][0], new Accumulator(c), argument.use())[2];
   },
+  UpdateExpression(c, { argument, operator }) {
+    argument = c.handle(argument);
+    return c.write("op", ops[operator][0], argument, argument, 1);
+  },
   AssignmentExpression: (c, { left, operator, right }) => {
     left = c.handle(left);
     right = c.handle(right);
@@ -105,6 +109,7 @@ module.exports = {
     for (let i of c.breaks.pop()) c.writeAt(i, "jump", end, "always");
     c.breaks.pop();
   },
+
   MemberExpression(c, { object, property, computed }) {
     if (computed) return c.handle(object).getMember(c.handle(property), computed);
     return c.handle(object).getMember(new Identifier(c, property.name), computed);

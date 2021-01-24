@@ -1,2 +1,3 @@
-x = 123;
-memory1[123 + x] = 0;
+for (let i = 0; i < 10; i++) {
+  message1.print(i);
+}
