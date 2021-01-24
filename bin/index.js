@@ -21,7 +21,8 @@ const app = new App({
       exec: ({ input, output }) => {
         input = path.resolve(process.cwd(), input);
         const content = fs.readFileSync(input, { encoding: "utf8" });
-        const { out } = compile(content);
+        const { out, error, start, end } = compile(content);
+        if (error) return console.log(`${error.message} (from ${start.line}:${start.column} to ${end.line}:${end.column})`);
         if (output) {
           output = path.resolve(process.cwd(), output);
           fs.writeFileSync(output, out, { encoding: "utf8" });

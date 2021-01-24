@@ -14,6 +14,7 @@ const BinaryExpression = (c, { left, operator, right }) => {
 };
 
 const FunctionExpression = (c, { params, body }) => {
+  if (c.params[0]) throw new Error("Cannot define function inside a function");
   c.params.push(params.map((id) => id.name));
   const head = c.size();
   c.size("unresolved function skip");
@@ -24,7 +25,10 @@ const FunctionExpression = (c, { params, body }) => {
   return new Literal(c, head + 1);
 };
 
-const CallExpression = (c, { callee, arguments }) => c.handle(callee).call(...arguments);
+const CallExpression = (c, { callee, arguments }) => {
+  if (c.params[0]) throw new Error("Cannot call function inside a function");
+  return c.handle(callee).call(...arguments);
+};
 
 module.exports = {
   init(c) {

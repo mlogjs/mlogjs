@@ -3,16 +3,16 @@ class Base {
     this.c = c;
   }
   get() {
-    throw Error("Not Implemented");
+    throw Error(`Failed to 'get' on ${this}`);
   }
   set() {
-    throw Error("Not Implemented");
+    throw Error(`Failed to 'set' on ${this}`);
   }
   getMember() {
-    throw Error("Not Implemented");
+    throw Error(`Failed to 'getMember' on ${this}`);
   }
   call() {
-    throw Error("Not Implemented");
+    throw Error(`Failed to 'call' on ${this}`);
   }
   toString() {
     return this.get();

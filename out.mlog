@@ -1,8 +1,6 @@
-set i 0
-op lessThan $acc0 i 10
-jump 7 equal $acc0 0
-print i
-printflush message1
-op add i i 1
-jump 1 always
+jump 2 always
+set @counter $addr
+set hello 1
+set $addr 5
+set @counter hello
 end
