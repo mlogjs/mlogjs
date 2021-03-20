@@ -2,7 +2,7 @@
 
 A compiler that compiles Javascript code into Mindustry logic code.
 
-# Installatin
+# Installation
 
 `npm i -g mlogcc`
 
