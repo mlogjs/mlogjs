@@ -34,7 +34,7 @@ touch my-code.js
 mlogcc my-code.js my-compiled-code.mlog
 ```
 
-> Of course make sure you have installed the CLI tool `mlogcc` globally.
+> Of course, make sure you have installed the CLI tool `mlogcc` globally.
 
 ## Are control statements and functions supported? Yes they are!
 
