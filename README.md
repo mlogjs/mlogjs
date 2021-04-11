@@ -109,7 +109,7 @@ if (switch1.enabled) {
 if (switch1.sensor("enabled")) {
   // So cool right?
 }
-// setting an inexistent member is the same principle, but this time it will use the function control.
+// setting an inexistent member is the same principle, but this time it will use the control function.
 ```
 
 Here comes the API definitions.
