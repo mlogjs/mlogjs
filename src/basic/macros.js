@@ -20,10 +20,14 @@ const macros = (c) => {
     drawLine: (x = 0, y = 0, x2 = 0, y2 = 0) => c.write("draw line", x, y, x2, y2),
     drawRect: (x, y, width, height) => c.write("draw rect", x, y, width, height),
     drawLineRect: (x, y, width, height) => c.write("draw lineRect", x, y, width, height),
-    drawPoly: (x = 0, y = 0, sides = 0, radius = 0, rotation = 0) => c.write("draw poly", x, y, sides, radius, rotation),
-    drawLinePoly: (x = 0, y = 0, sides = 0, radius = 0, rotation = 0) => c.write("draw linePoly", x, y, sides, radius, rotation),
-    drawTriangle: (x = 0, y = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0) => c.write("draw triangle", x, y, x2, y2, x3, y3),
-    drawImage: (x = 0, y = 0, image = None, size = 32, rotation = 0) => c.write("draw image", x, y, image, size, rotation),
+    drawPoly: (x = 0, y = 0, sides = 0, radius = 0, rotation = 0) =>
+      c.write("draw poly", x, y, sides, radius, rotation),
+    drawLinePoly: (x = 0, y = 0, sides = 0, radius = 0, rotation = 0) =>
+      c.write("draw linePoly", x, y, sides, radius, rotation),
+    drawTriangle: (x = 0, y = 0, x2 = 0, y2 = 0, x3 = 0, y3 = 0) =>
+      c.write("draw triangle", x, y, x2, y2, x3, y3),
+    drawImage: (x = 0, y = 0, image = "", size = 32, rotation = 0) =>
+      c.write("draw image", x, y, image, size, rotation),
     // memory
     read: (block, i) => c.write("read", new Accumulator(c), block, i)[1],
     write: (block, i, value) => c.write("write", value, block, i),
@@ -44,14 +48,17 @@ const macros = (c) => {
     // other
     sensor: (block, name) => c.write("sensor", new Accumulator(c), block, name)[1],
     control: (block, name, ...args) => c.write("control", name, block, ...args),
-    radar: (block, target1, target2, target3, order, sort) => c.write("radar", target1, target2, target3, sort, block, order, new Accumulator(c))[7],
+    radar: (block, target1, target2, target3, order, sort) =>
+      c.write("radar", target1, target2, target3, sort, block, order, new Accumulator(c))[7],
     unitBind: (type) => c.write("ubind", type),
     unitControl: (name, ...args) => c.write("control", name, ...args),
-    unitRadar: (target1, target2, target3, order, sort) => c.write("radar", target1, target2, target3, sort, order, new Accumulator(c))[6],
+    unitRadar: (target1, target2, target3, order, sort) =>
+      c.write("radar", target1, target2, target3, sort, order, new Accumulator(c))[6],
   };
   for (let key in members) {
     const member = members[key];
-    members[key] = typeof member == "function" ? new MacroFunction(c, member) : new Identifier(c, member);
+    members[key] =
+      typeof member == "function" ? new MacroFunction(c, member) : new Identifier(c, member);
   }
   return members;
 };

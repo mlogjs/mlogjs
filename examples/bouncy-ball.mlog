@@ -1,0 +1,25 @@
+set x 0
+set y 0
+set vx 1
+set vy 1
+draw color 255 255 255 255
+sensor $acc0 switch1 @enabled
+jump 24 equal $acc0 0
+op lessThan $acc1 x 0
+op greaterThan $acc2 x 166
+op or $acc3 $acc1 $acc2
+jump 12 equal $acc3 0
+op mul vx vx -1
+op lessThan $acc1 y 0
+op greaterThan $acc2 y 166
+op or $acc3 $acc1 $acc2
+jump 17 equal $acc3 0
+op mul vy vy -1
+op add x x vx
+op add y y vy
+op sub vy vy 0.1
+draw clear 0 0 0
+draw rect x y 10 10
+drawflush display1
+jump 5 always
+end
