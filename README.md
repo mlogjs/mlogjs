@@ -180,4 +180,4 @@ function unitRadar: (target1, target2, target3, order, sort)
 
 ## Feel like contributing? Yes you can!
 
-I will be super happy to work with you and make this project better. If you looked into the file structure, you can see that I have made a `basic` directory. I made a `basic` directory because this compiler was meant to support to compilation mode: `basic` and `full`. The `full` compilation mode will support fully recursive function calls because it will store data on the stack (inside a memory block).
+I will be super happy to work with you and make this project better. If you looked into the file structure, you can see that I have made a `basic` directory. I made a `basic` directory because this compiler was meant to support two compilation modes: `basic` and `full`. The `full` compilation mode will support fully recursive function calls because it will store data on the stack (inside a memory block).
