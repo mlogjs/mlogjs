@@ -1,6 +1,6 @@
-# mlogcc
+# mlogcc v0.0.2
 
-A compiler that compiles Javascript code into Mindustry logic code.
+Mlogcc is a compiler that compiles Javascript code into Mindustry logic code.
 
 ## Installation
 
@@ -21,7 +21,7 @@ printFlush(message1);
 
 > Note that all blocks are Javascript variables.
 
-The above is not fancy enough. We can make it more fancy...
+The above is not fancy enough. We can make it fancy...
 
 ```js
 message1.print("Hello world");
@@ -36,7 +36,7 @@ mlogcc my-code.js my-compiled-code.mlog
 
 > Of course, make sure you have installed the CLI tool `mlogcc` globally.
 
-## Are control statements and functions supported? Yes they are!
+## Are control statements and functions supported? Yes, they are!
 
 ```js
 for (let i = 0; i < 100; i++) {
@@ -73,7 +73,9 @@ let sum = add(1, 2);
 message1.print(sum);
 ```
 
-## Can I combine Mlog with JS? Yes you can!
+## Can I combine Mlog with JS? No, you can't!
+
+This feature has been sacrificed to fix a bug!
 
 ```js
 const block = new Message(1);
@@ -95,7 +97,7 @@ const value = bank1[0]; // value == 1
 
 ## API
 
-> Most of the folowing API is similar to the Mindustry Logic API. So if something is not clear here, please refer to the Mlog documentation. Blocks are of course an exception.
+> Most of the following API is similar to the Mindustry Logic API. So if something is not clear here, please refer to the Mlog documentation. Blocks are of course an exception.
 
 > When trying to access a member on the MacroBlock that does not exist in the defined interface, the compiler will understand.
 
@@ -107,12 +109,12 @@ if (switch1.enabled) {
 }
 // so it will do...
 if (switch1.sensor("enabled")) {
-  // So cool right?
+  // So cool, right?
 }
 // setting an inexistent member is the same principle, but this time it will use the control function.
 ```
 
-Here comes the API definitions.
+Here come the API definitions.
 
 ```ts
 
@@ -178,6 +180,6 @@ function unitControl: (name, ...args)
 function unitRadar: (target1, target2, target3, order, sort)
 ```
 
-## Feel like contributing? Yes you can!
+## Feel like contributing? Yes, you can!
 
 I will be super happy to work with you and make this project better. If you looked into the file structure, you can see that I have made a `basic` directory. I made a `basic` directory because this compiler was meant to support two compilation modes: `basic` and `full`. The `full` compilation mode will support fully recursive function calls because it will store data on the stack (inside a memory block).

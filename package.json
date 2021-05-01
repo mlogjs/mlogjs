@@ -1,6 +1,6 @@
 {
   "name": "mlogcc",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A compiler that compiles Javascript code into Mindustry Logic Code",
   "main": "src/index.js",
   "scripts": {
