@@ -119,5 +119,5 @@ module.exports = {
     return c.handle(object).getMember(new Identifier(c, property.name), computed);
   },
   TemplateElement: (c, { value }) => value.raw,
-  TemplateLiteral: (c, { quasis, expressions }) => c.write(expressions.map((e, i) => c.handle(quasis[i]) + c.handle(e).use()).join("") + c.handle(quasis.slice(-1)[0])),
+  TemplateLiteral: (c, { quasis, expressions }) => expressions.map((e, i) => c.handle(quasis[i]) + c.handle(e).use()).join("") + c.handle(quasis.slice(-1)[0]),
 };
