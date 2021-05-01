@@ -1,0 +1,4 @@
+class StringVariable {}
+
+class NumberVariable {}
+
