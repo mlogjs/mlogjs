@@ -1,4 +1,0 @@
-class StringVariable {}
-
-class NumberVariable {}
-
