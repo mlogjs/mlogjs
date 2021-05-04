@@ -5,3 +5,4 @@ let a = 10
 `
 
 console.log(new Compiler().compile(code))
+

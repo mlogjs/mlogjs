@@ -1,40 +1,75 @@
 import { parseScript } from "esprima";
-import { Node, Program, VariableDeclaration, VariableDeclarator} from "estree";
-
-
+import * as es from "estree";
+import Scope from "./Scope";
+import { TResLines } from "./types";
+import Literal from "./value/Literal";
+import Value from "./value/Value";
 
 export default class Compiler {
-	stackName?: string;
+	protected stackName?: string;
+	protected usingStack: boolean;
 
 	constructor(stackName?: string) {
+		this.usingStack = !!stackName;
 		this.stackName = stackName;
 	}
 
-	parse(script: string) {
+    compile(script: string) {
+		const program = this.parse(script);
+		const lines = this.handle(program, Scope.createRoot({}));
+		return lines.join("\n");
+	}
+
+	protected parse(script: string) {
 		return parseScript(script);
 	}
 
-    compile(script: string) {
-        const program = this.parse(script)
-        const codegen = this.handle(program, {})
-        return codegen.join("\n")
+    protected handleContainer(key: string, node: es.Node, scope: Scope): TResLines{
+        const lines = []
+        for (const child of node[key]) {
+            const [_, lines] = this.handle(child, scope)
+            lines.push(...lines)
+        }
+        return [null, lines]
     }
 
-    handle(node: Node) {
-        return this[node.type](node)
-    }
+	protected handle(node: es.Node, scope: Scope): TResLines {
+		return this[node.type](node, scope);
+	}
 
-    Program(program: Program) {
-        const codegen = []
-        for (const node of program.body) codegen.push(...this.handle(node))
-        return codegen
-    }
+	protected Program(node: es.Program, scope: Scope) {
+		return this.handleContainer("body", node, scope)
+	}
 
-    VariableDeclaration(decl: VariableDeclaration) {
+	protected VariableDeclaration(node: es.VariableDeclaration, scope: Scope) {
         
-    }
-    VariableDeclarator(decl: VariableDeclarator) {
+		return [
+			null,
+			node.declarations.map((n) => this.VariableDeclarator(n, scope, node.kind)).flat(),
+		];
+	}
 
-    }
+	protected VariableDeclarator(
+		node: es.VariableDeclarator,
+		scope: Scope,
+		kind: "let" | "var" | "const" = "let"
+	): TResLines {
+		const [init] = this.handle(node.init, scope);
+		const { name } = node.id as es.Identifier;
+		if (kind === "const" && init instanceof Literal) {
+			scope.set(name, init);
+			return [init, []];
+		}
+		return scope.createVariable(name).assign(scope, init);
+	}
+
+	protected Literal(node: es.Literal): TResLines {
+		let { value } = node;
+		value = typeof value === "string" ? value : Number(value);
+		return [new Literal(value), []];
+	}
+
+	protected Identifer(node: es.Identifier, scope: Scope): TResLines {
+		return [scope.get(node.name), []];
+	}
 }
- 
