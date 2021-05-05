@@ -1,8 +1,7 @@
-import Scope from "../Scope";
-import { EOperation } from "../types";
-import Value from "./Value";
+import { EOperation, IScope, TResLines, IValue } from ".";
+import { NumericalValue } from "./NumericalValue";
 
-export type TLiteral = string | number
+export type TLiteral = string | number;
 
 const literalOperations = {
 	equal: (a: number, b: number) => +(a === b),
@@ -25,33 +24,38 @@ const literalOperations = {
 	shl: (a: number, b: number) => a << b,
 	not: (a: number) => +!a,
 	flip: (a: number) => ~a,
-}
+};
 
-export default class Literal extends Value {
+export class LiteralValue extends NumericalValue {
 	constant = true;
 	data: TLiteral;
-	
+
 	constructor(data: TLiteral) {
-		super()
+		super();
 		this.data = data;
 	}
 
-	protected literalOperation(kind : keyof typeof literalOperations, scope: Scope, value: Literal) {
-		
-		const data = literalOperations[kind](this.data as number, value.data as number)
-		return [new Literal(data), []]
+	evaluate(scope: IScope): TResLines {
+		return [this, []];
 	}
 
-	protected accumulatedOperation(kind: EOperation, scope: Scope, value: Value) {
-		if (value instanceof Literal) {
-			return this.literalOperation(kind, scope, value)
+	protected compileOperation(
+		kind: keyof typeof literalOperations,
+		scope: IScope,
+		value: LiteralValue
+	): TResLines {
+		const data = literalOperations[kind](this.data as number, value.data as number);
+		return [new LiteralValue(data), []];
+	}
+
+	protected runtimeOperation(kind: EOperation, scope: IScope, value: IValue): TResLines {
+		if (value instanceof LiteralValue) {
+			return this.compileOperation(kind, scope, value);
 		}
-		return super.accumulatedOperation(kind, scope, value)
+		return super.runtimeOperation(kind, scope, value);
 	}
 
 	serialize() {
-		return JSON.stringify(this.data)
+		return JSON.stringify(this.data);
 	}
-	
-	
 }
