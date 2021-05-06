@@ -1,24 +1,12 @@
 import * as es from "estree";
-export type TValueMap = { [key: string]: IValue };
-
-export interface IScope {
-	accIndex: number;
-	valueMap: TValueMap;
-	superMap: TValueMap;
-	stacked: boolean;
-	name: string;
-	extend(name: string, stacked: boolean): IScope;
-	nameExistsInCurrent(name: string): boolean;
-	nameExistsInSuper(name: string): boolean;
-	nameExists(name: string): boolean;
-	set(name: string, value: IValue): IValue;
-	createValue(name: string): IValue;
-	get(name: string): IValue;
-}
+import { IScope } from "../core";
+import { TResLines } from "../line";
 
 export interface IValue {
 	constant: boolean;
-	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines
+	scope: IScope;
+	print(): TResLines;
+	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines;
 	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines;
 	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines;
 	assignmentOperation(operator: es.AssignmentOperator, scope: IScope, value: IValue): TResLines;
@@ -83,29 +71,9 @@ export interface IValue {
 	decrement(scope: IScope): TResLines;
 }
 
-export type TLine = (string | IValue)[];
-
-export type TResLines = [IValue, TLine[]];
-
-export enum EOperation {
-	Equal = "equal",
-	NotEqual = "notEqual",
-	LessThan = "lessThan",
-	GreaterThan = "greaterThan",
-	LessThanEqual = "lessThanEq",
-	GreaterThanEqual = "greaterThanEq",
-	Add = "add",
-	Subtract = "sub",
-	Multiply = "mul",
-	Divide = "div",
-	Modulus = "mod",
-	Pow = "pow",
-	LogicalAnd = "land",
-	BitwiseOr = "or",
-	BitwiseAnd = "and",
-	BitwiseXor = "xor",
-	BitwiseShiftRight = "shr",
-	BitwiseShiftLeft = "shl",
-	LogicalNot = "not",
-	BitwiseNot = "flip",
-}
+export * from "./ValueBase";
+export * from "./NumericalValue";
+export * from "./LiteralValue";
+export * from "./StoreValue";
+export * from "./StackValue";
+export * from "./operators";

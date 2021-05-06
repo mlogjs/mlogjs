@@ -1,4 +1,7 @@
-import { IValue, IScope, TResLines, NumericalValue } from ".";
+import { NumericalValue } from ".";
+import { IScope } from "../core";
+import { TResLines } from "../line";
+
 
 
 export class StackValue extends NumericalValue {

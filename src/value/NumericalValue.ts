@@ -1,12 +1,22 @@
-import { EOperation, IValue, LiteralValue, IScope, TemporaryValue, TResLines, ValueBase } from ".";
+import { ValueBase, IValue, TemporaryValue, LiteralValue, EOperation } from ".";
+import { IScope } from "../core";
+import { OperationLine, TResLines } from "../line";
 
 export class NumericalValue extends ValueBase {
-	protected runtimeOperation(kind: EOperation, scope: IScope, value?: IValue): TResLines {
-		const [left, leftLines] = this.evaluate(scope);
-		const [right, rightLines] = value ? value.evaluate(scope) : [null, []];
+	protected runtimeOperation(
+		kind: EOperation,
+		scope: IScope,
+		left: IValue,
+		right?: IValue
+	): TResLines {
+		if (right && !(right instanceof NumericalValue))
+			throw Error("Cannot do numerical operation on non-numerical value.");
+		const [leftValue, leftLines] = left.evaluate(scope);
+		const [rightValue, rightLines] = right ? right.evaluate(scope) : [null, []];
 		const acc = new TemporaryValue(scope);
-		return [acc, [...leftLines, ...rightLines, ["op", kind, acc, left, right]]];
+		return [acc, [...leftLines, ...rightLines, new OperationLine(kind, acc, leftValue, rightValue)]];
 	}
+
 	addAssign(scope: IScope, value: IValue): TResLines {
 		return this.assignFromResLines(scope, this.add(scope, value));
 	}
@@ -52,95 +62,95 @@ export class NumericalValue extends ValueBase {
 	logicalNullishAssign(scope: IScope, value: IValue): TResLines {
 		return this.assignFromResLines(scope, this.logicalNullish(scope, value));
 	}
+	increment(scope: IScope): TResLines {
+		return this.assignFromResLines(scope, this.add(scope, new LiteralValue(scope, 1)));
+	}
+	decrement(scope: IScope): TResLines {
+		return this.assignFromResLines(scope, this.subtract(scope, new LiteralValue(scope, 1)));
+	}
 	// comparison
 	equal(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Equal, scope, value);
+		return this.runtimeOperation(EOperation.Equal, scope, this, value);
 	}
 	strictEqual(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Equal, scope, value);
+		return this.runtimeOperation(EOperation.StrictEqual, scope, this, value);
 	}
 	notEqual(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.NotEqual, scope, value);
+		return this.runtimeOperation(EOperation.NotEqual, scope, this, value);
 	}
 	strictNotEqual(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.NotEqual, scope, value);
+		return this.runtimeOperation(EOperation.NotEqual, scope, this, value);
 	}
 	greaterThan(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.GreaterThan, scope, value);
+		return this.runtimeOperation(EOperation.GreaterThan, scope, this, value);
 	}
 	greaterThanOrEqual(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.GreaterThanEqual, scope, value);
+		return this.runtimeOperation(EOperation.GreaterThanEqual, scope, this, value);
 	}
 	lessThan(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.LessThan, scope, value);
+		return this.runtimeOperation(EOperation.LessThan, scope, this, value);
 	}
 	lessThanOrEqual(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.LessThanEqual, scope, value);
+		return this.runtimeOperation(EOperation.LessThanEqual, scope, this, value);
 	}
 	// arithmetic
 	add(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Add, scope, value);
+		return this.runtimeOperation(EOperation.Add, scope, this, value);
 	}
 	subtract(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Subtract, scope, value);
+		return this.runtimeOperation(EOperation.Subtract, scope, this, value);
 	}
 	multiply(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Multiply, scope, value);
+		return this.runtimeOperation(EOperation.Multiply, scope, this, value);
 	}
 	divide(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Divide, scope, value);
+		return this.runtimeOperation(EOperation.Divide, scope, this, value);
 	}
 	remainder(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Modulus, scope, value);
-	}
-	increment(scope: IScope): TResLines {
-		return this.add(scope, new LiteralValue(1));
-	}
-	decrement(scope: IScope): TResLines {
-		return this.subtract(scope, new LiteralValue(1));
+		return this.runtimeOperation(EOperation.Modulus, scope, this, value);
 	}
 	unaryNegate(scope: IScope): TResLines {
-		return this.runtimeOperation(EOperation.Subtract, scope);
+		return this.runtimeOperation(EOperation.Subtract, scope, new LiteralValue(scope, 0), this);
 	}
 	unaryPlus(scope: IScope): TResLines {
 		return [this, []];
 	}
 	power(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.Pow, scope, value);
+		return this.runtimeOperation(EOperation.Pow, scope, this, value);
 	}
 	// bitwise
 	bitwiseAnd(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseAnd, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseAnd, scope, this, value);
 	}
 	bitwiseOr(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseOr, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseOr, scope, this, value);
 	}
 	bitwiseXor(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseXor, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseXor, scope, this, value);
 	}
 	bitwiseNot(scope: IScope): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseNot, scope);
+		return this.runtimeOperation(EOperation.BitwiseNot, scope, this);
 	}
 	bitwiseLeftShift(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseShiftLeft, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseShiftLeft, scope, this, value);
 	}
 	bitwiseRightShift(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseShiftRight, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseShiftRight, scope, this, value);
 	}
 	bitwiseUnsignedRightShift(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseShiftRight, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseShiftRight, scope, this, value);
 	}
 	// logical
 	logicalAnd(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.LogicalAnd, scope, value);
+		return this.runtimeOperation(EOperation.LogicalAnd, scope, this, value);
 	}
 	logicalOr(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseOr, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseOr, scope, this, value);
 	}
 	logicalNot(scope: IScope): TResLines {
-		return this.runtimeOperation(EOperation.LogicalNot, scope);
+		return this.runtimeOperation(EOperation.LogicalNot, scope, this);
 	}
 	logicalNullish(scope: IScope, value: IValue): TResLines {
-		return this.runtimeOperation(EOperation.BitwiseOr, scope, value);
+		return this.runtimeOperation(EOperation.BitwiseOr, scope, this, value);
 	}
 }

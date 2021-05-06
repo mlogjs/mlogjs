@@ -1,11 +1,12 @@
-import {Compiler} from "./lib"
+import { Compiler } from "./core";
 
 const code = `
-const a = 1 / 6
-const b = 2
-const e = a + b + 3 + "asdf"
-let asdf = e
-`
+const a = 1
+if (a) {
+    let b = 123
+} else if (a) {
+    let b = 321
+}
+`;
 
-console.log(new Compiler().compile(code))
-
+console.log(new Compiler().compile(code));

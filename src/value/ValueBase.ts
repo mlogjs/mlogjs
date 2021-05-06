@@ -1,49 +1,51 @@
+import * as es from "estree";
+import { IScope } from "../core";
 import {
-	BinaryOperator,
-	LogicalOperator,
-	AssignmentOperator,
-	UpdateOperator,
-	UnaryOperator,
-} from "estree";
-import { IScope, TResLines } from ".";
-import {
-	AssignmentOperatorMap,
+	IValue,
 	BinaryOperatorMap,
 	LogicalOperatorMap,
-	UnaryOperatorMap,
+	AssignmentOperatorMap,
 	UpdateOperatorMap,
-} from "./operators";
-import { IValue } from "./types";
+	UnaryOperatorMap,
+} from ".";
+import { TResLines } from "../line";
+import { PrintLine } from "../line/PrintLine";
 
 export abstract class ValueBase implements IValue {
 	constant: boolean = false;
-
-	binaryOperation(operator: BinaryOperator, scope: IScope, value: IValue): TResLines {
+	scope: IScope;
+	constructor(scope: IScope) {
+		this.scope = scope;
+	}
+	print(): TResLines {
+		return [this, [new PrintLine(this)]];
+	}
+	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines {
 		const handler = this[BinaryOperatorMap[operator]] as (
 			scope: IScope,
 			value: IValue
 		) => TResLines;
 		return handler.bind(this)(scope, value);
 	}
-	logicalOperation(operator: LogicalOperator, scope: IScope, value: IValue): TResLines {
+	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines {
 		const handler = this[LogicalOperatorMap[operator]] as (
 			scope: IScope,
 			value: IValue
 		) => TResLines;
 		return handler.bind(this)(scope, value);
 	}
-	assignmentOperation(operator: AssignmentOperator, scope: IScope, value: IValue): TResLines {
+	assignmentOperation(operator: es.AssignmentOperator, scope: IScope, value: IValue): TResLines {
 		const handler = this[AssignmentOperatorMap[operator]] as (
 			scope: IScope,
 			value: IValue
 		) => TResLines;
 		return handler.bind(this)(scope, value);
 	}
-	updateOperation(operator: UpdateOperator, scope: IScope): TResLines {
+	updateOperation(operator: es.UpdateOperator, scope: IScope): TResLines {
 		const handler = this[UpdateOperatorMap[operator]] as (scope: IScope) => TResLines;
 		return handler.bind(this)(scope);
 	}
-	unaryOperation(operator: UnaryOperator, scope: IScope): TResLines {
+	unaryOperation(operator: es.UnaryOperator, scope: IScope): TResLines {
 		const handler = this[UnaryOperatorMap[operator]] as (scope: IScope) => TResLines;
 		return handler.bind(this)(scope);
 	}

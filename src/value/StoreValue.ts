@@ -1,16 +1,17 @@
-import { IValue, IScope, TResLines, NumericalValue} from ".";
+import { NumericalValue, IValue } from ".";
+import { IScope } from "../core";
+import { SetLine, TResLines } from "../line";
+
 
 export class StoreValue extends NumericalValue {
-	scope: IScope
 	name: string;
 
 	constructor(scope: IScope, name: string) {
-		super()
-		this.scope = scope
+		super(scope)
 		this.name = name;
 	}
 	serialize(): string {
-		return this.name + this.scope.name
+		return this.name
 	}
 	evaluate(scope: IScope): TResLines {
 		return [this, []]
@@ -22,7 +23,7 @@ export class StoreValue extends NumericalValue {
 			return [this, []]
 		}
 		const [res, lines] = value.evaluate(scope)
-		return [this, [...lines, ["set", this, res]]]
+		return [this, [...lines, new SetLine(this, res)]]
 	}
 }
 
