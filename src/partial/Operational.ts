@@ -1,22 +1,15 @@
-import { IValue, TemporaryValue } from "../value";
+import { TValueConstructor } from ".";
 import { IScope } from "../core";
 import { OperationLine, TResLines } from "../line";
 import { EOperation } from "../types";
-import {
-	TValueConstructor,
-	BinaryOperational,
-	LogicalOperational,
-	UnaryOperational,
-	UpdateOperational,
-	AssignOperational,
-	MappedOperation,
-} from ".";
+import { IValue, TemporaryValue } from "../value";
 
-
+export const operationalName = "std::operational"
 export function Operational<B extends TValueConstructor>(Base: B): TValueConstructor {
-	let c: TValueConstructor = class Operational extends MappedOperation(Base) {
+	return class Operational extends Base {
 		operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines {
-			if (right && !(right instanceof Operational))
+			console.log(right)
+			if (right && !right.is(operationalName))
 				throw Error("Cannot do numerical operation on non-numerical value.");
 			const [leftValue, leftLines] = left.evaluate(scope);
 			const [rightValue, rightLines] = right ? right.evaluate(scope) : [null, []];
@@ -27,12 +20,5 @@ export function Operational<B extends TValueConstructor>(Base: B): TValueConstru
 			];
 		}
 	};
-	c = BinaryOperational(c);
-	c = LogicalOperational(c);
-	c = UnaryOperational(c);
-	c = UpdateOperational(c);
-	c = AssignOperational(c);
-	return c;
+
 }
-
-

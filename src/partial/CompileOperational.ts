@@ -38,34 +38,24 @@ const literalOperations: { [key in EOperation]: (a: any, b?: any) => number } = 
 	flip: op((a) => ~a),
 };
 
-export function Literal<B extends TValueConstructor>(Base: B): TValueConstructor {
-	return class Literal extends Operational(Base) {
-		data: TLiteral;
-		constant = true;
-
-		constructor() {
-			super()
-		}
-
-		evaluate(scope: IScope): TResLines {
-			return [this, []];
-		}
-		toString() {
-			return JSON.stringify(this.data);
-		}
+export const compileOperationalName = "std::compileOperational"
+export function CompileOperational<B extends TValueConstructor>(Base: B): TValueConstructor {
+	return class CompileOperational extends Base {
+		data: {[compileOperationalName]: TLiteral}
+		
 		protected compileOperation(
 			kind: keyof typeof literalOperations,
 			scope: IScope,
-			left: Literal,
-			right?: Literal
+			left: IValue,
+			right?: IValue
 		): TResLines {
-			const data = literalOperations[kind](left.data, right?.data);
+			const data = literalOperations[kind](left.data[compileOperationalName], right?.data[compileOperationalName]);
 			return [new LiteralValue(scope, isFinite(data) ? data : null), []];
 		}
 		operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines {
-			if (left instanceof Literal && !right) {
+			if (left.is(compileOperationalName) && !right) {
 				return this.compileOperation(kind, scope, left);
-			} else if (left instanceof Literal && right instanceof Literal) {
+			} else if (left.is(compileOperationalName) && right.is(compileOperationalName)) {
 				return this.compileOperation(kind, scope, left, right);
 			}
 			return super.operation(kind, scope, left, right);

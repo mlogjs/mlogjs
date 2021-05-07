@@ -4,12 +4,11 @@ import { IScope } from "../core";
 import { TResLines } from "../line";
 import { EOperation } from "../types";
 
-
 export class ValueBase implements IValue {
 	constant: boolean = false;
 	scope: IScope;
-	data: any
-	
+	data: { [key: string]: any } = {};
+
 	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines {
 		const [assigned, assignedLines] = this.tryAssign(scope, res);
 		return [assigned, [...lines, ...assignedLines]];
@@ -20,9 +19,12 @@ export class ValueBase implements IValue {
 		return this.assign(scope, value);
 	}
 
-	constructor(scope: IScope, data: any) {
+	constructor(scope: IScope) {
 		this.scope = scope;
-		this.data = data
+	}
+	
+	is(kind: string): boolean {
+		return kind in this.data
 	}
 
 	operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines {
@@ -208,6 +210,4 @@ export class ValueBase implements IValue {
 	decrement(scope: IScope): TResLines {
 		throw new Error("Method not implemented.");
 	}
-
-
 }

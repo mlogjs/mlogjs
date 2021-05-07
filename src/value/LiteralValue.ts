@@ -1,11 +1,20 @@
-import { MindustryValue } from ".";
+import { Value } from ".";
 import { IScope } from "../core";
-import {  Literal } from "../partial/Literal";
+import { TResLines } from "../line";
+import { CompileOperational, compileOperationalName } from "../partial/CompileOperational";
 import { TLiteral } from "../types";
-export class LiteralValue extends Literal(MindustryValue) {
-	data: number | string;
-	constructor(scope: IScope, data: TLiteral) {
+export class LiteralValue extends CompileOperational(Value) {
+	data: { [compileOperationalName]: TLiteral };
+
+	constant = true;
+	evaluate(scope: IScope): TResLines {
+		return [this, []];
+	}
+	toString() {
+		return JSON.stringify(this.data[compileOperationalName]);
+	}
+	constructor(scope: IScope, value: TLiteral) {
 		super(scope);
-		this.data = data;
+		this.data["std::literal"] = value;
 	}
 }

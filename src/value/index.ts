@@ -6,8 +6,9 @@ import { EOperation } from "../types";
 export interface IValue {
 	constant: boolean;
 	scope: IScope;
-	data: any;
-	operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines
+	data: { [key: string]: any };
+	is(kind: string): boolean;
+	operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines;
 	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines;
 	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines;
 	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines;
@@ -73,6 +74,7 @@ export interface IValue {
 }
 
 export * from "./ValueBase";
-export * from "./MindustryValue";
+export * from "./Value";
 export * from "./LiteralValue";
 export * from "./StoreValue";
+

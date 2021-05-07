@@ -11,9 +11,6 @@ export function BinaryOperational<B extends TValueConstructor>(
 	Base: B
 ): TValueConstructor {
 	return class BinaryOperational extends Base {
-
-		
-
 		// math
 		add(scope: IScope, value: IValue): TResLines {
 			return this.operation(EOperation.Add, scope, this, value);
