@@ -1,22 +1,24 @@
 import * as es from "estree";
 import { IScope } from "../core";
 import { TResLines } from "../line";
+import { EOperation } from "../types";
 
 export interface IValue {
 	constant: boolean;
 	scope: IScope;
-	print(): TResLines;
+	data: any;
+	operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines
 	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines;
 	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines;
 	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines;
 	assignmentOperation(operator: es.AssignmentOperator, scope: IScope, value: IValue): TResLines;
 	updateOperation(operator: es.UpdateOperator, scope: IScope): TResLines;
 	unaryOperation(operator: es.UnaryOperator, scope: IScope): TResLines;
-	serialize(): string;
 	evaluate(scope: IScope): TResLines;
 	getMember(scope: IScope, value: IValue): TResLines;
 	getComputedMember(scope: IScope, value: IValue): TResLines;
 	call(scope: IScope, args: IValue[]): TResLines;
+	newCall(scope: IScope, args: IValue[]): TResLines;
 	tryAssign(scope: IScope, value: IValue): TResLines;
 	assign(scope: IScope, value: IValue): TResLines;
 	addAssign(scope: IScope, value: IValue): TResLines;
@@ -58,7 +60,6 @@ export interface IValue {
 	logicalOr(scope: IScope, value: IValue): TResLines;
 	logicalNullish(scope: IScope, value: IValue): TResLines;
 	inOperation(scope: IScope, value: IValue): TResLines;
-	// unary
 	instanceofOperation(scope: IScope): TResLines;
 	bitwiseNot(scope: IScope): TResLines;
 	logicalNot(scope: IScope): TResLines;
@@ -72,8 +73,6 @@ export interface IValue {
 }
 
 export * from "./ValueBase";
-export * from "./NumericalValue";
+export * from "./MindustryValue";
 export * from "./LiteralValue";
 export * from "./StoreValue";
-export * from "./StackValue";
-export * from "./operators";

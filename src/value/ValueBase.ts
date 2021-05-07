@@ -1,238 +1,213 @@
 import * as es from "estree";
+import { IValue } from ".";
 import { IScope } from "../core";
-import {
-	IValue,
-	BinaryOperatorMap,
-	LogicalOperatorMap,
-	AssignmentOperatorMap,
-	UpdateOperatorMap,
-	UnaryOperatorMap,
-} from ".";
 import { TResLines } from "../line";
-import { PrintLine } from "../line/PrintLine";
+import { EOperation } from "../types";
 
-export abstract class ValueBase implements IValue {
+
+export class ValueBase implements IValue {
 	constant: boolean = false;
 	scope: IScope;
-	constructor(scope: IScope) {
-		this.scope = scope;
-	}
-	print(): TResLines {
-		return [this, [new PrintLine(this)]];
-	}
-	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines {
-		const handler = this[BinaryOperatorMap[operator]] as (
-			scope: IScope,
-			value: IValue
-		) => TResLines;
-		return handler.bind(this)(scope, value);
-	}
-	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines {
-		const handler = this[LogicalOperatorMap[operator]] as (
-			scope: IScope,
-			value: IValue
-		) => TResLines;
-		return handler.bind(this)(scope, value);
-	}
-	assignmentOperation(operator: es.AssignmentOperator, scope: IScope, value: IValue): TResLines {
-		const handler = this[AssignmentOperatorMap[operator]] as (
-			scope: IScope,
-			value: IValue
-		) => TResLines;
-		return handler.bind(this)(scope, value);
-	}
-	updateOperation(operator: es.UpdateOperator, scope: IScope): TResLines {
-		const handler = this[UpdateOperatorMap[operator]] as (scope: IScope) => TResLines;
-		return handler.bind(this)(scope);
-	}
-	unaryOperation(operator: es.UnaryOperator, scope: IScope): TResLines {
-		const handler = this[UnaryOperatorMap[operator]] as (scope: IScope) => TResLines;
-		return handler.bind(this)(scope);
-	}
-
-	toString() {
-		return this.serialize();
-	}
-
-	serialize(): string {
-		throw Error("Cannot serialize");
-	}
-	evaluate(scope: IScope): TResLines {
-		throw Error("Cannot evaluate");
-	}
-	getMember(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot get member");
-	}
-	getComputedMember(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot get computed member");
-	}
-	call(scope: IScope, args: IValue[]): TResLines {
-		throw Error("Cannot call");
-	}
-	// assignment
-	tryAssign(scope: IScope, value: IValue): TResLines {
-		if (this.constant) throw Error("Cannot assign value to constant.");
-		return this.assign(scope, value);
-	}
-	assign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot assign");
-	}
-
+	data: any
+	
 	assignFromResLines(scope: IScope, [res, lines]: TResLines): TResLines {
 		const [assigned, assignedLines] = this.tryAssign(scope, res);
 		return [assigned, [...lines, ...assignedLines]];
 	}
 
+	tryAssign(scope: IScope, value: IValue): TResLines {
+		if (this.constant) throw Error("Cannot assign value to constant.");
+		return this.assign(scope, value);
+	}
+
+	constructor(scope: IScope, data: any) {
+		this.scope = scope;
+		this.data = data
+	}
+
+	operation(kind: EOperation, scope: IScope, left: IValue, right?: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	binaryOperation(operator: es.BinaryOperator, scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	logicalOperation(operator: es.LogicalOperator, scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	assignmentOperation(operator: es.AssignmentOperator, scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	updateOperation(operator: es.UpdateOperator, scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	unaryOperation(operator: es.UnaryOperator, scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	evaluate(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	getMember(scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	getComputedMember(scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	call(scope: IScope, args: IValue[]): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	newCall(scope: IScope, args: IValue[]): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	assign(scope: IScope, value: IValue): TResLines {
+		throw new Error("Method not implemented.");
+	}
 	addAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	subtractAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	multiplyAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	divideAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	remainderAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	powerAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseLeftShiftAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseRightShiftAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseUnsignedRightShiftAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseAndAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseXorAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseOrAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	logicalAndAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	logicalOrAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	logicalNullishAssign(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
-	// comparison
 	equal(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	strictEqual(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	notEqual(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	strictNotEqual(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	greaterThan(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	greaterThanOrEqual(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	lessThan(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	lessThanOrEqual(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
-	// arithmetic
 	add(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	subtract(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	multiply(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	divide(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	remainder(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
-	}
-	increment(scope: IScope): TResLines {
-		throw Error("Cannot ");
-	}
-	decrement(scope: IScope): TResLines {
-		throw Error("Cannot ");
-	}
-	unaryNegate(scope: IScope): TResLines {
-		throw Error("Cannot ");
-	}
-	unaryPlus(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	power(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
-	// bitwise
 	bitwiseAnd(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseOr(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseXor(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
-	}
-	bitwiseNot(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseLeftShift(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseRightShift(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	bitwiseUnsignedRightShift(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
-	// logical
 	logicalAnd(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	logicalOr(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
-	}
-	logicalNot(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	logicalNullish(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
-	// misc
 	inOperation(scope: IScope, value: IValue): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	instanceofOperation(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
+	}
+	bitwiseNot(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	logicalNot(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
 	}
 	voidOperation(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	typeofOperation(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
 	deleteOperation(scope: IScope): TResLines {
-		throw Error("Cannot ");
+		throw new Error("Method not implemented.");
 	}
+	unaryNegate(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	unaryPlus(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	increment(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+	decrement(scope: IScope): TResLines {
+		throw new Error("Method not implemented.");
+	}
+
+
 }

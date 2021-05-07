@@ -1,5 +1,6 @@
 import { LineBase } from ".";
-import { EOperation, IValue } from "../value";
+import { EOperation } from "../types";
+import {  IValue } from "../value";
 
 export class OperationLine extends LineBase {
     constructor(kind: EOperation, value: IValue, left: IValue, right?:IValue) {

@@ -1,4 +1,5 @@
-import { IValue, StackValue, StoreValue } from "../value";
+import { AddressLine, ILine } from "../line";
+import { IValue, StoreValue } from "../value";
 
 export type TValueMap = { [key: string]: IValue };
 
@@ -7,12 +8,14 @@ export interface IScope {
 	valueMap: TValueMap;
 	superMap: TValueMap;
 	stacked: boolean;
+	breakAddressLine: AddressLine
+	continueAddressLine: AddressLine
 	extend(stacked?: boolean): IScope;
 	nameExistsInCurrent(name: string): boolean;
 	nameExistsInSuper(name: string): boolean;
 	nameExists(name: string): boolean;
 	set(name: string, value: IValue): IValue;
-	createValue(name: string, storeName?:string): IValue;
+	createValue(name: string, storeName?: string): IValue;
 	get(name: string): IValue;
 }
 
@@ -21,6 +24,8 @@ export class Scope implements IScope {
 	valueMap: TValueMap;
 	superMap: TValueMap;
 	stacked: boolean;
+	breakAddressLine: AddressLine;
+	continueAddressLine: AddressLine;
 
 	constructor(values: TValueMap, superValues: TValueMap, stacked: boolean) {
 		this.accIndex = 0;
@@ -28,13 +33,17 @@ export class Scope implements IScope {
 		this.superMap = superValues;
 		this.stacked = stacked;
 	}
+	
 
 	static createRoot(superValues: TValueMap) {
 		return new this({}, superValues, false);
 	}
 
 	extend(stacked?: boolean): IScope {
-		return new Scope({}, this.valueMap, stacked ?? this.stacked);
+		const scope = new Scope({}, { ...this.valueMap, ...this.superMap }, stacked ?? this.stacked);
+		scope.breakAddressLine = this.breakAddressLine
+		scope.continueAddressLine = this.continueAddressLine
+		return scope
 	}
 
 	nameExistsInCurrent(name: string) {
@@ -54,7 +63,7 @@ export class Scope implements IScope {
 	}
 
 	createValue(name: string, storeName?: string) {
-		if (this.stacked) return this.set(name, new StackValue(this));
+		if (this.stacked) return //this.set(name, new StackValue(this));
 		return this.set(name, new StoreValue(this, storeName ?? name));
 	}
 
