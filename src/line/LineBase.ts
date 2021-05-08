@@ -15,7 +15,7 @@ export class LineBase implements ILine {
         return this
     }
 	processAddressLine(addr: number) {
-        for (const literal of this.literals) literal.data["std::literal"] = addr
+        for (const literal of this.literals) literal.data["std::compileOperational"] = addr
     }
 	serialize(): string {
 		return this.args.filter((v) => v).join(" ");

@@ -15,6 +15,6 @@ export class LiteralValue extends CompileOperational(Value) {
 	}
 	constructor(scope: IScope, value: TLiteral) {
 		super(scope);
-		this.data["std::literal"] = value;
+		this.data[compileOperationalName] = value;
 	}
 }
