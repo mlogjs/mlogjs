@@ -1,4 +1,4 @@
-# mlogcc v0.0.2
+# mlogcc v0.0.1
 
 Mlogcc is a compiler that compiles Javascript code into Mindustry logic code.
 
