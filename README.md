@@ -2,6 +2,15 @@
 
 Mlogcc is a compiler that compiles Javascript code into Mindustry logic code.
 
+## Discord
+
+You can join my discord server for more information on this compiler. 
+I will also host polls on features to support.
+
+https://discord.gg/98KWSSUPVj
+
+Thank you!
+
 ## Installation
 
 `npm i -g mlogcc`
