@@ -34,7 +34,6 @@ export class Compiler {
 
 	protected serialize(resLines: TValueInstructions) {
 		const [_, lines] = resLines;
-		console.log(lines);
 		return lines.filter((l) => !l.hidden).join("\n");
 	}
 

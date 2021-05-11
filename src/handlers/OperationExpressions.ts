@@ -10,8 +10,8 @@ export const LRExpression: THandler = (
 		operator: AssignementOperator | BinaryOperator | LogicalOperator;
 	}
 ) => {
-	const [left, leftInst] = c.handleEvaluate(scope, node.left);
-	const [right, rightInst] = c.handleEvaluate(scope, node.right);
+	const [left, leftInst] = c.handle(scope, node.left);
+	const [right, rightInst] = c.handle(scope, node.right);
 	const [op, opInst] = left[node.operator](scope, right);
 	return [op, [...leftInst, ...rightInst, ...opInst]];
 };
@@ -21,7 +21,7 @@ export const LogicalExpression: THandler = LRExpression;
 export const AssignmentExpression: THandler = LRExpression;
 
 export const UnaryExpression: THandler = (c, scope, { argument, operator }: es.UnaryExpression) => {
-	const [arg, argInst] = c.handleEvaluate(scope, argument);
+	const [arg, argInst] = c.handle(scope, argument);
 	const [op, opInst] = arg[operator.length === 1 ? "+" : "" + operator](scope);
 	return [op, [...argInst, ...opInst]];
 };
@@ -30,7 +30,7 @@ export const UpdateExpression: THandler = (
 	scope,
 	{ argument, operator, prefix }: es.UpdateExpression
 ) => {
-	const [arg, argInst] = c.handleEvaluate(scope, argument);
+	const [arg, argInst] = c.handle(scope, argument);
 	const [op, opInst] = arg[operator](scope, prefix);
 	return [op, [...argInst, ...opInst]];
 };

@@ -1,13 +1,12 @@
 import { Compiler } from "./Compiler";
 
 const code = `
-const hello = function (a,b,c) {
 
-}
-function hello() {
-
-}
-
+let i = 0
+i++
+i++
+i++
+i += i + i + i
 `;
 
 console.log(new Compiler().compile(code));

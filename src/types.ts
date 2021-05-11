@@ -22,11 +22,12 @@ export interface IInstruction {
 }
 
 export interface IScope {
+	name: string
 	breakAddressResolver: AddressResolver;
 	continueAddressResolver: AddressResolver;
 	tempIndex: number;
 	createScope(): IScope;
-	createFunction(stacked?: boolean): IScope;
+	createFunction(name: string, stacked?: boolean): IScope;
 	has(name: string): boolean;
 	get(name: string): TValue;
 	set(name: string, value: TValue): TValue;

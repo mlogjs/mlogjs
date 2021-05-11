@@ -1,4 +1,3 @@
-import { TResLines } from "../../temp/line";
 import { THandler, es, TValueInstructions } from "../types";
 
 export const VariableDeclaration: THandler = (c, scope, node: es.VariableDeclaration) => {
@@ -17,13 +16,12 @@ export const VariableDeclarator: THandler = (
 	const { name } = node.id as es.Identifier;
 	const [init] = valinst;
 	if (kind === "const" && !init) throw Error("Cannot create constant with void value.");
-	console.log("init", init, "kind", kind)
 	if (kind === "const" && init.constant) {
 		scope.set(name, init);
 		return [init, []];
 	} else {
 		const { line, column } = node.loc.start;
-		const value = scope.make(name, [name, line, column].join(":"));
+		const value = scope.make(name, line + ":" + column);
 		if (init) valinst[1].push(...value["="](scope, valinst[0])[1]);
 		if (kind === "const") value.constant = true;
 		return valinst;

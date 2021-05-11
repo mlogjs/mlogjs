@@ -4,6 +4,7 @@ import { IScope, TValue } from "./types";
 
 export class Scope implements IScope {
 	parent: Scope;
+	name: string
 	values: { [k: string]: TValue };
 	stacked: boolean = false;
 	tempIndex: number = 0;
@@ -13,21 +14,23 @@ export class Scope implements IScope {
 		values: { [k: string]: TValue },
 		parent: Scope = null,
 		stacked = false,
-		tempIndex = 0
+		tempIndex = 0,
+		name=""
 	) {
 		this.values = values;
 		this.parent = parent;
 		this.stacked = stacked;
 		this.tempIndex = tempIndex;
+		this.name = name
 	}
 	make(name: string, storeName: string): TValue {
 		return this.set(name, this.stacked ? null : new StoreValue(this, storeName))
 	}
 	createScope(): IScope {
-		return new Scope({}, this, this.stacked, this.tempIndex);
+		return new Scope({}, this, this.stacked, this.tempIndex, this.name);
 	}
-	createFunction(stacked?: boolean): IScope {
-		return new Scope({}, this, stacked ?? this.stacked, this.tempIndex);
+	createFunction(name: string, stacked?: boolean): IScope {
+		return new Scope({}, this, stacked ?? this.stacked, 0, name);
 	}
 	has(name: string): boolean {
 		if (name in this.values) return true;

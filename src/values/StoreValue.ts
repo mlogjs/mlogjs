@@ -12,8 +12,7 @@ export class StoreValue extends BaseValue implements TValue {
 	"="(scope: IScope, value: TValue): TValueInstructions {
 		if (this.constant) throw new Error(`Cannot assign to unmutable store '${this.name}'.`);
 		if (value instanceof TempValue) {
-			value.eval(scope)
-			value.name = this.name;
+			value.toStore(this.name)
 			return [this, []];
 		}
 		const [evalValue, evalInst] = value.eval(scope)
