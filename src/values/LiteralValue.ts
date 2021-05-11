@@ -1,10 +1,9 @@
-import { IScope, TValue, TValueInstructions } from "../types";
+import { IScope, TBindableValue, TLiteral, TValueInstructions } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 
-export type TLiteral = string | number;
 
-export class LiteralValue extends BaseValue implements TValue {
+export class LiteralValue extends BaseValue implements TBindableValue {
 	data: TLiteral;
 	constant = true
 	constructor(scope: IScope, data: TLiteral) {

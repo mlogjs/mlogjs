@@ -1,4 +1,5 @@
 import { THandler, es, TValueInstructions } from "../types";
+import { nodeName } from "../utils";
 
 export const VariableDeclaration: THandler = (c, scope, node: es.VariableDeclaration) => {
 	return c.handleMany(scope, node.declarations, (scope, child) =>
@@ -20,8 +21,7 @@ export const VariableDeclarator: THandler = (
 		scope.set(name, init);
 		return [init, []];
 	} else {
-		const { line, column } = node.loc.start;
-		const value = scope.make(name, line + ":" + column);
+		const value = scope.make(name, nodeName(node));
 		if (init) valinst[1].push(...value["="](scope, valinst[0])[1]);
 		if (kind === "const") value.constant = true;
 		return valinst;

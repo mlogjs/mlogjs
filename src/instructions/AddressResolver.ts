@@ -1,22 +1,19 @@
 import { InstructionBase } from ".";
-import { IScope } from "../types";
-import { LiteralValue } from "../values";
+import { IInstruction, IScope, TBindableValue } from "../types";
 
 export class AddressResolver extends InstructionBase {
-    bindReturn(scope: IScope): import("../types").IInstruction {
-        throw new Error("Method not implemented.");
-    }
+    
     hidden = true
-    literals : LiteralValue[]
-    constructor(...literals: LiteralValue[]) {
+    bonds : TBindableValue[]
+    constructor(...bonds: TBindableValue[]) {
         super()
-        this.literals = literals
+        this.bonds = bonds
     }
     resolve(i: number) {
-        for (const literal of this.literals) literal.data = i
+        for (const literal of this.bonds) literal.data = i
     }
-    bind(literal: LiteralValue) {
-        this.literals.push(literal)
+    bind(bond: TBindableValue) {
+        this.bonds.push(bond)
     }
     bindBreak(scope: IScope) {
 		scope.breakAddressResolver = this
@@ -26,4 +23,7 @@ export class AddressResolver extends InstructionBase {
         scope.continueAddressResolver = this
         return this
 	}
+    bindReturn(scope: IScope): IInstruction {
+        throw new Error("Method not implemented.");
+    }
 }

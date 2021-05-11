@@ -1,8 +1,8 @@
 import { InstructionBase } from ".";
-import { TValue } from "../types";
+import { IValue } from "../types";
 
 export class SetInstruction extends InstructionBase{
-    constructor(store: TValue, value: TValue) {
+    constructor(store: IValue, value: IValue) {
         super("set", store, value)
     }
 }

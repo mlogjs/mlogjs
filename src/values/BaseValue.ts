@@ -6,10 +6,10 @@ import {
 	UnaryOperator,
 	updateOperators,
 } from "../operators";
-import { IScope, TValue, TValueInstructions } from "../types";
+import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, TempValue, VoidValue } from ".";
 
-export class BaseValue extends VoidValue implements TValue {
+export class BaseValue extends VoidValue implements IValue {
 	constant = false;
 	"u-"(scope: IScope): TValueInstructions {
 		const [that, inst] = this.eval(scope);
@@ -51,7 +51,7 @@ for (const key in operatorMap) {
 	BaseValue.prototype[key] = function (
 		this: BaseValue,
 		scope: IScope,
-		value: TValue
+		value: IValue
 	): TValueInstructions {
 		const [left, leftInst] = this.eval(scope);
 		const [right, rightInst] = value.eval(scope);
@@ -96,9 +96,9 @@ const assignmentToBinary: { [k in AssignementOperator]?: BinaryOperator|LogicalO
 
 for (const op in assignmentToBinary) {
 	BaseValue.prototype[op] = function (
-		this: TValue,
+		this: IValue,
 		scope: IScope,
-		value: TValue
+		value: IValue
 	): TValueInstructions {
 		const [opValue, opInst] = this[assignmentToBinary[op]](scope, value)
 		const [retValue, retInst] = this["="](scope, opValue)
@@ -108,7 +108,7 @@ for (const op in assignmentToBinary) {
 
 for (const key of updateOperators) {
 	BaseValue.prototype[key] = function (
-		this: TValue,
+		this: IValue,
 		scope: IScope,
 		prefix: boolean
 	): TValueInstructions {

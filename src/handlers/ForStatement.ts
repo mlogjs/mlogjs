@@ -8,7 +8,7 @@ export const ForStatement: THandler = (c, scope, node: es.ForStatement) => {
 
 	const initInst = node.init ? c.handle(scope, node.init)[1] : [];
 	const [test, testLines] = node.test
-		? c.handleEvaluate(scope, node.test)
+		? c.handleEval(scope, node.test)
 		: [new LiteralValue(scope, 1), []];
 	const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
 	const startLoopAddr = new LiteralValue(scope, null);

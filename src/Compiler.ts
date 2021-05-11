@@ -2,6 +2,7 @@ import { es, IScope, THandler, TValueInstructions } from "./types";
 import * as handlers from "./handlers"
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
+import { Scope } from "./Scope";
 
 type THandlerMap = {[k in es.Node["type"]]?: THandler};
 
@@ -17,24 +18,25 @@ export class Compiler {
 
 	compile(script: string): string {
 		const program = this.parse(script);
-		const resLines = this.handle(null, program);
-		resLines[1].push(new EndInstruction());
-		console.log(resLines);
-		this.resolve(resLines);
-		return this.serialize(resLines);
+		const scope = new Scope({})
+		const valueInst = this.handle(scope, program);
+		valueInst[1].push(new EndInstruction(), ...scope.extraInstructions);
+		console.log(valueInst[1]);
+		this.resolve(valueInst);
+		return this.serialize(valueInst);
 	}
 
-	protected resolve(resLines: TValueInstructions) {
+	protected resolve(valueInst: TValueInstructions) {
 		let i = 0;
-		for (const line of resLines[1]) {
-			line.resolve(i);
-			if (!line.hidden) i++;
+		for (const inst of valueInst[1]) {
+			inst.resolve(i);
+			if (!inst.hidden) i++;
 		}
 	}
 
 	protected serialize(resLines: TValueInstructions) {
-		const [_, lines] = resLines;
-		return lines.filter((l) => !l.hidden).join("\n");
+		const [_, inst] = resLines;
+		return inst.filter((l) => !l.hidden).join("\n");
 	}
 
 	protected parse(script: string) {
@@ -47,10 +49,10 @@ export class Compiler {
 		return handler(this, scope, node, null);
 	}
 
-	handleEvaluate(scope: IScope, node: es.Node): TValueInstructions {
-		const [res, lines] = this.handle(scope, node);
+	handleEval(scope: IScope, node: es.Node): TValueInstructions {
+		const [res, inst] = this.handle(scope, node);
 		const [evaluated, evaluatedLines] = res.eval(scope);
-		return [evaluated, [...lines, ...evaluatedLines]];
+		return [evaluated, [...inst, ...evaluatedLines]];
 	}
 
 	handleMany(

@@ -1,5 +1,5 @@
-import { THandler, es } from "../types";
-import { LiteralValue, TLiteral } from "../values";
+import { THandler, es, TLiteral } from "../types";
+import { LiteralValue } from "../values";
 
 export const Literal: THandler = (c, scope, node: es.Literal) => {
 	const { value } = node;

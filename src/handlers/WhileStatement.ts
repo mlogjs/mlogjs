@@ -6,7 +6,7 @@ import { LiteralValue } from "../values";
 
 export const WhileStatement: THandler = (c, scope, node: es.WhileStatement) => {
 	const lines : IInstruction[] = [];
-	const [test, testLines] = c.handleEvaluate(scope, node.test);
+	const [test, testLines] = c.handleEval(scope, node.test);
 
 	const startLoopAddr = new LiteralValue(scope, null);
 	const endLoopAddr = new LiteralValue(scope, null);
