@@ -27,7 +27,7 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 		...c.handle(scope, body)[1],
         
 	);
-    
+
     const lastInst = scope.extraInstructions.slice(-1)[0]
     if (!(lastInst instanceof SetCounterInstruction) || lastInst.args[2] !== ret) {
         scope.extraInstructions.push(new SetCounterInstruction(ret))
@@ -35,3 +35,7 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 
 	return [new FunctionValue(scope, fnParams, addr, temp, ret), []];
 };
+
+export const FunctionDeclaration: THandler = (c, scope, node: es.FunctionDeclaration) => {
+    return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []]
+}
