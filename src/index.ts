@@ -2,9 +2,9 @@ import { Compiler } from "./Compiler";
 
 const code = `
 const a = {
-    hello: 1
+    $eval: () => {}
 }
-let b = a["hello"]
+let b = a()
 `;
 
 console.log(new Compiler().compile(code));

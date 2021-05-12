@@ -7,9 +7,12 @@ export const ObjectExpression: THandler = (c, scope, node: es.ObjectExpression) 
 	const inst = [];
 	for (const prop of node.properties as es.Property[]) {
 		if (prop.computed) throw new Error("Cannot handle computed property.");
-		const key = prop.key as es.Identifier;
-		const [member, memberInst] = c.handleEval(scope, prop.value);
-		data[key.name] = member;
+        const {key, value} = prop
+        let index: string
+        if (key.type === "Identifier") index = key.name
+        else if (key.type === "Literal") index = "" + key.value
+		const [member, memberInst] = c.handleEval(scope, value);
+		data[index] = member;
 		inst.push(...memberInst);
 	}
 	return [new ObjectValue(scope, data), inst];
