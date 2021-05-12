@@ -1,9 +1,10 @@
 import { Compiler } from "./Compiler";
 
 const code = `
-const a = (a,b,c) => {
-    return a + b + c
+const a = {
+    hello: 1
 }
+let b = a["hello"]
 `;
 
 console.log(new Compiler().compile(code));

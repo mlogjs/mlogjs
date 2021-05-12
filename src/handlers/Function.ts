@@ -1,7 +1,4 @@
-import {
-	AddressResolver,
-	SetCounterInstruction,
-} from "../instructions";
+import { AddressResolver, SetCounterInstruction } from "../instructions";
 import { THandler, es, IInstruction } from "../types";
 import { nodeName } from "../utils";
 import { LiteralValue, StoreValue } from "../values";
@@ -33,9 +30,7 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 		inst.push(new SetCounterInstruction(ret));
 	}
 
-	inst.forEach((v) => 
-		v.hidden = true
-	);
+	inst.forEach((v) => (v.hidden = true));
 	scope.extraInstructions.push(...inst);
 	return [new FunctionValue(scope, fnParams, addr, temp, ret, inst), []];
 };
@@ -44,4 +39,4 @@ export const FunctionDeclaration: THandler = (c, scope, node: es.FunctionDeclara
 	return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []];
 };
 
-export const ArrowFunctionExpression: THandler = FunctionExpression
+export const ArrowFunctionExpression: THandler = FunctionExpression;
