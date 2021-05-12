@@ -1,9 +1,13 @@
-import { AddressResolver, EJumpKind, JumpInstruction, SetCounterInstruction } from "../instructions";
-import { THandler, es } from "../types";
+import {
+	AddressResolver,
+	EJumpKind,
+	JumpInstruction,
+	SetCounterInstruction,
+} from "../instructions";
+import { THandler, es, IInstruction } from "../types";
 import { nodeName } from "../utils";
 import { LiteralValue, StoreValue } from "../values";
 import { FunctionValue } from "../values/FunctionValue";
-
 
 export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpression) => {
 	const name = nodeName(node);
@@ -19,23 +23,25 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 	const temp = new StoreValue(scope, "f" + name);
 	const ret = new StoreValue(scope, "r" + name);
 
-    scope.fnRet = ret
-    scope.fnTemp = temp
+	scope.fnRet = ret;
+	scope.fnTemp = temp;
 
-	scope.extraInstructions.push(
-        new AddressResolver(addr),
-		...c.handle(scope, body)[1],
-        
+	const inst: IInstruction[] = [];
+
+	inst.push(new AddressResolver(addr), ...c.handle(scope, body)[1]);
+
+	const lastInst = inst.slice(-1)[0];
+	if (!(lastInst instanceof SetCounterInstruction) || lastInst.args[2] !== ret) {
+		inst.push(new SetCounterInstruction(ret));
+	}
+
+	inst.forEach((v) => 
+		v.hidden = true
 	);
-
-    const lastInst = scope.extraInstructions.slice(-1)[0]
-    if (!(lastInst instanceof SetCounterInstruction) || lastInst.args[2] !== ret) {
-        scope.extraInstructions.push(new SetCounterInstruction(ret))
-    }
-
-	return [new FunctionValue(scope, fnParams, addr, temp, ret), []];
+	scope.extraInstructions.push(...inst);
+	return [new FunctionValue(scope, fnParams, addr, temp, ret, inst), []];
 };
 
 export const FunctionDeclaration: THandler = (c, scope, node: es.FunctionDeclaration) => {
-    return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []]
-}
+	return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []];
+};

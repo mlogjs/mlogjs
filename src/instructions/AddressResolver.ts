@@ -2,8 +2,11 @@ import { InstructionBase } from ".";
 import { IInstruction, IScope, TBindableValue } from "../types";
 
 export class AddressResolver extends InstructionBase {
-    
-    hidden = true
+    public get hidden() {
+        return true
+    }
+    public set hidden(value) {
+    }
     bonds : TBindableValue[]
     constructor(...bonds: TBindableValue[]) {
         super()

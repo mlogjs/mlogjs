@@ -1,7 +1,13 @@
 import { IInstruction, IValue } from "../types";
 
 export class InstructionBase implements IInstruction {
-	hidden = false;
+	private _hidden = false;
+    public get hidden() {
+        return this._hidden;
+    }
+    public set hidden(value) {
+        this._hidden = value;
+    }
 	args: (string | IValue)[];
     constructor(...args: (string | IValue)[]) {
         this.args = args
