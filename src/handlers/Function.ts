@@ -1,7 +1,5 @@
 import {
 	AddressResolver,
-	EJumpKind,
-	JumpInstruction,
 	SetCounterInstruction,
 } from "../instructions";
 import { THandler, es, IInstruction } from "../types";
@@ -45,3 +43,5 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 export const FunctionDeclaration: THandler = (c, scope, node: es.FunctionDeclaration) => {
 	return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []];
 };
+
+export const ArrowFunctionExpression: THandler = FunctionExpression

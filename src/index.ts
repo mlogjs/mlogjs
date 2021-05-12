@@ -1,7 +1,7 @@
 import { Compiler } from "./Compiler";
 
 const code = `
-const a = function (a,b,c) {
+const a = (a,b,c) => {
     return a + b + c
 }
 `;
