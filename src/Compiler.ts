@@ -20,7 +20,7 @@ export class Compiler {
 		const program = this.parse(script);
 		const scope = new Scope({})
 		const valueInst = this.handle(scope, program);
-		valueInst[1].push(new EndInstruction(), ...scope.extraInstructions);
+		valueInst[1].push(new EndInstruction(), ...scope.inst);
 		console.log(valueInst[1]);
 		this.resolve(valueInst);
 		return this.serialize(valueInst);

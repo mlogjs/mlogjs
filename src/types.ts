@@ -24,12 +24,11 @@ export interface IInstruction {
 
 export interface IScope {
 	name: string;
-	extraInstructions: IInstruction[];
-	breakAddressResolver: AddressResolver;
-	continueAddressResolver: AddressResolver;
-	fnRet: IValue;
-	fnTemp: IValue;
-	tempIndex: number;
+	inst: IInstruction[];
+	break: AddressResolver;
+	continue: AddressResolver;
+	function: IFunctionValue
+	ntemp: number;
 	createScope(): IScope;
 	createFunction(name: string, stacked?: boolean): IScope;
 	has(name: string): boolean;
@@ -55,8 +54,12 @@ export type IValue = { [k in UnaryOperator]?: (scope: IScope) => TValueInstructi
 	};
 
 export type TLiteral = string | number;
-export interface TBindableValue extends IValue {
+export interface IBindableValue extends IValue {
 	data: TLiteral;
+}
+
+export interface IFunctionValue extends IValue {
+	return(scope: IScope, argument: IValue): TValueInstructions
 }
 
 export type TValueInstructions = [IValue, IInstruction[]];

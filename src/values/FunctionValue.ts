@@ -1,10 +1,10 @@
 import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
-import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
+import { IFunctionValue, IInstruction, IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 import { VoidValue } from "./VoidValue";
 
-export class FunctionValue extends VoidValue {
+export class FunctionValue extends VoidValue implements IFunctionValue {
 	params: StoreValue[]
 	addr: LiteralValue;
 	temp: StoreValue;
@@ -20,6 +20,9 @@ export class FunctionValue extends VoidValue {
 		this.temp = temp
 		this.ret = ret
 		this.inst = inst
+	}
+	return(scope: IScope, argument: IValue): TValueInstructions {
+		throw new Error("Method not implemented.");
 	}
 
 	call(scope: IScope, args: IValue[]): TValueInstructions {

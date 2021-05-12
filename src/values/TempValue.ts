@@ -6,11 +6,11 @@ export class TempValue extends StoreValue {
 	setInstruction: SetInstruction;
 
 	constructor(scope: IScope) {
-		super(scope, "t" + scope.tempIndex + (scope.name ? ":" + scope.name : ""));
-		scope.tempIndex++;
+		super(scope, "t" + scope.ntemp + (scope.name ? ":" + scope.name : ""));
+		scope.ntemp++;
 	}
 	eval(scope: IScope): TValueInstructions {
-		scope.tempIndex--;
+		scope.ntemp--;
 		if (this.setInstruction) this.setInstruction.hidden = false;
 		return super.eval(scope);
 	}

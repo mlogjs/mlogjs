@@ -1,5 +1,5 @@
 import { InstructionBase } from ".";
-import { IInstruction, IScope, TBindableValue } from "../types";
+import { IInstruction, IScope, IBindableValue } from "../types";
 
 export class AddressResolver extends InstructionBase {
     public get hidden() {
@@ -7,23 +7,23 @@ export class AddressResolver extends InstructionBase {
     }
     public set hidden(value) {
     }
-    bonds : TBindableValue[]
-    constructor(...bonds: TBindableValue[]) {
+    bonds : IBindableValue[]
+    constructor(...bonds: IBindableValue[]) {
         super()
         this.bonds = bonds
     }
     resolve(i: number) {
         for (const literal of this.bonds) literal.data = i
     }
-    bind(bond: TBindableValue) {
+    bind(bond: IBindableValue) {
         this.bonds.push(bond)
     }
     bindBreak(scope: IScope) {
-		scope.breakAddressResolver = this
+		scope.break = this
         return this
 	}
 	bindContinue(scope: IScope) {
-        scope.continueAddressResolver = this
+        scope.continue = this
         return this
 	}
     bindReturn(scope: IScope): IInstruction {

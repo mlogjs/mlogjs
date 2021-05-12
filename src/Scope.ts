@@ -1,18 +1,17 @@
 import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
-import { IInstruction, IScope, IValue } from "./types";
+import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 
 export class Scope implements IScope {
 	parent: IScope;
 	name: string;
 	values: { [k: string]: IValue };
 	stacked: boolean = false;
-	tempIndex: number = 0;
-	extraInstructions: IInstruction[];
-	breakAddressResolver: AddressResolver;
-	continueAddressResolver: AddressResolver;
-	fnRet: IValue;
-	fnTemp: IValue;
+	ntemp: number = 0;
+	inst: IInstruction[];
+	break: AddressResolver;
+	continue: AddressResolver;
+	function: IFunctionValue;
 	constructor(
 		values: { [k: string]: IValue },
 		parent: IScope = null,
@@ -24,30 +23,22 @@ export class Scope implements IScope {
 		this.values = values;
 		this.parent = parent;
 		this.stacked = stacked;
-		this.tempIndex = tempIndex;
+		this.ntemp = tempIndex;
 		this.name = name;
-		this.extraInstructions = inst;
+		this.inst = inst;
 	}
 	make(name: string, storeName: string): IValue {
 		return this.set(name, this.stacked ? null : new StoreValue(this, storeName));
 	}
 	createScope(): IScope {
-		const scope = new Scope(
-			{},
-			this,
-			this.stacked,
-			this.tempIndex,
-			this.name,
-			this.extraInstructions
-		);
-		scope.breakAddressResolver = this.breakAddressResolver;
-		scope.continueAddressResolver = this.continueAddressResolver;
-		scope.fnRet = this.fnRet
-		scope.fnTemp = this.fnTemp
+		const scope = new Scope({}, this, this.stacked, this.ntemp, this.name, this.inst);
+		scope.break = this.break;
+		scope.continue = this.continue;
+		scope.function = this.function;
 		return scope;
 	}
 	createFunction(name: string, stacked?: boolean): IScope {
-		return new Scope({}, this, stacked ?? this.stacked, 0, name, this.extraInstructions);
+		return new Scope({}, this, stacked ?? this.stacked, 0, name, this.inst);
 	}
 	has(name: string): boolean {
 		if (name in this.values) return true;

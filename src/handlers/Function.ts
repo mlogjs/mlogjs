@@ -4,10 +4,20 @@ import { nodeName } from "../utils";
 import { LiteralValue, StoreValue } from "../values";
 import { FunctionValue } from "../values/FunctionValue";
 
-export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpression) => {
+export const ArrowFunctionExpression: THandler = (c, scope, node: es.ArrowFunctionExpression) => {
+
+	if (node.generator) return 
+
 	const name = nodeName(node);
 	scope = scope.createFunction(name);
-	const { params, body } = node;
+	let { params, body } = node;
+
+	if (node.expression) {
+		body = {
+			type: "BlockStatement",
+			body: [{ type: "ReturnStatement", argument: body as es.Expression }],
+		};
+	}
 
 	const fnParams = params.map((v) => {
 		const id = v as es.Identifier;
@@ -17,9 +27,6 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 	const addr = new LiteralValue(scope, null);
 	const temp = new StoreValue(scope, "f" + name);
 	const ret = new StoreValue(scope, "r" + name);
-
-	scope.fnRet = ret;
-	scope.fnTemp = temp;
 
 	const inst: IInstruction[] = [];
 
@@ -31,12 +38,13 @@ export const FunctionExpression: THandler = (c, scope, node: es.FunctionExpressi
 	}
 
 	inst.forEach((v) => (v.hidden = true));
-	scope.extraInstructions.push(...inst);
-	return [new FunctionValue(scope, fnParams, addr, temp, ret, inst), []];
+	scope.inst.push(...inst);
+	scope.function = new FunctionValue(scope, fnParams, addr, temp, ret, inst)
+	return [scope.function, []];
 };
 
 export const FunctionDeclaration: THandler = (c, scope, node: es.FunctionDeclaration) => {
-	return [scope.set(node.id.name, FunctionExpression(c, scope, node, null)[0]), []];
+	return [scope.set(node.id.name, ArrowFunctionExpression(c, scope, node, null)[0]), []];
 };
 
-export const ArrowFunctionExpression: THandler = FunctionExpression;
+export const FunctionExpression: THandler = ArrowFunctionExpression;

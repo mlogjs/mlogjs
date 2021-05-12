@@ -1,5 +1,5 @@
 
-import { TBindableValue, IValue } from "../types"
+import { IBindableValue, IValue } from "../types"
 import { InstructionBase } from "./InstructionBase"
 
 export enum EJumpKind {
@@ -14,7 +14,7 @@ export enum EJumpKind {
 }
 
 export class JumpInstruction extends InstructionBase {
-    constructor(address: TBindableValue, kind: EJumpKind, left?: IValue, right?:IValue) {
+    constructor(address: IBindableValue, kind: EJumpKind, left?: IValue, right?:IValue) {
         super("jump",address, kind, left, right)
     }
 }
