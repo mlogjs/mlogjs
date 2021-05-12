@@ -10,7 +10,6 @@ import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, TempValue, VoidValue } from ".";
 
 export class BaseValue extends VoidValue implements IValue {
-	constant = false;
 	"u-"(scope: IScope): TValueInstructions {
 		const [that, inst] = this.eval(scope);
 		const temp = null;

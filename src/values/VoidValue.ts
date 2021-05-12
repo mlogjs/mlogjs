@@ -3,7 +3,8 @@ import { operators } from "../operators";
 
 export class VoidValue implements IValue {
 	scope: IScope;
-	constant = true
+	constant = false
+	macro = false
 	constructor(scope: IScope) {
 		this.scope = scope;
 	}

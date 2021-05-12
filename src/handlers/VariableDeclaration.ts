@@ -22,7 +22,10 @@ export const VariableDeclarator: THandler = (
 		return [init, []];
 	} else {
 		const value = scope.make(name, nodeName(node));
-		if (init) valinst[1].push(...value["="](scope, valinst[0])[1]);
+		if (init) {
+			if (init.macro) throw new Error("Macro value must be constant.");
+			valinst[1].push(...value["="](scope, valinst[0])[1]);
+		}
 		if (kind === "const") value.constant = true;
 		return valinst;
 	}

@@ -9,6 +9,8 @@ export class FunctionValue extends VoidValue implements VoidValue {
 	addr: LiteralValue;
 	temp: StoreValue;
 	ret: StoreValue;
+	constant = true
+	macro = true
 	
 	constructor(scope: IScope, params: StoreValue[], addr: LiteralValue, temp: StoreValue, ret: StoreValue) {
 		super(scope);

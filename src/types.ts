@@ -48,6 +48,7 @@ export type IValue = { [k in UnaryOperator]?: (scope: IScope) => TValueInstructi
 	} & {
 		scope: IScope;
 		constant: boolean;
+		macro: boolean;
 		eval(scope: IScope): TValueInstructions;
 		call(scope: IScope, args: IValue[]): TValueInstructions;
 		get(scope: IScope, name: IValue): TValueInstructions;
