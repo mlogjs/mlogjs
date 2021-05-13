@@ -23,6 +23,8 @@ export interface IInstruction {
 
 
 export interface IScope {
+	parent: IScope;
+	data: {};
 	name: string;
 	inst: IInstruction[];
 	break: AddressResolver;
@@ -34,7 +36,9 @@ export interface IScope {
 	has(name: string): boolean;
 	get(name: string): IValue;
 	set(name: string, value: IValue): IValue;
+	hardSet(name: string, value: IValue): IValue;
 	make(name: string, storeName: string): IValue;
+	copy(): IScope
 }
 
 export type IValue = { [k in UnaryOperator]?: (scope: IScope) => TValueInstructions } &

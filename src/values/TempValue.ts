@@ -21,6 +21,7 @@ export class TempValue extends StoreValue {
 		return [this, [...evalInst, this.setInstruction]];
 	}
 	toStore(name: string) {
+		if (this.setInstruction) this.setInstruction.hidden = false;
 		this.name = name;
 		this.eval = super.eval;
 		this["="] = super["="];

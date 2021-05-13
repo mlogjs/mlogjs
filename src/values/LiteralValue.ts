@@ -50,12 +50,6 @@ const operatorMap: { [k in BinaryOperator | LogicalOperator]?: TOperationFn } = 
 	"||": (a, b) => +(a || b),
 } as const;
 
-const unaryOperatorMap: { [k in UnaryOperator]?: TOperationFn } = {
-	"!": (v) => +!v,
-	"~": (v) => ~v,
-	"u-": (v) => -v,
-} as const;
-
 for (const key in operatorMap) {
 	const fn = operatorMap[key] as TOperationFn;
 	LiteralValue.prototype[key] = function (
@@ -63,10 +57,19 @@ for (const key in operatorMap) {
 		scope: IScope,
 		value: LiteralValue
 	): TValueInstructions {
-		if (!(value instanceof LiteralValue)) return BaseValue.prototype[key](scope, value);
+		if (!(value instanceof LiteralValue)) {
+			console.log(this, "using super method because not instance of LiteralValue", value)
+			return BaseValue.prototype[key](scope, value)
+		};
 		return [new LiteralValue(scope, fn(this.num, value.num)), []];
 	};
 }
+
+const unaryOperatorMap: { [k in UnaryOperator]?: TOperationFn } = {
+	"!": (v) => +!v,
+	"~": (v) => ~v,
+	"u-": (v) => -v,
+} as const;
 
 for (const key in unaryOperatorMap) {
 	LiteralValue.prototype[key] = function (this: LiteralValue, scope: IScope): TValueInstructions {
