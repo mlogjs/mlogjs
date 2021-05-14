@@ -1,0 +1,1 @@
+{"version":3,"file":"SetCounterInstruction.js","sourceRoot":"","sources":["../../src/instructions/SetCounterInstruction.ts"],"names":[],"mappings":";;;AAAA,wBAAoC;AAGpC,MAAa,qBAAsB,SAAQ,kBAAe;IACzD,YAAY,KAAa;QACxB,KAAK,CAAC,KAAK,EAAE,UAAU,EAAE,KAAK,CAAC,CAAC;IACjC,CAAC;CACD;AAJD,sDAIC"}

@@ -1,6 +1,3 @@
-import { Compiler } from "./Compiler";
-import {readFileSync} from "fs"
-
-const code = readFileSync("samples/templates.js", {encoding: "utf8"})
-
-console.log(new Compiler().compile(code))
+import {Compiler} from "./Compiler"
+const compiler = new Compiler()
+export const compile = (script: string) => compiler.compile(script)
