@@ -21,27 +21,36 @@ const mathOperations: { [k: string]: (a: number, b?: number) => number } = {
 	rand: null,
 };
 
-function createMacroMathOperations (scope: IScope) {
-
-    const macroMathOperations = {}
-    for (const key in mathOperations) {
-        const fn = mathOperations[key]
-        macroMathOperations[key] = new MacroFunction(scope, (a, b) => {
-            if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
-                if (typeof a.data !== "number" || typeof a.data !== "number") throw new Error("Cannot do math operation with non-numerical literals.")
-                return [new LiteralValue(scope, fn(a.num, b.num)), []]
-            }
-            const temp = new TempValue(scope)
-            return [temp, [new OperationInstruction(key, temp, a, b)]]
-        })
-    }
-    return macroMathOperations
+function createMacroMathOperations(scope: IScope) {
+	const macroMathOperations = {};
+	for (const key in mathOperations) {
+		const fn = mathOperations[key];
+		macroMathOperations[key] = new MacroFunction(scope, (a, b) => {
+			if (b) {
+				if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
+					if (typeof a.data !== "number" || typeof b.data !== "number")
+						throw new Error("Cannot do math operation with non-numerical literals.");
+					return [new LiteralValue(scope, fn(a.num, b.num)), []];
+				}
+				const temp = new TempValue(scope);
+				return [temp, [new OperationInstruction(key, temp, a, b)]];
+			}
+			if (fn && a instanceof LiteralValue) {
+				if (typeof a.data !== "number")
+					throw new Error("Cannot do math operation with non-numerical literal.");
+				return [new LiteralValue(scope, fn(a.num)), []];
+			}
+			const temp = new TempValue(scope);
+			return [temp, [new OperationInstruction(key, temp, a, b)]];
+		});
+	}
+	return macroMathOperations;
 }
 
 export class MlogMath extends ObjectValue {
-    constructor(scope: IScope) {
-        super(scope, createMacroMathOperations(scope))
-    }
+	constructor(scope: IScope) {
+		super(scope, createMacroMathOperations(scope));
+	}
 }
 
 // op angle result a b

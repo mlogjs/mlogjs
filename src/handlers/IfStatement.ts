@@ -15,7 +15,7 @@ export const IfStatement : THandler = (c, scope, node: es.IfStatement) => {
     const endIfAddr = new LiteralValue(scope, null)
     inst.push(
         ...testInst,
-        new JumpInstruction(endIfAddr, EJumpKind.NotEqual, test, new LiteralValue(scope, 0)),
+        new JumpInstruction(endIfAddr, EJumpKind.Equal, test, new LiteralValue(scope, 0)),
         ...c.handle(scope, node.consequent)[1],
         new AddressResolver(endIfAddr)
     )

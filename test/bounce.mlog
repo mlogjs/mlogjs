@@ -1,0 +1,23 @@
+set 5:4 88
+set 6:4 88
+set 8:4 0
+set 9:4 2
+draw color 255 255 255
+op lessThan t0 5:4 0
+op greaterThan t1 5:4 176
+op or t0 t0 t1
+jump 10 equal t0 0
+op mul 8:4 8:4 -1
+op lessThan t0 6:4 0
+op greaterThan t1 6:4 176
+op or t0 t0 t1
+jump 15 equal t0 0
+op mul 9:4 9:4 -1
+op add 5:4 5:4 8:4
+op add 6:4 6:4 9:4
+op add 9:4 9:4 -1
+draw clear
+draw rect 5:4 6:4 5 5
+drawflush display1
+jump 5 always
+end

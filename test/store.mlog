@@ -1,0 +1,3 @@
+set 1:6 @thisx
+print 1:6
+end

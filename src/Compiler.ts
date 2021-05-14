@@ -3,7 +3,7 @@ import * as handlers from "./handlers";
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import { BlockBuilder, MlogMath, StoreFactory, TempFactory } from "./macros";
+import { BlockBuilder, MlogMath, Print, StoreFactory, TempFactory } from "./macros";
 import { Draw } from "./macros/Draw";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
@@ -24,11 +24,11 @@ export class Compiler {
 		scope.hardSet("Block", new BlockBuilder(scope));
 		scope.hardSet("Math", new MlogMath(scope));
 		scope.hardSet("draw", new Draw(scope))
+		scope.hardSet("print", new Print(scope))
 		scope.hardSet("Store", new StoreFactory(scope))
 		scope.hardSet("Temp", new TempFactory(scope))
 		const valueInst = this.handle(scope, program);
 		valueInst[1].push(new EndInstruction(), ...scope.inst);
-		console.log(valueInst[1]);
 		this.resolve(valueInst);
 		return this.serialize(valueInst);
 	}

@@ -12,7 +12,6 @@ export const LRExpression: THandler = (
 ) => {
 	const [left, leftInst] = c.handle(scope, node.left);
 	const [right, rightInst] = c.handle(scope, node.right);
-	console.log("left", left)
 	const [op, opInst] = left[node.operator](scope, right);
 	return [op, [...leftInst, ...rightInst, ...opInst]];
 };

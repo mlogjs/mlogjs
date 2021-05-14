@@ -1,0 +1,4 @@
+set 1:4 1
+op add t0 1 1:4
+print t0
+end
