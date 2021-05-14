@@ -13,7 +13,7 @@ export const VariableDeclarator: THandler = (
 	node: es.VariableDeclarator,
 	kind: "let" | "var" | "const" = "let"
 ) => {
-	let valinst: TValueInstructions = node.init ? c.handle(scope, node.init) : [null, []];
+	let valinst: TValueInstructions = node.init ? c.handleEval(scope, node.init) : [null, []];
 	const { name } = node.id as es.Identifier;
 	const [init] = valinst;
 	if (kind === "const" && !init) throw Error("Cannot create constant with void value.");

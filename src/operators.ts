@@ -24,17 +24,29 @@ export const assignmentOperators = [
 ] as const;
 export type AssignementOperator = typeof assignmentOperators[number];
 
+export const leftRightOperators = [
+    ...binaryOperators,
+	...logicalOperators,
+	...assignmentOperators
+] as const
+
+export type LeftRightOperator = typeof leftRightOperators[number]
+
 export const unaryOperators = ["!", "u+", "u-", "delete", "typeof", "void", "~"] as const;
 export type UnaryOperator = typeof unaryOperators[number];
 
 export const updateOperators = ["++", "--"] as const;
 export type UpdateOperator = typeof updateOperators[number];
 
-export const operators = [
-	...binaryOperators,
-	...logicalOperators,
-	...assignmentOperators,
-	...unaryOperators,
+export const singleOperators = [
+    ...unaryOperators,
 	...updateOperators,
+] as const
+
+export type SingleOperator = typeof singleOperators[number]
+
+export const operators = [
+	...leftRightOperators,
+	...singleOperators
 ] as const;
 export type Operator = typeof operators[number]

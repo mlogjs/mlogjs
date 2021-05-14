@@ -12,36 +12,36 @@ import { TempValue } from "./TempValue";
 import { VoidValue } from "./VoidValue";
 
 export class FunctionValue extends VoidValue implements IFunctionValue {
-	paramStores: StoreValue[];
-	paramNames: string[];
-	inst: IInstruction[];
-	addr: LiteralValue;
-	temp: StoreValue;
-	ret: StoreValue;
-	inline: boolean;
-	body: es.BlockStatement;
-	name: string;
-	c: Compiler;
 	constant = true;
 	macro = true;
-	count: number = 0;
-	callSize: number;
-	bodySize: number;
-	inlineTemp: TempValue;
+	private paramStores: StoreValue[];
+	private paramNames: string[];
+	private inst: IInstruction[];
+	private addr: LiteralValue;
+	private temp: StoreValue;
+	private ret: StoreValue;
+	private inline: boolean;
+	private tryingInline: boolean;
+	private body: es.BlockStatement;
+	private name: string;
+	private c: Compiler;
+	private callSize: number;
+	private inlineTemp: TempValue;
+	private inlineEnd: LiteralValue;
+	private bundled: boolean = false;
 
-	protected createValues() {
+	private createValues() {
 		this.addr = new LiteralValue(this.scope, null);
 		this.temp = new StoreValue(this.scope, "f" + this.name);
 		this.ret = new StoreValue(this.scope, "r" + this.name);
 	}
 
-	protected createInst() {
+	private createInst() {
 		this.inst = [new AddressResolver(this.addr), ...this.c.handle(this.scope, this.body)[1]];
-		const last = this.inst.slice(-1)[0];
-		if (!(last instanceof SetCounterInstruction) || last.args[2] !== this.ret) {
+		const [last] = this.inst.filter(v => !(v instanceof AddressResolver)).slice(-1);
+		if (!(last instanceof SetCounterInstruction && last.args[2] === this.ret)) {
 			this.inst.push(new SetCounterInstruction(this.ret));
 		}
-		this.bodySize = this.inst.length;
 	}
 
 	constructor(
@@ -67,13 +67,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 		this.createInst();
 	}
 
-	protected normalReturn(scope: IScope, arg: IValue): TValueInstructions {
+	private normalReturn(scope: IScope, arg: IValue): TValueInstructions {
 		const argInst = arg ? this.temp["="](scope, arg)[1] : [];
 		return [null, [...argInst, new SetCounterInstruction(this.ret)]];
 	}
 
-	protected normalCall(scope: IScope, args: IValue[]): TValueInstructions {
-		this.scope.inst.push(...this.inst);
+	private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
+		if (!this.bundled) this.scope.inst.push(...this.inst);
+		this.bundled = true;
 		const callAddressLiteral = new LiteralValue(scope, null);
 		const inst: IInstruction[] = this.paramStores
 			.map((param, i) => param["="](scope, args[i])[1])
@@ -86,41 +87,53 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 		return [this.temp, inst];
 	}
 
-	protected inlineReturn(scope: IScope, arg: IValue): TValueInstructions {
+	private inlineReturn(scope: IScope, arg: IValue): TValueInstructions {
 		const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
-		const fnEnd = new LiteralValue(scope, null);
-		return [
-			null,
-			[...argInst, new JumpInstruction(fnEnd, EJumpKind.Always), new AddressResolver(fnEnd)],
-		];
+		return [null, [...argInst, new JumpInstruction(this.inlineEnd, EJumpKind.Always)]];
 	}
 
-	protected inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
-		const fnScope = this.scope.copy();
-		args.forEach((arg, i) => fnScope.hardSet(this.paramNames[i], arg));
+	private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
+		// create return value
 		this.inlineTemp = new TempValue(scope);
-		const old = this.inline
-		this.inline = true
-		const vi = this.c.handle(fnScope, this.body)[1]
-		this.inline = old
-		return [this.inlineTemp, vi];
+		this.inlineEnd = new LiteralValue(scope, null);
+
+		// make a copy of the function scope
+		const fnScope = this.scope.copy();
+		// hard set variables within the function scope
+		this.paramNames.forEach((name, i) => fnScope.hardSet(name, args[i]));
+
+		this.tryingInline = true;
+		let inst = this.c.handle(fnScope, this.body)[1];
+		this.tryingInline = false;
+
+		// get the last instructions
+		const [jump] = inst.slice(-1);
+		if (jump instanceof JumpInstruction) {
+			// remove useless jump
+			if (jump.args[1] === this.inlineEnd) inst.pop();
+		}
+
+		inst.push(new AddressResolver(this.inlineEnd));
+
+		// return the function value
+		return [this.inlineTemp, inst];
 	}
 
 	call(scope: IScope, args: IValue[]): TValueInstructions {
-		if (args.length < this.paramStores.length)
-			throw new Error("Cannot call: missing arguments.");
-		const inlineCall = this.inlineCall(scope, args)
-		const inlineSize = inlineCall[1].filter(i=>!i.hidden).length
-		if (this.inline || inlineSize <= this.callSize) return inlineCall
+		if (args.length !== this.paramStores.length)
+			throw new Error("Cannot call: argument count not matching.");
+		const inlineCall = this.inlineCall(scope, args);
+		const inlineSize = inlineCall[1].filter((i) => !i.hidden).length;
+		if (this.inline || inlineSize <= this.callSize) return inlineCall;
 		return this.normalCall(scope, args);
 	}
 
 	return(scope: IScope, arg: IValue): TValueInstructions {
 		if (arg && arg.macro) {
 			this.inline = true;
-			return [null, []]
+			return [null, []];
 		}
-		if (this.inline) return this.inlineReturn(scope, arg);
+		if (this.inline || this.tryingInline) return this.inlineReturn(scope, arg);
 		return this.normalReturn(scope, arg);
 	}
 

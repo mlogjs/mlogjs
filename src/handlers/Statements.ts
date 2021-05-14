@@ -6,6 +6,8 @@ export const ExpressionStatement: THandler = (c, scope, node: es.ExpressionState
 	return c.handle(scope, node.expression);
 };
 
+
+
 export const BlockStatement: THandler = (c, scope, node: es.BlockStatement) => {
 	return c.handleMany(scope.createScope(), node.body);
 };

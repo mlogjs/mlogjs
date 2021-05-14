@@ -1,26 +1,18 @@
 export * as es from "estree";
+import { Compiler } from "./Compiler";
+import { AddressResolver } from "./instructions";
+import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
+export interface IInstruction {
+	hidden: boolean;
+	resolve(i: number): void;
+}
+
 export type THandler = (
 	compiler: Compiler,
 	scope: IScope,
 	node: any,
 	arg: any
 ) => TValueInstructions;
-
-import { Compiler } from "./Compiler";
-import { AddressResolver } from "./instructions";
-import {
-	AssignementOperator,
-	BinaryOperator,
-	LogicalOperator,
-	UnaryOperator,
-	UpdateOperator,
-} from "./operators";
-
-export interface IInstruction {
-	hidden: boolean;
-	resolve(i: number): void;
-}
-
 
 export interface IScope {
 	parent: IScope;
@@ -29,7 +21,7 @@ export interface IScope {
 	inst: IInstruction[];
 	break: AddressResolver;
 	continue: AddressResolver;
-	function: IFunctionValue
+	function: IFunctionValue;
 	ntemp: number;
 	createScope(): IScope;
 	createFunction(name: string, stacked?: boolean): IScope;
@@ -38,17 +30,12 @@ export interface IScope {
 	set(name: string, value: IValue): IValue;
 	hardSet(name: string, value: IValue): IValue;
 	make(name: string, storeName: string): IValue;
-	copy(): IScope
+	copy(): IScope;
 }
 
 export type IValue = { [k in UnaryOperator]?: (scope: IScope) => TValueInstructions } &
 	{ [k in UpdateOperator]?: (scope: IScope, prefix: boolean) => TValueInstructions } &
-	{
-		[k in BinaryOperator | AssignementOperator | LogicalOperator]?: (
-			scope: IScope,
-			value: IValue
-		) => TValueInstructions;
-	} & {
+	{ [k in LeftRightOperator]?: (scope: IScope, value: IValue) => TValueInstructions } & {
 		scope: IScope;
 		constant: boolean;
 		macro: boolean;
@@ -63,7 +50,7 @@ export interface IBindableValue extends IValue {
 }
 
 export interface IFunctionValue extends IValue {
-	return(scope: IScope, argument: IValue): TValueInstructions
+	return(scope: IScope, argument: IValue): TValueInstructions;
 }
 
 export type TValueInstructions = [IValue, IInstruction[]];

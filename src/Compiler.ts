@@ -1,10 +1,12 @@
 import { es, IScope, THandler, TValueInstructions } from "./types";
-import * as handlers from "./handlers"
+import * as handlers from "./handlers";
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
+import { BlockBuilder, MlogMath, StoreFactory, TempFactory } from "./macros";
+import { Draw } from "./macros/Draw";
 
-type THandlerMap = {[k in es.Node["type"]]?: THandler};
+type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
 export class Compiler {
 	protected stackName?: string;
@@ -18,7 +20,12 @@ export class Compiler {
 
 	compile(script: string): string {
 		const program = this.parse(script);
-		const scope = new Scope({})
+		const scope = new Scope({});
+		scope.hardSet("Block", new BlockBuilder(scope));
+		scope.hardSet("Math", new MlogMath(scope));
+		scope.hardSet("draw", new Draw(scope))
+		scope.hardSet("Store", new StoreFactory(scope))
+		scope.hardSet("Temp", new TempFactory(scope))
 		const valueInst = this.handle(scope, program);
 		valueInst[1].push(new EndInstruction(), ...scope.inst);
 		console.log(valueInst[1]);

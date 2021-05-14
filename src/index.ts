@@ -1,9 +1,6 @@
 import { Compiler } from "./Compiler";
+import {readFileSync} from "fs"
 
-const code = `
-const a = (a,b,c) => a + b + c
-let b = 3
-let c = a(1,2,b)
-`;
+const code = readFileSync("samples/templates.js", {encoding: "utf8"})
 
-console.log(new Compiler().compile(code));
+console.log(new Compiler().compile(code))

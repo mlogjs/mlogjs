@@ -9,7 +9,7 @@ export const IfStatement : THandler = (c, scope, node: es.IfStatement) => {
     const [test, testInst] = c.handleEval(scope, node.test);
     if (test instanceof LiteralValue) {
         if (test.data) inst.push(...c.handle(scope, node.consequent)[1]);
-        else inst.push(...c.handle(scope, node.alternate)[1])
+        else if (node.alternate) inst.push(...c.handle(scope, node.alternate)[1])
         return [null, inst];
     }
     const endIfAddr = new LiteralValue(scope, null)

@@ -18,3 +18,5 @@ export const CallExpression: THandler  = (c, scope, node: es.CallExpression) => 
 
     return [callValue, inst]
 }
+
+export const NewExpression = CallExpression

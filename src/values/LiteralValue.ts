@@ -58,8 +58,7 @@ for (const key in operatorMap) {
 		value: LiteralValue
 	): TValueInstructions {
 		if (!(value instanceof LiteralValue)) {
-			console.log(this, "using super method because not instance of LiteralValue", value)
-			return BaseValue.prototype[key](scope, value)
+			return BaseValue.prototype[key].apply(this, [scope, value])
 		};
 		return [new LiteralValue(scope, fn(this.num, value.num)), []];
 	};
@@ -73,7 +72,7 @@ const unaryOperatorMap: { [k in UnaryOperator]?: TOperationFn } = {
 
 for (const key in unaryOperatorMap) {
 	LiteralValue.prototype[key] = function (this: LiteralValue, scope: IScope): TValueInstructions {
-		const fn = operatorMap[key] as TOperationFn;
+		const fn = unaryOperatorMap[key] as TOperationFn;
 		return [new LiteralValue(scope, fn(this.num)), []];
 	};
 }

@@ -19,6 +19,7 @@
   "homepage": "https://github.com/str1z/mlogcc#readme",
   "dependencies": {
     "@types/esprima": "^4.0.2",
+    "@types/node": "^15.0.3",
     "esprima": "^4.0.1"
   }
 }
