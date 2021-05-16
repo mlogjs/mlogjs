@@ -1,0 +1,4 @@
+set 1:4 1
+print "a is a store."
+printflush message1
+end

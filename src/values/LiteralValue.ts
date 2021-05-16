@@ -21,6 +21,10 @@ export class LiteralValue extends BaseValue implements IBindableValue {
 		if (typeof this.data === "string") return 1;
 		return this.data;
 	}
+
+	typeof(scope: IScope): TValueInstructions {
+		return [new LiteralValue(scope, "literal"), []]
+	}
 }
 
 type TOperationFn = (a: number, b?: number) => number;

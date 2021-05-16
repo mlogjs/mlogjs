@@ -36,6 +36,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 		this.ret = new StoreValue(this.scope, "r" + this.name);
 	}
 
+	typeof(scope: IScope): TValueInstructions {
+		return [new LiteralValue(scope, "function"), []]
+	}
+
 	private createInst() {
 		this.inst = [new AddressResolver(this.addr), ...this.c.handle(this.scope, this.body)[1]];
 		const [last] = this.inst.filter(v => !(v instanceof AddressResolver)).slice(-1);

@@ -13,6 +13,10 @@ export class ObjectValue extends VoidValue {
 		this.data = data;
 	}
 
+	typeof(scope: IScope): TValueInstructions {
+		return [new LiteralValue(scope, "object"), []]
+	}
+
 	get(scope: IScope, key: LiteralValue): TValueInstructions {
 		const member = this.data[key.data];
 		if (member) return [member, []];
