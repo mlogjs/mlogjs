@@ -3,7 +3,7 @@ set 5:4 88
 set 6:4 2
 set 7:4 0
 draw color 255 255 255
-sensor t0 switch1 enabled
+sensor t0 switch1 @enabled
 jump 26 equal t0 0
 op add 4:4 4:4 6:4
 op add 5:4 5:4 7:4
@@ -13,13 +13,13 @@ op add t2 4:4 5
 op greaterThan t2 t2 176
 op or t1 t1 t2
 jump 16 equal t1 0
-op mul 6:4 6:4 -0.9
+op div 6:4 6:4 -1.1
 op lessThan t1 5:4 0
 op add t2 5:4 5
 op greaterThan t2 t2 176
 op or t1 t1 t2
 jump 22 equal t1 0
-op mul 7:4 7:4 -0.9
+op div 7:4 7:4 -1.1
 draw clear
 draw rect 4:4 5:4 5 5
 drawflush display1

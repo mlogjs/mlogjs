@@ -12,13 +12,13 @@ const switch1 = Block("switch1");
 draw("color", 255, 255, 255);
 
 while (switch1.enabled) {
-
     x += vx;
 	y += vy;
 	vy += g;
 
-	if (x < 0 || x + bsize > dsize) vx *= -0.9;
-	if (y < 0 || y + bsize > dsize) vy *= -0.9;
+    // using / because -0.x are currently not parsed properly by mindustry
+	if (x < 0 || x + bsize > dsize) vx /= -1.1;
+	if (y < 0 || y + bsize > dsize) vy /= -1.1;
 
 	draw("clear");
 	draw("rect", x, y, bsize, bsize);
