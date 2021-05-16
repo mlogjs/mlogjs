@@ -1,0 +1,3 @@
+- [MlogJS](/)
+- [Getting Started](/getting-started)
+- [Data Types](/data-types)

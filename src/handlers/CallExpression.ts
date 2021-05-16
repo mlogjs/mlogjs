@@ -5,6 +5,7 @@ export const CallExpression: THandler  = (c, scope, node: es.CallExpression) => 
     const inst : IInstruction[] = []
 
     const args = node.arguments.map(node => {
+        // TODO: this might be why t0 did not increment
         const [v, i] = c.handleEval(scope, node)
         inst.push(...i)
         return v
