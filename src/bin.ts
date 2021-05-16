@@ -18,4 +18,4 @@ yargs(hideBin(process.argv)).command("$0 [path] [out]", "compiles your Javascrip
     if (!existsSync(path)) return console.log(`file at ${path} does not exist`)
     const compiled = compile(readFileSync(path as string, {encoding: "utf-8"}))
     writeFileSync(out, compiled)
-}).help().scriptName("mlogcc").demandCommand().parse()
+}).help().scriptName("mlogjs").demandCommand().parse()
