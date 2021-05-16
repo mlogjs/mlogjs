@@ -1,26 +1,26 @@
 {
   "name": "mlogjs",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
   "main": "build/index.js",
   "bin": {
-    "mlogcc": "./build/bin.js"
+    "mlogjs": "./build/bin.js"
   },
   "scripts": {
     "build": "tsc && webpack",
-    "start": "npm run build && npm i -g . && mlogcc"
+    "start": "npm run build && npm i -g . && mlogjs"
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/str1z/mlogcc.git"
+    "url": "git+https://github.com/str1z/mlogjs.git"
   },
   "keywords": [],
   "author": "str1z",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/str1z/mlogcc/issues"
+    "url": "https://github.com/str1z/mlogjs/issues"
   },
-  "homepage": "https://github.com/str1z/mlogcc#readme",
+  "homepage": "https://github.com/str1z/mlogjs#readme",
   "dependencies": {
     "esprima": "^4.0.1",
     "yargs": "^17.0.1"

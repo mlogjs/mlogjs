@@ -1,6 +1,6 @@
 # MlogJS
 
-MlogJS is compiler that allows users to compile complex JavaScript programs into Mindustry Logic Code.
+MlogJS is a compiler that allows users to compile complex JavaScript programs into Mindustry Logic Code.
 
 ## Discord
 
@@ -11,11 +11,7 @@ You can join the Discord server for more information and for help.
 ## Getting started!
 
 ```
-npm i mlogcc -g
-```
-The alternative is...
-```
 npm i mlogjs -g
 ```
 
-After installing the package from NPM, read the docs!
+After installing the package from NPM, read the [https://str1z.github.io/mlogjs](docs).

@@ -16,6 +16,11 @@ yargs(hideBin(process.argv)).command("$0 [path] [out]", "compiles your Javascrip
     if (!path) return console.log("missing required path argument")
     if (!out) return console.log("missing output path")
     if (!existsSync(path)) return console.log(`file at ${path} does not exist`)
-    const compiled = compile(readFileSync(path as string, {encoding: "utf-8"}))
-    writeFileSync(out, compiled)
+    try {
+        const compiled = compile(readFileSync(path as string, {encoding: "utf-8"}))
+        writeFileSync(out, compiled)
+        console.log(`Success: Compiled ${path}. Your compiled code is at ${out}.`)
+    } catch(e) {
+        console.log("Error: " + e.message)
+    }
 }).help().scriptName("mlogjs").demandCommand().parse()

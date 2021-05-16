@@ -57,7 +57,7 @@ export class Compiler {
 			if (!handler) throw Error("Missing handler for " + node.type);
 			return handler(this, scope, node, null);
 		} catch(error) {
-			throw new Error(`${nodeName(node)} : ${error}`)
+			throw new Error(`${node.type} ${nodeName(node)} > ${error.message}`)
 		}
 	}
 
