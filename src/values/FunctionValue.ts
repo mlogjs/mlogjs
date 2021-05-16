@@ -95,7 +95,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 	private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
 		// create return value
 		this.inlineTemp = new TempValue(scope);
-		console.log("=================== inline temp =================", this.inlineTemp)
 		this.inlineEnd = new LiteralValue(scope, null);
 
 		// make a copy of the function scope

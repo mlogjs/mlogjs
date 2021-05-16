@@ -21,7 +21,6 @@ export class TempValue extends StoreValue {
 	}
 
 	proxy(value: IValue): TValueInstructions {
-		console.log(this.toString(), "is becoming a proxy for", value.toString())
 		if (this.proxied) throw new Error("Cannot proxy multiple times.")
 		this.proxied = value
 		for (const key of [...operators, "eval", "get", "call", "toString", "proxy"]) {
