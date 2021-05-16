@@ -5,7 +5,8 @@ import { StoreValue } from "./";
 import { LiteralValue } from "./LiteralValue";
 
 export class TempValue extends StoreValue {
-	proxied: IValue
+	proxied: IValue;
+	canProxy = true;
 	constructor(scope: IScope, name?: string) {
 		super(scope, name ?? "t" + scope.ntemp + (scope.name ? ":" + scope.name : ""));
 		if (!name) scope.ntemp++;
@@ -15,16 +16,19 @@ export class TempValue extends StoreValue {
 		return super.eval(scope);
 	}
 
-	"="(scope: IScope, value: IValue): TValueInstructions{
-		if (value instanceof LiteralValue) return this.proxy(value)
-		return super["="](scope, value)
+	"="(scope: IScope, value: IValue): TValueInstructions {
+		if (value instanceof LiteralValue && this.canProxy) {
+			this.canProxy = false;
+			return this.proxy(value);
+		}
+		return super["="](scope, value);
 	}
 
 	proxy(value: IValue): TValueInstructions {
-		if (this.proxied) throw new Error("Cannot proxy multiple times.")
-		this.proxied = value
+		if (this.proxied) throw new Error("Cannot proxy multiple times.");
+		this.proxied = value;
 		for (const key of [...operators, "eval", "get", "call", "toString", "proxy"]) {
-			if (key in value) this[key] = (...args: any) => value[key].apply(value, args)
+			if (key in value) this[key] = (...args: any) => value[key].apply(value, args);
 		}
 		return [this, []];
 	}

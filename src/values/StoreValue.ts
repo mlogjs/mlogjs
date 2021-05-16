@@ -17,7 +17,7 @@ export class StoreValue extends BaseValue implements IValue {
 
 	"="(scope: IScope, value: IValue): TValueInstructions {
 		if (this.constant) throw new Error(`Cannot assign to unmutable store '${this.name}'.`);
-		if (value instanceof TempValue) return value.proxy(this);
+		if (value instanceof TempValue && value.canProxy) return value.proxy(this);
 		const [evalValue, evalInst] = value.eval(scope);
 		return [this, [...evalInst, new SetInstruction(this, evalValue)]];
 	}

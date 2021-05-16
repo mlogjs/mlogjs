@@ -1,0 +1,4 @@
+jump 1 always
+set 1:6 2
+set 6:4 1:6
+end

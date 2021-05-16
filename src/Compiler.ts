@@ -5,6 +5,7 @@ import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import { BlockBuilder, MlogMath, Print, StoreFactory, TempFactory } from "./macros";
 import { Draw } from "./macros/Draw";
+import { nodeName } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
@@ -51,9 +52,13 @@ export class Compiler {
 	}
 
 	handle(scope: IScope, node: es.Node): TValueInstructions {
-		const handler = this.handlers[node.type];
-		if (!handler) throw Error("Missing handler for " + node.type);
-		return handler(this, scope, node, null);
+		try {
+			const handler = this.handlers[node.type];
+			if (!handler) throw Error("Missing handler for " + node.type);
+			return handler(this, scope, node, null);
+		} catch(error) {
+			throw new Error(`${nodeName(node)} : ${error}`)
+		}
 	}
 
 	handleEval(scope: IScope, node: es.Node): TValueInstructions {
