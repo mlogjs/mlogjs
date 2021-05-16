@@ -107,12 +107,13 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 		let inst = this.c.handle(fnScope, this.body)[1];
 		this.tryingInline = false;
 
+		// removing useless instruction
 		// get the last instructions
-		const [jump] = inst.slice(-1);
-		if (jump instanceof JumpInstruction) {
-			// remove useless jump
-			if (jump.args[1] === this.inlineEnd) inst.pop();
-		}
+		// const [jump] = inst.slice(-1);
+		// if (jump instanceof JumpInstruction) {
+		// 	// remove useless jump
+		// 	if (jump.args[1] === this.inlineEnd) inst.pop();
+		// }
 
 		inst.push(new AddressResolver(this.inlineEnd));
 
