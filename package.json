@@ -7,7 +7,8 @@
     "mlogcc": "./build/bin.js"
   },
   "scripts": {
-    "build": "tsc && webpack "
+    "build": "tsc && webpack",
+    "start": "npm run build && npm i -g . && mlogcc"
   },
   "repository": {
     "type": "git",

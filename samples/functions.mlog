@@ -1,0 +1,4 @@
+set 12:4 1
+op mul t0 12:4 2
+op add 13:4 t0 -1
+end

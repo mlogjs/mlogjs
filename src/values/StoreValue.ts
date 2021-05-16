@@ -1,4 +1,4 @@
-import { BaseValue, TempValue} from ".";
+import { BaseValue, TempValue } from ".";
 import { SetInstruction } from "../instructions";
 import { operators } from "../operators";
 import { IScope, IValue, TValueInstructions } from "../types";
@@ -12,11 +12,8 @@ export class StoreValue extends BaseValue implements IValue {
 	}
 	"="(scope: IScope, value: IValue): TValueInstructions {
 		if (this.constant) throw new Error(`Cannot assign to unmutable store '${this.name}'.`);
-		if (value instanceof TempValue) {
-			value.proxy(this)
-			return [this, []];
-		}
-		const [evalValue, evalInst] = value.eval(scope)
+		if (value instanceof TempValue) return value.proxy(this);
+		const [evalValue, evalInst] = value.eval(scope);
 		return [this, [...evalInst, new SetInstruction(this, evalValue)]];
 	}
 	eval(scope: IScope): TValueInstructions {
@@ -25,5 +22,4 @@ export class StoreValue extends BaseValue implements IValue {
 	toString() {
 		return this.name;
 	}
-	
 }
