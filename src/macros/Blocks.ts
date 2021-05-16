@@ -69,7 +69,7 @@ class Block extends ObjectValue {
 						"The use of '@' is unnecessary beucase it is already done for you."
 					);
 				const temp = new TempValue(scope);
-				return [temp, [new InstructionBase("sensor", temp, name, attr.data)]];
+				return [temp, [new InstructionBase("sensor", temp, name, "@" + attr.data)]];
 			}),
 			//control enabled block1 0 0 0 0
 			control: new MacroFunction(scope, (attr: IValue, ...args: IValue[]) => {
