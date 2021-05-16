@@ -23,7 +23,7 @@ export const ForStatement: THandler = (c, scope, node: es.ForStatement) => {
 			...initInst,
 			startLoopLine,
 			...testLines,
-			new JumpInstruction(endLoopAddr, EJumpKind.NotEqual, test, new LiteralValue(scope, 0)),
+			new JumpInstruction(endLoopAddr, EJumpKind.Equal, test, new LiteralValue(scope, 0)),
 			...c.handle(scope, node.body)[1],
 			...updateLines,
 			new JumpInstruction(startLoopAddr, EJumpKind.Always),

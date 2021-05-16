@@ -28,7 +28,7 @@ export const WhileStatement: THandler = (c, scope, node: es.WhileStatement) => {
 	lines.push(
 		startLoopLine,
 		...testLines,
-		new JumpInstruction(endLoopAddr, EJumpKind.NotEqual, test, new LiteralValue(scope, 0)),
+		new JumpInstruction(endLoopAddr, EJumpKind.Equal, test, new LiteralValue(scope, 0)),
 		...c.handle(scope, node.body)[1],
 		new JumpInstruction(startLoopAddr, EJumpKind.Always),
 		endLoopLine
