@@ -16,13 +16,14 @@ export class TempValue extends StoreValue {
 		return super.eval(scope);
 	}
 
-	"="(scope: IScope, value: IValue): TValueInstructions {
-		if (value instanceof LiteralValue && this.canProxy) {
-			this.canProxy = false;
-			return this.proxy(value);
-		}
-		return super["="](scope, value);
-	}
+	// 
+	// "="(scope: IScope, value: IValue): TValueInstructions {
+	// 	if (value instanceof LiteralValue && this.canProxy) {
+	// 		this.canProxy = false;
+	// 		return this.proxy(value);
+	// 	}
+	// 	return super["="](scope, value);
+	// }
 
 	proxy(value: IValue): TValueInstructions {
 		if (this.proxied) throw new Error("Cannot proxy multiple times.");

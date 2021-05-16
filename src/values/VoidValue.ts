@@ -3,27 +3,28 @@ import { operators } from "../operators";
 
 export class VoidValue implements IValue {
 	scope: IScope;
-	constant = false
-	macro = false
+	constant = false;
+	macro = false;
 	constructor(scope: IScope) {
 		this.scope = scope;
 	}
 	eval(scope: IScope): TValueInstructions {
-		throw new Error("Cannot eval.");
+		throw new Error(`${this} cannot eval.`);
 	}
 	call(scope: IScope, args: IValue[]): TValueInstructions {
-		throw new Error("Cannot call.");
+		throw new Error(`${this} cannot call.`);
 	}
 	get(scope: IScope, name: IValue): TValueInstructions {
-		throw new Error("Cannot get.");
+		throw new Error(`${this} cannot get.`);
 	}
 	toString(): string {
-		throw new Error("Cannot serialize.");
+		return "void";
 	}
 }
 
 for (const key of operators) {
-	VoidValue.prototype[key] = () => {
-		throw new Error(`Cannot '${key}' operation.`);
+	VoidValue.prototype[key] = function () {
+		console.log(this);
+		throw new Error(`${this} cannot '${key}' operation.`);
 	};
 }

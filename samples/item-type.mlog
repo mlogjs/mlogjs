@@ -1,0 +1,5 @@
+set t0 "@metaglass"
+jump 2 always
+print t0
+printflush message1
+end
