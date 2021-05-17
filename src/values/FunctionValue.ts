@@ -3,6 +3,7 @@ import {
 	AddressResolver,
 	EJumpKind,
 	JumpInstruction,
+	ReturnInstruction,
 	SetCounterInstruction,
 } from "../instructions";
 import { es, IFunctionValue, IInstruction, IScope, IValue, TValueInstructions } from "../types";
@@ -90,7 +91,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
 	private inlineReturn(scope: IScope, arg: IValue): TValueInstructions {
 		const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
-		return [null, [...argInst, new JumpInstruction(this.inlineEnd, EJumpKind.Always)]];
+		return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
 	}
 
 	private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {

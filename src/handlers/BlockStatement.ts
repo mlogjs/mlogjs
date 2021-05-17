@@ -1,0 +1,12 @@
+import { BreakInstruction, ContinueInstruction, ReturnInstruction, SetCounterInstruction } from "../instructions";
+import { es, THandler } from "../types";
+
+export const BlockStatement: THandler = (c, scope, node: es.BlockStatement) => {
+	const [value, insts] = c.handleMany(scope.createScope(), node.body);
+    const cleanInst = []
+    for (const inst of insts) {
+        if (inst instanceof BreakInstruction || inst instanceof ContinueInstruction || inst instanceof ReturnInstruction || inst instanceof SetCounterInstruction) break
+        cleanInst.push(inst)
+    }
+    return [value, cleanInst]
+};

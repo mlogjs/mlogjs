@@ -1,27 +1,24 @@
-import { EJumpKind, JumpInstruction, SetCounterInstruction } from "../instructions";
-import { THandler, es } from "../types";
-import { LiteralValue, StoreValue } from "../values";
+import {
+	BreakInstruction,
+	ContinueInstruction
+} from "../instructions";
+import { es, THandler } from "../types";
+import { LiteralValue } from "../values";
 
 export const ExpressionStatement: THandler = (c, scope, node: es.ExpressionStatement) => {
 	return c.handle(scope, node.expression);
 };
 
-
-
-export const BlockStatement: THandler = (c, scope, node: es.BlockStatement) => {
-	return c.handleMany(scope.createScope(), node.body);
-};
-
 export const BreakStatement: THandler = (_, scope) => {
 	const addr = new LiteralValue(scope, null);
 	scope.break.bind(addr);
-	return [null, [new JumpInstruction(addr, EJumpKind.Always)]];
+	return [null, [new BreakInstruction(addr)]];
 };
 
 export const ContinueStatement: THandler = (_, scope) => {
 	const addr = new LiteralValue(scope, null);
 	scope.continue.bind(addr);
-	return [null, [new JumpInstruction(addr, EJumpKind.Always)]];
+	return [null, [new ContinueInstruction(addr)]];
 };
 
 export const ReturnStatement: THandler = (c, scope, node: es.ReturnStatement) => {
