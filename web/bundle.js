@@ -46,10 +46,10 @@ eval("\r\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\r\n
 /*!****************************************!*\
   !*** ./src/handlers/BlockStatement.ts ***!
   \****************************************/
-/***/ ((__unused_webpack_module, exports, __webpack_require__) => {
+/***/ ((__unused_webpack_module, exports) => {
 
 "use strict";
-eval("\r\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\r\nexports.BlockStatement = void 0;\r\nconst instructions_1 = __webpack_require__(/*! ../instructions */ \"./src/instructions/index.ts\");\r\nconst BlockStatement = (c, scope, node) => {\r\n    const [value, insts] = c.handleMany(scope.createScope(), node.body);\r\n    const cleanInst = [];\r\n    for (const inst of insts) {\r\n        if (inst instanceof instructions_1.BreakInstruction || inst instanceof instructions_1.ContinueInstruction || inst instanceof instructions_1.ReturnInstruction || inst instanceof instructions_1.SetCounterInstruction)\r\n            break;\r\n        cleanInst.push(inst);\r\n    }\r\n    return [value, cleanInst];\r\n};\r\nexports.BlockStatement = BlockStatement;\r\n\n\n//# sourceURL=webpack://mlogcc/./src/handlers/BlockStatement.ts?");
+eval("\r\nObject.defineProperty(exports, \"__esModule\", ({ value: true }));\r\nexports.BlockStatement = void 0;\r\nconst BlockStatement = (c, scope, node) => {\r\n    const [value, insts] = c.handleMany(scope.createScope(), node.body);\r\n    // const cleanInst = []\r\n    // for (const inst of insts) {\r\n    //     if (inst instanceof BreakInstruction || inst instanceof ContinueInstruction || inst instanceof ReturnInstruction || inst instanceof SetCounterInstruction) break\r\n    //     cleanInst.push(inst)\r\n    // }\r\n    return [value, insts];\r\n};\r\nexports.BlockStatement = BlockStatement;\r\n\n\n//# sourceURL=webpack://mlogcc/./src/handlers/BlockStatement.ts?");
 
 /***/ }),
 
