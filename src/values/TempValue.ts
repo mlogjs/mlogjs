@@ -38,7 +38,6 @@ export class TempValue extends StoreValue {
 		if (this.proxied) throw new Error("Cannot proxy multiple times.");
 		this.proxied = value;
 		this.canProxy = false
-		console.log(`${this} is becoming a proxy for ${value}`)
 		for (const key of [...operators, "eval", "get", "call", "toString", "proxy"] as const) {
 			if (key !== "=" && key in value) this[key] = (...args: any) => value[key].apply(value, args);
 		}
