@@ -1,4 +1,7 @@
-set t0 "@metaglass"
+set 21:4 3
+op strictEqual t0:1:0 21:4 1
+jump null equal t0:1:0 0
+set t0 "@copper"
 print t0
 printflush message1
 end

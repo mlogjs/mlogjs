@@ -18,6 +18,6 @@ function getItemType(c) {
 	return "null";
 }
 
-const type = 3
+let type = 3
 const msg1 = Block("message1");
-msg1.puts(getItemType(3));
+msg1.puts(getItemType(type));
