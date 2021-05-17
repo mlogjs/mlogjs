@@ -42,10 +42,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
 	private createInst() {
 		this.inst = [new AddressResolver(this.addr), ...this.c.handle(this.scope, this.body)[1]];
-		const [last] = this.inst.filter(v => !(v instanceof AddressResolver)).slice(-1);
-		if (!(last instanceof SetCounterInstruction && last.args[2] === this.ret)) {
-			this.inst.push(new SetCounterInstruction(this.ret));
-		}
+		this.inst.push(new SetCounterInstruction(this.ret));
 	}
 
 	constructor(
