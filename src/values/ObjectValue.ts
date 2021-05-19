@@ -14,7 +14,7 @@ export class ObjectValue extends VoidValue {
 	}
 
 	typeof(scope: IScope): TValueInstructions {
-		return [new LiteralValue(scope, "object"), []]
+		return [new LiteralValue(scope, "object"), []];
 	}
 
 	get(scope: IScope, key: LiteralValue): TValueInstructions {
@@ -41,8 +41,9 @@ export class ObjectValue extends VoidValue {
 for (const op of operators) {
 	ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
 		const $ = this.data["$" + op];
-		if (!$) return VoidValue.prototype[op].apply(this, args)
+		if (!$) return VoidValue.prototype[op].apply(this, args);
+		let [scope, ...fnArgs] = args
 		// @ts-ignore
-		return $.call(...args)
+		return $.call(scope, fnArgs);
 	};
 }
