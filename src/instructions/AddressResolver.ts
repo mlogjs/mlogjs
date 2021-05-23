@@ -26,7 +26,4 @@ export class AddressResolver extends InstructionBase {
         scope.continue = this
         return this
 	}
-    bindReturn(scope: IScope): IInstruction {
-        throw new Error("Method not implemented.");
-    }
 }

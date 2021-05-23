@@ -3,7 +3,7 @@ import * as handlers from "./handlers";
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import { BlockBuilder, MlogMath, Print, StoreFactory, TempFactory } from "./macros";
+import { BlockBuilder, Concat, MlogMath, Print, StoreFactory, TempFactory } from "./macros";
 import { Draw } from "./macros/Draw";
 import { nodeName } from "./utils";
 
@@ -26,8 +26,10 @@ export class Compiler {
 		scope.hardSet("Math", new MlogMath(scope));
 		scope.hardSet("draw", new Draw(scope))
 		scope.hardSet("print", new Print(scope))
+		scope.hardSet("concat", new Concat(scope))
 		scope.hardSet("Store", new StoreFactory(scope))
 		scope.hardSet("Temp", new TempFactory(scope))
+
 		const valueInst = this.handle(scope, program);
 		valueInst[1].push(new EndInstruction(), ...scope.inst);
 		this.resolve(valueInst);

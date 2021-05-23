@@ -1,7 +1,13 @@
-import { IScope, IBindableValue, TLiteral, TValueInstructions } from "../types";
+import { IScope, IBindableValue, TLiteral, TValueInstructions, IValue } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 
+const literalMethods = {
+	length: function (this: LiteralValue, scope: IScope) {
+		if (typeof this.data !== "string") throw new Error("Length method only works on string literal values.")
+		return new LiteralValue(scope, this.data.length)
+	}
+}
 
 export class LiteralValue extends BaseValue implements IBindableValue {
 	data: TLiteral;
@@ -15,6 +21,12 @@ export class LiteralValue extends BaseValue implements IBindableValue {
 	}
 	toString() {
 		return JSON.stringify(this.data);
+	}
+	get(scope: IScope, name: IValue): TValueInstructions {
+		if (!(name instanceof LiteralValue && typeof name.data === "string")) return super.get(scope, name)
+		const method = literalMethods[name.data]
+		if (!method) throw new Error(`Method ${name.data} does not exist on literal values.`)
+		return [method.apply(this, [scope]), []]
 	}
 	get num() {
 		if (this.data === null) return 0;
