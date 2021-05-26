@@ -23,6 +23,7 @@ export class Compiler {
 		const program = this.parse(script);
 		const scope = new Scope({});
 		scope.hardSet("Block", new BlockBuilder(scope));
+		scope.hardSet("Entity", new BlockBuilder(scope));
 		scope.hardSet("Math", new MlogMath(scope));
 		scope.hardSet("draw", new Draw(scope))
 		scope.hardSet("print", new Print(scope))

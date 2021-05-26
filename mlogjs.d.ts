@@ -19,3 +19,5 @@ declare class Block {
 	control(attr: TControl, ...args: number[]): void;
 	radar(target0: TTarget, target1: TTarget, target2: TTarget, sort: TSort, distance: number): any;
 }
+
+declare const Entity = Block;
