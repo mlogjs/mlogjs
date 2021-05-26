@@ -1,0 +1,113 @@
+draw color 255 255 255
+set 31:5 40
+op div t0 31:5 2
+op sub 32:5 88 t0
+set 35:5 88
+set 36:5 88
+op rand t0 10
+op sub 37:5 t0 5
+op rand t1 10
+op sub 38:5 t1 5
+set 41:5 6
+set 42:10 0
+op lessThan t4 42:10 6
+jump 18 equal t4 0
+write 1 bank1 42:10
+set t5 42:10
+op add 42:10 42:10 1
+jump 12 always
+draw clear 0 0 0
+draw rect 32:5 10 31:5 5
+draw rect 35:5 36:5 5 5
+sensor t2 switch1 @enabled
+jump 28 equal t2 0
+op sub t4 176 31:5
+op lessThan t5 32:5 t4
+jump 27 equal t5 0
+op add 32:5 32:5 3
+jump 31 always
+op greaterThan t4 32:5 0
+jump 31 equal t4 0
+op sub 32:5 32:5 3
+op add 35:5 35:5 37:5
+op add 36:5 36:5 38:5
+op lessThan t7 35:5 0
+op add t8 35:5 5
+op greaterThan t9 t8 176
+op or t10 t7 t9
+jump 39 equal t10 0
+op mul 37:5 37:5 -1
+op add t12 36:5 5
+op greaterThan t13 t12 176
+jump 43 equal t13 0
+op mul 38:5 38:5 -1
+op add t15 35:5 5
+op greaterThan t16 t15 32:5
+op add t17 32:5 31:5
+op lessThan t18 35:5 t17
+op land t19 t16 t18
+op add t20 36:5 5
+op greaterThan t21 t20 10
+op land t22 t19 t21
+op lessThan t23 36:5 15
+op land t24 t22 t23
+jump 63 equal t24 0
+op mul 38:5 38:5 -1.1
+op add t26 35:5 2.5
+op sub t27 t26 32:5
+op div t28 31:5 2
+op add t29 t27 t28
+op div t30 t29 10
+op add 37:5 37:5 t30
+set t32 31:5
+op sub 31:5 31:5 1
+set 82:6 0
+set 83:11 126
+op greaterThan t25 83:11 106
+jump 104 equal t25 0
+set 84:12 1
+op lessThan t27 84:12 176
+jump 102 equal t27 0
+read t3 bank1 82:6
+op equal t29 t3 1
+jump 98 equal t29 0
+draw rect 84:12 83:11 57.666666666666664 9
+op add t30 35:5 5
+op greaterThan t31 t30 84:12
+op add t32 84:12 58.666666666666664
+op lessThan t33 35:5 t32
+op land t34 t31 t33
+op add t35 36:5 5
+op greaterThan t36 t35 83:11
+op land t37 t34 t36
+op add t38 83:11 10
+op lessThan t39 36:5 t38
+op land t40 t37 t39
+jump 98 equal t40 0
+write 0 bank1 82:6
+set t41 41:5
+op sub 41:5 41:5 1
+op sub t43 84:12 4
+op greaterThan t44 35:5 t43
+op add t45 84:12 62.666666666666664
+op lessThan t46 35:5 t45
+op land t47 t44 t46
+jump 97 equal t47 0
+op mul 38:5 38:5 -1
+jump 98 always
+op mul 37:5 37:5 -1
+set t30 82:6
+op add 82:6 82:6 1
+op add 84:12 84:12 58.666666666666664
+jump 68 always
+op sub 83:11 83:11 10
+jump 65 always
+op lessThan t25 36:5 0
+op equal t26 41:5 0
+op or t27 t25 t26
+jump 109 equal t27 0
+jump 111 always
+drawflush display1
+jump 18 always
+jump 1 always
+end

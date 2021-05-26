@@ -1,4 +1,11 @@
-import { AssignementOperator, BinaryOperator, LogicalOperator, Operator } from "../operators";
+import {
+	AssignementOperator,
+	assignmentOperators,
+	BinaryOperator,
+	LogicalOperator,
+	Operator,
+	operators,
+} from "../operators";
 import { THandler, es } from "../types";
 
 export const LRExpression: THandler = (
@@ -10,18 +17,31 @@ export const LRExpression: THandler = (
 		operator: AssignementOperator | BinaryOperator | LogicalOperator;
 	}
 ) => {
-	const [left, leftInst] = c.handle(scope, node.left);
-	const [right, rightInst] = c.handle(scope, node.right);
+	const [left, leftInst] = c.handleEval(scope, node.left);
+	const [right, rightInst] = c.handleEval(scope, node.right);
 	const [op, opInst] = left[node.operator](scope, right);
 	return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
 export const BinaryExpression: THandler = LRExpression;
 export const LogicalExpression: THandler = LRExpression;
-export const AssignmentExpression: THandler = LRExpression;
+export const AssignmentExpression: THandler = (
+	c,
+	scope,
+	node: {
+		left: es.Node;
+		right: es.Node;
+		operator: AssignementOperator | BinaryOperator | LogicalOperator;
+	}
+) => {
+	const [left, leftInst] = c.handle(scope, node.left);
+	const [right, rightInst] = c.handleEval(scope, node.right);
+	const [op, opInst] = left[node.operator](scope, right);
+	return [op, [...leftInst, ...rightInst, ...opInst]];
+};
 
 export const UnaryExpression: THandler = (c, scope, { argument, operator }: es.UnaryExpression) => {
-	const [arg, argInst] = c.handle(scope, argument);
+	const [arg, argInst] = c.handleEval(scope, argument);
 	const [op, opInst] = arg[(operator.length === 1 ? "u" : "") + operator](scope);
 	return [op, [...argInst, ...opInst]];
 };
