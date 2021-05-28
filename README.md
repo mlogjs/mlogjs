@@ -15,4 +15,4 @@ npm i mlogjs -g
 ```
 
 After installing the package from NPM, please visit the docs.
-https://str1z.github.io/mlogjs/
+https://weisrc.github.io/mlogjs/
