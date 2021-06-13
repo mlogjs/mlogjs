@@ -61,7 +61,7 @@ declare function draw(
 	...args: any
 );
 
-declare function print(...values: any);
-declare function concat(...values: string[]);
+declare function print(...values: any): void;
+declare function concat(...values: string[]): string;
 
 declare class Entity extends Block {}
