@@ -34,7 +34,7 @@ export class Compiler {
 		const valueInst = this.handle(scope, program);
 		valueInst[1].push(new EndInstruction(), ...scope.inst);
 		this.resolve(valueInst);
-		return this.serialize(valueInst);
+		return this.serialize(valueInst) + "\n";
 	}
 
 	protected resolve(valueInst: TValueInstructions) {
