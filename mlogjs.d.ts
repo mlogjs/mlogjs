@@ -1,4 +1,3 @@
-declare type TControl = "enabled" | "shoot" | "shootp" | "configure" | "color";
 declare type TTarget =
 	| "any"
 	| "enemy"
@@ -8,7 +7,7 @@ declare type TTarget =
 	| "flying"
 	| "boss"
 	| "ground";
-declare type TSort = "distance" | "health" | "shield" | "armor" | "maxHealth";
+
 declare class Block {
 	constructor(name: string);
 	write(i: number, value: number): number;
@@ -17,8 +16,14 @@ declare class Block {
 	drawFlush(): void;
 	puts(...values: (number | string)[]): void;
 	sensor(attr: string): number | boolean;
-	control(attr: TControl, ...args: number[]): void;
-	radar(target0: TTarget, target1: TTarget, target2: TTarget, sort: TSort, distance: number): any;
+	control(attr: "enabled" | "shoot" | "shootp" | "configure" | "color", ...args: number[]): void;
+	radar(
+		target0: TTarget,
+		target1: TTarget,
+		target2: TTarget,
+		sort: "distance" | "health" | "shield" | "armor" | "maxHealth",
+		distance: number
+	): any;
 }
 
 declare class Store {
@@ -59,7 +64,7 @@ declare function draw(
 		| "triangle"
 		| "image",
 	...args: any
-);
+): void;
 
 declare function print(...values: any): void;
 declare function concat(...values: string[]): string;
