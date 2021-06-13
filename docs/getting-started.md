@@ -12,4 +12,8 @@ npm i -g mlogjs
 
 ## Web version
 
+https://weisrc.github.io/mlogjs-web-editor/
+
 ## Discord bot
+
+Coming soon!
