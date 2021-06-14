@@ -7,14 +7,25 @@ export const ObjectExpression: THandler = (c, scope, node: es.ObjectExpression) 
 	const inst = [];
 	for (const prop of node.properties as es.Property[]) {
 		if (prop.computed) throw new Error("Cannot handle computed property.");
-        const {key, value} = prop
-        let index: string
-        if (key.type === "Identifier") index = key.name
-        else if (key.type === "Literal") index = "" + key.value
+		const { key, value } = prop;
+		let index: string;
+		if (key.type === "Identifier") index = key.name;
+		else if (key.type === "Literal") index = "" + key.value;
 		const [member, memberInst] = c.handleEval(scope, value);
 		data[index] = member;
 		inst.push(...memberInst);
 	}
+	return [new ObjectValue(scope, data), inst];
+};
+
+export const ArrayExpression: THandler = (c, scope, node: es.ArrayExpression) => {
+	const data = {};
+	const inst = [];
+	node.elements.forEach((element, i) => {
+		const [value, valueInst] = c.handleEval(scope, element);
+		data[i] = value;
+		inst.push(valueInst);
+	});
 	return [new ObjectValue(scope, data), inst];
 };
 
