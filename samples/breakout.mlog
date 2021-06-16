@@ -31,85 +31,78 @@ jump 31 equal t4 0
 op sub 32:5 32:5 3
 op add 35:5 35:5 37:5
 op add 36:5 36:5 38:5
-op add t7 35:5 37:5
-op lessThan t8 t7 0
-op add t9 35:5 37:5
-op add t10 t9 5
-op greaterThan t11 t10 176
-op or t12 t8 t11
-jump 41 equal t12 0
+op add 65:6 35:5 5
+op add 66:6 36:5 5
+op lessThan t9 35:5 0
+op greaterThan t10 65:6 176
+op or t11 t9 t10
+jump 40 equal t11 0
 op mul 37:5 37:5 -1
-op add t14 36:5 38:5
-op add t15 t14 5
-op greaterThan t16 t15 176
-jump 46 equal t16 0
+op greaterThan t13 66:6 176
+jump 43 equal t13 0
 op mul 38:5 38:5 -1
-op add t18 35:5 5
-op greaterThan t19 t18 32:5
-op add t20 32:5 31:5
-op lessThan t21 35:5 t20
-op land t22 t19 t21
-op add t23 36:5 5
-op greaterThan t24 t23 10
-op land t25 t22 t24
-op lessThan t26 36:5 15
-op land t27 t25 t26
-jump 66 equal t27 0
+op greaterThan t15 65:6 32:5
+op add t16 32:5 31:5
+op lessThan t17 35:5 t16
+op land t18 t15 t17
+op greaterThan t19 66:6 10
+op land t20 t18 t19
+op lessThan t21 36:5 15
+op land t22 t20 t21
+jump 61 equal t22 0
 op mul 38:5 38:5 -1.1
-op add t29 35:5 2.5
-op sub t30 t29 32:5
-op div t31 31:5 2
-op add t32 t30 t31
-op div t33 t32 10
-op add 37:5 37:5 t33
-set t35 31:5
+op add t24 35:5 2.5
+op sub t25 t24 32:5
+op div t26 31:5 2
+op add t27 t25 t26
+op div t28 t27 10
+op add 37:5 37:5 t28
+set t30 31:5
 op sub 31:5 31:5 1
-set 82:6 0
-set 83:11 126
-op greaterThan t28 83:11 106
-jump 107 equal t28 0
-set 84:12 1
-op lessThan t30 84:12 176
-jump 105 equal t30 0
-read t3 bank1 82:6
-op equal t32 t3 1
-jump 101 equal t32 0
-draw rect 84:12 83:11 57.666666666666664 9
-op add t33 35:5 5
-op greaterThan t34 t33 84:12
-op add t35 84:12 58.666666666666664
-op lessThan t36 35:5 t35
-op land t37 t34 t36
-op add t38 36:5 5
-op greaterThan t39 t38 83:11
-op land t40 t37 t39
-op add t41 83:11 10
-op lessThan t42 36:5 t41
-op land t43 t40 t42
-jump 101 equal t43 0
-write 0 bank1 82:6
-set t44 41:5
+set 85:6 0
+set 86:11 126
+op greaterThan t23 86:11 106
+jump 100 equal t23 0
+set 87:12 1
+op lessThan t25 87:12 176
+jump 98 equal t25 0
+read t3 bank1 85:6
+op equal t27 t3 1
+jump 94 equal t27 0
+draw rect 87:12 86:11 57.666666666666664 9
+op greaterThan t28 65:6 87:12
+op add t29 87:12 58.666666666666664
+op lessThan t30 35:5 t29
+op land t31 t28 t30
+op greaterThan t32 66:6 86:11
+op land t33 t31 t32
+op add t34 86:11 10
+op lessThan t35 36:5 t34
+op land t36 t33 t35
+jump 94 equal t36 0
+write 0 bank1 85:6
+set t37 41:5
 op sub 41:5 41:5 1
-op sub t46 84:12 4
-op greaterThan t47 35:5 t46
-op add t48 84:12 62.666666666666664
-op lessThan t49 35:5 t48
-op land t50 t47 t49
-jump 100 equal t50 0
+op sub t39 87:12 4
+op greaterThan t40 35:5 t39
+op add t41 87:12 62.666666666666664
+op lessThan t42 35:5 t41
+op land t43 t40 t42
+jump 93 equal t43 0
 op mul 38:5 38:5 -1
-jump 101 always
+jump 94 always
 op mul 37:5 37:5 -1
-set t33 82:6
-op add 82:6 82:6 1
-op add 84:12 84:12 58.666666666666664
-jump 71 always
-op sub 83:11 83:11 10
-jump 68 always
-op lessThan t28 36:5 0
-op equal t29 41:5 0
-op or t30 t28 t29
-jump 112 equal t30 0
-jump 114 always
+set t28 85:6
+op add 85:6 85:6 1
+op add 87:12 87:12 58.666666666666664
+jump 66 always
+op sub 86:11 86:11 10
+jump 63 always
+op lessThan t23 36:5 0
+op equal t24 41:5 0
+op or t25 t23 t24
+jump 105 equal t25 0
+jump 107 always
 drawflush display1
 jump 18 always
 jump 1 always

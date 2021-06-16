@@ -61,16 +61,19 @@ while (1) {
 		// update ball
 		ballX += ballVX;
 		ballY += ballVY;
+		// precompute end points
+		let ballXEnd = ballX + ballSize
+		let ballYEnd = ballY + ballSize
 
 		// handle ball-wall collision
-		if (ballX + ballVX < 0 || ballX + ballVX + ballSize > size) ballVX *= -1;
-		if (ballY + ballVY + ballSize > size) ballVY *= -1;
+		if (ballX < 0 || ballXEnd > size) ballVX *= -1;
+		if (ballYEnd > size) ballVY *= -1;
 
 		// handle ball-paddle collision
 		if (
-			ballX + ballSize > paddleX &&
+			ballXEnd > paddleX &&
 			ballX < paddleX + paddleWidth &&
-			ballY + ballSize > paddleY &&
+			ballYEnd > paddleY &&
 			ballY < paddleY + paddleHeight
 		) {
 			ballVY *= -1.1;
@@ -88,9 +91,9 @@ while (1) {
 					draw("rect", x, y, brickWidth - 1, brickHeight - 1);
 					// detect collision
 					if (
-						ballX + ballSize > x &&
+						ballXEnd > x &&
 						ballX < x + brickWidth &&
-						ballY + ballSize > y &&
+						ballYEnd > y &&
 						ballY < y + brickHeight
 					) {
 						bricks[brickPtr] = 0;
