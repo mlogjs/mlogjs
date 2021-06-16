@@ -63,8 +63,8 @@ while (1) {
 		ballY += ballVY;
 
 		// handle ball-wall collision
-		if (ballX < 0 || ballX + ballSize > size) ballVX *= -1;
-		if (ballY + ballSize > size) ballVY *= -1;
+		if (ballX + ballVX < 0 || ballX + ballVX + ballSize > size) ballVX *= -1;
+		if (ballY + ballVY + ballSize > size) ballVY *= -1;
 
 		// handle ball-paddle collision
 		if (
