@@ -5,6 +5,9 @@ import { MacroFunction } from "./Function";
 
 class Block extends ObjectValue {
 	name: string;
+	toString() {
+		return this.name;
+	}
 	constructor(scope: IScope, name: string) {
 		super(scope, {
             $get: new MacroFunction(scope, (prop: IValue) => {
