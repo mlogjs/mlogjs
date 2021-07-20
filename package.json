@@ -12,15 +12,15 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/str1z/mlogjs.git"
+    "url": "git+https://github.com/weisrc/mlogjs.git"
   },
   "keywords": [],
   "author": "str1z",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/str1z/mlogjs/issues"
+    "url": "https://github.com/weisrc/mlogjs/issues"
   },
-  "homepage": "https://github.com/str1z/mlogjs#readme",
+  "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
     "esprima": "^4.0.1",
     "yargs": "^17.0.1"
