@@ -6,7 +6,7 @@ MlogJS is a compiler that allows users to compile complex JavaScript programs in
 
 You can join the Discord server for more information and help.
 
-https://discord.com/invite/ynH6WQQ3
+https://discord.gg/SvgjCtZnR5
 
 ## Getting started!
 
