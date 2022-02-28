@@ -1,1 +1,1 @@
-let string = concat("Hello ", "there", "!")
+let string = concat("Hello ", "there", "!");
