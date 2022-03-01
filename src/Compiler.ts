@@ -60,6 +60,7 @@ export class Compiler {
     scope.hardSet("sensor", new commands.Sensor(scope));
     scope.hardSet("wait", new commands.Wait(scope));
     scope.hardSet("lookup", new commands.Lookup(scope));
+    scope.hardSet("unitBind", new commands.UnitBind(scope));
 
     scope.hardSet("concat", new Concat(scope));
     scope.hardSet("Store", new StoreFactory(scope));

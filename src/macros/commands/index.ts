@@ -8,3 +8,4 @@ export * from "./Radar";
 export * from "./Sensor";
 export * from "./Wait";
 export * from "./Lookup";
+export * from "./UnitBind";
