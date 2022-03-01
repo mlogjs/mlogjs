@@ -1,7 +1,7 @@
-import { InstructionBase } from "../instructions";
-import { IScope, IValue } from "../types";
-import { LiteralValue } from "../values";
-import { MacroFunction } from "./Function";
+import { InstructionBase } from "../../instructions";
+import { IScope, IValue } from "../../types";
+import { LiteralValue } from "../../values";
+import { MacroFunction } from "../Function";
 
 export class Draw extends MacroFunction {
   constructor(scope: IScope) {

@@ -7,11 +7,10 @@ import {
   BlockBuilder,
   Concat,
   MlogMath,
-  Print,
   StoreFactory,
   TempFactory,
+  commands,
 } from "./macros";
-import { Draw } from "./macros/Draw";
 import { nodeName } from "./utils";
 import { NamespaceMacro } from "./macros/Namespace";
 import { RawValueMacro } from "./macros/RawValue";
@@ -49,8 +48,11 @@ export class Compiler {
     scope.hardSet("Block", new BlockBuilder(scope));
     scope.hardSet("Entity", new BlockBuilder(scope));
     scope.hardSet("Math", new MlogMath(scope));
-    scope.hardSet("draw", new Draw(scope));
-    scope.hardSet("print", new Print(scope));
+
+    // commands
+    scope.hardSet("draw", new commands.Draw(scope));
+    scope.hardSet("print", new commands.Print(scope));
+
     scope.hardSet("concat", new Concat(scope));
     scope.hardSet("Store", new StoreFactory(scope));
     scope.hardSet("Temp", new TempFactory(scope));
