@@ -169,6 +169,21 @@ declare global {
     sort: TRadarSort
   ): T;
 
+  /**
+   * Alternate way to access special properties on objects.
+   *
+   * This method allows you to use customly created symbols
+   * and sensor them on buildings.
+   * @param property The property to be sensed on the building
+   * @param target
+   *
+   * @example
+   *  let myBuilding = getBuilding("container1")
+   *  // jsdoc doesn't allow me to type this
+   * // variable, but you should type it as a symbol in this case
+   *  let myCustomSymbol = getVar("@custom-symbol") // problably defined by a mod
+   *  let result = sensor(myCustomSymbol, myBuilding)
+   */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
   function wait(seconds: number): void;
