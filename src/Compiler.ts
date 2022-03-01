@@ -58,6 +58,7 @@ export class Compiler {
     scope.hardSet("control", new commands.Control(scope));
     scope.hardSet("radar", new commands.Radar(scope));
     scope.hardSet("sensor", new commands.Sensor(scope));
+    scope.hardSet("wait", new commands.Wait(scope));
 
     scope.hardSet("concat", new Concat(scope));
     scope.hardSet("Store", new StoreFactory(scope));
