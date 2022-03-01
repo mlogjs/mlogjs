@@ -11,3 +11,4 @@ export * from "./Lookup";
 export * from "./UnitBind";
 export * from "./UnitControl";
 export * from "./UnitRadar";
+export * from "./UnitLocate";
