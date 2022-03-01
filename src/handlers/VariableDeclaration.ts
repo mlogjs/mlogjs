@@ -52,13 +52,12 @@ export const VariableDeclarator: THandler = (
 
       for (let i = 0; i < elements.length; i++) {
         const element = elements[i] as es.Identifier;
+
         if (!element) continue;
         const val = (init as ObjectValue).data[i];
-        console.log(val);
-        valinst.push(val);
-        return valinst;
+        scope.set(element.name, val);
       }
-      break;
+      return valinst;
     }
     default:
       throw new Error("");
