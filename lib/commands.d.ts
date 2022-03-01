@@ -249,11 +249,11 @@ declare global {
     radius: number
   ): boolean;
 
-  function unitRadar<T extends BasicBuilding | BasicUnit>(
+  function unitRadar<T extends BasicUnit>(
     filter1: TRadarFilter,
     filter2: TRadarFilter,
     filter3: TRadarFilter,
-    order: boolean,
+    order: number,
     sort: TRadarSort
   ): T;
 
