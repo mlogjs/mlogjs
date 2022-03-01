@@ -2,32 +2,11 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, StoreValue, TempValue } from "../../values";
+import { validRadarFilters, validRadarSorts } from "./Radar";
 
-export const validRadarFilters = [
-  "any",
-  "enemy",
-  "ally",
-  "player",
-  "attacker",
-  "flying",
-  "boss",
-  "ground",
-];
-
-export const validRadarSorts = [
-  "distance",
-  "health",
-  "shield",
-  "armor",
-  "maxHealth",
-];
-
-export class Radar extends MacroFunction {
+export class UnitRadar extends MacroFunction {
   constructor(scope: IScope) {
-    super(scope, (building, filter1, filter2, filter3, order, sort) => {
-      if (!(building instanceof StoreValue))
-        throw new Error("The building must a store");
-
+    super(scope, (filter1, filter2, filter3, order, sort) => {
       if (
         !(filter1 instanceof LiteralValue) ||
         typeof filter1.data !== "string" ||
@@ -59,8 +38,7 @@ export class Radar extends MacroFunction {
         temp,
         [
           new InstructionBase(
-            "radar",
-            building,
+            "uradar",
             filter1.data,
             filter2.data,
             filter3.data,

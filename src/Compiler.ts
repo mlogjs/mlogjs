@@ -62,6 +62,7 @@ export class Compiler {
     scope.hardSet("lookup", new commands.Lookup(scope));
     scope.hardSet("unitBind", new commands.UnitBind(scope));
     scope.hardSet("unitControl", new commands.UnitControl(scope));
+    scope.hardSet("unitRadar", new commands.UnitRadar(scope));
 
     scope.hardSet("concat", new Concat(scope));
     scope.hardSet("Store", new StoreFactory(scope));
