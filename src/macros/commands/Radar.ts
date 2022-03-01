@@ -45,6 +45,9 @@ export class Radar extends MacroFunction {
       if (!(sort instanceof LiteralValue) || typeof sort.data !== "string")
         throw new Error("The radar sort must be a string literal");
 
+      if (!validSorts.includes(sort.data))
+        throw new Error("Invalid sort value");
+
       return [
         null,
         [
