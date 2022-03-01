@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { StoreValue } from "../../values";
+import { StoreValue, TempValue } from "../../values";
 
 export class Sensor extends MacroFunction {
   constructor(scope: IScope) {
@@ -11,7 +11,9 @@ export class Sensor extends MacroFunction {
 
       if (!(target instanceof StoreValue))
         throw new Error("The sensor target must be a store");
-      return [null, [new InstructionBase("sensor", property, target)]];
+
+      const temp = new TempValue(scope);
+      return [temp, [new InstructionBase("sensor", temp, property, target)]];
     });
   }
 }

@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, StoreValue, TempValue } from "../../values";
 
 export class GetLink extends MacroFunction {
   constructor(scope: IScope) {
@@ -13,7 +13,8 @@ export class GetLink extends MacroFunction {
         throw new Error(
           "The getlink index must be a number literal or a store"
         );
-      return [null, [new InstructionBase("getlink", index)]];
+      const temp = new TempValue(scope);
+      return [temp, [new InstructionBase("getlink", temp, index)]];
     });
   }
 }

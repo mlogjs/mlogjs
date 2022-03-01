@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, StoreValue, TempValue } from "../../values";
 
 const validFilters = [
   "any",
@@ -48,8 +48,9 @@ export class Radar extends MacroFunction {
       if (!validSorts.includes(sort.data))
         throw new Error("Invalid sort value");
 
+      const temp = new TempValue(scope);
       return [
-        null,
+        temp,
         [
           new InstructionBase(
             "radar",
@@ -58,7 +59,8 @@ export class Radar extends MacroFunction {
             filter2.data,
             filter3.data,
             order,
-            sort.data
+            sort.data,
+            temp
           ),
         ],
       ];
