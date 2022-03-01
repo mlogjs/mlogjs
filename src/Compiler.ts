@@ -13,6 +13,7 @@ import {
 } from "./macros";
 import { Draw } from "./macros/Draw";
 import { nodeName } from "./utils";
+import { NamespaceMacro } from "./macros/Namespace";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
@@ -29,6 +30,14 @@ export class Compiler {
   compile(script: string): string {
     const program = this.parse(script);
     const scope = new Scope({});
+    scope.hardSet("ControlKind", new NamespaceMacro(scope));
+    scope.hardSet("Vars", new NamespaceMacro(scope));
+    scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
+    scope.hardSet("Liquids", new NamespaceMacro(scope));
+    scope.hardSet("Units", new NamespaceMacro(scope));
+    scope.hardSet("LAccess", new NamespaceMacro(scope));
+    scope.hardSet("UnitCommands", new NamespaceMacro(scope));
+    scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
     scope.hardSet("Block", new BlockBuilder(scope));
     scope.hardSet("Entity", new BlockBuilder(scope));
     scope.hardSet("Math", new MlogMath(scope));
