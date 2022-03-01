@@ -1,11 +1,5 @@
-/// <reference path="./kinds.d.ts" />
-
-import {
-  TRadarFilterArray,
-  TRadarSort,
-  TUnitLocateBuildingGroup,
-} from "../src/instructions/units";
-
+import "./kind";
+import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
 declare global {
   /**
    * Appends the items to the print buffer, calling this function
@@ -153,7 +147,9 @@ declare global {
 
   function radar<T extends BasicUnit | BasicBuilding = AnyBuilding | AnyUnit>(
     building: BasicBuilding,
-    filter: TRadarFilterArray,
+    filter1: TRadarFilter,
+    filter2: TRadarFilter,
+    filter3: TRadarFilter,
     order: boolean,
     sort: TRadarSort
   ): T;
@@ -224,7 +220,9 @@ declare global {
   ): boolean;
 
   function unitRadar<T extends BasicBuilding | BasicUnit>(
-    filter: TRadarFilterArray,
+    filter1: TRadarFilter,
+    filter2: TRadarFilter,
+    filter3: TRadarFilter,
     order: boolean,
     sort: TRadarSort
   ): T;
