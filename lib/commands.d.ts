@@ -145,12 +145,27 @@ declare global {
     b: number
   ): void;
 
+  /**
+   * Detects an unit nearby this `building`.
+   * @param building The building used to detect potential targets
+   * @param filter1 First filter for selecting a target. Setting it to "any" ignores it
+   * @param filter2 Second filter for selecting a target. Setting it to "any" ignores it
+   * @param filter3 Third filter for selecting a target. Setting it to "any" ignores it
+   * @param order The n th unit that fits these requirements based on the sorting method
+   *  (1 => first unit, 2 => second unit and so on)
+   * @param sort The method on which the results should be sorted
+   *
+   * @example
+   *  let turret = getBuilding("cyclone1")
+   *  // returns the second nearest enemy unit
+   *  let result = radar(turret, "enemy", "any", "any", 2, "distance")
+   */
   function radar<T extends BasicUnit | BasicBuilding = AnyBuilding | AnyUnit>(
     building: BasicBuilding,
     filter1: TRadarFilter,
     filter2: TRadarFilter,
     filter3: TRadarFilter,
-    order: boolean,
+    order: number,
     sort: TRadarSort
   ): T;
 
