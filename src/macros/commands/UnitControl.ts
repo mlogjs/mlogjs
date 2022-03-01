@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
 
 const validModes = [
   "idle",
@@ -43,7 +43,32 @@ export class UnitControl extends MacroFunction {
           "The others arguments of unitControl must be literals or stores"
         );
 
-      return [null, [new InstructionBase("ucontrol", mode.data, ...args)]];
+      let result: ObjectValue | TempValue | null = null;
+      let extraArgs = [];
+      switch (mode.data) {
+        case "getBlock": {
+          const outType = new TempValue(scope);
+          const outBuilding = new TempValue(scope);
+          result = new ObjectValue(scope, {
+            0: outType,
+            1: outBuilding,
+            length: new LiteralValue(scope, 2),
+          });
+          extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
+          break;
+        }
+        case "within": {
+          const temp = new TempValue(scope);
+          result = temp;
+          extraArgs = [temp, 0];
+          break;
+        }
+      }
+
+      return [
+        result,
+        [new InstructionBase("ucontrol", mode.data, ...args, ...extraArgs)],
+      ];
     });
   }
 }
