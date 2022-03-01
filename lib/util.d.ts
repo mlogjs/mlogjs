@@ -1,4 +1,4 @@
-type TRadarFilter =
+export type TRadarFilter =
   | "any"
   | "enemy"
   | "ally"
@@ -8,14 +8,19 @@ type TRadarFilter =
   | "boss"
   | "ground";
 
-type TRadarFilterArray =
+export type TRadarFilterArray =
   | [TRadarFilter]
   | [TRadarFilter, TRadarFilter]
   | [TRadarFilter, TRadarFilter, TRadarFilter];
 
-type TRadarSort = "distance" | "health" | "shield" | "armor" | "maxHealth";
+export type TRadarSort =
+  | "distance"
+  | "health"
+  | "shield"
+  | "armor"
+  | "maxHealth";
 
-type TUnitLocateBuildingGroup =
+export type TUnitLocateBuildingGroup =
   | "core"
   | "storage"
   | "generator"
