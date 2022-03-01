@@ -14,6 +14,7 @@ import {
 import { Draw } from "./macros/Draw";
 import { nodeName } from "./utils";
 import { NamespaceMacro } from "./macros/Namespace";
+import { RawValueMacro } from "./macros/RawValue";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
@@ -30,6 +31,8 @@ export class Compiler {
   compile(script: string): string {
     const program = this.parse(script);
     const scope = new Scope({});
+
+    // namespaces
     scope.hardSet("ControlKind", new NamespaceMacro(scope));
     scope.hardSet("Vars", new NamespaceMacro(scope));
     scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
@@ -38,6 +41,11 @@ export class Compiler {
     scope.hardSet("LAccess", new NamespaceMacro(scope));
     scope.hardSet("UnitCommands", new NamespaceMacro(scope));
     scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
+
+    // helper methods
+    scope.hardSet("getBuilding", new RawValueMacro(scope));
+    scope.hardSet("getVar", new RawValueMacro(scope));
+
     scope.hardSet("Block", new BlockBuilder(scope));
     scope.hardSet("Entity", new BlockBuilder(scope));
     scope.hardSet("Math", new MlogMath(scope));
