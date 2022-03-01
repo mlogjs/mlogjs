@@ -269,6 +269,4 @@ declare global {
   function unitLocate<T extends BasicBuilding = AnyBuilding>(
     find: "spawn" | "damaged"
   ): [found: false] | [found: true, x: number, y: number, building: T];
-
-  function asm(line: TemplateStringsArray): void;
 }
