@@ -52,7 +52,7 @@ export class Radar extends MacroFunction {
         null,
         [
           new InstructionBase(
-            "control",
+            "radar",
             building,
             filter1.data,
             filter2.data,
