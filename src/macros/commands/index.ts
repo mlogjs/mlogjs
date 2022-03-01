@@ -5,3 +5,4 @@ export * from "./DrawFlush";
 export * from "./GetLink";
 export * from "./Control";
 export * from "./Radar";
+export * from "./Sensor";
