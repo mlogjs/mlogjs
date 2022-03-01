@@ -54,6 +54,7 @@ export class Compiler {
     scope.hardSet("print", new commands.Print(scope));
     scope.hardSet("printFlush", new commands.PrintFlush(scope));
     scope.hardSet("drawFlush", new commands.DrawFlush(scope));
+    scope.hardSet("getLink", new commands.GetLink(scope));
 
     scope.hardSet("concat", new Concat(scope));
     scope.hardSet("Store", new StoreFactory(scope));
