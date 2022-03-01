@@ -1,3 +1,3 @@
-const temp = new Temp()
-let a = temp
-a = 123
+const temp = new Temp();
+let a = temp;
+a = 123;
