@@ -8,7 +8,7 @@ export class DrawFlush extends MacroFunction {
     super(scope, (target: IValue) => {
       if (!(target instanceof ObjectValue))
         throw new Error("The drawflush target must be a building");
-      return [null, [new InstructionBase("printflush", target)]];
+      return [null, [new InstructionBase("drawflush", target)]];
     });
   }
 }
