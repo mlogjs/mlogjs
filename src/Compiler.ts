@@ -14,7 +14,7 @@ import {
   BuildingBuilder,
 } from "./macros";
 import { nodeName } from "./utils";
-import { NamespaceMacro } from "./macros/Namespace";
+import { NamespaceMacro, VarsNamespace } from "./macros/Namespace";
 import { RawValueMacro } from "./macros/RawValue";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
@@ -35,7 +35,7 @@ export class Compiler {
 
     // namespaces
     scope.hardSet("ControlKind", new NamespaceMacro(scope));
-    scope.hardSet("Vars", new NamespaceMacro(scope));
+    scope.hardSet("Vars", new VarsNamespace(scope));
     scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
     scope.hardSet("Liquids", new NamespaceMacro(scope));
     scope.hardSet("Units", new NamespaceMacro(scope));

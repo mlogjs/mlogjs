@@ -4,7 +4,7 @@ import { IScope, IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";
 
-const itemNames = [
+export const itemNames = [
   "copper",
   "lead",
   "metaglass",
