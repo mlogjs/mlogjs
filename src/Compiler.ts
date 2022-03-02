@@ -10,6 +10,7 @@ import {
   StoreFactory,
   TempFactory,
   commands,
+  MemoryBuilder,
 } from "./macros";
 import { nodeName } from "./utils";
 import { NamespaceMacro } from "./macros/Namespace";
@@ -48,6 +49,7 @@ export class Compiler {
     scope.hardSet("Block", new BlockBuilder(scope));
     scope.hardSet("Entity", new BlockBuilder(scope));
     scope.hardSet("Math", new MlogMath(scope));
+    scope.hardSet("Memory", new MemoryBuilder(scope));
 
     // commands
     scope.hardSet("draw", new commands.Draw(scope));
