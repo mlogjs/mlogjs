@@ -62,12 +62,12 @@ export class Radar extends MacroFunction {
         [
           new InstructionBase(
             "radar",
-            building,
             filter1.data,
             filter2.data,
             filter3.data,
-            order,
             sort.data,
+            building,
+            order,
             temp
           ),
         ],
