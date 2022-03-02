@@ -19,6 +19,12 @@ declare global {
    */
   function draw(mode: "clear", r: number, g: number, b: number): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "color",
     r: number,
@@ -27,8 +33,20 @@ declare global {
     a: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(mode: "stroke", width: number): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "line",
     x1: number,
@@ -37,6 +55,12 @@ declare global {
     y2: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "rect",
     x: number,
@@ -45,6 +69,12 @@ declare global {
     height: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "lineRect",
     x: number,
@@ -53,6 +83,12 @@ declare global {
     height: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "poly",
     x: number,
@@ -62,6 +98,12 @@ declare global {
     rotation: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "linePoly",
     x: number,
@@ -71,6 +113,12 @@ declare global {
     rotation: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "triangle",
     x: number,
@@ -81,6 +129,12 @@ declare global {
     y3: number
   ): void;
 
+  /**
+   * Appends draw contents to the draw buffer.
+   *
+   * Warning: these methods only append data to the draw buffer,
+   * which is used by `drawFlush` to actually draw content on a display.
+   */
   function draw(
     mode: "image",
     x: number,
@@ -156,11 +210,11 @@ declare global {
    * @param sort The method on which the results should be sorted
    *
    * @example
-   *  let turret = getBuilding("cyclone1")
+   *  const turret = getBuilding("cyclone1")
    *  // returns the second nearest enemy unit
-   *  let result = radar(turret, "enemy", "any", "any", 2, "distance")
+   *  const result = radar(turret, "enemy", "any", "any", 2, "distance")
    */
-  function radar<T extends BasicUnit | BasicBuilding = AnyBuilding | AnyUnit>(
+  function radar<T extends BasicUnit = AnyUnit>(
     building: BasicBuilding,
     filter1: TRadarFilter,
     filter2: TRadarFilter,
@@ -237,11 +291,11 @@ declare global {
     rotation: number,
     config: unknown
   ): void;
-  function unitControl(
+  function unitControl<T extends BasicBuilding = AnyBuilding>(
     mode: "getBlock",
     x: number,
     y: number
-  ): [type: BlockSymbol | null, building: BasicBuilding | null];
+  ): [type: BlockSymbol | null, building: T | null];
   function unitControl(
     mode: "within",
     x: number,

@@ -1,5 +1,5 @@
 import "./globals";
-import './custom-lib'
+import "./custom-lib";
 
 type LogicSymbols = typeof Items & typeof Liquids & typeof LAccess;
 
@@ -98,7 +98,7 @@ declare global {
 
   type Controllable = WithSymbols<{
     readonly controlled: 0 | ControlKind;
-    readonly controller: BasicUnit | BasicBuilding;
+    readonly controller: AnyUnit | BasicBuilding;
   }>;
 
   type Nameable = WithSymbols<{
