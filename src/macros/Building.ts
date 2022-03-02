@@ -1,8 +1,9 @@
 import { camelToDashCase } from "../utils";
-import { InstructionBase } from "../instructions";
-import { IScope, IValue } from "../types";
+import { InstructionBase, OperationInstruction } from "../instructions";
+import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";
+import { operatorMap } from "../operators";
 
 export const itemNames = [
   "copper",
@@ -65,4 +66,21 @@ export class BuildingBuilder extends ObjectValue {
       }),
     });
   }
+}
+
+for (const key in operatorMap) {
+  const kind = operatorMap[key];
+  Building.prototype[key] = function (
+    this: Building,
+    scope: IScope,
+    value: IValue
+  ): TValueInstructions {
+    const left = new StoreValue(scope, this.name);
+    const [right, rightInst] = value.eval(scope);
+    const temp = new TempValue(scope);
+    return [
+      temp,
+      [...rightInst, new OperationInstruction(kind, temp, left, right)],
+    ];
+  };
 }

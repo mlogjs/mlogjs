@@ -1,9 +1,16 @@
 import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
-import { IScope } from "../types";
-import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
+import { IScope, IValue, TValueInstructions } from "../types";
+import {
+  BaseValue,
+  LiteralValue,
+  ObjectValue,
+  StoreValue,
+  TempValue,
+} from "../values";
 import { Building, itemNames } from "./Building";
-import { InstructionBase } from "../instructions";
+import { InstructionBase, OperationInstruction } from "../instructions";
+import { comparisonBinaryOperators, operatorMap } from "../operators";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -74,4 +81,21 @@ export class Unit extends ObjectValue {
   toString(): string {
     return this.name;
   }
+}
+
+for (const key in operatorMap) {
+  const kind = operatorMap[key];
+  Unit.prototype[key] = function (
+    this: Unit,
+    scope: IScope,
+    value: IValue
+  ): TValueInstructions {
+    const left = new StoreValue(scope, this.name);
+    const [right, rightInst] = value.eval(scope);
+    const temp = new TempValue(scope);
+    return [
+      temp,
+      [...rightInst, new OperationInstruction(kind, temp, left, right)],
+    ];
+  };
 }
