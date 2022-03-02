@@ -1,4 +1,4 @@
-/// <reference path="./custom-lib.d.ts" />
+/// <reference path="./eslib/index.d.ts" />
 /// <reference path="./commands.d.ts" />
 /// <reference path="./globals.d.ts" />
 /// <reference path="./helpers.d.ts" />
