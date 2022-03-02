@@ -1,0 +1,8 @@
+set 1:9 0
+op lessThan t0 1:9 100
+jump 7 notEqual t0 0
+print 1:9
+set t0 1:9
+op add 1:9 1:9 1
+jump 1 always
+end
