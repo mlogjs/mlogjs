@@ -1,105 +1,105 @@
 draw color 255 255 255
-set 31:5 40
-op div t0 31:5 2
-op sub 32:5 88 t0
-set 35:5 88
-set 36:5 88
+set 31:6 40
+op div t0 31:6 2
+op sub 32:6 88 t0
+set 35:6 88
+set 36:6 88
 op rand t0 10
-op sub 37:5 t0 5
+op sub 37:6 t0 5
 op rand t1 10
-op sub 38:5 t1 5
-set 41:5 6
-set 42:10 0
-op lessThan t4 42:10 6
+op sub 38:6 t1 5
+set 41:6 6
+set 42:11 0
+op lessThan t4 42:11 6
 jump 18 equal t4 0
-write 1 bank1 42:10
-set t5 42:10
-op add 42:10 42:10 1
+sensor 1 bank1 42:11
+set t5 42:11
+op add 42:11 42:11 1
 jump 12 always
 draw clear 0 0 0
-draw rect 32:5 10 31:5 5
-draw rect 35:5 36:5 5 5
-sensor t2 switch1 @enabled
-jump 28 equal t2 0
-op sub t4 176 31:5
-op lessThan t5 32:5 t4
+draw rect 32:6 10 31:6 5
+draw rect 35:6 36:6 5 5
+sensor t3 switch1 @enabled
+jump 28 equal t3 0
+op sub t4 176 31:6
+op lessThan t5 32:6 t4
 jump 27 equal t5 0
-op add 32:5 32:5 3
+op add 32:6 32:6 3
 jump 31 always
-op greaterThan t4 32:5 0
+op greaterThan t4 32:6 0
 jump 31 equal t4 0
-op sub 32:5 32:5 3
-op add 35:5 35:5 37:5
-op add 36:5 36:5 38:5
-op add 65:6 35:5 5
-op add 66:6 36:5 5
-op lessThan t9 35:5 0
-op greaterThan t10 65:6 176
+op sub 32:6 32:6 3
+op add 35:6 35:6 37:6
+op add 36:6 36:6 38:6
+op add 65:8 35:6 5
+op add 66:8 36:6 5
+op lessThan t9 35:6 0
+op greaterThan t10 65:8 176
 op or t11 t9 t10
 jump 40 equal t11 0
-op mul 37:5 37:5 -1
-op greaterThan t13 66:6 176
+op mul 37:6 37:6 -1
+op greaterThan t13 66:8 176
 jump 43 equal t13 0
-op mul 38:5 38:5 -1
-op greaterThan t15 65:6 32:5
-op add t16 32:5 31:5
-op lessThan t17 35:5 t16
+op mul 38:6 38:6 -1
+op greaterThan t15 65:8 32:6
+op add t16 32:6 31:6
+op lessThan t17 35:6 t16
 op land t18 t15 t17
-op greaterThan t19 66:6 10
+op greaterThan t19 66:8 10
 op land t20 t18 t19
-op lessThan t21 36:5 15
+op lessThan t21 36:6 15
 op land t22 t20 t21
 jump 61 equal t22 0
-op mul 38:5 38:5 -1.1
-op add t24 35:5 2.5
-op sub t25 t24 32:5
-op div t26 31:5 2
+op mul 38:6 38:6 -1.1
+op add t24 35:6 2.5
+op sub t25 t24 32:6
+op div t26 31:6 2
 op add t27 t25 t26
 op div t28 t27 10
-op add 37:5 37:5 t28
-set t30 31:5
-op sub 31:5 31:5 1
-set 85:6 0
-set 86:11 126
-op greaterThan t23 86:11 106
+op add 37:6 37:6 t28
+set t30 31:6
+op sub 31:6 31:6 1
+set 85:8 0
+set 86:13 126
+op greaterThan t23 86:13 106
 jump 100 equal t23 0
-set 87:12 1
-op lessThan t25 87:12 176
+set 87:15 1
+op lessThan t25 87:15 176
 jump 98 equal t25 0
-read t3 bank1 85:6
-op equal t27 t3 1
+sensor t4 bank1 85:8
+op equal t27 t4 1
 jump 94 equal t27 0
-draw rect 87:12 86:11 57.666666666666664 9
-op greaterThan t28 65:6 87:12
-op add t29 87:12 58.666666666666664
-op lessThan t30 35:5 t29
+draw rect 87:15 86:13 57.666666666666664 9
+op greaterThan t28 65:8 87:15
+op add t29 87:15 58.666666666666664
+op lessThan t30 35:6 t29
 op land t31 t28 t30
-op greaterThan t32 66:6 86:11
+op greaterThan t32 66:8 86:13
 op land t33 t31 t32
-op add t34 86:11 10
-op lessThan t35 36:5 t34
+op add t34 86:13 10
+op lessThan t35 36:6 t34
 op land t36 t33 t35
 jump 94 equal t36 0
-write 0 bank1 85:6
-set t37 41:5
-op sub 41:5 41:5 1
-op sub t39 87:12 4
-op greaterThan t40 35:5 t39
-op add t41 87:12 62.666666666666664
-op lessThan t42 35:5 t41
+sensor 0 bank1 85:8
+set t37 41:6
+op sub 41:6 41:6 1
+op sub t39 87:15 4
+op greaterThan t40 35:6 t39
+op add t41 87:15 62.666666666666664
+op lessThan t42 35:6 t41
 op land t43 t40 t42
 jump 93 equal t43 0
-op mul 38:5 38:5 -1
+op mul 38:6 38:6 -1
 jump 94 always
-op mul 37:5 37:5 -1
-set t28 85:6
-op add 85:6 85:6 1
-op add 87:12 87:12 58.666666666666664
+op mul 37:6 37:6 -1
+set t28 85:8
+op add 85:8 85:8 1
+op add 87:15 87:15 58.666666666666664
 jump 66 always
-op sub 86:11 86:11 10
+op sub 86:13 86:13 10
 jump 63 always
-op lessThan t23 36:5 0
-op equal t24 41:5 0
+op lessThan t23 36:6 0
+op equal t24 41:6 0
 op or t25 t23 t24
 jump 105 equal t25 0
 jump 107 always

@@ -14,4 +14,4 @@ You can join the Discord server for more information and for help.
 npm i mlogjs -g
 ```
 
-After installing the package from NPM, read the [docs](https://str1z.github.io/mlogjs).
+After installing the package from NPM, read the [docs](#/getting-started).

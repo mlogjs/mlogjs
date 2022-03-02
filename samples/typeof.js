@@ -1,7 +1,8 @@
 let a = 1;
-const message1 = Block("message1");
+const message1 = getBuilding("message1");
 if (typeof a === "store") {
-  message1.puts("a is a store.");
+  print("a is a store");
 } else {
-  message1.puts("a is not a store.");
+  print("a is not a store");
 }
+printFlush(message1);

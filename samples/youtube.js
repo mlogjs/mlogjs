@@ -6,8 +6,8 @@ let y = dsize / 2;
 let vx = 2;
 let vy = 0;
 
-const display = Block("display1");
-const switch1 = Block("switch1");
+const display = getBuilding("display1");
+const switch1 = getBuilding("switch1");
 
 draw("color", 255, 255, 255);
 
@@ -22,5 +22,5 @@ while (switch1.enabled) {
 
   draw("clear");
   draw("rect", x, y, bsize, bsize);
-  display.drawFlush();
+  drawFlush(display);
 }

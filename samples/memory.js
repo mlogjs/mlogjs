@@ -1,3 +1,5 @@
-const cell = Block("cell1");
+const cell = getBuilding("cell1");
+const memory = new Memory(cell);
+
 let test = 1;
-cell[test] = test;
+memory[test] = test;

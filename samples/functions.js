@@ -26,5 +26,6 @@ let a = 1;
 let b = 1;
 
 let result = op(type, a, b);
-const message1 = Block("message1");
-message1.puts("The result is : ", result, ".");
+const message1 = getBuilding("message1");
+print("Thre result is: ", result, ".");
+printFlush(message1);

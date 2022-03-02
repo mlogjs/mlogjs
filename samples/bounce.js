@@ -8,7 +8,7 @@ let y = displaySize / 2;
 let vx = 0;
 let vy = 2;
 
-const display1 = new Block("display1");
+const display1 = getBuilding("display1");
 
 draw("color", 255, 255, 255);
 
@@ -21,5 +21,5 @@ while (1) {
 
   draw("clear");
   draw("rect", x, y, ballSize, ballSize);
-  display1.drawFlush();
+  drawFlush(display1);
 }

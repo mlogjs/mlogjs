@@ -89,3 +89,29 @@ export type SingleOperator = typeof singleOperators[number];
 
 export const operators = [...leftRightOperators, ...singleOperators] as const;
 export type Operator = typeof operators[number];
+
+export const operatorMap: { [k in BinaryOperator | LogicalOperator]?: string } =
+  {
+    "==": "equal",
+    "===": "strictEqual",
+    "!=": "notEqual",
+    "!==": "notEqual",
+    "<": "lessThan",
+    ">": "greaterThan",
+    "<=": "lessThanEq",
+    ">=": "greaterThanEq",
+    "+": "add",
+    "-": "sub",
+    "*": "mul",
+    "/": "div",
+    "%": "mod",
+    "**": "pow",
+    "|": "or",
+    "&": "and",
+    "^": "xor",
+    ">>": "shr",
+    ">>>": "shr",
+    "<<": "shl",
+    "&&": "land",
+    "||": "or",
+  } as const;
