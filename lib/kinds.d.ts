@@ -1,7 +1,8 @@
 /// <reference path="./traits.d.ts" />
 
 interface BasicUnit
-  extends Shooting,
+  extends ItemHolder,
+    Shooting,
     WithHealth,
     Rotatable,
     Spaced,
