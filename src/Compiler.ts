@@ -3,16 +3,7 @@ import * as handlers from "./handlers";
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import {
-  BlockBuilder,
-  Concat,
-  MlogMath,
-  StoreFactory,
-  TempFactory,
-  commands,
-  MemoryBuilder,
-  BuildingBuilder,
-} from "./macros";
+import { MlogMath, commands, MemoryBuilder, BuildingBuilder } from "./macros";
 import { nodeName } from "./utils";
 import { NamespaceMacro, VarsNamespace } from "./macros/Namespace";
 import { RawValueMacro } from "./macros/RawValue";
@@ -47,8 +38,6 @@ export class Compiler {
     scope.hardSet("getBuilding", new BuildingBuilder(scope));
     scope.hardSet("getVar", new RawValueMacro(scope));
 
-    scope.hardSet("Block", new BlockBuilder(scope));
-    scope.hardSet("Entity", new BlockBuilder(scope));
     scope.hardSet("Math", new MlogMath(scope));
     scope.hardSet("Memory", new MemoryBuilder(scope));
 
@@ -67,10 +56,6 @@ export class Compiler {
     scope.hardSet("unitControl", new commands.UnitControl(scope));
     scope.hardSet("unitRadar", new commands.UnitRadar(scope));
     scope.hardSet("unitLocate", new commands.UnitLocate(scope));
-
-    scope.hardSet("concat", new Concat(scope));
-    scope.hardSet("Store", new StoreFactory(scope));
-    scope.hardSet("Temp", new TempFactory(scope));
 
     const valueInst = this.handle(scope, program);
     valueInst[1].push(new EndInstruction(), ...scope.inst);
