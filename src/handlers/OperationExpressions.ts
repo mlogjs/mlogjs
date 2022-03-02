@@ -46,8 +46,10 @@ export const UnaryExpression: THandler = (
   { argument, operator }: es.UnaryExpression
 ) => {
   const [arg, argInst] = c.handleEval(scope, argument);
-  const [op, opInst] =
-    arg[(operator.length === 1 ? "u" : "") + operator](scope);
+  const operatorId =
+    operator == "+" || operator == "-" ? "u" + operator : operator;
+
+  const [op, opInst] = arg[operatorId](scope);
   return [op, [...argInst, ...opInst]];
 };
 export const UpdateExpression: THandler = (
