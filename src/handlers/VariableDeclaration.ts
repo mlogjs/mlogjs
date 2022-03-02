@@ -29,7 +29,7 @@ export const VariableDeclarator: THandler = (
         throw Error("Cannot create constant with void value.");
       if (kind === "const" && init.constant) {
         scope.set(name, init);
-        return [init, []];
+        return valinst;
       } else {
         const value = scope.make(name, nodeName(node));
         if (init) {
