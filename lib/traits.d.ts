@@ -1,4 +1,5 @@
 import "./globals";
+import './custom-lib'
 
 type LogicSymbols = typeof Items & typeof Liquids & typeof LAccess;
 

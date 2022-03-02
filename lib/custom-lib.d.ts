@@ -1,8 +1,36 @@
 /// <reference no-default-lib="true" />
 
+type Record<K extends keyof any, T> = {
+  [P in K]: T;
+};
+
 interface Array<T> {
   [index: number]: T;
   length: number;
+  [Symbol.iterator](): IterableIterator<T>;
+}
+
+interface IteratorYieldResult<TYield> {
+  done?: false;
+  value: TYield;
+}
+
+interface IteratorReturnResult<TReturn> {
+  done: true;
+  value: TReturn;
+}
+
+type IteratorResult<T, TReturn = any> =
+  | IteratorYieldResult<T>
+  | IteratorReturnResult<TReturn>;
+
+interface Iterator<T, TReturn = any, TNext = undefined> {
+  next(...args: [] | [TNext]): IteratorResult<T, TReturn>;
+  return?(value?: TReturn): IteratorResult<T, TReturn>;
+  throw?(e?: any): IteratorResult<T, TReturn>;
+}
+
+interface IterableIterator<T> extends Iterator<T> {
   [Symbol.iterator](): IterableIterator<T>;
 }
 
@@ -21,6 +49,14 @@ interface Object {}
 interface RegExp {}
 
 interface String {}
+
+interface Symbol {}
+
+interface SymbolConstructor {
+  readonly iterator: unique symbol;
+}
+
+declare var Symbol: SymbolConstructor;
 
 interface Math {
   /**
