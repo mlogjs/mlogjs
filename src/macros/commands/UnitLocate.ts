@@ -3,6 +3,7 @@ import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
+import { Building } from "../Building";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];
 
@@ -53,7 +54,7 @@ export class UnitLocate extends MacroFunction {
           0: outFound,
           1: outX,
           2: outY,
-          3: outBuilding,
+          3: new Building(scope, outBuilding.name),
           length: new LiteralValue(scope, find.data === "ore" ? 3 : 4),
         }),
         [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
