@@ -41,7 +41,7 @@ export class VarsNamespace extends NamespaceMacro {
     const $get = this.data.$get as MacroFunction;
     this.data.$get = new MacroFunction(scope, prop => {
       if (prop instanceof LiteralValue) {
-        if (prop.data === "unit") return [new Unit(scope), []];
+        if (prop.data === "unit") return [new Unit(scope, "@unit"), []];
         if (prop.data === "this") return [new Building(scope, "@this"), []];
       }
       return $get.call(scope, [prop]);
@@ -49,9 +49,21 @@ export class VarsNamespace extends NamespaceMacro {
   }
 }
 
+export class UCommandsNamespace extends NamespaceMacro {
+  constructor(scope: IScope) {
+    super(scope);
+    const $get = this.data.$get as MacroFunction;
+    this.data.$get = new MacroFunction(scope, prop => {
+      if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
+        throw new Error("Cannot use dynamic properties on object macros");
+      const symbolName = prop.data[0].toUpperCase() + prop.data.slice(1);
+      return [new StoreValue(scope, `@command${symbolName}`), []];
+    });
+  }
+}
 // TODO: repeated logic between UnitMacro and Building
 export class Unit extends ObjectValue {
-  constructor(scope: IScope, public name: string = "@unit") {
+  constructor(scope: IScope, public name: string) {
     super(scope, {
       $get: new MacroFunction(scope, prop => {
         if (prop instanceof LiteralValue && typeof prop.data === "string") {

@@ -11,7 +11,11 @@ import {
   Concat,
 } from "./macros";
 import { nodeName } from "./utils";
-import { NamespaceMacro, VarsNamespace } from "./macros/Namespace";
+import {
+  NamespaceMacro,
+  UCommandsNamespace,
+  VarsNamespace,
+} from "./macros/Namespace";
 import { RawValueMacro } from "./macros/RawValue";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
@@ -37,7 +41,7 @@ export class Compiler {
     scope.hardSet("Liquids", new NamespaceMacro(scope));
     scope.hardSet("Units", new NamespaceMacro(scope));
     scope.hardSet("LAccess", new NamespaceMacro(scope));
-    scope.hardSet("UnitCommands", new NamespaceMacro(scope));
+    scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
     scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
     // helper methods
