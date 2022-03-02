@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 
 const validKinds = ["enabled", "shoot", "shootp", "config", "color"];
 export class Control extends MacroFunction {
@@ -13,8 +13,8 @@ export class Control extends MacroFunction {
       if (!validKinds.includes(kind.data))
         throw new Error("Invalid control kind");
 
-      if (!(building instanceof StoreValue))
-        throw new Error("The building must be a store");
+      if (!(building instanceof ObjectValue))
+        throw new Error("The building must be an object value");
 
       return [
         null,

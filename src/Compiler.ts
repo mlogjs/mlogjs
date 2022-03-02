@@ -11,6 +11,7 @@ import {
   TempFactory,
   commands,
   MemoryBuilder,
+  BuildingBuilder,
 } from "./macros";
 import { nodeName } from "./utils";
 import { NamespaceMacro } from "./macros/Namespace";
@@ -43,7 +44,7 @@ export class Compiler {
     scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
     // helper methods
-    scope.hardSet("getBuilding", new RawValueMacro(scope));
+    scope.hardSet("getBuilding", new BuildingBuilder(scope));
     scope.hardSet("getVar", new RawValueMacro(scope));
 
     scope.hardSet("Block", new BlockBuilder(scope));

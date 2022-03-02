@@ -2,6 +2,7 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
+import { Building } from "../Building";
 
 const validModes = [
   "idle",
@@ -36,7 +37,11 @@ export class UnitControl extends MacroFunction {
       if (
         args.some(
           value =>
-            !(value instanceof StoreValue || value instanceof LiteralValue)
+            !(
+              value instanceof StoreValue ||
+              value instanceof LiteralValue ||
+              value instanceof ObjectValue
+            )
         )
       )
         throw new Error(
@@ -51,7 +56,7 @@ export class UnitControl extends MacroFunction {
           const outBuilding = new TempValue(scope);
           result = new ObjectValue(scope, {
             0: outType,
-            1: outBuilding,
+            1: new Building(scope, outBuilding.name),
             length: new LiteralValue(scope, 2),
           });
           extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];

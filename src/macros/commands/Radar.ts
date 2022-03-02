@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue, TempValue } from "../../values";
+import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
 
 export const validRadarFilters = [
   "any",
@@ -25,7 +25,7 @@ export const validRadarSorts = [
 export class Radar extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (building, filter1, filter2, filter3, order, sort) => {
-      if (!(building instanceof StoreValue))
+      if (!(building instanceof ObjectValue))
         throw new Error("The building must a store");
 
       if (
