@@ -4,5 +4,5 @@
 
 ![](mlogjs.png)
 
-[GitHub](https://github.com/str1z/mlogcc)
-[Get Started](#getting-started)
+[GitHub](https://github.com/weisrc/mlogcc)
+[Get Started](/getting-started)
