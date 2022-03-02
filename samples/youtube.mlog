@@ -8,17 +8,17 @@ jump 26 equal t0 0
 op add 4:4 4:4 6:4
 op add 5:4 5:4 7:4
 op add 7:4 7:4 -1
-op lessThan t1 4:4 0
-op add t2 4:4 5
-op greaterThan t2 t2 176
-op or t1 t1 t2
-jump 16 equal t1 0
+op lessThan t4 4:4 0
+op add t5 4:4 5
+op greaterThan t6 t5 176
+op or t7 t4 t6
+jump 16 equal t7 0
 op div 6:4 6:4 -1.1
-op lessThan t1 5:4 0
-op add t2 5:4 5
-op greaterThan t2 t2 176
-op or t1 t1 t2
-jump 22 equal t1 0
+op lessThan t9 5:4 0
+op add t10 5:4 5
+op greaterThan t11 t10 176
+op or t12 t9 t11
+jump 22 equal t12 0
 op div 7:4 7:4 -1.1
 draw clear
 draw rect 4:4 5:4 5 5

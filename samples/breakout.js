@@ -1,6 +1,6 @@
-const bricks = new Block("bank1");
-const display = new Block("display1");
-const message = new Block("message1");
+const bricks = getBuilding("bank1");
+const display = getBuilding("display1");
+const message = getBuilding("message1");
 
 const size = 176;
 
@@ -17,7 +17,7 @@ const brickTotal = brickCols * brickRows;
 const paddleHeight = 5;
 const paddleY = 10;
 const paddleSpeed = 3;
-const paddleController = new Block("switch1");
+const paddleController = getBuilding("switch1");
 
 // ball
 const ballMaxStartSpeed = 5;
@@ -117,6 +117,6 @@ while (1) {
     if (ballY < 0 || brickCount == 0) break;
 
     // flush display
-    display.drawFlush();
+    drawFlush(display);
   }
 }

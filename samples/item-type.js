@@ -19,5 +19,6 @@ function getItemType(c) {
 }
 
 let type = 3;
-const msg1 = Block("message1");
-msg1.puts(getItemType(type));
+const msg1 = getBuilding("message1");
+print(getItemType(type));
+printFlush(msg1);
