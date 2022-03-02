@@ -3,7 +3,13 @@ import * as handlers from "./handlers";
 import { parseScript } from "esprima";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import { MlogMath, commands, MemoryBuilder, BuildingBuilder } from "./macros";
+import {
+  MlogMath,
+  commands,
+  MemoryBuilder,
+  BuildingBuilder,
+  Concat,
+} from "./macros";
 import { nodeName } from "./utils";
 import { NamespaceMacro, VarsNamespace } from "./macros/Namespace";
 import { RawValueMacro } from "./macros/RawValue";
@@ -37,6 +43,7 @@ export class Compiler {
     // helper methods
     scope.hardSet("getBuilding", new BuildingBuilder(scope));
     scope.hardSet("getVar", new RawValueMacro(scope));
+    scope.hardSet("concat", new Concat(scope));
 
     scope.hardSet("Math", new MlogMath(scope));
     scope.hardSet("Memory", new MemoryBuilder(scope));

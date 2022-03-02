@@ -19,3 +19,5 @@ declare function getVar<T>(key: string): T;
 declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
   name: string
 ): T;
+
+declare function concat(...strings: string[]): string;
