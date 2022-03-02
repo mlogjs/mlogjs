@@ -1,6 +1,8 @@
-import { InstructionBase } from "../instructions";
+import { operators } from "../operators";
+import { InstructionBase, OperationInstruction } from "../instructions";
 import { IScope, IValue } from "../types";
 import {
+  BaseValue,
   LiteralValue,
   ObjectValue,
   StoreValue,
@@ -9,30 +11,38 @@ import {
 } from "../values";
 import { MacroFunction } from "./Function";
 
+class MemoryEntry extends ObjectValue {
+  constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
+    super(scope, {
+      $eval: new MacroFunction(scope, () => {
+        const temp = new TempValue(scope);
+        return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
+      }),
+      "$=": new MacroFunction(scope, value => {
+        return [null, [new InstructionBase("write", prop, mem.cell, value)]];
+      }),
+    });
+  }
+}
+
+for (const operator of operators) {
+  if (operator === "=") continue;
+  MemoryEntry.prototype[operator] = function (this: MemoryEntry, ...args) {
+    return BaseValue.prototype[operator].apply(this, args);
+  };
+}
+
 class MemoryMacro extends ObjectValue {
   name: string;
   toString() {
     return this.name;
   }
-  constructor(scope: IScope, cell: ObjectValue, size: LiteralValue) {
+  constructor(scope: IScope, public cell: ObjectValue, size: LiteralValue) {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
           return [new VoidValue(scope), []];
-        const cellValue =
-          cell instanceof LiteralValue ? (cell.data as string) : cell;
-        const obj = new ObjectValue(scope, {
-          $eval: new MacroFunction(scope, () => {
-            const temp = new TempValue(scope);
-            return [temp, [new InstructionBase("read", temp, cellValue, prop)]];
-          }),
-          "$=": new MacroFunction(scope, value => {
-            return [
-              null,
-              [new InstructionBase("write", prop, cellValue, value)],
-            ];
-          }),
-        });
+        const obj = new MemoryEntry(scope, this, prop);
         return [obj, []];
       }),
       length: size,
