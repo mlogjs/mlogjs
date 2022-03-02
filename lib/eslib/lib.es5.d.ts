@@ -34,7 +34,10 @@ interface NewableFunction extends Function {}
 
 interface IArguments {}
 
-interface String {}
+interface String {
+  /** Returns the length of a String object. */
+  readonly length: number;
+}
 
 interface Boolean {}
 
