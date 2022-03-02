@@ -2,7 +2,7 @@ import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
 import { IScope } from "../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
-import { itemNames } from "./Building";
+import { Building, itemNames } from "./Building";
 import { InstructionBase } from "../instructions";
 
 interface NamespaceMacroOptions {
@@ -33,8 +33,9 @@ export class VarsNamespace extends NamespaceMacro {
     super(scope);
     const $get = this.data.$get as MacroFunction;
     this.data.$get = new MacroFunction(scope, prop => {
-      if (prop instanceof LiteralValue && prop.data === "unit") {
-        return [new Unit(scope), []];
+      if (prop instanceof LiteralValue) {
+        if (prop.data === "unit") return [new Unit(scope), []];
+        if (prop.data === "this") return [new Building(scope, "@this"), []];
       }
       return $get.call(scope, [prop]);
     });
