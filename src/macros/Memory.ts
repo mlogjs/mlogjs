@@ -14,7 +14,7 @@ class MemoryMacro extends ObjectValue {
   toString() {
     return this.name;
   }
-  constructor(scope: IScope, cell: StoreValue, size: LiteralValue) {
+  constructor(scope: IScope, cell: ObjectValue, size: LiteralValue) {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
@@ -39,7 +39,7 @@ class MemoryMacro extends ObjectValue {
       size,
     });
 
-    this.name = cell.name;
+    this.name = cell.toString();
   }
 }
 
@@ -49,8 +49,8 @@ export class MemoryBuilder extends ObjectValue {
       $call: new MacroFunction(
         scope,
         (cell: IValue, size: IValue = new LiteralValue(scope, 64)) => {
-          if (!(cell instanceof StoreValue))
-            throw new Error("Memory cell must be a string literal or a store.");
+          if (!(cell instanceof ObjectValue))
+            throw new Error("Memory cell must be a building object.");
 
           if (!(size instanceof LiteralValue && typeof size.data === "number"))
             throw new Error("The memory size must be a number literal.");

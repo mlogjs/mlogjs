@@ -43,7 +43,7 @@ export class VarsNamespace extends NamespaceMacro {
 }
 
 // TODO: repeated logic between UnitMacro and Building
-class Unit extends ObjectValue {
+export class Unit extends ObjectValue {
   constructor(scope: IScope, public name: string = "@unit") {
     super(scope, {
       $get: new MacroFunction(scope, prop => {
