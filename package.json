@@ -3,9 +3,7 @@
   "version": "0.1.11",
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
   "main": "build/index.js",
-  "bin": {
-    "mlogjs": "./build/bin.js"
-  },
+  "bin": "./build/bin.js",
   "scripts": {
     "build": "tsc && webpack",
     "start": "npm run build && npm i -g . && mlogjs"
@@ -14,6 +12,7 @@
     "type": "git",
     "url": "git+https://github.com/weisrc/mlogjs.git"
   },
+  "packageManager": "yarn@3.2.0",
   "keywords": [],
   "author": "str1z",
   "license": "MIT",
