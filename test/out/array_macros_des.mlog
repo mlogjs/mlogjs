@@ -1,0 +1,5 @@
+print 5
+print 19
+print 123
+print "foo"
+end
