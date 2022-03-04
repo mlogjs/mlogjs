@@ -32,7 +32,7 @@ export const ArrayExpression: THandler = (
   node.elements.forEach((element, i) => {
     const [value, valueInst] = c.handleEval(scope, element);
     data[i] = value;
-    inst.push(valueInst);
+    inst.push(...valueInst);
   });
   return [new ObjectValue(scope, data), inst];
 };
