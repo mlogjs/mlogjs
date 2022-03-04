@@ -13,7 +13,7 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          yarn install --immutable --immutable-cache --check-cache
+          yarn install --immutable
           yarn jest
           yarn build
           git add -f dist build
