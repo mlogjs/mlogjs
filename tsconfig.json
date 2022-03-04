@@ -6,6 +6,7 @@
     "esModuleInterop": true,
     "module": "commonjs",
     "moduleResolution": "node",
+    "noImplicitAny": true,
     "outDir": "build",
     "sourceMap": true,
     "target": "es6"
