@@ -1,6 +1,7 @@
 export * as es from "estree";
 import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
+import { MacroFunction } from "./macros";
 import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
 export interface IInstruction {
   hidden: boolean;
@@ -33,26 +34,72 @@ export interface IScope {
   copy(): IScope;
 }
 
-export type IValue = {
-  [k in UnaryOperator]?: (scope: IScope) => TValueInstructions;
-} & {
-  [k in UpdateOperator]?: (
-    scope: IScope,
-    prefix: boolean
-  ) => TValueInstructions;
-} & {
-  [k in LeftRightOperator]?: (
-    scope: IScope,
-    value: IValue
-  ) => TValueInstructions;
-} & {
+// we can't use type maps to define actual methods
+// and if we don't do this we'll get an error [ts(2425)]
+export interface IValue {
+  // main properties
   scope: IScope;
   constant: boolean;
   macro: boolean;
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions;
   get(scope: IScope, name: IValue): TValueInstructions;
-};
+
+  // unary operators
+  "!"(scope: IScope): TValueInstructions;
+  "u+"(scope: IScope): TValueInstructions;
+  "u-"(scope: IScope): TValueInstructions;
+  "delete"(scope: IScope): TValueInstructions;
+  "typeof"(scope: IScope): TValueInstructions;
+  "void"(scope: IScope): TValueInstructions;
+  "~"(scope: IScope): TValueInstructions;
+
+  // update operators
+  "++"(scope: IScope, prefix: boolean): TValueInstructions;
+  "--"(scope: IScope, prefix: boolean): TValueInstructions;
+
+  // left right operators
+  "*"(scope: IScope, value: IValue): TValueInstructions;
+  "**"(scope: IScope, value: IValue): TValueInstructions;
+  "+"(scope: IScope, value: IValue): TValueInstructions;
+  "-"(scope: IScope, value: IValue): TValueInstructions;
+  "/"(scope: IScope, value: IValue): TValueInstructions;
+  "%"(scope: IScope, value: IValue): TValueInstructions;
+  "!="(scope: IScope, value: IValue): TValueInstructions;
+  "!=="(scope: IScope, value: IValue): TValueInstructions;
+  "<"(scope: IScope, value: IValue): TValueInstructions;
+  "<="(scope: IScope, value: IValue): TValueInstructions;
+  "=="(scope: IScope, value: IValue): TValueInstructions;
+  "==="(scope: IScope, value: IValue): TValueInstructions;
+  ">"(scope: IScope, value: IValue): TValueInstructions;
+  ">="(scope: IScope, value: IValue): TValueInstructions;
+  "&"(scope: IScope, value: IValue): TValueInstructions;
+  "<<"(scope: IScope, value: IValue): TValueInstructions;
+  ">>"(scope: IScope, value: IValue): TValueInstructions;
+  ">>>"(scope: IScope, value: IValue): TValueInstructions;
+  "^"(scope: IScope, value: IValue): TValueInstructions;
+  "|"(scope: IScope, value: IValue): TValueInstructions;
+  instanceof(scope: IScope, value: IValue): TValueInstructions;
+  in(scope: IScope, value: IValue): TValueInstructions;
+  "&&"(scope: IScope, value: IValue): TValueInstructions;
+  "??"(scope: IScope, value: IValue): TValueInstructions;
+  "||"(scope: IScope, value: IValue): TValueInstructions;
+  "%="(scope: IScope, value: IValue): TValueInstructions;
+  "&="(scope: IScope, value: IValue): TValueInstructions;
+  "*="(scope: IScope, value: IValue): TValueInstructions;
+  "**="(scope: IScope, value: IValue): TValueInstructions;
+  "+="(scope: IScope, value: IValue): TValueInstructions;
+  "-="(scope: IScope, value: IValue): TValueInstructions;
+  "/="(scope: IScope, value: IValue): TValueInstructions;
+  "&&="(scope: IScope, value: IValue): TValueInstructions;
+  "||="(scope: IScope, value: IValue): TValueInstructions;
+  "<<="(scope: IScope, value: IValue): TValueInstructions;
+  ">>="(scope: IScope, value: IValue): TValueInstructions;
+  ">>>="(scope: IScope, value: IValue): TValueInstructions;
+  "^="(scope: IScope, value: IValue): TValueInstructions;
+  "|="(scope: IScope, value: IValue): TValueInstructions;
+  "="(scope: IScope, value: IValue): TValueInstructions;
+}
 
 export type TLiteral = string | number;
 export interface IBindableValue extends IValue {
@@ -64,3 +111,7 @@ export interface IFunctionValue extends IValue {
 }
 
 export type TValueInstructions = [IValue, IInstruction[]];
+
+export type TOperatorMacroMap = {
+  [K in UnaryOperator | UpdateOperator | LeftRightOperator]?: MacroFunction;
+};
