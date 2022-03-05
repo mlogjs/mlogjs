@@ -8,8 +8,8 @@ export class InstructionBase implements IInstruction {
   public set hidden(value) {
     this._hidden = value;
   }
-  args: (string | IValue)[];
-  constructor(...args: (string | IValue)[]) {
+  args: (string | IValue | null)[];
+  constructor(...args: (string | IValue | null)[]) {
     this.args = args;
   }
   resolve(i: number) {}

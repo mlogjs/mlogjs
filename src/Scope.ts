@@ -3,29 +3,19 @@ import { AddressResolver } from "./instructions";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 
 export class Scope implements IScope {
-  parent: IScope;
-  name: string;
   data: { [k: string]: IValue };
-  stacked: boolean = false;
-  ntemp: number = 0;
-  inst: IInstruction[];
-  break: AddressResolver;
-  continue: AddressResolver;
-  function: IFunctionValue;
+  break!: AddressResolver;
+  continue!: AddressResolver;
+  function!: IFunctionValue;
   constructor(
     values: { [k: string]: IValue },
-    parent: IScope = null,
-    stacked = false,
-    ntemp = 0,
-    name = "",
-    inst = []
+    public parent: IScope = null as never,
+    public stacked = false,
+    public ntemp = 0,
+    public name = "",
+    public inst: IInstruction[] = []
   ) {
     this.data = values;
-    this.parent = parent;
-    this.stacked = stacked;
-    this.ntemp = ntemp;
-    this.name = name;
-    this.inst = inst;
   }
   copy(): IScope {
     const scope = new Scope(
@@ -72,7 +62,7 @@ export class Scope implements IScope {
   make(name: string, storeName: string): IValue {
     return this.set(
       name,
-      this.stacked ? null : new StoreValue(this, storeName)
+      this.stacked ? (null as never) : new StoreValue(this, storeName)
     );
   }
 }

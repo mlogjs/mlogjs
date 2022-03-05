@@ -8,7 +8,10 @@ import {
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 
-const literalMethods = {
+const literalMethods: Record<
+  string,
+  (this: LiteralValue, scope: IScope) => LiteralValue
+> = {
   length: function (this: LiteralValue, scope: IScope) {
     if (typeof this.data !== "string")
       throw new Error("Length method only works on string literal values.");
@@ -49,59 +52,68 @@ export class LiteralValue extends BaseValue implements IBindableValue {
 }
 
 type TOperationFn = (a: number, b?: number) => number;
+type TBinOperationFn = (a: number, b: number) => number;
 
-const operatorMap: { [k in BinaryOperator | LogicalOperator]?: TOperationFn } =
-  {
-    "==": (a, b) => +(a == b),
-    "===": (a, b) => +(a === b),
-    "!=": (a, b) => +(a != b),
-    "!==": (a, b) => +(a !== b),
-    "<": (a, b) => +(a < b),
-    ">": (a, b) => +(a > b),
-    "<=": (a, b) => +(a <= b),
-    ">=": (a, b) => +(a >= b),
-    "+": (a, b) => a + b,
-    "-": (a, b) => a - b,
-    "*": (a, b) => a * b,
-    "/": (a, b) => a / b,
-    "%": (a, b) => a % b,
-    "**": (a, b) => a ** b,
-    "|": (a, b) => a | b,
-    "&": (a, b) => a & b,
-    "^": (a, b) => a ^ b,
-    ">>": (a, b) => a >> b,
-    ">>>": (a, b) => a >> b,
-    "<<": (a, b) => a << b,
-    "&&": (a, b) => +(a && b),
-    "||": (a, b) => +(a || b),
-  } as const;
+const operatorMap: {
+  [k in BinaryOperator | LogicalOperator]?: TBinOperationFn;
+} = {
+  "==": (a, b) => +(a == b),
+  "===": (a, b) => +(a === b),
+  "!=": (a, b) => +(a != b),
+  "!==": (a, b) => +(a !== b),
+  "<": (a, b) => +(a < b),
+  ">": (a, b) => +(a > b),
+  "<=": (a, b) => +(a <= b),
+  ">=": (a, b) => +(a >= b),
+  "+": (a, b) => a + b,
+  "-": (a, b) => a - b,
+  "*": (a, b) => a * b,
+  "/": (a, b) => a / b,
+  "%": (a, b) => a % b,
+  "**": (a, b) => a ** b,
+  "|": (a, b) => a | b,
+  "&": (a, b) => a & b,
+  "^": (a, b) => a ^ b,
+  ">>": (a, b) => a >> b,
+  ">>>": (a, b) => a >> b,
+  "<<": (a, b) => a << b,
+  "&&": (a, b) => +(a && b),
+  "||": (a, b) => +(a || b),
+} as const;
 
 for (const key in operatorMap) {
-  const fn = operatorMap[key] as TOperationFn;
-  LiteralValue.prototype[key] = function (
+  type K = keyof typeof operatorMap;
+  const fn = operatorMap[key as K] as TOperationFn;
+  LiteralValue.prototype[key as K] = function (
     this: LiteralValue,
     scope: IScope,
     value: LiteralValue
   ): TValueInstructions {
     if (!(value instanceof LiteralValue)) {
-      return BaseValue.prototype[key].apply(this, [scope, value]);
+      return BaseValue.prototype[key as K].apply(this, [scope, value]);
     }
     return [new LiteralValue(scope, fn(this.num, value.num)), []];
   };
 }
 
-const unaryOperatorMap: { [k in UnaryOperator]?: TOperationFn } = {
+const unaryOperatorMap: {
+  [k in Exclude<
+    UnaryOperator,
+    "u+" | "delete" | "typeof" | "void"
+  >]: TOperationFn;
+} = {
   "!": v => +!v,
   "~": v => ~v,
   "u-": v => -v,
 } as const;
 
 for (const key in unaryOperatorMap) {
-  LiteralValue.prototype[key] = function (
+  type K = keyof typeof unaryOperatorMap;
+  LiteralValue.prototype[key as K] = function (
     this: LiteralValue,
     scope: IScope
   ): TValueInstructions {
-    const fn = unaryOperatorMap[key] as TOperationFn;
+    const fn = unaryOperatorMap[key as K];
     return [new LiteralValue(scope, fn(this.num)), []];
   };
 }

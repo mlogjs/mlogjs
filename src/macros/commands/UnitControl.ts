@@ -49,7 +49,7 @@ export class UnitControl extends MacroFunction {
         );
 
       let result: ObjectValue | TempValue | null = null;
-      let extraArgs = [];
+      let extraArgs: IValue[] = [];
       switch (mode.data) {
         case "getBlock": {
           const outType = new TempValue(scope);
@@ -65,13 +65,13 @@ export class UnitControl extends MacroFunction {
         case "within": {
           const temp = new TempValue(scope);
           result = temp;
-          extraArgs = [temp, 0];
+          extraArgs = [temp, new LiteralValue(scope, 0)];
           break;
         }
       }
 
       return [
-        result,
+        result as IValue,
         [new InstructionBase("ucontrol", mode.data, ...args, ...extraArgs)],
       ];
     });

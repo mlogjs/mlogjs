@@ -96,8 +96,9 @@ export class Unit extends ObjectValue {
 }
 
 for (const key in operatorMap) {
-  const kind = operatorMap[key];
-  Unit.prototype[key] = function (
+  type K = keyof typeof operatorMap;
+  const kind = operatorMap[key as K];
+  Unit.prototype[key as K] = function (
     this: Unit,
     scope: IScope,
     value: IValue

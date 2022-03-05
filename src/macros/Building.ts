@@ -69,8 +69,9 @@ export class BuildingBuilder extends ObjectValue {
 }
 
 for (const key in operatorMap) {
-  const kind = operatorMap[key];
-  Building.prototype[key] = function (
+  type K = keyof typeof operatorMap;
+  const kind = operatorMap[key as K];
+  Building.prototype[key as K] = function (
     this: Building,
     scope: IScope,
     value: IValue

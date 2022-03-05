@@ -33,7 +33,7 @@ export const ArrowFunctionExpression: THandler = (
       scope,
       name,
       paramNames,
-      paramStores,
+      paramStores as StoreValue[],
       body as es.BlockStatement,
       c
     ),
@@ -47,7 +47,10 @@ export const FunctionDeclaration: THandler = (
   node: es.FunctionDeclaration
 ) => {
   return [
-    scope.set(node.id.name, ArrowFunctionExpression(c, scope, node, null)[0]),
+    scope.set(
+      (node.id as es.Identifier).name,
+      ArrowFunctionExpression(c, scope, node, null)[0]
+    ),
     [],
   ];
 };

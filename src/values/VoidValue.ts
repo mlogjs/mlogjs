@@ -22,6 +22,9 @@ export class VoidValue implements IValue {
   }
 }
 
+// tells typescript that VoidValue implements value
+export interface VoidValue extends IValue {}
+
 for (const key of operators) {
   VoidValue.prototype[key] = function () {
     console.log(this);

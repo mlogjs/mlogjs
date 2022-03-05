@@ -5,9 +5,9 @@ import { StoreValue } from "./";
 import { LiteralValue } from "./LiteralValue";
 
 export class TempValue extends StoreValue {
-  proxied: IValue;
+  proxied!: IValue;
   canProxy = true;
-  setInst: IInstruction;
+  setInst!: IInstruction;
 
   constructor(scope: IScope, name?: string) {
     super(
@@ -49,7 +49,8 @@ export class TempValue extends StoreValue {
       "proxy",
     ] as const) {
       if (key !== "=" && key in value)
-        this[key] = (...args: any) => value[key].apply(value, args);
+        this[key] = (...args: any) =>
+          (value[key as keyof IValue] as Function).apply(value, args) as never;
     }
     this.setInst = new SetInstruction(this, value);
     this.setInst.hidden = true;
@@ -66,7 +67,7 @@ export class TempValue extends StoreValue {
       "toString",
       "proxy",
     ] as const) {
-      this[key] = TempValue.prototype[key];
+      this[key] = TempValue.prototype[key] as never;
     }
   }
 }

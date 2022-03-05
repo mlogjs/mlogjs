@@ -47,7 +47,7 @@ export const UnaryExpression: THandler = (
 ) => {
   const [arg, argInst] = c.handleEval(scope, argument);
   const operatorId =
-    operator == "+" || operator == "-" ? "u" + operator : operator;
+    operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
 
   const [op, opInst] = arg[operatorId](scope);
   return [op, [...argInst, ...opInst]];
