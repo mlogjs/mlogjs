@@ -1,0 +1,17 @@
+name: npm-publish
+on: [workflow_dispatch]
+jobs:
+  publish:
+    environment: npm
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          ref: ci
+      - uses: actions/setup-node@v2
+        with:
+          node-version: "16.x"
+          registry-url: "https://registry.npmjs.org"
+      - run: yarn install --immutable && yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
