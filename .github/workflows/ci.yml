@@ -14,9 +14,9 @@ jobs:
           node-version: 16.x
       - run: |
           yarn install --immutable
-          yarn jest
+          yarn jest --coverage
           yarn build
-          git add -f dist build
+          git add -f dist build docs
       - name: Push
         env:
           MESSAGE: ${{ github.event.head_commit.message }}

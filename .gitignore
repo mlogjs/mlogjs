@@ -1,5 +1,7 @@
 # Custom
-build/
+build
+dist
+docs/coverage
 
 # Logs
 logs
