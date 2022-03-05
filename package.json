@@ -6,7 +6,8 @@
   "bin": "./build/bin.js",
   "scripts": {
     "build": "tsc && webpack",
-    "start": "npm run build && npm i -g . && mlogjs"
+    "start": "npm run build && npm i -g . && mlogjs",
+    "prepublishOnly": "npm run build"
   },
   "repository": {
     "type": "git",
