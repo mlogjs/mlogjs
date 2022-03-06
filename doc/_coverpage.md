@@ -2,7 +2,7 @@
 
 > Effortless JavaScript to Mindustry Logic Code compiler.
 
-![](mlogjs.png)
+![logo](logo.png)
 
-[GitHub](https://github.com/weisrc/mlogcc)
+[GitHub](https://github.com/weisrc/mlogjs)
 [Get Started](/getting-started)
