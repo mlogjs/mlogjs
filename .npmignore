@@ -2,6 +2,7 @@ src
 test
 docs
 doc
+editor
 .github
 .yarn
 samples
