@@ -9,6 +9,7 @@
     "outDir": "build",
     "resolveJsonModule": true,
     "sourceMap": true,
+    "strict": true,
     "target": "ES2021"
   },
   "include": ["src", "lib/*"]
