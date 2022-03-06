@@ -22,7 +22,7 @@ export const ContinueStatement: THandler<null> = (_, scope) => {
   return [null, [new ContinueInstruction(addr)]];
 };
 
-export const ReturnStatement: THandler = (
+export const ReturnStatement: THandler<IValue | null> = (
   c,
   scope,
   node: es.ReturnStatement

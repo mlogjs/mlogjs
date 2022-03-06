@@ -4,6 +4,7 @@ import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
 import { MacroFunction } from "./macros";
 import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
+import { StoreValue } from "./values";
 export interface IInstruction {
   hidden: boolean;
   resolve(i: number): void;
@@ -17,7 +18,7 @@ export type THandler<T extends IValue | null = IValue> = (
 ) => TValueInstructions<T>;
 
 export interface IScope {
-  parent: IScope;
+  parent: IScope | null;
   data: {};
   name: string;
   inst: IInstruction[];
@@ -29,9 +30,9 @@ export interface IScope {
   createFunction(name: string, stacked?: boolean): IScope;
   has(name: string): boolean;
   get(name: string): IValue;
-  set(name: string, value: IValue): IValue;
-  hardSet(name: string, value: IValue): IValue;
-  make(name: string, storeName: string): IValue;
+  set<T extends IValue>(name: string, value: T): T;
+  hardSet<T extends IValue>(name: string, value: T): T;
+  make(name: string, storeName: string): StoreValue;
   copy(): IScope;
 }
 
@@ -108,7 +109,7 @@ export interface IBindableValue extends IValue {
 }
 
 export interface IFunctionValue extends IValue {
-  return(scope: IScope, argument: IValue): TValueInstructions;
+  return(scope: IScope, argument: IValue): TValueInstructions<IValue | null>;
 }
 
 export type TValueInstructions<Content extends IValue | null = IValue> = [

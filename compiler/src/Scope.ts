@@ -9,7 +9,7 @@ export class Scope implements IScope {
   function!: IFunctionValue;
   constructor(
     values: Record<string, IValue | null>,
-    public parent: IScope = null as never,
+    public parent: IScope | null = null,
     public stacked = false,
     public ntemp = 0,
     public name = "",
@@ -48,18 +48,18 @@ export class Scope implements IScope {
   get(name: string): IValue {
     const value = this.data[name];
     if (value) return value;
-    if (this.parent) return this.parent.get(name) as IValue;
+    if (this.parent) return this.parent.get(name);
     throw Error(`${name} is not declared.`);
   }
-  set(name: string, value: IValue): IValue {
+  set<T extends IValue>(name: string, value: T): T {
     if (name in this.data) throw Error(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
-  hardSet(name: string, value: IValue): IValue {
+  hardSet<T extends IValue>(name: string, value: T): T {
     this.data[name] = value;
     return value;
   }
-  make(name: string, storeName: string): IValue {
+  make(name: string, storeName: string): StoreValue {
     return this.set(
       name,
       this.stacked ? (null as never) : new StoreValue(this, storeName)

@@ -50,7 +50,7 @@ export class TempValue extends StoreValue {
     ] as const) {
       if (key !== "=" && key in value)
         this[key] = (...args: any) =>
-          (value[key as keyof IValue] as Function).apply(value, args) as never;
+          (value[key as keyof IValue] as Function).apply(value, args);
     }
     this.setInst = new SetInstruction(this, value);
     this.setInst.hidden = true;

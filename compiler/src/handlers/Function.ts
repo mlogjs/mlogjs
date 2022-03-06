@@ -21,7 +21,7 @@ export const ArrowFunctionExpression: THandler = (
   }
 
   const paramNames = [];
-  const paramStores = [];
+  const paramStores: StoreValue[] = [];
 
   for (const id of params as es.Identifier[]) {
     paramNames.push(id.name);
@@ -33,7 +33,7 @@ export const ArrowFunctionExpression: THandler = (
       scope,
       name,
       paramNames,
-      paramStores as StoreValue[],
+      paramStores,
       body as es.BlockStatement,
       c
     ),

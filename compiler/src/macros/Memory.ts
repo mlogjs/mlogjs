@@ -19,10 +19,7 @@ class MemoryEntry extends ObjectValue {
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {
-        return [
-          null as never,
-          [new InstructionBase("write", prop, mem.cell, value)],
-        ];
+        return [null, [new InstructionBase("write", prop, mem.cell, value)]];
       }),
     });
   }
@@ -35,7 +32,7 @@ for (const operator of operators) {
     ...args: unknown[]
   ) {
     return (BaseValue.prototype[operator] as Function).apply(this, args);
-  } as never;
+  };
 }
 
 class MemoryMacro extends ObjectValue {
