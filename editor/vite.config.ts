@@ -16,10 +16,13 @@ const raw = async (path: string, root = path): Promise<File[]> =>
 
 const rawResolver: PluginOption = {
   name: "raw-resolver",
-  resolveId: (id, from) =>
-    id.endsWith("!raw")
-      ? "\0raw" + resolve(dirname(from), id.slice(0, -4))
-      : null,
+  resolveId: (id, from) => {
+    if (!id.endsWith("!raw")) return null;
+    const base = id.startsWith(".")
+      ? dirname(from)
+      : resolve(__dirname, "../node_modules");
+    return "\0raw" + resolve(base, id.slice(0, -4));
+  },
   load: async id =>
     id.startsWith("\0raw")
       ? "export default " + JSON.stringify(await raw(id.slice(4)))

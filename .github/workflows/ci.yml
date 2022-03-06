@@ -14,9 +14,10 @@ jobs:
           node-version: 16.x
       - run: |
           yarn install --immutable
-          yarn clean
-          yarn coverage
-          yarn run-p build build:editor docs
+          yarn workspace mlogjs clean
+          yarn workspace mlogjs coverage
+          yarn workspace mlogjs run-p build docs
+          yarn workspace editor build
           git add -f dist build docs
       - env:
           MESSAGE: ${{ github.event.head_commit.message }}
