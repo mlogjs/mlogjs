@@ -11,7 +11,8 @@ import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData extends TOperatorMacroMap {
   [k: string]: IValue | undefined;
-  $get?: MacroFunction;
+  $get?: MacroFunction<IValue>;
+  $eval?: MacroFunction<IValue>;
 }
 export class ObjectValue extends VoidValue {
   constant = true;
@@ -41,7 +42,7 @@ export class ObjectValue extends VoidValue {
     return $eval.call(scope, []);
   }
 
-  call(scope: IScope, args: IValue[]): TValueInstructions {
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args);
     return $call.call(scope, args);
