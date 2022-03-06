@@ -13,8 +13,8 @@ jobs:
         with:
           node-version: 16.x
       - run: |
-          yarn clean
           yarn install --immutable
+          yarn clean
           yarn coverage
           yarn build
           yarn build:editor
