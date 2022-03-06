@@ -9,12 +9,12 @@ export interface IInstruction {
   resolve(i: number): void;
 }
 
-export type THandler = (
+export type THandler<T extends IValue | null = IValue> = (
   compiler: Compiler,
   scope: IScope,
   node: any,
   arg: any
-) => TValueInstructions;
+) => TValueInstructions<T>;
 
 export interface IScope {
   parent: IScope;
