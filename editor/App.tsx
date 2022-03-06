@@ -1,9 +1,9 @@
 import "./style.css";
 import Editor, { EditorProps, Monaco } from "@monaco-editor/react";
-import { compile } from "../src";
+import { compile } from "mlogjs";
 import React, { Fragment, useEffect, useState } from "react";
 import SplitPane from "react-split-pane";
-import lib from "../lib!raw";
+import lib from "mlogjs/lib!raw";
 import { editor } from "monaco-editor";
 
 export function App() {
