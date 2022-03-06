@@ -3,12 +3,12 @@ import { AddressResolver } from "./instructions";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 
 export class Scope implements IScope {
-  data: { [k: string]: IValue };
+  data: Record<string, IValue | null>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
   constructor(
-    values: { [k: string]: IValue },
+    values: Record<string, IValue | null>,
     public parent: IScope = null as never,
     public stacked = false,
     public ntemp = 0,
@@ -48,7 +48,7 @@ export class Scope implements IScope {
   get(name: string): IValue {
     const value = this.data[name];
     if (value) return value;
-    if (this.parent) return this.parent.get(name);
+    if (this.parent) return this.parent.get(name) as IValue;
     throw Error(`${name} is not declared.`);
   }
   set(name: string, value: IValue): IValue {
