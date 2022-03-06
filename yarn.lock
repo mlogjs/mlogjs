@@ -5,13 +5,6 @@ __metadata:
   version: 6
   cacheKey: 8
 
-"-@npm:^0.0.1":
-  version: 0.0.1
-  resolution: "-@npm:0.0.1"
-  checksum: 33786d96a8c404f3ce4db242b50d9a8f6013b3a0673bba52186b92f016429135ec2d9b9f77abf85c2a2b757c85e9b33a1f44d5dbf9740fd6294de87198681fd6
-  languageName: node
-  linkType: hard
-
 "@ampproject/remapping@npm:^2.1.0":
   version: 2.1.2
   resolution: "@ampproject/remapping@npm:2.1.2"
@@ -3970,7 +3963,6 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mlogjs@workspace:."
   dependencies:
-    "-": ^0.0.1
     "@monaco-editor/react": ^4.3.1
     "@types/estree": ^0.0.51
     "@types/jest": ^27.4.1

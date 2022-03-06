@@ -36,7 +36,6 @@
   },
   "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
-    "-": "^0.0.1",
     "acorn": "^8.7.0",
     "cli-highlight": "^2.1.11",
     "yargs": "^17.0.1"
