@@ -3,23 +3,20 @@
   "version": "0.2.1",
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
   "main": "build/index.js",
+  "module": "./dist/mlogjs.es.js",
   "bin": "./build/bin.js",
   "scripts": {
-    "clean": "rm -rf docs dist build",
+    "clean": "rm -rf ../docs dist build",
     "build": "tsc && vite build",
     "dev": "ts-node src/bin",
     "test": "jest",
     "coverage": "jest --coverage",
-    "docs:doc": "mkdir -p docs && cp -r doc/. docs",
-    "docs:lib": "typedoc --out docs/lib lib/*",
-    "docs:src": "typedoc --out docs/src src/index.ts",
+    "docs:doc": "mkdir -p ../docs && cp -r doc/. ../docs",
+    "docs:lib": "typedoc --out ../docs/lib lib/*",
+    "docs:src": "typedoc --out ../docs/src src/index.ts",
     "docs": "run-p docs:lib docs:src docs:doc",
     "start": "npm run build && npm i -g . && mlogjs",
     "prepublishOnly": "npm run build"
-  },
-  "exports": {
-    "require": "./build/index.js",
-    "import": "./dist/index.js"
   },
   "repository": {
     "type": "git",
