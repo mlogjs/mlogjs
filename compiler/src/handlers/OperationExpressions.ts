@@ -36,7 +36,7 @@ export const AssignmentExpression: THandler = (
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
   const [right, rightInst] = c.handleEval(scope, node.right);
-  const [op, opInst] = left[node.operator](scope, right);
+  const [op, opInst] = left![node.operator](scope, right);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
@@ -58,6 +58,6 @@ export const UpdateExpression: THandler = (
   { argument, operator, prefix }: es.UpdateExpression
 ) => {
   const [arg, argInst] = c.handle(scope, argument);
-  const [op, opInst] = arg[operator](scope, prefix);
+  const [op, opInst] = arg![operator](scope, prefix);
   return [op, [...argInst, ...opInst]];
 };

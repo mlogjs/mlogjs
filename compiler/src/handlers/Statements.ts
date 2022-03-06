@@ -11,13 +11,13 @@ export const ExpressionStatement: THandler<IValue | null> = (
 };
 
 export const BreakStatement: THandler<null> = (_, scope) => {
-  const addr = new LiteralValue(scope, null);
+  const addr = new LiteralValue(scope, null as never);
   scope.break.bind(addr);
   return [null, [new BreakInstruction(addr)]];
 };
 
 export const ContinueStatement: THandler<null> = (_, scope) => {
-  const addr = new LiteralValue(scope, null);
+  const addr = new LiteralValue(scope, null as never);
   scope.continue.bind(addr);
   return [null, [new ContinueInstruction(addr)]];
 };
