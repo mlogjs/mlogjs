@@ -17,7 +17,9 @@ const raw = async (path: string, root = path): Promise<File[]> =>
 const rawResolver: PluginOption = {
   name: "raw-resolver",
   resolveId: (id, from) =>
-    id.endsWith("!raw") && "\0raw" + resolve(dirname(from), id.slice(0, -4)),
+    id.endsWith("!raw")
+      ? "\0raw" + resolve(dirname(from), id.slice(0, -4))
+      : null,
   load: async id =>
     id.startsWith("\0raw")
       ? "export default " + JSON.stringify(await raw(id.slice(4)))
@@ -27,6 +29,7 @@ const rawResolver: PluginOption = {
 export default defineConfig({
   build: {
     outDir: resolve(__dirname, "../docs/editor"),
+    emptyOutDir: true,
   },
   base: "mlogjs/editor",
   plugins: [react(), rawResolver],

@@ -3,7 +3,9 @@ import { compile } from "../src";
 import React, { Fragment, useState } from "react";
 import SplitPane from "react-split-pane";
 import "./style.css";
-import lib from "../lib!raw";
+// import lib from "../lib!raw";
+
+const lib = [];
 
 export function App() {
   const [compiled, setCompiled] = useState("");
