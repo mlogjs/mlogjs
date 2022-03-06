@@ -892,22 +892,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/esprima@npm:^4.0.2":
-  version: 4.0.3
-  resolution: "@types/esprima@npm:4.0.3"
-  dependencies:
-    "@types/estree": "*"
-  checksum: 266d1f87a9469688af0f143dec47caae25e6f689194da0d57d03d796cf8bdbfb99593717885e98d9538f1beff967a642f126d693e0e4b5fa4f4605fb55866919
-  languageName: node
-  linkType: hard
-
-"@types/estree@npm:*":
-  version: 0.0.51
-  resolution: "@types/estree@npm:0.0.51"
-  checksum: e56a3bcf759fd9185e992e7fdb3c6a5f81e8ff120e871641607581fb3728d16c811702a7d40fa5f869b7f7b4437ab6a87eb8d98ffafeee51e85bbe955932a189
-  languageName: node
-  linkType: hard
-
 "@types/graceful-fs@npm:^4.1.2":
   version: 4.1.5
   resolution: "@types/graceful-fs@npm:4.1.5"
@@ -3943,7 +3927,6 @@ __metadata:
   resolution: "mlogjs@workspace:."
   dependencies:
     "@monaco-editor/react": ^4.3.1
-    "@types/esprima": ^4.0.2
     "@types/jest": ^27.4.1
     "@types/node": ^15.3.0
     "@types/react": ^17.0.39

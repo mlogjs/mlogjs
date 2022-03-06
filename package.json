@@ -41,7 +41,6 @@
   },
   "devDependencies": {
     "@monaco-editor/react": "^4.3.1",
-    "@types/esprima": "^4.0.2",
     "@types/jest": "^27.4.1",
     "@types/node": "^15.3.0",
     "@types/react": "^17.0.39",
