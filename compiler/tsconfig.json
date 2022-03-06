@@ -4,6 +4,7 @@
     "baseUrl": ".",
     "declaration": true,
     "esModuleInterop": true,
+    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
     "outDir": "build",
