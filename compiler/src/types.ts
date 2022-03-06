@@ -43,7 +43,7 @@ export interface IValue {
   constant: boolean;
   macro: boolean;
   eval(scope: IScope): TValueInstructions;
-  call(scope: IScope, args: IValue[]): TValueInstructions;
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
 
   // unary operators
@@ -111,7 +111,10 @@ export interface IFunctionValue extends IValue {
   return(scope: IScope, argument: IValue): TValueInstructions;
 }
 
-export type TValueInstructions = [IValue, IInstruction[]];
+export type TValueInstructions<Content extends IValue | null = IValue> = [
+  Content,
+  IInstruction[]
+];
 
 export type TOperatorMacroMap = {
   [K in UnaryOperator | UpdateOperator | LeftRightOperator]?: MacroFunction;
