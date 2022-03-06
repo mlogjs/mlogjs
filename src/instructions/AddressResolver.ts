@@ -1,5 +1,5 @@
 import { InstructionBase } from ".";
-import { IInstruction, IScope, IBindableValue } from "../types";
+import { IBindableValue, IScope } from "../types";
 
 export class AddressResolver extends InstructionBase {
   public get hidden() {

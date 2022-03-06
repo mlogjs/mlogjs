@@ -1,6 +1,6 @@
 import { es, IScope, THandler, TValueInstructions } from "./types";
 import * as handlers from "./handlers";
-import { parseScript } from "esprima";
+import { parse } from "acorn";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import {
@@ -88,7 +88,10 @@ export class Compiler {
   }
 
   protected parse(script: string) {
-    return parseScript(script, { loc: true });
+    return parse(script, {
+      locations: true,
+      ecmaVersion: "latest",
+    }) as es.Node;
   }
 
   handle(scope: IScope, node: es.Node): TValueInstructions {

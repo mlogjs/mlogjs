@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
-    "esprima": "^4.0.1",
+    "acorn": "^8.7.0",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
