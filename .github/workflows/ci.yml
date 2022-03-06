@@ -16,9 +16,7 @@ jobs:
           yarn install --immutable
           yarn clean
           yarn coverage
-          yarn build
-          yarn build:editor
-          yarn docs
+          yarn run-p build build:editor docs
           git add -f dist build docs
       - env:
           MESSAGE: ${{ github.event.head_commit.message }}
