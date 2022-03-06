@@ -6,8 +6,8 @@
     "esModuleInterop": true,
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "resolveJsonModule": true,
     "outDir": "build",
+    "resolveJsonModule": true,
     "sourceMap": true,
     "target": "ES2021"
   },
