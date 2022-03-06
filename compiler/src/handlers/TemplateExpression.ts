@@ -7,7 +7,7 @@ import {
   TValueInstructions,
 } from "../types";
 
-export const TemplateLiteral: THandler = (
+export const TemplateLiteral: THandler<null> = (
   c,
   scope,
   node: es.TemplateLiteral

@@ -35,8 +35,8 @@ yargs(hideBin(process.argv))
         let end = start;
 
         if (node) {
-          start = node.loc.start;
-          end = node.loc.end;
+          start = node.loc!.start;
+          end = node.loc!.end;
         }
 
         const lines = code.split("\n");

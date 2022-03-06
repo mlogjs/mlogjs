@@ -1,6 +1,10 @@
-import { es, THandler } from "../types";
+import { es, IValue, THandler } from "../types";
 
-export const BlockStatement: THandler = (c, scope, node: es.BlockStatement) => {
+export const BlockStatement: THandler<IValue | null> = (
+  c,
+  scope,
+  node: es.BlockStatement
+) => {
   const [value, insts] = c.handleMany(scope.createScope(), node.body);
   // const cleanInst = []
   // for (const inst of insts) {

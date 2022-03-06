@@ -16,8 +16,8 @@ export class JumpInstruction extends InstructionBase {
   constructor(
     address: IBindableValue,
     kind: EJumpKind,
-    left?: IValue,
-    right?: IValue
+    left: IValue | null = null,
+    right: IValue | null = null
   ) {
     super("jump", address, kind, left, right);
   }

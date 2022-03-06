@@ -3,7 +3,7 @@ import { EJumpKind } from "../instructions";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
 
-export const IfStatement: THandler = (c, scope, node: es.IfStatement) => {
+export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   const inst = [];
   const [test, testInst] = c.handleEval(scope, node.test);
 
