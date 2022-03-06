@@ -24,17 +24,17 @@ yargs(hideBin(process.argv))
       if (!out) return console.log("missing output path");
       if (!existsSync(path))
         return console.log(`file at ${path} does not exist`);
-      try {
-        const compiled = compile(
-          readFileSync(path as string, { encoding: "utf-8" })
-        );
-        writeFileSync(out, compiled);
-        console.log(
-          `Success: Compiled ${path}. Your compiled code is at ${out}.`
-        );
-      } catch (e) {
-        console.log("Error: " + e.message);
+      const [output, error] = compile(
+        readFileSync(path as string, { encoding: "utf-8" })
+      );
+      if (error) {
+        console.log("Error: " + error.message);
+        return;
       }
+      writeFileSync(out, output);
+      console.log(
+        `Success: Compiled ${path}. Your compiled code is at ${out}.`
+      );
     }
   )
   .help()

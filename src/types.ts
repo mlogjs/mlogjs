@@ -1,4 +1,5 @@
 export * as es from "estree";
+import * as es from "estree";
 import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
 import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";

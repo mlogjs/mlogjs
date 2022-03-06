@@ -1,22 +1,9 @@
-import { es, IScope, THandler, TValueInstructions } from "./types";
-import * as handlers from "./handlers";
 import { parse } from "acorn";
+import * as handlers from "./handlers";
+import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import {
-  MlogMath,
-  commands,
-  MemoryBuilder,
-  BuildingBuilder,
-  Concat,
-} from "./macros";
-import { nodeName } from "./utils";
-import {
-  NamespaceMacro,
-  UCommandsNamespace,
-  VarsNamespace,
-} from "./macros/Namespace";
-import { RawValueMacro } from "./macros/RawValue";
+import { es, IScope, THandler, TValueInstructions } from "./types";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
@@ -30,48 +17,22 @@ export class Compiler {
     this.stackName = stackName;
   }
 
-  compile(script: string): string {
-    const program = this.parse(script);
-    const scope = new Scope({});
+  compile(script: string): [string, Error, es.Node[]] {
+    let output: string;
+    try {
+      const program = this.parse(script);
+      const scope = new Scope({});
 
-    // namespaces
-    scope.hardSet("ControlKind", new NamespaceMacro(scope));
-    scope.hardSet("Vars", new VarsNamespace(scope));
-    scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
-    scope.hardSet("Liquids", new NamespaceMacro(scope));
-    scope.hardSet("Units", new NamespaceMacro(scope));
-    scope.hardSet("LAccess", new NamespaceMacro(scope));
-    scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
-    scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
+      initScope(scope);
 
-    // helper methods
-    scope.hardSet("getBuilding", new BuildingBuilder(scope));
-    scope.hardSet("getVar", new RawValueMacro(scope));
-    scope.hardSet("concat", new Concat(scope));
-
-    scope.hardSet("Math", new MlogMath(scope));
-    scope.hardSet("Memory", new MemoryBuilder(scope));
-
-    // commands
-    scope.hardSet("draw", new commands.Draw(scope));
-    scope.hardSet("print", new commands.Print(scope));
-    scope.hardSet("printFlush", new commands.PrintFlush(scope));
-    scope.hardSet("drawFlush", new commands.DrawFlush(scope));
-    scope.hardSet("getLink", new commands.GetLink(scope));
-    scope.hardSet("control", new commands.Control(scope));
-    scope.hardSet("radar", new commands.Radar(scope));
-    scope.hardSet("sensor", new commands.Sensor(scope));
-    scope.hardSet("wait", new commands.Wait(scope));
-    scope.hardSet("lookup", new commands.Lookup(scope));
-    scope.hardSet("unitBind", new commands.UnitBind(scope));
-    scope.hardSet("unitControl", new commands.UnitControl(scope));
-    scope.hardSet("unitRadar", new commands.UnitRadar(scope));
-    scope.hardSet("unitLocate", new commands.UnitLocate(scope));
-
-    const valueInst = this.handle(scope, program);
-    valueInst[1].push(new EndInstruction(), ...scope.inst);
-    this.resolve(valueInst);
-    return this.serialize(valueInst) + "\n";
+      const valueInst = this.handle(scope, program);
+      valueInst[1].push(new EndInstruction(), ...scope.inst);
+      this.resolve(valueInst);
+      output = this.serialize(valueInst) + "\n";
+    } catch (error) {
+      return [null, error, error?.nodeStack ?? []];
+    }
+    return [output, null, []];
   }
 
   protected resolve(valueInst: TValueInstructions) {
@@ -100,7 +61,9 @@ export class Compiler {
       if (!handler) throw Error("Missing handler for " + node.type);
       return handler(this, scope, node, null);
     } catch (error) {
-      throw new Error(`${node.type} ${nodeName(node)} > ${error.message}`);
+      error.nodeStack ??= [];
+      error.nodeStack.push(node);
+      throw error;
     }
   }
 
