@@ -10,7 +10,7 @@ for (const path of paths) {
   test(name + " will compile", async () => {
     const input = await readFile(`test/in/${path}`, "utf8");
     const expected = await readFile(`test/out/${name}.mlog`, "utf8");
-    const actual = compile(input);
+    const [actual] = compile(input);
     expect(actual).toBe(expected);
   });
 }
