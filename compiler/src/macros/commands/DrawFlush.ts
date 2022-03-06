@@ -3,7 +3,7 @@ import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { ObjectValue, StoreValue } from "../../values";
 
-export class DrawFlush extends MacroFunction {
+export class DrawFlush extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (target: IValue) => {
       if (!(target instanceof ObjectValue))

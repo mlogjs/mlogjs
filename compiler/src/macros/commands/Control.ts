@@ -4,7 +4,7 @@ import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 
 const validKinds = ["enabled", "shoot", "shootp", "config", "color"];
-export class Control extends MacroFunction {
+export class Control extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (kind, building, ...args) => {
       if (!(kind instanceof LiteralValue) || typeof kind.data !== "string")

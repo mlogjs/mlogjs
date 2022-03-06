@@ -3,7 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { StoreValue, TempValue } from "../../values";
 
-export class UnitBind extends MacroFunction {
+export class UnitBind extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, type => {
       if (!(type instanceof StoreValue))

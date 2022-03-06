@@ -3,7 +3,7 @@ import { IScope, IValue } from "../../types";
 import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
-export class Draw extends MacroFunction {
+export class Draw extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (kind: IValue, ...args: IValue[]) => {
       if (!(kind instanceof LiteralValue))

@@ -25,7 +25,7 @@ const validModes = [
   "within",
 ];
 
-export class UnitControl extends MacroFunction {
+export class UnitControl extends MacroFunction<IValue | null> {
   constructor(scope: IScope) {
     super(scope, (mode, ...args) => {
       if (!(mode instanceof LiteralValue) || typeof mode.data !== "string")
@@ -71,7 +71,7 @@ export class UnitControl extends MacroFunction {
       }
 
       return [
-        result as IValue,
+        result,
         [new InstructionBase("ucontrol", mode.data, ...args, ...extraArgs)],
       ];
     });
