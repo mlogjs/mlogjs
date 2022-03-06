@@ -10,6 +10,6 @@ for (const path of paths) {
   test(name + " will fail", async () => {
     const input = await readFile(`test/fail/${path}`, "utf8");
     const error = input.split("\n")[0].split("//")[1].trim();
-    expect(compile(input)[1].message).toBe(error);
+    expect(compile(input)[1]!.message).toBe(error);
   });
 }
