@@ -1,8 +1,8 @@
 <div markdown="1" align="center">
 
-[![mlogjs](https://weisrc.github.io/mlogjs/mlogjs.png)][docs]
+[![mlogjs](https://weisrc.github.io/mlogjs/logo.png)][docs]
 
-# **JavaScript [Mlog](https://mindustrygame.github.io/wiki/logic/0-introduction/) Compiler**
+# **JavaScript [MLog](https://mindustrygame.github.io/wiki/logic/0-introduction/) Compiler**
 
 [![ci](https://github.com/weisrc/mlogjs/actions/workflows/ci.yml/badge.svg)][ci]
 [![npm](https://img.shields.io/npm/v/mlogjs?color=cb3837&logo=npm)][npm]

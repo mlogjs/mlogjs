@@ -1,7 +1,7 @@
 # Custom
 build
 dist
-docs/coverage
+docs
 
 # Logs
 logs

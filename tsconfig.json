@@ -4,7 +4,7 @@
     "declaration": true,
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
-    "target": "es6",
+    "target": "ES2021",
     "moduleResolution": "node",
     "sourceMap": true,
     "outDir": "build",
@@ -13,5 +13,5 @@
       "*": ["node_modules/*", "src/types/*"]
     }
   },
-  "include": ["src/**/*"]
+  "include": ["src", "lib/*"]
 }
