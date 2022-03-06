@@ -1,0 +1,36 @@
+set 24:4 0
+set 25:4 1
+set 26:4 1
+set 17:12 24:4
+set 17:18 25:4
+set 17:21 26:4
+set r17:0 8
+jump 12 always
+set 28:4 f17:0
+print "Thre result is: " 28:4 "."
+printflush message1
+end
+op strictEqual t0:17:0 17:12 0
+jump 18 equal t0:17:0 0
+op add f17:0 17:18 17:21
+jump 16 always
+set @counter r17:0
+jump 35 always
+op strictEqual t2:17:0 17:12 1
+jump 24 equal t2:17:0 0
+op sub f17:0 17:18 17:21
+jump 22 always
+set @counter r17:0
+jump 35 always
+op strictEqual t4:17:0 17:12 2
+jump 30 equal t4:17:0 0
+op mul f17:0 17:18 17:21
+jump 28 always
+set @counter r17:0
+jump 35 always
+op strictEqual t6:17:0 17:12 3
+jump 35 equal t6:17:0 0
+op div f17:0 17:18 17:21
+jump 34 always
+set @counter r17:0
+set @counter r17:0

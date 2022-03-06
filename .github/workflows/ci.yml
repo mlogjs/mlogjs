@@ -14,11 +14,12 @@ jobs:
           node-version: 16.x
       - run: |
           yarn install --immutable
-          yarn jest
-          yarn build
-          git add -f dist build
-      - name: Push
-        env:
+          yarn workspace mlogjs clean
+          yarn workspace mlogjs coverage
+          yarn workspace mlogjs run-p build docs
+          yarn workspace editor build
+          git add -f compiler/dist compiler/build docs
+      - env:
           MESSAGE: ${{ github.event.head_commit.message }}
         run: |
           git config --global user.name "github-actions[bot]"

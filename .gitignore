@@ -1,5 +1,7 @@
 # Custom
-build/
+build
+dist
+docs
 
 # Logs
 logs
