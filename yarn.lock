@@ -1873,6 +1873,25 @@ __metadata:
   languageName: node
   linkType: hard
 
+"editor@workspace:editor":
+  version: 0.0.0-use.local
+  resolution: "editor@workspace:editor"
+  dependencies:
+    "@monaco-editor/react": ^4.3.1
+    "@types/react": ^17.0.39
+    "@types/react-dom": ^17.0.13
+    "@types/react-split-pane": ^0.1.67
+    "@vitejs/plugin-react": ^1.2.0
+    mlogjs: "workspace:^"
+    monaco-editor: ^0.32.1
+    react: ^17.0.2
+    react-dom: ^17.0.2
+    react-split-pane: ^0.1.92
+    typescript: "*"
+    vite: "*"
+  languageName: unknown
+  linkType: soft
+
 "electron-to-chromium@npm:^1.4.71":
   version: 1.4.75
   resolution: "electron-to-chromium@npm:1.4.75"
@@ -3958,25 +3977,6 @@ __metadata:
   checksum: a96865108c6c3b1b8e1d5e9f11843de1e077e57737602de1b82030815f311be11f96f09cce59bd5b903d0b29834733e5313f9301e3ed6d6f6fba2eae0df4298f
   languageName: node
   linkType: hard
-
-"mlogjs-web-editor@workspace:editor":
-  version: 0.0.0-use.local
-  resolution: "mlogjs-web-editor@workspace:editor"
-  dependencies:
-    "@monaco-editor/react": ^4.3.1
-    "@types/react": ^17.0.39
-    "@types/react-dom": ^17.0.13
-    "@types/react-split-pane": ^0.1.67
-    "@vitejs/plugin-react": ^1.2.0
-    mlogjs: "workspace:^"
-    monaco-editor: ^0.32.1
-    react: ^17.0.2
-    react-dom: ^17.0.2
-    react-split-pane: ^0.1.92
-    typescript: "*"
-    vite: "*"
-  languageName: unknown
-  linkType: soft
 
 "mlogjs@workspace:^, mlogjs@workspace:compiler":
   version: 0.0.0-use.local
