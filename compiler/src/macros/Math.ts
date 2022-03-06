@@ -28,7 +28,7 @@ function createMacroMathOperations(scope: IScope) {
   const macroMathOperations: Record<string, MacroFunction> = {};
   for (const key in mathOperations) {
     const fn = mathOperations[key];
-    macroMathOperations[key] = new MacroFunction(scope, (a, b) => {
+    macroMathOperations[key] = new MacroFunction<IValue>(scope, (a, b) => {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (typeof a.data !== "number" || typeof b.data !== "number")
