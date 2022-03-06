@@ -120,7 +120,7 @@ interface Math {
   sqrt(x: number): number;
 
   /**
-   * Returns a random floating point number from 0 to `range` (excluding `range` istself)
+   * Returns a random floating point number from 0 to `range` (excluding `range` itself)
    * @param range
    */
   rand(range: number): number;
