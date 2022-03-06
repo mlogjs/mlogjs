@@ -1,8 +1,11 @@
 #!/usr/bin/env node
 import { existsSync, readFileSync, writeFileSync } from "fs";
-import { compile } from ".";
-import yargs from "yargs";
 import { hideBin } from "yargs/helpers";
+import { compile } from ".";
+import { highlight } from "cli-highlight";
+import yargs from "yargs";
+import chalk from "chalk";
+import { resolve } from "path";
 
 yargs(hideBin(process.argv))
   .command(
@@ -24,11 +27,37 @@ yargs(hideBin(process.argv))
       if (!out) return console.log("missing output path");
       if (!existsSync(path))
         return console.log(`file at ${path} does not exist`);
-      const [output, error] = compile(
-        readFileSync(path as string, { encoding: "utf-8" })
-      );
+      const code = readFileSync(path as string, "utf8");
+      const [output, error, [node]] = compile(code);
       if (error) {
-        console.log("Error: " + error.message);
+        // @ts-ignore
+        let start = error?.loc as { line: number; column: number };
+        let end = start;
+
+        if (node) {
+          start = node.loc.start;
+          end = node.loc.end;
+        }
+
+        const lines = code.split("\n");
+        console.log(
+          chalk.cyanBright([resolve(path), start.line, start.column].join(":"))
+        );
+        for (
+          let i = Math.max(start.line - 3, 0);
+          i < Math.min(end.line + 2, lines.length);
+          i++
+        ) {
+          const n = i + 1;
+          const head = chalk.gray((n + " | ").padStart(6, " "));
+          console.log(head + highlight(lines[i], { language: "js" }));
+          if (n === start.line) {
+            console.log(
+              chalk.red(" ".repeat(6 + start.column) + "^ " + error.message)
+            );
+          }
+        }
+
         return;
       }
       writeFileSync(out, output);

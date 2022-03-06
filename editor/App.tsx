@@ -28,11 +28,11 @@ export function App() {
   function compileAndShow() {
     if (!editor) return;
     const model = editor.getModel();
-    const [output, error, nodes] = compile(code);
+    const [output, error, [node]] = compile(code);
     const markers: editor.IMarkerData[] = [];
     if (error) {
-      if (nodes[0]) {
-        const { start, end } = nodes[0].loc;
+      if (node) {
+        const { start, end } = node.loc;
         markers.push({
           message: error.message,
           startLineNumber: start.line,
