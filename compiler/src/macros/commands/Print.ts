@@ -1,11 +1,17 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IInstruction, IScope, IValue } from "../../types";
 
 export class Print extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (...values: IValue[]) => {
-      return [null, [new InstructionBase("print", ...values)]];
+      const inst: IInstruction[] = [];
+
+      for (const value of values) {
+        inst.push(new InstructionBase("print", value));
+      }
+
+      return [null, inst];
     });
   }
 }
