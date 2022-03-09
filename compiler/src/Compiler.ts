@@ -75,10 +75,10 @@ export class Compiler {
     return [evaluated, [...inst, ...evaluatedLines]];
   }
 
-  handleMany(
+  handleMany<T extends es.Node>(
     scope: IScope,
-    nodes: es.Node[],
-    handler: typeof Compiler.prototype.handle = this.handle.bind(this)
+    nodes: T[],
+    handler: (scope: IScope, node: T) => TValueInstructions<IValue | null> = this.handle.bind(this)
   ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
