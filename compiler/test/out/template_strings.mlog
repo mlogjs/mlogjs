@@ -1,0 +1,3 @@
+radar player enemy any distance cyclone1 1 radarResult
+print radarResult
+end
