@@ -7,6 +7,18 @@ import { Building } from "../Building";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];
 
+const validBuildingGroups = [
+  "core",
+  "storage",
+  "generator",
+  "turret",
+  "factory",
+  "repair",
+  "rally",
+  "battery",
+  "reactor",
+];
+
 export class UnitLocate extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (find, ...args) => {
@@ -39,8 +51,17 @@ export class UnitLocate extends MacroFunction {
           break;
         }
         case "building": {
-          const [group, enemy] = args as [LiteralValue, IValue];
-          inputArgs = [find.data, group.data as string, enemy, "@copper"];
+          const [group, enemy] = args;
+
+          if (
+            !(group instanceof LiteralValue && typeof group.data === "string")
+          ) {
+            throw new Error("The building group must be a string literal");
+          }
+          if (!validBuildingGroups.includes(group.data))
+            throw new Error("Invalid building group");
+
+          inputArgs = [find.data, group.data, enemy, "@copper"];
           break;
         }
         case "spawn":
