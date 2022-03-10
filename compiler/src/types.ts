@@ -118,5 +118,8 @@ export type TValueInstructions<Content extends IValue | null = IValue> = [
 ];
 
 export type TOperatorMacroMap = {
-  [K in UnaryOperator | UpdateOperator | LeftRightOperator]?: MacroFunction;
+  [K in
+    | UnaryOperator
+    | UpdateOperator
+    | LeftRightOperator as `$${K}`]?: MacroFunction;
 };
