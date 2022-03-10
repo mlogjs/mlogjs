@@ -19,7 +19,7 @@ class MemoryEntry extends ObjectValue {
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {
-        return [null, [new InstructionBase("write", prop, mem.cell, value)]];
+        return [value, [new InstructionBase("write", prop, mem.cell, value)]];
       }),
     });
   }
