@@ -55,10 +55,9 @@ export class ObjectValue extends VoidValue {
 
 for (const op of operators) {
   ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
-    const $ = this.data["$" + op];
+    const $ = this.data[`$${op}`];
     if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
     let [scope, ...fnArgs] = args;
-    // @ts-ignore
     return $.call(scope, fnArgs);
   };
 }
