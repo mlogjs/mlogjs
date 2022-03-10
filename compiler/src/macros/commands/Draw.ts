@@ -6,7 +6,7 @@ import { MacroFunction } from "../Function";
 export class Draw extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (kind: IValue, ...args: IValue[]) => {
-      if (!(kind instanceof LiteralValue))
+      if (!(kind instanceof LiteralValue && typeof kind.data === "string"))
         throw new Error("Draw kind must be literal.");
       if (
         [
@@ -20,7 +20,7 @@ export class Draw extends MacroFunction<null> {
           "linePoly",
           "triangle",
           "image",
-        ].indexOf(kind.data as string) === -1
+        ].indexOf(kind.data) === -1
       )
         throw new Error("Draw kind must be valid");
       return [
@@ -28,7 +28,7 @@ export class Draw extends MacroFunction<null> {
         [
           new InstructionBase(
             "draw",
-            kind.data as string,
+            kind.data,
             ...args.map(v => {
               if (v instanceof LiteralValue && typeof v.data === "string")
                 return v.data;
