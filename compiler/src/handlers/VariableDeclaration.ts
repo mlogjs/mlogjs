@@ -50,11 +50,21 @@ export const VariableDeclarator: THandler<IValue | null> = (
       if (!init.macro)
         throw new Error("Cannot use array destructuring on non macro values");
 
+      if (!(init instanceof ObjectValue)) {
+        throw new Error("Array destructuring target must be an object value");
+      }
+
       for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as es.Identifier;
+        const element = elements[i] as es.Identifier | es.Pattern | null;
 
         if (!element) continue;
-        const val = (init as ObjectValue).data[i]!;
+        if (element.type !== "Identifier") {
+          throw new Error(
+            "Array destructuring expression can only have empty items or identifiers"
+          );
+        }
+
+        const val = init.data[i]!;
         scope.set(element.name, val);
       }
       return valinst;
