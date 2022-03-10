@@ -1,0 +1,7 @@
+print "single"
+print "first"
+print "second"
+print "third"
+set 4:6 @foo
+print 4:6
+end

@@ -29,8 +29,12 @@ export class ObjectValue extends VoidValue {
   }
 
   get(scope: IScope, key: LiteralValue): TValueInstructions {
-    const member = this.data[key.data];
-    if (member) return [member, []];
+    // avoids naming collisions with keys like
+    // constructor or toString
+    if (this.data.hasOwnProperty(key.data)) {
+      const member = this.data[key.data];
+      return [member, []];
+    }
     const { $get } = this.data;
     if (!$get) throw new Error("Cannot get undefined member.");
     return $get.call(scope, [key]);
