@@ -1,4 +1,4 @@
-import { MacroFunction } from "src/macros";
+import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
   IScope,
@@ -32,7 +32,7 @@ export class ObjectValue extends VoidValue {
     // avoids naming collisions with keys like
     // constructor or toString
     if (this.data.hasOwnProperty(key.data)) {
-      const member = this.data[key.data];
+      const member = this.data[key.data]!;
       return [member, []];
     }
     const { $get } = this.data;
