@@ -24,22 +24,22 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   macro = true;
   private paramStores: StoreValue[];
   private paramNames: string[];
-  private inst: IInstruction[];
-  private addr: LiteralValue;
-  private temp: StoreValue;
-  private ret: StoreValue;
-  private inline: boolean;
-  private tryingInline: boolean;
+  private inst!: IInstruction[];
+  private addr!: LiteralValue;
+  private temp!: StoreValue;
+  private ret!: StoreValue;
+  private inline!: boolean;
+  private tryingInline!: boolean;
   private body: es.BlockStatement;
   private name: string;
   private c: Compiler;
   private callSize: number;
-  private inlineTemp: TempValue;
-  private inlineEnd: LiteralValue;
+  private inlineTemp!: TempValue;
+  private inlineEnd!: LiteralValue;
   private bundled: boolean = false;
 
   private createValues() {
-    this.addr = new LiteralValue(this.scope, null);
+    this.addr = new LiteralValue(this.scope, null as never);
     this.temp = new StoreValue(this.scope, "f" + this.name);
     this.ret = new StoreValue(this.scope, "r" + this.name);
   }
@@ -79,7 +79,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.createInst();
   }
 
-  private normalReturn(scope: IScope, arg: IValue): TValueInstructions {
+  private normalReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
     const argInst = arg ? this.temp["="](scope, arg)[1] : [];
     return [null, [...argInst, new SetCounterInstruction(this.ret)]];
   }
@@ -87,7 +87,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
     if (!this.bundled) this.scope.inst.push(...this.inst);
     this.bundled = true;
-    const callAddressLiteral = new LiteralValue(scope, null);
+    const callAddressLiteral = new LiteralValue(scope, null as never);
     const inst: IInstruction[] = this.paramStores
       .map((param, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
@@ -99,7 +99,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [this.temp, inst];
   }
 
-  private inlineReturn(scope: IScope, arg: IValue): TValueInstructions {
+  private inlineReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
     const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
     return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
   }
@@ -107,7 +107,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
     // create return value
     this.inlineTemp = new TempValue(scope);
-    this.inlineEnd = new LiteralValue(scope, null);
+    this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
     const fnScope = this.scope.copy();
@@ -141,7 +141,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return this.normalCall(scope, args);
   }
 
-  return(scope: IScope, arg: IValue): TValueInstructions {
+  return(scope: IScope, arg: IValue): TValueInstructions<IValue | null> {
     if (arg && arg.macro) {
       this.inline = true;
       return [null, []];

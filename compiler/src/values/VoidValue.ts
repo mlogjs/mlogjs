@@ -11,7 +11,7 @@ export class VoidValue implements IValue {
   eval(scope: IScope): TValueInstructions {
     throw new Error(`${this} cannot eval.`);
   }
-  call(scope: IScope, args: IValue[]): TValueInstructions {
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
     throw new Error(`${this} cannot call.`);
   }
   get(scope: IScope, name: IValue): TValueInstructions {
@@ -21,6 +21,9 @@ export class VoidValue implements IValue {
     return "void";
   }
 }
+
+// tells typescript that VoidValue implements value
+export interface VoidValue extends IValue {}
 
 for (const key of operators) {
   VoidValue.prototype[key] = function () {

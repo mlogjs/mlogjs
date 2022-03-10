@@ -23,7 +23,10 @@ export class BaseValue extends VoidValue implements IValue {
   }
 }
 
-const operatorMap: { [k in BinaryOperator | LogicalOperator]?: string } = {
+const operatorMap: Record<
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
+  string
+> = {
   "==": "equal",
   "===": "strictEqual",
   "!=": "notEqual",
@@ -49,8 +52,9 @@ const operatorMap: { [k in BinaryOperator | LogicalOperator]?: string } = {
 } as const;
 
 for (const key in operatorMap) {
-  const kind = operatorMap[key];
-  BaseValue.prototype[key] = function (
+  type K = keyof typeof operatorMap;
+  const kind = operatorMap[key as K] as string;
+  BaseValue.prototype[key as K] = function (
     this: BaseValue,
     scope: IScope,
     value: IValue
@@ -69,26 +73,28 @@ for (const key in operatorMap) {
   };
 }
 
-const unaryOperatorMap: { [k in UnaryOperator]?: string } = {
+const unaryOperatorMap: Record<Extract<UnaryOperator, "!" | "~">, string> = {
   "!": "not",
   "~": "flip",
 } as const;
 
 for (const key in unaryOperatorMap) {
-  const name = unaryOperatorMap[key];
-  BaseValue.prototype[key] = function (
+  type K = keyof typeof unaryOperatorMap;
+  const name = unaryOperatorMap[key as K];
+  BaseValue.prototype[key as K] = function (
     this: BaseValue,
     scope: IScope
   ): TValueInstructions {
     const [that, inst] = this.eval(scope);
     const temp = new TempValue(scope);
-    return [temp, [...inst, new OperationInstruction(name, temp, that)]];
+    return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
 }
 
-const assignmentToBinary: {
-  [k in AssignementOperator]?: BinaryOperator | LogicalOperator;
-} = {
+const assignmentToBinary: Record<
+  Exclude<AssignementOperator, "=">,
+  BinaryOperator | LogicalOperator
+> = {
   "+=": "+",
   "-=": "-",
   "*=": "*",
@@ -106,12 +112,13 @@ const assignmentToBinary: {
 } as const;
 
 for (const op in assignmentToBinary) {
-  BaseValue.prototype[op] = function (
+  type K = keyof typeof assignmentToBinary;
+  BaseValue.prototype[op as K] = function (
     this: IValue,
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    const [opValue, opInst] = this[assignmentToBinary[op]](scope, value);
+    const [opValue, opInst] = this[assignmentToBinary[op as K]](scope, value);
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
   };

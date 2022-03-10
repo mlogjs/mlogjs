@@ -1,24 +1,24 @@
 import { LiteralValue, ObjectValue } from "../values";
-import { THandler, es, TValueInstructions } from "../types";
+import { THandler, es, TValueInstructions, IValue } from "../types";
 import { nodeName } from "../utils";
 
-export const VariableDeclaration: THandler = (
+export const VariableDeclaration: THandler<null> = (
   c,
   scope,
   node: es.VariableDeclaration
 ) => {
   return c.handleMany(scope, node.declarations, (scope, child) =>
-    VariableDeclarator(c, scope, child as es.VariableDeclarator, node.kind)
+    VariableDeclarator(c, scope, child, node.kind)
   );
 };
 
-export const VariableDeclarator: THandler = (
+export const VariableDeclarator: THandler<IValue | null> = (
   c,
   scope,
   node: es.VariableDeclarator,
   kind: "let" | "var" | "const" = "let"
 ) => {
-  let valinst: TValueInstructions = node.init
+  let valinst: TValueInstructions<IValue | null> = node.init
     ? c.handleEval(scope, node.init)
     : [null, []];
   switch (node.id.type) {
@@ -27,14 +27,14 @@ export const VariableDeclarator: THandler = (
       const [init] = valinst;
       if (kind === "const" && !init)
         throw Error("Cannot create constant with void value.");
-      if (kind === "const" && init.constant) {
+      if (kind === "const" && init?.constant) {
         scope.set(name, init);
         return valinst;
       } else {
         const value = scope.make(name, nodeName(node));
         if (init) {
           if (init.macro) throw new Error("Macro value must be constant.");
-          valinst[1].push(...value["="](scope, valinst[0])[1]);
+          valinst[1].push(...value["="](scope, init)[1]);
         }
         if (kind === "const") value.constant = true;
         return valinst;
@@ -50,11 +50,21 @@ export const VariableDeclarator: THandler = (
       if (!init.macro)
         throw new Error("Cannot use array destructuring on non macro values");
 
+      if (!(init instanceof ObjectValue)) {
+        throw new Error("Array destructuring target must be an object value");
+      }
+
       for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as es.Identifier;
+        const element = elements[i] as es.Identifier | es.Pattern | null;
 
         if (!element) continue;
-        const val = (init as ObjectValue).data[i];
+        if (element.type !== "Identifier") {
+          throw new Error(
+            "Array destructuring expression can only have empty items or identifiers"
+          );
+        }
+
+        const val = init.data[i]!;
         scope.set(element.name, val);
       }
       return valinst;

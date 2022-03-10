@@ -2,7 +2,7 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IInstruction, IScope, IValue } from "../../types";
 
-export class Print extends MacroFunction {
+export class Print extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (...values: IValue[]) => {
       const inst: IInstruction[] = [];

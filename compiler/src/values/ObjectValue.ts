@@ -1,14 +1,25 @@
+import { MacroFunction } from "../macros";
 import { operators } from "../operators";
-import { IScope, IValue, TValueInstructions } from "../types";
+import {
+  IScope,
+  IValue,
+  TOperatorMacroMap,
+  TValueInstructions,
+} from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
+export interface IObjectValueData extends TOperatorMacroMap {
+  [k: string]: IValue | undefined;
+  $get?: MacroFunction<IValue>;
+  $eval?: MacroFunction<IValue>;
+}
 export class ObjectValue extends VoidValue {
   constant = true;
   macro = true;
-  data: { [k: string]: IValue };
+  data: IObjectValueData;
 
-  constructor(scope: IScope, data: { [k: string]: IValue } = {}) {
+  constructor(scope: IScope, data: IObjectValueData = {}) {
     super(scope);
     this.data = data;
   }
@@ -21,7 +32,7 @@ export class ObjectValue extends VoidValue {
     // avoids naming collisions with keys like
     // constructor or toString
     if (this.data.hasOwnProperty(key.data)) {
-      const member = this.data[key.data];
+      const member = this.data[key.data]!;
       return [member, []];
     }
     const { $get } = this.data;
@@ -35,7 +46,7 @@ export class ObjectValue extends VoidValue {
     return $eval.call(scope, []);
   }
 
-  call(scope: IScope, args: IValue[]): TValueInstructions {
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args);
     return $call.call(scope, args);
@@ -44,10 +55,9 @@ export class ObjectValue extends VoidValue {
 
 for (const op of operators) {
   ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
-    const $ = this.data["$" + op];
-    if (!$) return VoidValue.prototype[op].apply(this, args);
+    const $ = this.data[`$${op}`];
+    if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
     let [scope, ...fnArgs] = args;
-    // @ts-ignore
     return $.call(scope, fnArgs);
   };
 }

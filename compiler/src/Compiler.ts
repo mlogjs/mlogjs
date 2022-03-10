@@ -3,9 +3,9 @@ import * as handlers from "./handlers";
 import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
-import { es, IScope, THandler, TValueInstructions } from "./types";
+import { es, IScope, IValue, THandler, TValueInstructions } from "./types";
 
-type THandlerMap = { [k in es.Node["type"]]?: THandler };
+type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
 export class Compiler {
   protected stackName?: string;
@@ -17,7 +17,9 @@ export class Compiler {
     this.stackName = stackName;
   }
 
-  compile(script: string): [string, Error, es.Node[]] {
+  compile(
+    script: string
+  ): [string, null, es.Node[]] | [null, Error, es.Node[]] {
     let output: string;
     try {
       const program = this.parse(script);
@@ -29,13 +31,13 @@ export class Compiler {
       valueInst[1].push(new EndInstruction(), ...scope.inst);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
-    } catch (error) {
+    } catch (error: any) {
       return [null, error, error?.nodeStack ?? []];
     }
     return [output, null, []];
   }
 
-  protected resolve(valueInst: TValueInstructions) {
+  protected resolve(valueInst: TValueInstructions<IValue | null>) {
     let i = 0;
     for (const inst of valueInst[1]) {
       inst.resolve(i);
@@ -43,7 +45,7 @@ export class Compiler {
     }
   }
 
-  protected serialize(resLines: TValueInstructions) {
+  protected serialize(resLines: TValueInstructions<IValue | null>) {
     const [_, inst] = resLines;
     return inst.filter(l => !l.hidden).join("\n");
   }
@@ -55,12 +57,12 @@ export class Compiler {
     }) as es.Node;
   }
 
-  handle(scope: IScope, node: es.Node): TValueInstructions {
+  handle(scope: IScope, node: es.Node): TValueInstructions<IValue | null> {
     try {
       const handler = this.handlers[node.type];
       if (!handler) throw Error("Missing handler for " + node.type);
       return handler(this, scope, node, null);
-    } catch (error) {
+    } catch (error: any) {
       error.nodeStack ??= [];
       error.nodeStack.push(node);
       throw error;
@@ -69,15 +71,15 @@ export class Compiler {
 
   handleEval(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
-    const [evaluated, evaluatedLines] = res.eval(scope);
+    const [evaluated, evaluatedLines] = res!.eval(scope);
     return [evaluated, [...inst, ...evaluatedLines]];
   }
 
-  handleMany(
+  handleMany<T extends es.Node>(
     scope: IScope,
-    nodes: es.Node[],
-    handler: typeof Compiler.prototype.handle = this.handle.bind(this)
-  ): TValueInstructions {
+    nodes: T[],
+    handler: (scope: IScope, node: T) => TValueInstructions<IValue | null> = this.handle.bind(this)
+  ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
       const [_, nodeLines] = handler(scope, node);

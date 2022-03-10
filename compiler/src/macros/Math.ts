@@ -3,11 +3,14 @@ import { IScope, IValue } from "../types";
 import { LiteralValue, ObjectValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";
 
-const mathOperations: { [k: string]: (a: number, b?: number) => number } = {
-  max: (a, b) => Math.max(a, b),
-  min: (a, b) => Math.min(a, b),
-  angle: (a, b) => Math.atan2(a, b),
-  len: (a, b) => Math.sqrt(a ** 2 + b ** 2),
+const mathOperations: Record<
+  string,
+  ((a: number, b?: number) => number) | null
+> = {
+  max: (a, b) => Math.max(a, b as number),
+  min: (a, b) => Math.min(a, b as number),
+  angle: (a, b) => Math.atan2(a, b as number),
+  len: (a, b) => Math.sqrt(a ** 2 + (b as number) ** 2),
   noise: null,
   abs: a => Math.abs(a),
   log: a => Math.log(a),
@@ -22,10 +25,10 @@ const mathOperations: { [k: string]: (a: number, b?: number) => number } = {
 };
 
 function createMacroMathOperations(scope: IScope) {
-  const macroMathOperations = {};
+  const macroMathOperations: Record<string, MacroFunction> = {};
   for (const key in mathOperations) {
     const fn = mathOperations[key];
-    macroMathOperations[key] = new MacroFunction(scope, (a, b) => {
+    macroMathOperations[key] = new MacroFunction<IValue>(scope, (a, b) => {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (typeof a.data !== "number" || typeof b.data !== "number")
@@ -42,6 +45,7 @@ function createMacroMathOperations(scope: IScope) {
           throw new Error(
             "Cannot do math operation with non-numerical literal."
           );
+
         return [new LiteralValue(scope, fn(a.num)), []];
       }
       const temp = new TempValue(scope);

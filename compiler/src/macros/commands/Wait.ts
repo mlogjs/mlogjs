@@ -3,7 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, StoreValue } from "../../values";
 
-export class Wait extends MacroFunction {
+export class Wait extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, seconds => {
       if (

@@ -3,29 +3,19 @@ import { AddressResolver } from "./instructions";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 
 export class Scope implements IScope {
-  parent: IScope;
-  name: string;
-  data: { [k: string]: IValue };
-  stacked: boolean = false;
-  ntemp: number = 0;
-  inst: IInstruction[];
-  break: AddressResolver;
-  continue: AddressResolver;
-  function: IFunctionValue;
+  data: Record<string, IValue | null>;
+  break!: AddressResolver;
+  continue!: AddressResolver;
+  function!: IFunctionValue;
   constructor(
-    values: { [k: string]: IValue },
-    parent: IScope = null,
-    stacked = false,
-    ntemp = 0,
-    name = "",
-    inst = []
+    values: Record<string, IValue | null>,
+    public parent: IScope | null = null,
+    public stacked = false,
+    public ntemp = 0,
+    public name = "",
+    public inst: IInstruction[] = []
   ) {
     this.data = values;
-    this.parent = parent;
-    this.stacked = stacked;
-    this.ntemp = ntemp;
-    this.name = name;
-    this.inst = inst;
   }
   copy(): IScope {
     const scope = new Scope(
@@ -61,18 +51,18 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.get(name);
     throw Error(`${name} is not declared.`);
   }
-  set(name: string, value: IValue): IValue {
+  set<T extends IValue>(name: string, value: T): T {
     if (name in this.data) throw Error(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
-  hardSet(name: string, value: IValue): IValue {
+  hardSet<T extends IValue>(name: string, value: T): T {
     this.data[name] = value;
     return value;
   }
-  make(name: string, storeName: string): IValue {
+  make(name: string, storeName: string): StoreValue {
     return this.set(
       name,
-      this.stacked ? null : new StoreValue(this, storeName)
+      this.stacked ? (null as never) : new StoreValue(this, storeName)
     );
   }
 }

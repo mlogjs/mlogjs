@@ -1,6 +1,10 @@
-import { es, IInstruction, THandler } from "../types";
+import { es, IInstruction, IValue, THandler } from "../types";
 
-export const CallExpression: THandler = (c, scope, node: es.CallExpression) => {
+export const CallExpression: THandler<IValue | null> = (
+  c,
+  scope,
+  node: es.CallExpression
+) => {
   const inst: IInstruction[] = [];
 
   const args = node.arguments.map(node => {

@@ -2,12 +2,16 @@ import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import { es, IInstruction, THandler } from "../types";
 import { LiteralValue } from "../values";
 
-export const WhileStatement: THandler = (c, scope, node: es.WhileStatement) => {
+export const WhileStatement: THandler<null> = (
+  c,
+  scope,
+  node: es.WhileStatement
+) => {
   const lines: IInstruction[] = [];
   const [test, testLines] = c.handleEval(scope, node.test);
 
-  const startLoopAddr = new LiteralValue(scope, null);
-  const endLoopAddr = new LiteralValue(scope, null);
+  const startLoopAddr = new LiteralValue(scope, null as never);
+  const endLoopAddr = new LiteralValue(scope, null as never);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
 

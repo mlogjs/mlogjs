@@ -21,7 +21,7 @@ export const ArrowFunctionExpression: THandler = (
   }
 
   const paramNames = [];
-  const paramStores = [];
+  const paramStores: StoreValue[] = [];
 
   for (const id of params as es.Identifier[]) {
     paramNames.push(id.name);
@@ -47,7 +47,10 @@ export const FunctionDeclaration: THandler = (
   node: es.FunctionDeclaration
 ) => {
   return [
-    scope.set(node.id.name, ArrowFunctionExpression(c, scope, node, null)[0]),
+    scope.set(
+      (node.id as es.Identifier).name,
+      ArrowFunctionExpression(c, scope, node, null)[0]
+    ),
     [],
   ];
 };
