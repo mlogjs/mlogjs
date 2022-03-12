@@ -24,7 +24,7 @@ let value = sensor(customSymbol, building);
 
 ## concat
 
-Allows you to concat a series of constant strings.
+Allows you to concatenate a series of constant strings.
 
 ```js
 const programVersion = "2";
