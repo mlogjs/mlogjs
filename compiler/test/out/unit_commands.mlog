@@ -1,0 +1,15 @@
+ubind @flare
+ucontrol approach 0 0 5
+ucontrol boost 1
+ucontrol build 0 0 @router 0
+ucontrol flag 123
+ucontrol getBlock 0 0 t0 t1 0
+ucontrol idle
+ucontrol itemDrop @air 100
+ucontrol itemTake shard1 @copper 10
+ucontrol within 1 2 10 15:6 0
+print 15:6
+ucontrol getBlock 10 20 t3 t4 0
+print t3
+print t4
+end
