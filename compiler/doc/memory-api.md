@@ -10,8 +10,8 @@ const message = getBuilding("message1");
 
 const mem = new Memory(bank, 512); // tell the compiler the size of the memory unit. 64 by default
 
-if (!mem[0]) {
-  mem[0] = true;
+if (mem[0] == 0) {
+  mem[0] = 1;
   print("Processor intialized");
 } else {
   let runs = mem[1];
