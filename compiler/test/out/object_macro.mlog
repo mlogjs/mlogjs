@@ -1,0 +1,7 @@
+print 10
+print "String literal"
+print "number index"
+print "Number is "
+print 20
+printflush message1
+end
