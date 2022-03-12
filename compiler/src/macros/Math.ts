@@ -7,20 +7,23 @@ const mathOperations: Record<
   string,
   ((a: number, b?: number) => number) | null
 > = {
-  max: (a, b) => Math.max(a, b as number),
-  min: (a, b) => Math.min(a, b as number),
-  angle: (a, b) => Math.atan2(a, b as number),
-  len: (a, b) => Math.sqrt(a ** 2 + (b as number) ** 2),
+  max: (a, b) => Math.max(a, b!),
+  min: (a, b) => Math.min(a, b!),
+  angle: (x, y) => {
+    const angle = (Math.atan2(y!, x) * 180) / Math.PI;
+    return angle < 0 ? angle + 360 : angle;
+  },
+  len: (a, b) => Math.sqrt(a ** 2 + b! ** 2),
   noise: null,
   abs: a => Math.abs(a),
   log: a => Math.log(a),
-  log10: a => Math.log(a) / Math.log(10),
+  log10: a => Math.log10(a),
   sin: a => Math.sin(a),
   cos: a => Math.cos(a),
   tan: a => Math.tan(a),
   floor: a => Math.floor(a),
   ceil: a => Math.ceil(a),
-  sqrt: a => Math.ceil(a),
+  sqrt: a => Math.sqrt(a),
   rand: null,
 };
 
