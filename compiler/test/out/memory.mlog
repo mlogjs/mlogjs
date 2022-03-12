@@ -1,0 +1,14 @@
+print "Mem size"
+print 64
+print "\n"
+print "Big Mem size"
+print 512
+print "\n"
+read t0 cell1 0
+print "mem at 0"
+print t0
+write 0 cell1 120
+read t1 cell1 0
+print "mem at 0 again"
+print t1
+end
