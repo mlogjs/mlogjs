@@ -28,6 +28,8 @@ yargs(hideBin(process.argv))
       if (!existsSync(path))
         return console.log(`file at ${path} does not exist`);
       const out = argv.out ?? defaultOutPath(path);
+      if (path == out)
+        return console.log("The out path cannot be the same as the input path");
       const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compile(code);
       if (error) {
