@@ -21,3 +21,15 @@ let value = sensor(customSymbol, building);
 
 // do somthing after
 ```
+
+## concat
+
+Allows you to concat a series of constant strings.
+
+```js
+const programVersion = "2";
+const programName = "special-program";
+const fullName = concat(programName, "-v", programVersion);
+
+// ...
+```
