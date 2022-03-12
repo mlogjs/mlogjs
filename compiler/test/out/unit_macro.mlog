@@ -1,0 +1,19 @@
+op equal t0 @unit null
+jump 3 equal t0 0
+ubind @flare
+sensor t1 @unit @ammo
+print "ammo: "
+print t1
+print "\n"
+sensor t2 @unit @health
+print "health: "
+print t2
+print "\n"
+set 10:4 @copper
+sensor t3 @unit 10:4
+print "amount of "
+print 10:4
+print " : "
+print t3
+printflush message1
+end
