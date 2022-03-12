@@ -1,0 +1,13 @@
+set 2:6 @cryofluid
+sensor t0 cyclone1 @ammo
+print "current ammo: "
+print t0
+print "\n"
+sensor t1 cyclone1 2:6
+print "amount of "
+print 2:6
+print " : "
+print t1
+print "\n"
+printflush message1
+end
