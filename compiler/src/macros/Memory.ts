@@ -44,7 +44,7 @@ class MemoryMacro extends ObjectValue {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
-          return [new VoidValue(scope), []];
+          throw new Error(`Invalid memory object property: "${prop.data}"`);
         const obj = new MemoryEntry(scope, this, prop);
         return [obj, []];
       }),
