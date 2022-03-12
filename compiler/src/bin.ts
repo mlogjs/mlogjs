@@ -15,14 +15,15 @@ yargs(hideBin(process.argv))
       return yargs
         .positional("path", {
           describe: "path of the file to compile",
+          type: "string",
         })
         .positional("out", {
           describe: "path of the output file",
+          type: "string",
         });
     },
     argv => {
-      const path = argv.path as string;
-      const out = argv.out as string;
+      const path = argv.path;
       if (!path) return console.log("missing required path argument");
       if (!out) return console.log("missing output path");
       if (!existsSync(path))
