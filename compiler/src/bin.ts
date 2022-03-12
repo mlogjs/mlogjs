@@ -5,7 +5,7 @@ import { compile } from ".";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
-import { resolve } from "path";
+import { join, parse, resolve } from "path";
 
 yargs(hideBin(process.argv))
   .command(
@@ -25,10 +25,10 @@ yargs(hideBin(process.argv))
     argv => {
       const path = argv.path;
       if (!path) return console.log("missing required path argument");
-      if (!out) return console.log("missing output path");
       if (!existsSync(path))
         return console.log(`file at ${path} does not exist`);
-      const code = readFileSync(path as string, "utf8");
+      const out = argv.out ?? defaultOutPath(path);
+      const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compile(code);
       if (error) {
         // @ts-ignore
@@ -71,3 +71,8 @@ yargs(hideBin(process.argv))
   .scriptName("mlogjs")
   .demandCommand()
   .parse();
+
+function defaultOutPath(path: string) {
+  const parsed = parse(path);
+  return join(parsed.dir, `${parsed.name}.mlog`);
+}
