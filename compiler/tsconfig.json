@@ -7,11 +7,12 @@
     "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "outDir": "build",
+    "outDir": "dist/types",
+    "emitDeclarationOnly": true,
     "resolveJsonModule": true,
     "sourceMap": true,
     "strict": true,
     "target": "ES2021"
   },
-  "include": ["src", "lib/*"]
+  "include": ["src", "lib/*", "bin/index.js"]
 }

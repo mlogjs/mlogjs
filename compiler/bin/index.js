@@ -1,11 +1,11 @@
 #!/usr/bin/env node
-import { existsSync, readFileSync, writeFileSync } from "fs";
-import { hideBin } from "yargs/helpers";
-import { compile } from ".";
-import { highlight } from "cli-highlight";
-import yargs from "yargs";
-import chalk from "chalk";
-import { join, parse, resolve } from "path";
+const { existsSync, readFileSync, writeFileSync } = require("fs");
+const { hideBin } = require("yargs/helpers");
+const { compile } = require("../dist/mlogjs.cjs.js");
+const { highlight } = require("cli-highlight");
+const yargs = require("yargs");
+const chalk = require("chalk");
+const { join, parse, resolve } = require("path");
 
 yargs(hideBin(process.argv))
   .command(
@@ -33,13 +33,12 @@ yargs(hideBin(process.argv))
       const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compile(code);
       if (error) {
-        // @ts-ignore
-        let start = error?.loc as { line: number; column: number };
+        let start = error?.loc;
         let end = start;
 
         if (node) {
-          start = node.loc!.start;
-          end = node.loc!.end;
+          start = node.loc.start;
+          end = node.loc.end;
         }
 
         const lines = code.split("\n");
@@ -74,7 +73,7 @@ yargs(hideBin(process.argv))
   .demandCommand()
   .parse();
 
-function defaultOutPath(path: string) {
+function defaultOutPath(path) {
   const parsed = parse(path);
   return join(parsed.dir, `${parsed.name}.mlog`);
 }

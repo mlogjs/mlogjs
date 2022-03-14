@@ -3997,7 +3997,7 @@ __metadata:
     vite: "*"
     yargs: ^17.0.1
   bin:
-    mlogjs: ./build/bin.js
+    mlogjs: ./bin/index.js
   languageName: unknown
   linkType: soft
 
