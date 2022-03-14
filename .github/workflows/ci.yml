@@ -17,7 +17,7 @@ jobs:
       - run: yarn workspace mlogjs coverage
       - run: yarn workspace mlogjs run-p build docs
       - run: yarn workspace editor build
-      - run: git add -f compiler/dist compiler/build docs
+      - run: git add -f compiler/dist docs
 
       - env:
           MESSAGE: ${{ github.event.head_commit.message }}
