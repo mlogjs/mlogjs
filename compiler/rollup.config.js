@@ -31,7 +31,7 @@ export default defineConfig([
     ],
     plugins: [
       typescript({
-        tsconfig: "./tsconfig.base.json",
+        tsconfig: "./tsconfig.json",
       }),
     ],
   },
@@ -55,7 +55,7 @@ export default defineConfig([
         ],
       }),
       typescript({
-        tsconfig: "./tsconfig.base.json",
+        tsconfig: "./tsconfig.json",
         compilerOptions: {
           outDir: "build/types",
           declaration: true,
