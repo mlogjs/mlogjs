@@ -8,7 +8,7 @@
   "types": "./dist/types",
   "scripts": {
     "clean": "rm -rf ../docs dist build",
-    "build": "vite build && tsc",
+    "build": "rollup -c",
     "dev": "ts-node src/bin",
     "test": "jest",
     "coverage": "jest --coverage",
