@@ -2,9 +2,9 @@
   "name": "mlogjs",
   "version": "0.2.2",
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
-  "main": "./dist/mlogjs.cjs.js",
-  "module": "./dist/mlogjs.es.js",
-  "bin": "./bin/index.js",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "bin": "./dist/index.cjs",
   "types": "./dist/types",
   "scripts": {
     "clean": "rm -rf ../docs dist build",
