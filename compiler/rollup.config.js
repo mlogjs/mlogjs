@@ -11,34 +11,35 @@ const external = [
   "chalk",
   "path",
 ];
+
 export default defineConfig([
   {
     input: "src/index.ts",
     external,
     output: [
       {
-        dir: "build/cjs",
+        file: "dist/index.cjs",
         format: "cjs",
-        preserveModules: true,
-        entryFileNames: "[name].cjs",
       },
       {
-        dir: "build/mjs",
+        file: "dist/index.mjs",
         format: "esm",
-        preserveModules: true,
-        entryFileNames: "[name].mjs",
       },
     ],
     plugins: [
       typescript({
         tsconfig: "./tsconfig.json",
+        compilerOptions: {
+          declarationDir: "types",
+          declaration: true,
+        },
       }),
     ],
   },
   {
     input: "src/bin.ts",
     output: {
-      dir: "build",
+      dir: "dist",
       preserveModules: true,
       format: "cjs",
       entryFileNames: "[name].cjs",
@@ -50,16 +51,12 @@ export default defineConfig([
         entries: [
           {
             find: /^\.$/, // this replacement only works for the "." import
-            replacement: "./cjs/index.cjs",
+            replacement: "./index.cjs",
           },
         ],
       }),
       typescript({
         tsconfig: "./tsconfig.json",
-        compilerOptions: {
-          outDir: "build/types",
-          declaration: true,
-        },
       }),
     ],
   },
