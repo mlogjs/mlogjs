@@ -12,4 +12,4 @@ npm i -g mlogjs
 
 ## Web version
 
-https://weisrc.github.io/mlogjs-web-editor/
+https://weisrc.github.io/mlogjs/editor/
