@@ -4074,7 +4074,7 @@ __metadata:
     typescript: "*"
     yargs: ^17.0.1
   bin:
-    mlogjs: ./bin/index.js
+    mlogjs: ./dist/index.cjs
   languageName: unknown
   linkType: soft
 
