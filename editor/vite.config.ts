@@ -34,6 +34,6 @@ export default defineConfig({
     outDir: resolve(__dirname, "../docs/editor"),
     emptyOutDir: true,
   },
-  base: "mlogjs/editor",
+  base: "/mlogjs/editor/",
   plugins: [react(), rawResolver],
 });
