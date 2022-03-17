@@ -1,4 +1,4 @@
-import { LiteralValue, ObjectValue } from "../values";
+import { ObjectValue } from "../values";
 import { THandler, es, TValueInstructions, IValue } from "../types";
 import { nodeName } from "../utils";
 
@@ -18,7 +18,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
   node: es.VariableDeclarator,
   kind: "let" | "var" | "const" = "let"
 ) => {
-  let valinst: TValueInstructions<IValue | null> = node.init
+  const valinst: TValueInstructions<IValue | null> = node.init
     ? c.handleEval(scope, node.init)
     : [null, []];
   switch (node.id.type) {
@@ -55,7 +55,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
       }
 
       for (let i = 0; i < elements.length; i++) {
-        const element = elements[i] as es.Identifier | es.Pattern | null;
+        const element = elements[i];
 
         if (!element) continue;
         if (element.type !== "Identifier") {

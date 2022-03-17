@@ -12,7 +12,7 @@ export class TempValue extends StoreValue {
   constructor(scope: IScope, name?: string) {
     super(
       scope,
-      name ?? "t" + scope.ntemp + (scope.name ? ":" + scope.name : "")
+      name ?? `t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
     );
     if (!name) scope.ntemp++;
   }

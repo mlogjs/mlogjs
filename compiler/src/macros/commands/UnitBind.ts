@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { StoreValue, TempValue } from "../../values";
+import { StoreValue } from "../../values";
 
 export class UnitBind extends MacroFunction<null> {
   constructor(scope: IScope) {

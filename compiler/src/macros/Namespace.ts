@@ -1,16 +1,10 @@
 import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
 import { IScope, IValue, TValueInstructions } from "../types";
-import {
-  BaseValue,
-  LiteralValue,
-  ObjectValue,
-  StoreValue,
-  TempValue,
-} from "../values";
+import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
 import { Building, itemNames } from "./Building";
 import { InstructionBase, OperationInstruction } from "../instructions";
-import { comparisonBinaryOperators, operatorMap } from "../operators";
+import { operatorMap } from "../operators";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -52,7 +46,6 @@ export class VarsNamespace extends NamespaceMacro {
 export class UCommandsNamespace extends NamespaceMacro {
   constructor(scope: IScope) {
     super(scope);
-    const $get = this.data.$get as MacroFunction;
     this.data.$get = new MacroFunction(scope, prop => {
       if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
         throw new Error("Cannot use dynamic properties on object macros");

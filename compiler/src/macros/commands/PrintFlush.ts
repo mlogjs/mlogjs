@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { ObjectValue, StoreValue } from "../../values";
+import { ObjectValue } from "../../values";
 
 export class PrintFlush extends MacroFunction<null> {
   constructor(scope: IScope) {

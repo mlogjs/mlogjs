@@ -36,7 +36,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private callSize: number;
   private inlineTemp!: TempValue;
   private inlineEnd!: LiteralValue;
-  private bundled: boolean = false;
+  private bundled = false;
 
   private createValues() {
     this.addr = new LiteralValue(this.scope, null as never);
@@ -115,7 +115,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.paramNames.forEach((name, i) => fnScope.hardSet(name, args[i]));
 
     this.tryingInline = true;
-    let inst = this.c.handle(fnScope, this.body)[1];
+    const inst = this.c.handle(fnScope, this.body)[1];
     this.tryingInline = false;
 
     // removing useless instruction

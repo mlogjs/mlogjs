@@ -1,4 +1,4 @@
-import { InstructionBase, OperationInstruction } from "../instructions";
+import { OperationInstruction } from "../instructions";
 import { IScope, IValue } from "../types";
 import { LiteralValue, ObjectValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";

@@ -51,7 +51,7 @@ yargs(hideBin(process.argv))
           i++
         ) {
           const n = i + 1;
-          const head = chalk.gray((n + " | ").padStart(6, " "));
+          const head = chalk.gray(`${n} | `.padStart(6, " "));
           console.log(head + highlight(lines[i], { language: "js" }));
           if (n === start.line) {
             console.log(

@@ -46,7 +46,7 @@ export class Compiler {
   }
 
   protected serialize(resLines: TValueInstructions<IValue | null>) {
-    const [_, inst] = resLines;
+    const [, inst] = resLines;
     return inst.filter(l => !l.hidden).join("\n");
   }
 
@@ -78,11 +78,14 @@ export class Compiler {
   handleMany<T extends es.Node>(
     scope: IScope,
     nodes: T[],
-    handler: (scope: IScope, node: T) => TValueInstructions<IValue | null> = this.handle.bind(this)
+    handler: (
+      scope: IScope,
+      node: T
+    ) => TValueInstructions<IValue | null> = this.handle.bind(this)
   ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
-      const [_, nodeLines] = handler(scope, node);
+      const [, nodeLines] = handler(scope, node);
       lines.push(...nodeLines);
     }
     return [null, lines];

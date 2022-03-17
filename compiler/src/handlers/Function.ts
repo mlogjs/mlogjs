@@ -1,7 +1,6 @@
-import { AddressResolver, SetCounterInstruction } from "../instructions";
-import { THandler, es, IInstruction } from "../types";
+import { THandler, es } from "../types";
 import { nodeName } from "../utils";
-import { LiteralValue, StoreValue } from "../values";
+import { StoreValue } from "../values";
 import { FunctionValue } from "../values/FunctionValue";
 
 export const ArrowFunctionExpression: THandler = (

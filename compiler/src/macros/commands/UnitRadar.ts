@@ -1,6 +1,6 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IScope } from "../../types";
 import { LiteralValue, StoreValue, TempValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
 

@@ -1,10 +1,7 @@
 import {
   AssignementOperator,
-  assignmentOperators,
   BinaryOperator,
   LogicalOperator,
-  Operator,
-  operators,
 } from "../operators";
 import { THandler, es } from "../types";
 

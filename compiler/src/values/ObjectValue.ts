@@ -31,7 +31,7 @@ export class ObjectValue extends VoidValue {
   get(scope: IScope, key: LiteralValue): TValueInstructions {
     // avoids naming collisions with keys like
     // constructor or toString
-    if (this.data.hasOwnProperty(key.data)) {
+    if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
       const member = this.data[key.data]!;
       return [member, []];
     }
@@ -57,7 +57,7 @@ for (const op of operators) {
   ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
     const $ = this.data[`$${op}`];
     if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
-    let [scope, ...fnArgs] = args;
+    const [scope, ...fnArgs] = args;
     return $.call(scope, fnArgs);
   };
 }

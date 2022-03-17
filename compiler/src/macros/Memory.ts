@@ -1,14 +1,7 @@
 import { operators } from "../operators";
-import { InstructionBase, OperationInstruction } from "../instructions";
+import { InstructionBase } from "../instructions";
 import { IScope, IValue } from "../types";
-import {
-  BaseValue,
-  LiteralValue,
-  ObjectValue,
-  StoreValue,
-  TempValue,
-  VoidValue,
-} from "../values";
+import { BaseValue, LiteralValue, ObjectValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";
 
 class MemoryEntry extends ObjectValue {

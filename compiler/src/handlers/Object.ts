@@ -1,4 +1,3 @@
-import { Scope } from "../Scope";
 import { es, IInstruction, THandler } from "../types";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
@@ -14,7 +13,7 @@ export const ObjectExpression: THandler = (
     const { key, value } = prop;
     let index: string;
     if (key.type === "Identifier") index = key.name;
-    else if (key.type === "Literal") index = "" + key.value;
+    else if (key.type === "Literal") index = `${key.value}`;
     else {
       throw new Error(`Unsupported object key type: ${key.type}`);
     }

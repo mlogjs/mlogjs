@@ -2,7 +2,7 @@ import { es } from "./types";
 
 export function nodeName(node: es.Node) {
   const { line, column } = node.loc!.start;
-  return line + ":" + column;
+  return `${line}:${column}`;
 }
 
 export function camelToDashCase(name: string) {

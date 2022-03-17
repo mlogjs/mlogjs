@@ -1,6 +1,6 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IScope } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
 import { Unit } from "../Namespace";
 

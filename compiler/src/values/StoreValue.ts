@@ -1,6 +1,5 @@
 import { BaseValue, LiteralValue, TempValue } from ".";
 import { SetInstruction } from "../instructions";
-import { operators } from "../operators";
 import { IScope, IValue, TValueInstructions } from "../types";
 
 export class StoreValue extends BaseValue implements IValue {

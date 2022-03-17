@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../../values";
+import { IScope } from "../../types";
+import { LiteralValue, ObjectValue } from "../../values";
 
 const validKinds = ["enabled", "shoot", "shootp", "config", "color"];
 export class Control extends MacroFunction<null> {

@@ -2,7 +2,6 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
-import { validRadarFilters, validRadarSorts } from "./Radar";
 import { Building } from "../Building";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];

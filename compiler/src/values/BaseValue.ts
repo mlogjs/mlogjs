@@ -53,7 +53,7 @@ const operatorMap: Record<
 
 for (const key in operatorMap) {
   type K = keyof typeof operatorMap;
-  const kind = operatorMap[key as K] as string;
+  const kind = operatorMap[key as K];
   BaseValue.prototype[key as K] = function (
     this: BaseValue,
     scope: IScope,
