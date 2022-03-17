@@ -12,7 +12,9 @@ export interface IInstruction {
 export type THandler<T extends IValue | null = IValue> = (
   compiler: Compiler,
   scope: IScope,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   arg: any
 ) => TValueInstructions<T>;
 

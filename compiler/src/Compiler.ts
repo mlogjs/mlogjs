@@ -32,9 +32,9 @@ export class Compiler {
       valueInst[1].push(new EndInstruction(), ...scope.inst);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
-    } catch (error: any) {
+    } catch (error) {
       const nodeStack = error instanceof CompilerError ? error.nodeStack : [];
-      return [null, error, nodeStack];
+      return [null, error as Error, nodeStack];
     }
     return [output, null, []];
   }
@@ -64,7 +64,7 @@ export class Compiler {
       const handler = this.handlers[node.type];
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
       return handler(this, scope, node, null);
-    } catch (error: any) {
+    } catch (error) {
       if (error instanceof CompilerError) {
         error.nodeStack.push(node);
       }
