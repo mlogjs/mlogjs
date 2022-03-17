@@ -5,6 +5,7 @@ import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
 import { join, parse, resolve } from "path";
+import { CompilerError } from "./CompilerError";
 
 yargs(hideBin(process.argv))
   .command(
@@ -32,8 +33,10 @@ yargs(hideBin(process.argv))
       const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compile(code);
       if (error) {
-        // @ts-ignore
-        let start = error?.loc as { line: number; column: number };
+        let start = (error as CompilerError).loc as {
+          line: number;
+          column: number;
+        };
         let end = start;
 
         if (node) {
