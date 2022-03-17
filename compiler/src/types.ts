@@ -110,7 +110,10 @@ export interface IBindableValue extends IValue {
 }
 
 export interface IFunctionValue extends IValue {
-  return(scope: IScope, argument: IValue): TValueInstructions<IValue | null>;
+  return(
+    scope: IScope,
+    argument: IValue | null
+  ): TValueInstructions<IValue | null>;
 }
 
 export type TValueInstructions<Content extends IValue | null = IValue> = [

@@ -80,7 +80,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.createInst();
   }
 
-  private normalReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
+  private normalReturn(
+    scope: IScope,
+    arg: IValue | null
+  ): TValueInstructions<null> {
     const argInst = arg ? this.temp["="](scope, arg)[1] : [];
     return [null, [...argInst, new SetCounterInstruction(this.ret)]];
   }
@@ -100,7 +103,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [this.temp, inst];
   }
 
-  private inlineReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
+  private inlineReturn(
+    scope: IScope,
+    arg: IValue | null
+  ): TValueInstructions<null> {
     const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
     return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
   }
@@ -142,7 +148,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return this.normalCall(scope, args);
   }
 
-  return(scope: IScope, arg: IValue): TValueInstructions<IValue | null> {
+  return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
     if (arg && arg.macro) {
       this.inline = true;
       return [null, []];

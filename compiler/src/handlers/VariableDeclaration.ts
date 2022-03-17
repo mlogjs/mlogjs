@@ -70,6 +70,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
           );
         }
 
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const val = init.data[i]!;
         scope.set(element.name, val);
       }

@@ -33,6 +33,7 @@ export class ObjectValue extends VoidValue {
     // avoids naming collisions with keys like
     // constructor or toString
     if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const member = this.data[key.data]!;
       return [member, []];
     }

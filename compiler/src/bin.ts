@@ -37,7 +37,9 @@ yargs(hideBin(process.argv))
         let end = start;
 
         if (node) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           start = node.loc!.start;
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
           end = node.loc!.end;
         }
 
