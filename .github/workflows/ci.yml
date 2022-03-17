@@ -1,7 +1,8 @@
 name: ci
 
 on:
-  push
+  push:
+    branches: ['!ci']
 
 jobs:
   ci:
