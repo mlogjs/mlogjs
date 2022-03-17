@@ -1,8 +1,7 @@
 name: ci
 
 on:
-  push:
-    branches: [main]
+  push
 
 jobs:
   ci:
@@ -17,11 +16,11 @@ jobs:
       - run: yarn workspace mlogjs coverage
       - run: yarn workspace mlogjs run-p build docs
       - run: yarn workspace editor build
-      - run: git add -f compiler/dist docs
-
-      - env:
+      - if: contains(github.ref, "main")
+        env:
           MESSAGE: ${{ github.event.head_commit.message }}
         run: |
+          git add -f compiler/dist docs
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "$MESSAGE"
