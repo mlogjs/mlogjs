@@ -18,7 +18,7 @@ export type THandler<T extends IValue | null = IValue> = (
 
 export interface IScope {
   parent: IScope | null;
-  data: {};
+  data: Record<string, IValue | null>;
   name: string;
   inst: IInstruction[];
   break: AddressResolver;
