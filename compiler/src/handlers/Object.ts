@@ -18,7 +18,7 @@ export const ObjectExpression: THandler = (
     if (key.type === "Identifier") {
       index = key.name;
     } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
-      index = "" + key.value;
+      index = `${key.value}`;
     } else {
       throw new Error(`Unsupported object key type: ${key.type}`);
     }
