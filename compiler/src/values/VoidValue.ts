@@ -9,13 +9,13 @@ export class VoidValue implements IValue {
   constructor(scope: IScope) {
     this.scope = scope;
   }
-  eval(scope: IScope): TValueInstructions {
+  eval(_scope: IScope): TValueInstructions {
     throw new CompilerError(`${this} cannot eval.`);
   }
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
+  call(_scope: IScope, _args: IValue[]): TValueInstructions<IValue | null> {
     throw new CompilerError(`${this} cannot call.`);
   }
-  get(scope: IScope, name: IValue): TValueInstructions {
+  get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
   }
   toString(): string {

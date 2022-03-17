@@ -12,7 +12,7 @@ export class InstructionBase implements IInstruction {
   constructor(...args: (string | IValue | null)[]) {
     this.args = args;
   }
-  resolve(i: number) {}
+  resolve(_i: number) {}
   toString() {
     return this.args.filter(arg => arg).join(" ");
   }

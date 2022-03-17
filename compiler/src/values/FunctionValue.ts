@@ -151,7 +151,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return this.normalReturn(scope, arg);
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
 }
