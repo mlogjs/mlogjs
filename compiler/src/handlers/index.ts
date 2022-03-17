@@ -12,3 +12,4 @@ export * from "./CallExpression";
 export * from "./Object";
 export * from "./TemplateExpression";
 export * from "./BlockStatement";
+export * from "./File";

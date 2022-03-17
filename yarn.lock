@@ -220,6 +220,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@babel/parser@npm:^7.17.7":
+  version: 7.17.7
+  resolution: "@babel/parser@npm:7.17.7"
+  bin:
+    parser: ./bin/babel-parser.js
+  checksum: d2612c2597838a605bcbe921fd2c7381b3ab75603c7907020df037c22a3d27f0507285da74553cd75f403300ca76642323ca2e72ba55cc4222d4a20b87505b0c
+  languageName: node
+  linkType: hard
+
 "@babel/plugin-syntax-async-generators@npm:^7.8.4":
   version: 7.8.4
   resolution: "@babel/plugin-syntax-async-generators@npm:7.8.4"
@@ -1150,7 +1159,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"acorn@npm:^8.2.4, acorn@npm:^8.4.1, acorn@npm:^8.7.0":
+"acorn@npm:^8.2.4, acorn@npm:^8.4.1":
   version: 8.7.0
   resolution: "acorn@npm:8.7.0"
   bin:
@@ -4055,6 +4064,8 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "mlogjs@workspace:compiler"
   dependencies:
+    "@babel/parser": ^7.17.7
+    "@babel/types": ^7.17.0
     "@rollup/plugin-alias": ^3.1.9
     "@rollup/plugin-replace": ^4.0.0
     "@rollup/plugin-typescript": ^8.3.1
@@ -4062,7 +4073,6 @@ __metadata:
     "@types/jest": ^27.4.1
     "@types/node": ^15.3.0
     "@types/yargs": ^16.0.1
-    acorn: ^8.7.0
     cli-highlight: ^2.1.11
     jest: ^27.5.1
     npm-run-all: ^4.1.5
