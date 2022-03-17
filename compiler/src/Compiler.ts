@@ -1,4 +1,4 @@
-import { parse } from "acorn";
+import { parse } from "@typescript-eslint/typescript-estree";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
@@ -52,7 +52,7 @@ export class Compiler {
 
   protected parse(script: string) {
     return parse(script, {
-      locations: true,
+      loc: true,
       ecmaVersion: "latest",
     }) as es.Node;
   }

@@ -32,7 +32,7 @@
   },
   "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
-    "acorn": "^8.7.0",
+    "@typescript-eslint/typescript-estree": "^5.15.0",
     "cli-highlight": "^2.1.11",
     "yargs": "^17.0.1"
   },
