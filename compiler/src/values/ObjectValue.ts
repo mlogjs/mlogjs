@@ -55,8 +55,12 @@ export class ObjectValue extends VoidValue {
 }
 
 for (const op of operators) {
-  ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
+  ObjectValue.prototype[op] = function (
+    this: ObjectValue,
+    ...args: [IScope, ...never[]]
+  ) {
     const $ = this.data[`$${op}`];
+    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
     if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
     const [scope, ...fnArgs] = args;
     return $.call(scope, fnArgs);

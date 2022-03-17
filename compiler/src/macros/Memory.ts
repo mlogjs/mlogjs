@@ -25,6 +25,7 @@ for (const operator of operators) {
     this: MemoryEntry,
     ...args: unknown[]
   ) {
+    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
     return (BaseValue.prototype[operator] as Function).apply(this, args);
   };
 }

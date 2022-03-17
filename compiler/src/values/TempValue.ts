@@ -50,8 +50,10 @@ export class TempValue extends StoreValue {
       "proxy",
     ] as const) {
       if (key !== "=" && key in value)
-        this[key] = (...args: any) =>
-          (value[key as keyof IValue] as Function).apply(value, args);
+        this[key] = (...args: never[]) => {
+          // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
+          return (value[key as keyof IValue] as Function).apply(value, args);
+        };
     }
     this.setInst = new SetInstruction(this, value);
     this.setInst.hidden = true;
