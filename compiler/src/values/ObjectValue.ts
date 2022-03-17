@@ -1,3 +1,4 @@
+import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
@@ -31,12 +32,13 @@ export class ObjectValue extends VoidValue {
   get(scope: IScope, key: LiteralValue): TValueInstructions {
     // avoids naming collisions with keys like
     // constructor or toString
-    if (this.data.hasOwnProperty(key.data)) {
+    if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
       const member = this.data[key.data]!;
       return [member, []];
     }
     const { $get } = this.data;
-    if (!$get) throw new Error("Cannot get undefined member.");
+    if (!$get) throw new CompilerError("Cannot get undefined member.");
     return $get.call(scope, [key]);
   }
 
@@ -54,10 +56,14 @@ export class ObjectValue extends VoidValue {
 }
 
 for (const op of operators) {
-  ObjectValue.prototype[op] = function (this: ObjectValue, ...args: any[]) {
+  ObjectValue.prototype[op] = function (
+    this: ObjectValue,
+    ...args: [IScope, ...never[]]
+  ) {
     const $ = this.data[`$${op}`];
+    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
     if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
-    let [scope, ...fnArgs] = args;
+    const [scope, ...fnArgs] = args;
     return $.call(scope, fnArgs);
   };
 }

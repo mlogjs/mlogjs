@@ -1,4 +1,5 @@
 import { parse } from "@babel/parser";
+import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
@@ -19,7 +20,7 @@ export class Compiler {
 
   compile(
     script: string
-  ): [string, null, es.Node[]] | [null, Error, es.Node[]] {
+  ): [string, null, es.Node[]] | [null, Error | CompilerError, es.Node[]] {
     let output: string;
     try {
       const program = this.parse(script);
@@ -31,8 +32,9 @@ export class Compiler {
       valueInst[1].push(new EndInstruction(), ...scope.inst);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
-    } catch (error: any) {
-      return [null, error, error?.nodeStack ?? []];
+    } catch (error) {
+      const nodeStack = error instanceof CompilerError ? error.nodeStack : [];
+      return [null, error as Error, nodeStack];
     }
     return [output, null, []];
   }
@@ -46,7 +48,7 @@ export class Compiler {
   }
 
   protected serialize(resLines: TValueInstructions<IValue | null>) {
-    const [_, inst] = resLines;
+    const [, inst] = resLines;
     return inst.filter(l => !l.hidden).join("\n");
   }
 
@@ -59,19 +61,20 @@ export class Compiler {
 
   handle(scope: IScope, node: es.Node): TValueInstructions<IValue | null> {
     try {
-      
       const handler = this.handlers[node.type];
-      if (!handler) throw Error("Missing handler for " + node.type);
+      if (!handler) throw new CompilerError("Missing handler for " + node.type);
       return handler(this, scope, node, null);
-    } catch (error: any) {
-      error.nodeStack ??= [];
-      error.nodeStack.push(node);
+    } catch (error) {
+      if (error instanceof CompilerError) {
+        error.nodeStack.push(node);
+      }
       throw error;
     }
   }
 
   handleEval(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const [evaluated, evaluatedLines] = res!.eval(scope);
     return [evaluated, [...inst, ...evaluatedLines]];
   }
@@ -86,7 +89,7 @@ export class Compiler {
   ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
-      const [_, nodeLines] = handler(scope, node);
+      const [, nodeLines] = handler(scope, node);
       lines.push(...nodeLines);
     }
     return [null, lines];

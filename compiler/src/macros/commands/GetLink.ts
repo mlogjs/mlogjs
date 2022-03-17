@@ -3,6 +3,7 @@ import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, StoreValue, TempValue } from "../../values";
 import { Building } from "../Building";
+import { CompilerError } from "../../CompilerError";
 
 export class GetLink extends MacroFunction {
   constructor(scope: IScope) {
@@ -11,7 +12,7 @@ export class GetLink extends MacroFunction {
         !(index instanceof StoreValue) &&
         (!(index instanceof LiteralValue) || typeof index.data !== "number")
       )
-        throw new Error(
+        throw new CompilerError(
           "The getlink index must be a number literal or a store"
         );
       const temp = new TempValue(scope);

@@ -3,6 +3,7 @@ import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
 import { Building } from "../Building";
+import { CompilerError } from "../../CompilerError";
 
 const validModes = [
   "idle",
@@ -29,10 +30,12 @@ export class UnitControl extends MacroFunction<IValue | null> {
   constructor(scope: IScope) {
     super(scope, (mode, ...args) => {
       if (!(mode instanceof LiteralValue) || typeof mode.data !== "string")
-        throw new Error("The unitControl mode must be a string literal");
+        throw new CompilerError(
+          "The unitControl mode must be a string literal"
+        );
 
       if (!validModes.includes(mode.data))
-        throw new Error("Invalid unitControl mode");
+        throw new CompilerError("Invalid unitControl mode");
 
       if (
         args.some(
@@ -44,7 +47,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
             )
         )
       )
-        throw new Error(
+        throw new CompilerError(
           "The others arguments of unitControl must be literals or stores"
         );
 

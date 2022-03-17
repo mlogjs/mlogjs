@@ -12,13 +12,15 @@ export interface IInstruction {
 export type THandler<T extends IValue | null = IValue> = (
   compiler: Compiler,
   scope: IScope,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any,
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   arg: any
 ) => TValueInstructions<T>;
 
 export interface IScope {
   parent: IScope | null;
-  data: {};
+  data: Record<string, IValue | null>;
   name: string;
   inst: IInstruction[];
   break: AddressResolver;
@@ -108,7 +110,10 @@ export interface IBindableValue extends IValue {
 }
 
 export interface IFunctionValue extends IValue {
-  return(scope: IScope, argument: IValue): TValueInstructions<IValue | null>;
+  return(
+    scope: IScope,
+    argument: IValue | null
+  ): TValueInstructions<IValue | null>;
 }
 
 export type TValueInstructions<Content extends IValue | null = IValue> = [

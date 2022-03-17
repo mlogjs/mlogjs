@@ -18,7 +18,7 @@ export class MacroFunction<
   call(scope: IScope, args: IValue[]): TValueInstructions<RT> {
     return this.fn.apply(this, args);
   }
-  eval(scope: IScope): TValueInstructions {
+  eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
 }

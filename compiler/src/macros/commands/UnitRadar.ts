@@ -1,8 +1,9 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IScope } from "../../types";
 import { LiteralValue, StoreValue, TempValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
+import { CompilerError } from "../../CompilerError";
 
 export class UnitRadar extends MacroFunction {
   constructor(scope: IScope) {
@@ -15,23 +16,23 @@ export class UnitRadar extends MacroFunction {
         !(filter3 instanceof LiteralValue) ||
         typeof filter3.data !== "string"
       )
-        throw new Error("The filters must be string literals");
+        throw new CompilerError("The filters must be string literals");
 
       if (!validRadarFilters.includes(filter1.data))
-        throw new Error("Invalid value for filter1");
+        throw new CompilerError("Invalid value for filter1");
       if (!validRadarFilters.includes(filter2.data))
-        throw new Error("Invalid value for filter2");
+        throw new CompilerError("Invalid value for filter2");
       if (!validRadarFilters.includes(filter3.data))
-        throw new Error("Invalid value for filter3");
+        throw new CompilerError("Invalid value for filter3");
 
       if (!(order instanceof LiteralValue || order instanceof StoreValue))
-        throw new Error("The radar order must be a literal or a store");
+        throw new CompilerError("The radar order must be a literal or a store");
 
       if (!(sort instanceof LiteralValue) || typeof sort.data !== "string")
-        throw new Error("The radar sort must be a string literal");
+        throw new CompilerError("The radar sort must be a string literal");
 
       if (!validRadarSorts.includes(sort.data))
-        throw new Error("Invalid sort value");
+        throw new CompilerError("Invalid sort value");
 
       const temp = new TempValue(scope);
       return [

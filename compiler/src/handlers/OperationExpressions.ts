@@ -1,10 +1,8 @@
+import { CompilerError } from "../CompilerError";
 import {
   AssignementOperator,
-  assignmentOperators,
   BinaryOperator,
   LogicalOperator,
-  Operator,
-  operators,
 } from "../operators";
 import { THandler, es } from "../types";
 
@@ -36,6 +34,7 @@ export const AssignmentExpression: THandler = (
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
   const [right, rightInst] = c.handleEval(scope, node.right);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = left![node.operator](scope, right);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
@@ -48,7 +47,8 @@ export const UnaryExpression: THandler = (
   const [arg, argInst] = c.handleEval(scope, argument);
   const operatorId =
     operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
-  if (operatorId === "throw") throw Error("throw operator is not supported")
+  if (operatorId === "throw")
+    throw new CompilerError("throw operator is not supported");
 
   const [op, opInst] = arg[operatorId](scope);
   return [op, [...argInst, ...opInst]];
@@ -59,6 +59,7 @@ export const UpdateExpression: THandler = (
   { argument, operator, prefix }: es.UpdateExpression
 ) => {
   const [arg, argInst] = c.handle(scope, argument);
+  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = arg![operator](scope, prefix);
   return [op, [...argInst, ...opInst]];
 };

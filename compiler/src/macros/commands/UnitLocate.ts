@@ -2,8 +2,8 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
-import { validRadarFilters, validRadarSorts } from "./Radar";
 import { Building } from "../Building";
+import { CompilerError } from "../../CompilerError";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];
 
@@ -23,10 +23,10 @@ export class UnitLocate extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (find, ...args) => {
       if (!(find instanceof LiteralValue && typeof find.data === "string"))
-        throw new Error("The unitLocate find must be a string literal");
+        throw new CompilerError("The unitLocate find must be a string literal");
 
       if (!validFinds.includes(find.data))
-        throw new Error("Invalid find value");
+        throw new CompilerError("Invalid find value");
 
       if (
         args.some(
@@ -34,7 +34,7 @@ export class UnitLocate extends MacroFunction {
             !(value instanceof StoreValue || value instanceof LiteralValue)
         )
       )
-        throw new Error(
+        throw new CompilerError(
           "The others arguments of unitLocate must be literals or stores"
         );
 
@@ -56,10 +56,12 @@ export class UnitLocate extends MacroFunction {
           if (
             !(group instanceof LiteralValue && typeof group.data === "string")
           ) {
-            throw new Error("The building group must be a string literal");
+            throw new CompilerError(
+              "The building group must be a string literal"
+            );
           }
           if (!validBuildingGroups.includes(group.data))
-            throw new Error("Invalid building group");
+            throw new CompilerError("Invalid building group");
 
           inputArgs = [find.data, group.data, enemy, "@copper"];
           break;

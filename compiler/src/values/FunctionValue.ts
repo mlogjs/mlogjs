@@ -1,4 +1,5 @@
 import { Compiler } from "../Compiler";
+import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
   EJumpKind,
@@ -36,7 +37,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private callSize: number;
   private inlineTemp!: TempValue;
   private inlineEnd!: LiteralValue;
-  private bundled: boolean = false;
+  private bundled = false;
 
   private createValues() {
     this.addr = new LiteralValue(this.scope, null as never);
@@ -79,7 +80,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.createInst();
   }
 
-  private normalReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
+  private normalReturn(
+    scope: IScope,
+    arg: IValue | null
+  ): TValueInstructions<null> {
     const argInst = arg ? this.temp["="](scope, arg)[1] : [];
     return [null, [...argInst, new SetCounterInstruction(this.ret)]];
   }
@@ -99,7 +103,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [this.temp, inst];
   }
 
-  private inlineReturn(scope: IScope, arg: IValue): TValueInstructions<null> {
+  private inlineReturn(
+    scope: IScope,
+    arg: IValue | null
+  ): TValueInstructions<null> {
     const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
     return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
   }
@@ -115,7 +122,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.paramNames.forEach((name, i) => fnScope.hardSet(name, args[i]));
 
     this.tryingInline = true;
-    let inst = this.c.handle(fnScope, this.body)[1];
+    const inst = this.c.handle(fnScope, this.body)[1];
     this.tryingInline = false;
 
     // removing useless instruction
@@ -134,14 +141,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   call(scope: IScope, args: IValue[]): TValueInstructions {
     if (args.length !== this.paramStores.length)
-      throw new Error("Cannot call: argument count not matching.");
+      throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;
     return this.normalCall(scope, args);
   }
 
-  return(scope: IScope, arg: IValue): TValueInstructions<IValue | null> {
+  return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
     if (arg && arg.macro) {
       this.inline = true;
       return [null, []];
@@ -150,7 +157,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return this.normalReturn(scope, arg);
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
 }
