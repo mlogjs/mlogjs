@@ -7,6 +7,7 @@ import {
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
+import { CompilerError } from "../CompilerError";
 
 const literalMethods: Record<
   string,
@@ -14,7 +15,9 @@ const literalMethods: Record<
 > = {
   length: function (this: LiteralValue, scope: IScope) {
     if (typeof this.data !== "string")
-      throw new Error("Length method only works on string literal values.");
+      throw new CompilerError(
+        "Length method only works on string literal values."
+      );
     return new LiteralValue(scope, this.data.length);
   },
 };
@@ -37,7 +40,9 @@ export class LiteralValue extends BaseValue implements IBindableValue {
       return super.get(scope, name);
     const method = literalMethods[name.data];
     if (!method)
-      throw new Error(`Method ${name.data} does not exist on literal values.`);
+      throw new CompilerError(
+        `Method ${name.data} does not exist on literal values.`
+      );
     return [method.apply(this, [scope]), []];
   }
   get num() {

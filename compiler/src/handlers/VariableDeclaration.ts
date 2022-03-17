@@ -1,6 +1,7 @@
 import { ObjectValue } from "../values";
 import { THandler, es, TValueInstructions, IValue } from "../types";
 import { nodeName } from "../utils";
+import { CompilerError } from "../CompilerError";
 
 export const VariableDeclaration: THandler<null> = (
   c,
@@ -26,14 +27,15 @@ export const VariableDeclarator: THandler<IValue | null> = (
       const { name } = node.id;
       const [init] = valinst;
       if (kind === "const" && !init)
-        throw Error("Cannot create constant with void value.");
+        throw new CompilerError("Cannot create constant with void value.");
       if (kind === "const" && init?.constant) {
         scope.set(name, init);
         return valinst;
       } else {
         const value = scope.make(name, nodeName(node));
         if (init) {
-          if (init.macro) throw new Error("Macro value must be constant.");
+          if (init.macro)
+            throw new CompilerError("Macro value must be constant.");
           valinst[1].push(...value["="](scope, init)[1]);
         }
         if (kind === "const") value.constant = true;
@@ -44,14 +46,18 @@ export const VariableDeclarator: THandler<IValue | null> = (
       const { elements } = node.id;
       const [init] = valinst;
       if (!init)
-        throw new Error(
+        throw new CompilerError(
           "Cannot use array destructuring with constant with void value."
         );
       if (!init.macro)
-        throw new Error("Cannot use array destructuring on non macro values");
+        throw new CompilerError(
+          "Cannot use array destructuring on non macro values"
+        );
 
       if (!(init instanceof ObjectValue)) {
-        throw new Error("Array destructuring target must be an object value");
+        throw new CompilerError(
+          "Array destructuring target must be an object value"
+        );
       }
 
       for (let i = 0; i < elements.length; i++) {
@@ -59,7 +65,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
 
         if (!element) continue;
         if (element.type !== "Identifier") {
-          throw new Error(
+          throw new CompilerError(
             "Array destructuring expression can only have empty items or identifiers"
           );
         }
@@ -70,6 +76,6 @@ export const VariableDeclarator: THandler<IValue | null> = (
       return valinst;
     }
     default:
-      throw new Error("");
+      throw new CompilerError("");
   }
 };

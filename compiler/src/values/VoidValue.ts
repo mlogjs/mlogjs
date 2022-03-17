@@ -1,5 +1,6 @@
 import { IScope, IValue, TValueInstructions } from "../types";
 import { operators } from "../operators";
+import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
   scope: IScope;
@@ -9,13 +10,13 @@ export class VoidValue implements IValue {
     this.scope = scope;
   }
   eval(scope: IScope): TValueInstructions {
-    throw new Error(`${this} cannot eval.`);
+    throw new CompilerError(`${this} cannot eval.`);
   }
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
-    throw new Error(`${this} cannot call.`);
+    throw new CompilerError(`${this} cannot call.`);
   }
   get(scope: IScope, name: IValue): TValueInstructions {
-    throw new Error(`${this} cannot get.`);
+    throw new CompilerError(`${this} cannot get.`);
   }
   toString(): string {
     return "void";
@@ -28,6 +29,6 @@ export interface VoidValue extends IValue {}
 for (const key of operators) {
   VoidValue.prototype[key] = function () {
     console.log(this);
-    throw new Error(`${this} cannot '${key}' operation.`);
+    throw new CompilerError(`${this} cannot '${key}' operation.`);
   };
 }

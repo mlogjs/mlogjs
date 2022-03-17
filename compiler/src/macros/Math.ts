@@ -1,3 +1,4 @@
+import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
 import { IScope, IValue } from "../types";
 import { LiteralValue, ObjectValue, TempValue } from "../values";
@@ -35,7 +36,7 @@ function createMacroMathOperations(scope: IScope) {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (typeof a.data !== "number" || typeof b.data !== "number")
-            throw new Error(
+            throw new CompilerError(
               "Cannot do math operation with non-numerical literals."
             );
           return [new LiteralValue(scope, fn(a.num, b.num)), []];
@@ -45,7 +46,7 @@ function createMacroMathOperations(scope: IScope) {
       }
       if (fn && a instanceof LiteralValue) {
         if (typeof a.data !== "number")
-          throw new Error(
+          throw new CompilerError(
             "Cannot do math operation with non-numerical literal."
           );
 

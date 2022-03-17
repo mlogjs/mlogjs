@@ -1,3 +1,4 @@
+import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
@@ -36,7 +37,7 @@ export class ObjectValue extends VoidValue {
       return [member, []];
     }
     const { $get } = this.data;
-    if (!$get) throw new Error("Cannot get undefined member.");
+    if (!$get) throw new CompilerError("Cannot get undefined member.");
     return $get.call(scope, [key]);
   }
 

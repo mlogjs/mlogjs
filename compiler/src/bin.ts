@@ -62,7 +62,7 @@ yargs(hideBin(process.argv))
 
         return;
       }
-      writeFileSync(out, output as string);
+      writeFileSync(out, output);
       console.log(
         `Success: Compiled ${path}. Your compiled code is at ${out}.`
       );

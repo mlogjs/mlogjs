@@ -1,6 +1,7 @@
 import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
+import { CompilerError } from "./CompilerError";
 
 export class Scope implements IScope {
   data: Record<string, IValue | null>;
@@ -49,10 +50,11 @@ export class Scope implements IScope {
     const value = this.data[name];
     if (value) return value;
     if (this.parent) return this.parent.get(name);
-    throw Error(`${name} is not declared.`);
+    throw new CompilerError(`${name} is not declared.`);
   }
   set<T extends IValue>(name: string, value: T): T {
-    if (name in this.data) throw Error(`${name} is already declared.`);
+    if (name in this.data)
+      throw new CompilerError(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
   hardSet<T extends IValue>(name: string, value: T): T {

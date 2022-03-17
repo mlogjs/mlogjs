@@ -1,4 +1,5 @@
 import { Compiler } from "../Compiler";
+import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
   EJumpKind,
@@ -134,7 +135,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   call(scope: IScope, args: IValue[]): TValueInstructions {
     if (args.length !== this.paramStores.length)
-      throw new Error("Cannot call: argument count not matching.");
+      throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;

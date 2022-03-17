@@ -1,4 +1,5 @@
 import { parse } from "@babel/parser";
+import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
@@ -19,7 +20,7 @@ export class Compiler {
 
   compile(
     script: string
-  ): [string, null, es.Node[]] | [null, Error, es.Node[]] {
+  ): [string, null, es.Node[]] | [null, Error | CompilerError, es.Node[]] {
     let output: string;
     try {
       const program = this.parse(script);
@@ -32,7 +33,8 @@ export class Compiler {
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
     } catch (error: any) {
-      return [null, error, error?.nodeStack ?? []];
+      const nodeStack = error instanceof CompilerError ? error.nodeStack : [];
+      return [null, error, nodeStack];
     }
     return [output, null, []];
   }
@@ -59,13 +61,13 @@ export class Compiler {
 
   handle(scope: IScope, node: es.Node): TValueInstructions<IValue | null> {
     try {
-      
       const handler = this.handlers[node.type];
-      if (!handler) throw Error("Missing handler for " + node.type);
+      if (!handler) throw new CompilerError("Missing handler for " + node.type);
       return handler(this, scope, node, null);
     } catch (error: any) {
-      error.nodeStack ??= [];
-      error.nodeStack.push(node);
+      if (error instanceof CompilerError) {
+        error.nodeStack.push(node);
+      }
       throw error;
     }
   }

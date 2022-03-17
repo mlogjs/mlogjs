@@ -5,6 +5,7 @@ import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
 import { Building, itemNames } from "./Building";
 import { InstructionBase, OperationInstruction } from "../instructions";
 import { operatorMap } from "../operators";
+import { CompilerError } from "../CompilerError";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -18,7 +19,9 @@ export class NamespaceMacro extends ObjectValue {
     super(scope, {
       $get: new MacroFunction(scope, prop => {
         if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
-          throw new Error("Cannot use dynamic properties on object macros");
+          throw new CompilerError(
+            "Cannot use dynamic properties on object macros"
+          );
         const symbolName = this.changeCasing
           ? camelToDashCase(prop.data)
           : prop.data;
@@ -48,7 +51,9 @@ export class UCommandsNamespace extends NamespaceMacro {
     super(scope);
     this.data.$get = new MacroFunction(scope, prop => {
       if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
-        throw new Error("Cannot use dynamic properties on object macros");
+        throw new CompilerError(
+          "Cannot use dynamic properties on object macros"
+        );
       const symbolName = prop.data[0].toUpperCase() + prop.data.slice(1);
       return [new StoreValue(scope, `@command${symbolName}`), []];
     });
@@ -76,7 +81,7 @@ export class Unit extends ObjectValue {
           const temp = new TempValue(scope);
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
-        throw new Error(
+        throw new CompilerError(
           "Building property acessors must be string literals or stores"
         );
       }),
