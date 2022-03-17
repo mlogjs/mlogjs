@@ -30,6 +30,6 @@ export const ReturnStatement: THandler<IValue | null> = (
   const [arg, argInst] = node.argument
     ? c.handle(scope, node.argument)
     : [null, []];
-  const [ret, retInst] = scope.function.return(scope, arg!);
+  const [ret, retInst] = scope.function.return(scope, arg);
   return [ret, [...argInst, ...retInst]];
 };

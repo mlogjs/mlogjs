@@ -1,4 +1,4 @@
-import { Scope } from "../Scope";
+import { CompilerError } from "../CompilerError";
 import { es, IInstruction, THandler } from "../types";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
@@ -11,17 +11,18 @@ export const ObjectExpression: THandler = (
   const inst = [];
   for (const prop of node.properties) {
     if (prop.type === "SpreadElement")
-      throw new Error("Cannot handle spread element");
-    if (prop.computed) throw new Error("Cannot handle computed property.");
+      throw new CompilerError("Cannot handle spread element");
+    if (prop.computed)
+      throw new CompilerError("Cannot handle computed property.");
     const { key } = prop;
     const value = prop.type === "ObjectProperty" ? prop.value : prop;
     let index: string;
     if (key.type === "Identifier") {
       index = key.name;
     } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
-      index = "" + key.value;
+      index = `${key.value}`;
     } else {
-      throw new Error(`Unsupported object key type: ${key.type}`);
+      throw new CompilerError(`Unsupported object key type: ${key.type}`);
     }
     const [member, memberInst] = c.handleEval(scope, value);
     data[index] = member;

@@ -1,3 +1,4 @@
+import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
 import { operators } from "../operators";
 import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
@@ -12,7 +13,7 @@ export class TempValue extends StoreValue {
   constructor(scope: IScope, name?: string) {
     super(
       scope,
-      name ?? "t" + scope.ntemp + (scope.name ? ":" + scope.name : "")
+      name ?? `t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
     );
     if (!name) scope.ntemp++;
   }
@@ -35,9 +36,9 @@ export class TempValue extends StoreValue {
   proxy(value: IValue): TValueInstructions {
     if (!this.canProxy) {
       console.log(this.proxied);
-      throw new Error("Cannot proxy (canProxy = false).");
+      throw new CompilerError("Cannot proxy (canProxy = false).");
     }
-    if (this.proxied) throw new Error("Cannot proxy multiple times.");
+    if (this.proxied) throw new CompilerError("Cannot proxy multiple times.");
     this.proxied = value;
     this.canProxy = false;
     for (const key of [
@@ -49,8 +50,10 @@ export class TempValue extends StoreValue {
       "proxy",
     ] as const) {
       if (key !== "=" && key in value)
-        this[key] = (...args: any) =>
-          (value[key as keyof IValue] as Function).apply(value, args);
+        this[key] = (...args: never[]) => {
+          // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
+          return (value[key as keyof IValue] as Function).apply(value, args);
+        };
     }
     this.setInst = new SetInstruction(this, value);
     this.setInst.hidden = true;

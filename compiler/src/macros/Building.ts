@@ -4,6 +4,7 @@ import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
 import { MacroFunction } from "./Function";
 import { operatorMap } from "../operators";
+import { CompilerError } from "../CompilerError";
 
 export const itemNames = [
   "copper",
@@ -45,7 +46,7 @@ export class Building extends ObjectValue {
           const temp = new TempValue(scope);
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
-        throw new Error(
+        throw new CompilerError(
           "Building property acessors must be string literals or stores"
         );
       }),
@@ -59,9 +60,9 @@ export class BuildingBuilder extends ObjectValue {
     super(scope, {
       $call: new MacroFunction(scope, (nameLit: IValue) => {
         if (!(nameLit instanceof LiteralValue))
-          throw new Error("Block name must be a literal.");
+          throw new CompilerError("Block name must be a literal.");
         if (typeof nameLit.data !== "string")
-          throw new Error("Block name must be a string.");
+          throw new CompilerError("Block name must be a string.");
         return [new Building(scope, nameLit.data), []];
       }),
     });

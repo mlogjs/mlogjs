@@ -1,11 +1,5 @@
 import { ZeroSpaceInstruction } from "../instructions";
-import {
-  es,
-  IInstruction,
-  IValue,
-  THandler,
-  TValueInstructions,
-} from "../types";
+import { es, IInstruction, IValue, THandler } from "../types";
 
 export const TemplateLiteral: THandler<null> = (
   c,

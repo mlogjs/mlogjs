@@ -13,7 +13,7 @@ export function App() {
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>(null);
 
   const onMount: EditorProps["onMount"] = (editor, monaco) => {
-    const defaults = monaco.languages.typescript.javascriptDefaults;
+    const defaults = monaco.languages.typescript.typescriptDefaults;
     defaults.setCompilerOptions({
       noLib: true,
       allowNonTsExtensions: true,
