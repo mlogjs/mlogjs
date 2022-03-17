@@ -57,7 +57,7 @@ export function App() {
       <SplitPane split="horizontal" defaultSize="50%">
         <Editor
           onChange={setCode}
-          language="javascript"
+          language="typescript"
           onMount={onMount}
           value={code}
         />

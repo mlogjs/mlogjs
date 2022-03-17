@@ -1,4 +1,4 @@
-import { parse } from "acorn";
+import { parse } from "@babel/parser";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
@@ -52,13 +52,14 @@ export class Compiler {
 
   protected parse(script: string) {
     return parse(script, {
-      locations: true,
-      ecmaVersion: "latest",
-    }) as es.Node;
+      ranges: true,
+      plugins: ["typescript"],
+    });
   }
 
   handle(scope: IScope, node: es.Node): TValueInstructions<IValue | null> {
     try {
+      
       const handler = this.handlers[node.type];
       if (!handler) throw Error("Missing handler for " + node.type);
       return handler(this, scope, node, null);

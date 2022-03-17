@@ -8,13 +8,18 @@ export const ObjectExpression: THandler = (
 ) => {
   const data: IObjectValueData = {};
   const inst = [];
-  for (const prop of node.properties as es.Property[]) {
+  for (const prop of node.properties) {
+    if (prop.type === "SpreadElement")
+      throw new Error("Cannot handle spread element");
     if (prop.computed) throw new Error("Cannot handle computed property.");
-    const { key, value } = prop;
+    const { key } = prop;
+    const value = prop.type === "ObjectProperty" ? prop.value : prop;
     let index: string;
-    if (key.type === "Identifier") index = key.name;
-    else if (key.type === "Literal") index = `${key.value}`;
-    else {
+    if (key.type === "Identifier") {
+      index = key.name;
+    } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
+      index = "" + key.value;
+    } else {
       throw new Error(`Unsupported object key type: ${key.type}`);
     }
     const [member, memberInst] = c.handleEval(scope, value);

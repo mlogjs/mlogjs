@@ -45,6 +45,7 @@ export const UnaryExpression: THandler = (
   const [arg, argInst] = c.handleEval(scope, argument);
   const operatorId =
     operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
+  if (operatorId === "throw") throw Error("throw operator is not supported")
 
   const [op, opInst] = arg[operatorId](scope);
   return [op, [...argInst, ...opInst]];

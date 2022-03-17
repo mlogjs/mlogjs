@@ -33,11 +33,12 @@
   },
   "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
-    "acorn": "^8.7.0",
+    "@babel/parser": "^7.17.7",
     "cli-highlight": "^2.1.11",
     "yargs": "^17.0.1"
   },
   "devDependencies": {
+    "@babel/types": "^7.17.0",
     "@rollup/plugin-alias": "^3.1.9",
     "@rollup/plugin-replace": "^4.0.0",
     "@rollup/plugin-typescript": "^8.3.1",
