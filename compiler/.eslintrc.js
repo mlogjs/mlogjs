@@ -27,6 +27,12 @@ const config = {
       },
     ],
     "no-unused-vars": "off",
+    "prefer-const": [
+      "error",
+      {
+        destructuring: "all",
+      },
+    ],
     "prefer-spread": "off",
   },
 };
