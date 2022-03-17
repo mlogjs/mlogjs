@@ -2,17 +2,13 @@
   "compilerOptions": {
     "allowSyntheticDefaultImports": true,
     "baseUrl": ".",
-    "declaration": true,
     "esModuleInterop": true,
-    "module": "commonjs",
     "moduleResolution": "node",
     "noImplicitAny": true,
-    "outDir": "dist/types",
-    "emitDeclarationOnly": true,
     "resolveJsonModule": true,
-    "sourceMap": true,
+    "rootDir": "src",
     "strict": true,
     "target": "ES2021"
   },
-  "include": ["src", "lib/*", "bin/index.js"]
+  "include": ["src", "lib/*"]
 }
