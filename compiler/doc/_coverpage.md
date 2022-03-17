@@ -1,4 +1,4 @@
-# MlogJS <small>0.1.1</small>
+# MlogJS <small>0.2.2</small>
 
 > Effortless JavaScript to Mindustry Logic Code compiler.
 
