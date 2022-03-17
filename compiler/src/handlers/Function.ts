@@ -16,8 +16,10 @@ export const ArrowFunctionExpression: THandler = (
   if (node.expression) {
     body = {
       type: "BlockStatement",
-      body: [{ type: "ReturnStatement", argument: body as es.Expression }],
-    };
+      body: [
+        { ...body, type: "ReturnStatement", argument: body as es.Expression },
+      ],
+    } as es.BlockStatement;
   }
 
   const paramNames = [];
@@ -56,3 +58,4 @@ export const FunctionDeclaration: THandler = (
 };
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;
+export const ObjectMethod: THandler = ArrowFunctionExpression;

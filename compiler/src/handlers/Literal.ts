@@ -1,17 +1,22 @@
 import { THandler, es, TLiteral } from "../types";
 import { LiteralValue } from "../values";
 
-export const Literal: THandler = (c, scope, node: es.Literal) => {
-  const { value } = node;
-  if (
-    value === null ||
-    typeof value === "string" ||
-    typeof value === "number"
-  ) {
-    return [new LiteralValue(scope, value as TLiteral), []];
-  }
-  if (typeof value === "boolean") {
-    return [new LiteralValue(scope, +value), []];
-  }
-  throw Error("Cannot create literal " + typeof value);
-};
+const Literal: THandler = (
+  _c,
+  scope,
+  node: es.StringLiteral | es.NumericLiteral
+) => [new LiteralValue(scope, node.value as TLiteral), []];
+
+export const NumericLiteral = Literal;
+export const StringLiteral = Literal;
+
+export const NullLiteral: THandler = (_c, scope) => [
+  new LiteralValue(scope, null as unknown as TLiteral),
+  [],
+];
+
+export const BooleanLiteral: THandler = (
+  _c,
+  scope,
+  node: es.BooleanLiteral
+) => [new LiteralValue(scope, +node.value), []];

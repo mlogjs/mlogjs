@@ -1,5 +1,4 @@
-export * as es from "estree";
-import * as es from "estree";
+export * as es from "@babel/types";
 import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
 import { MacroFunction } from "./macros";
