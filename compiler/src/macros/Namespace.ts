@@ -38,8 +38,10 @@ export class VarsNamespace extends NamespaceMacro {
     const $get = this.data.$get as MacroFunction;
     this.data.$get = new MacroFunction(scope, prop => {
       if (prop instanceof LiteralValue) {
-        if (prop.data === "unit") return [new Unit(scope, "@unit"), []];
-        if (prop.data === "this") return [new Building(scope, "@this"), []];
+        if (prop.data === "unit")
+          return [new Unit({ scope, name: "@unit" }), []];
+        if (prop.data === "this")
+          return [new Building({ scope, name: "@this" }), []];
       }
       return $get.call(scope, [prop]);
     });
@@ -60,25 +62,41 @@ export class UCommandsNamespace extends NamespaceMacro {
   }
 }
 // TODO: repeated logic between UnitMacro and Building
-export class Unit extends ObjectValue {
-  constructor(scope: IScope, public name: string) {
+export class Unit extends ObjectValue implements IValue {
+  readonly renameable: boolean;
+  name: string;
+  constructor({
+    scope,
+    name,
+    renameable,
+  }: {
+    scope: IScope;
+    name: string;
+    renameable?: boolean;
+  }) {
     super(scope, {
       $get: new MacroFunction(scope, prop => {
         if (prop instanceof LiteralValue && typeof prop.data === "string") {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           // special case, should return another unit or building
           const result =
-            prop.data === "controller" ? new Unit(scope, temp.name) : temp;
+            prop.data === "controller"
+              ? new Unit({
+                  scope,
+                  name: scope.makeTempName(),
+                  renameable: true,
+                })
+              : temp;
           return [
             result,
             [new InstructionBase("sensor", result, this, `@${name}`)],
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -86,10 +104,16 @@ export class Unit extends ObjectValue {
         );
       }),
     });
+    this.name = name;
+    this.renameable = !!renameable;
   }
 
   toString(): string {
     return this.name;
+  }
+
+  rename(name: string): void {
+    if (this.renameable) this.name = name;
   }
 }
 
@@ -103,7 +127,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const left = new StoreValue(scope, this.name);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, left, right)],

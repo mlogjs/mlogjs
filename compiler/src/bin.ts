@@ -1,11 +1,10 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { hideBin } from "yargs/helpers";
-import { compile } from ".";
+import { Compiler, CompilerError } from ".";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
 import { join, parse, resolve } from "path";
-import { CompilerError } from "./CompilerError";
 
 yargs(hideBin(process.argv))
   .command(
@@ -20,6 +19,12 @@ yargs(hideBin(process.argv))
         .positional("out", {
           describe: "path of the output file",
           type: "string",
+        })
+        .option("compact-names", {
+          type: "boolean",
+          default: false,
+          describe:
+            "Wether the compiler should preserve or compact variable and function names",
         });
     },
     argv => {
@@ -30,8 +35,11 @@ yargs(hideBin(process.argv))
       const out = argv.out ?? defaultOutPath(path);
       if (path == out)
         return console.log("The out path cannot be the same as the input path");
+      const compiler = new Compiler({
+        compactNames: argv["compact-names"],
+      });
       const code = readFileSync(path, "utf8");
-      const [output, error, [node]] = compile(code);
+      const [output, error, [node]] = compiler.compile(code);
       if (error) {
         let start = (error as CompilerError).loc as {
           line: number;

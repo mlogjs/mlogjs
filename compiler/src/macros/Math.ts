@@ -42,7 +42,7 @@ function createMacroMathOperations(scope: IScope) {
             );
           return [new LiteralValue(scope, fn(a.num, b.num)), []];
         }
-        const temp = new TempValue(scope);
+        const temp = new TempValue({ scope });
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -53,7 +53,7 @@ function createMacroMathOperations(scope: IScope) {
 
         return [new LiteralValue(scope, fn(a.num)), []];
       }
-      const temp = new TempValue(scope);
+      const temp = new TempValue({ scope });
       return [temp, [new OperationInstruction(key, temp, a, b)]];
     });
   }

@@ -2,6 +2,7 @@ import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 import { CompilerError } from "./CompilerError";
+import { internalPrefix } from "./utils";
 
 export class Scope implements IScope {
   data: Record<string, IValue | null>;
@@ -66,5 +67,12 @@ export class Scope implements IScope {
       name,
       this.stacked ? (null as never) : new StoreValue(this, storeName)
     );
+  }
+  makeTempName(): string {
+    const name = this.name ? `:${this.name}` : "";
+    const result = `${internalPrefix}t${this.ntemp}${name}`;
+
+    this.ntemp++;
+    return result;
   }
 }

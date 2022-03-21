@@ -38,10 +38,14 @@ export class UnitLocate extends MacroFunction {
           "The others arguments of unitLocate must be literals or stores"
         );
 
-      const outFound = new TempValue(scope);
-      const outX = new TempValue(scope);
-      const outY = new TempValue(scope);
-      const outBuilding = new TempValue(scope);
+      const outFound = new TempValue({ scope });
+      const outX = new TempValue({ scope });
+      const outY = new TempValue({ scope });
+      const outBuilding = new Building({
+        scope,
+        name: scope.makeTempName(),
+        renameable: true,
+      });
       const outArgs = [outX, outY, outFound, outBuilding];
       let inputArgs: (IValue | string)[] = [];
       switch (find.data) {
@@ -77,7 +81,7 @@ export class UnitLocate extends MacroFunction {
           0: outFound,
           1: outX,
           2: outY,
-          3: new Building(scope, outBuilding.name),
+          3: outBuilding,
           length: new LiteralValue(scope, find.data === "ore" ? 3 : 4),
         }),
         [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],

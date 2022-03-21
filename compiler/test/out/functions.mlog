@@ -12,26 +12,26 @@ print 28:4
 print "."
 printflush message1
 end
-op strictEqual t0:17:0 17:12 0
-jump 20 equal t0:17:0 0
+op strictEqual &t0:17:0 17:12 0
+jump 20 equal &t0:17:0 0
 op add f17:0 17:18 17:21
 jump 18 always
 set @counter r17:0
 jump 37 always
-op strictEqual t2:17:0 17:12 1
-jump 26 equal t2:17:0 0
+op strictEqual &t2:17:0 17:12 1
+jump 26 equal &t2:17:0 0
 op sub f17:0 17:18 17:21
 jump 24 always
 set @counter r17:0
 jump 37 always
-op strictEqual t4:17:0 17:12 2
-jump 32 equal t4:17:0 0
+op strictEqual &t4:17:0 17:12 2
+jump 32 equal &t4:17:0 0
 op mul f17:0 17:18 17:21
 jump 30 always
 set @counter r17:0
 jump 37 always
-op strictEqual t6:17:0 17:12 3
-jump 37 equal t6:17:0 0
+op strictEqual &t6:17:0 17:12 3
+jump 37 equal &t6:17:0 0
 op div f17:0 17:18 17:21
 jump 36 always
 set @counter r17:0

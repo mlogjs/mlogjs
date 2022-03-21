@@ -8,14 +8,23 @@ import { es, IScope, IValue, THandler, TValueInstructions } from "./types";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
+export interface CompilerOptions {
+  stackName?: string;
+
+  /** Wether the compiler should preserve or compact variable and function names*/
+  compactNames?: boolean;
+}
+
 export class Compiler {
   protected stackName?: string;
   protected usingStack: boolean;
   protected handlers: THandlerMap = handlers;
+  readonly compactNames: boolean;
 
-  constructor(stackName?: string) {
+  constructor({ stackName, compactNames = false }: CompilerOptions = {}) {
     this.usingStack = !!stackName;
     this.stackName = stackName;
+    this.compactNames = compactNames;
   }
 
   compile(

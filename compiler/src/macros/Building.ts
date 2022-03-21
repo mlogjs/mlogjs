@@ -24,26 +24,38 @@ export const itemNames = [
   "blastCompound",
   "pyratite",
 ];
-export class Building extends ObjectValue {
+
+export class Building extends ObjectValue implements IValue {
   name: string;
+  readonly renameable: boolean;
+
   toString() {
     return this.name;
   }
-  constructor(scope: IScope, name: string) {
+
+  constructor({
+    scope,
+    name,
+    renameable,
+  }: {
+    scope: IScope;
+    name: string;
+    renameable?: boolean;
+  }) {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data === "string") {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [
             temp,
             [new InstructionBase("sensor", temp, this, `@${name}`)],
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -52,6 +64,12 @@ export class Building extends ObjectValue {
       }),
     });
     this.name = name;
+
+    this.renameable = !!renameable;
+  }
+
+  rename(name: string): void {
+    if (this.renameable) this.name = name;
   }
 }
 
@@ -63,7 +81,7 @@ export class BuildingBuilder extends ObjectValue {
           throw new CompilerError("Block name must be a literal.");
         if (typeof nameLit.data !== "string")
           throw new CompilerError("Block name must be a string.");
-        return [new Building(scope, nameLit.data), []];
+        return [new Building({ scope, name: nameLit.data }), []];
       }),
     });
   }
@@ -79,7 +97,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const left = new StoreValue(scope, this.name);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, left, right)],

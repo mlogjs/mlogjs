@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue, TempValue } from "../../values";
+import { LiteralValue, StoreValue } from "../../values";
 import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
 
@@ -15,9 +15,12 @@ export class GetLink extends MacroFunction {
         throw new CompilerError(
           "The getlink index must be a number literal or a store"
         );
-      const temp = new TempValue(scope);
-      const outBuild = new Building(scope, temp.name);
-      return [outBuild, [new InstructionBase("getlink", temp, index)]];
+      const outBuild = new Building({
+        scope,
+        name: scope.makeTempName(),
+        renameable: true,
+      });
+      return [outBuild, [new InstructionBase("getlink", outBuild, index)]];
     });
   }
 }

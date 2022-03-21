@@ -35,6 +35,7 @@ export interface IScope {
   hardSet<T extends IValue>(name: string, value: T): T;
   make(name: string, storeName: string): StoreValue;
   copy(): IScope;
+  makeTempName(): string;
 }
 
 // we can't use type maps to define actual methods
@@ -47,6 +48,7 @@ export interface IValue {
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
+  rename?(name: string): void;
 
   // unary operators
   "!"(scope: IScope): TValueInstructions;

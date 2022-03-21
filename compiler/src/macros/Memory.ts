@@ -9,7 +9,7 @@ class MemoryEntry extends ObjectValue {
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
     super(scope, {
       $eval: new MacroFunction(scope, () => {
-        const temp = new TempValue(scope);
+        const temp = new TempValue({ scope });
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {

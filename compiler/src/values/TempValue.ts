@@ -5,17 +5,21 @@ import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
 import { StoreValue } from "./";
 import { LiteralValue } from "./LiteralValue";
 
-export class TempValue extends StoreValue {
+export interface TempValueOptions {
+  scope: IScope;
+  name?: string;
+  renameable?: boolean;
+}
+
+export class TempValue extends StoreValue implements IValue {
   proxied!: IValue;
   canProxy = true;
   setInst!: IInstruction;
+  readonly renameable: boolean;
 
-  constructor(scope: IScope, name?: string) {
-    super(
-      scope,
-      name ?? `t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
-    );
-    if (!name) scope.ntemp++;
+  constructor({ scope, name, renameable = true }: TempValueOptions) {
+    super(scope, name ?? scope.makeTempName());
+    this.renameable = renameable;
   }
 
   eval(scope: IScope): TValueInstructions {
@@ -48,6 +52,7 @@ export class TempValue extends StoreValue {
       "call",
       "toString",
       "proxy",
+      "rename",
     ] as const) {
       if (key !== "=" && key in value)
         this[key] = (...args: never[]) => {
@@ -69,8 +74,13 @@ export class TempValue extends StoreValue {
       "call",
       "toString",
       "proxy",
+      "rename",
     ] as const) {
       this[key] = TempValue.prototype[key] as never;
     }
+  }
+
+  rename(name: string): void {
+    if (this.renameable) this.name = name;
   }
 }

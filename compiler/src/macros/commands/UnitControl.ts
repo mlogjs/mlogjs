@@ -55,18 +55,23 @@ export class UnitControl extends MacroFunction<IValue | null> {
       let extraArgs: IValue[] = [];
       switch (mode.data) {
         case "getBlock": {
-          const outType = new TempValue(scope);
-          const outBuilding = new TempValue(scope);
+          const outType = new TempValue({ scope });
+          const outBuilding = new Building({
+            scope,
+            name: scope.makeTempName(),
+            renameable: true,
+          });
+
           result = new ObjectValue(scope, {
             0: outType,
-            1: new Building(scope, outBuilding.name),
+            1: outBuilding,
             length: new LiteralValue(scope, 2),
           });
           extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
           break;
         }
         case "within": {
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           result = temp;
           extraArgs = [temp, new LiteralValue(scope, 0)];
           break;

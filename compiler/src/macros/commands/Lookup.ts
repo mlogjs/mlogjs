@@ -22,7 +22,7 @@ export class Lookup extends MacroFunction {
           "The lookup index must be a number literal or a store"
         );
 
-      const temp = new TempValue(scope);
+      const temp = new TempValue({ scope });
       return [temp, [new InstructionBase("lookup", kind.data, temp, index)]];
     });
   }

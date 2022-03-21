@@ -1,19 +1,25 @@
-op equal t0 @unit null
-jump 3 equal t0 0
+op equal &t0 @unit null
+jump 3 equal &t0 0
 ubind @flare
-sensor t1 @unit @ammo
+sensor &t1 @unit @ammo
 print "ammo: "
-print t1
+print &t1
 print "\n"
-sensor t2 @unit @health
+sensor &t2 @unit @health
 print "health: "
-print t2
+print &t2
 print "\n"
 set 10:4 @copper
-sensor t3 @unit 10:4
+sensor &t3 @unit 10:4
 print "amount of "
 print 10:4
 print " : "
-print t3
+print &t3
 printflush message1
+radar enemy any any distance cyclone1 1 14:6
+uradar enemy flying any 1 distance 22:6
+sensor &t6 14:6 @health
+sensor &t7 22:6 @health
+print &t6
+print &t7
 end
