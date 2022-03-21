@@ -56,7 +56,6 @@ export class Scope implements IScope {
   set<T extends IValue>(name: string, value: T): T {
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
-    value.onScopeSet?.(this, name);
     return this.hardSet(name, value);
   }
   hardSet<T extends IValue>(name: string, value: T): T {

@@ -68,7 +68,7 @@ export class Building extends ObjectValue implements IValue {
     this.renameable = !!renameable;
   }
 
-  onScopeSet(scope: IScope, name: string): void {
+  rename(name: string): void {
     if (this.renameable) this.name = name;
   }
 }

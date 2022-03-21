@@ -52,7 +52,7 @@ export class TempValue extends StoreValue implements IValue {
       "call",
       "toString",
       "proxy",
-      "onScopeSet",
+      "rename",
     ] as const) {
       if (key !== "=" && key in value)
         this[key] = (...args: never[]) => {
@@ -74,13 +74,13 @@ export class TempValue extends StoreValue implements IValue {
       "call",
       "toString",
       "proxy",
-      "onScopeSet",
+      "rename",
     ] as const) {
       this[key] = TempValue.prototype[key] as never;
     }
   }
 
-  onScopeSet(scope: IScope, name: string): void {
+  rename(name: string): void {
     if (this.renameable) this.name = name;
   }
 }
