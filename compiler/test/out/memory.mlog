@@ -4,11 +4,11 @@ print "\n"
 print "Big Mem size"
 print 512
 print "\n"
-read t0 cell1 0
+read &t0 cell1 0
 print "mem at 0"
-print t0
+print &t0
 write 120 cell1 0
-read t1 cell1 0
+read &t1 cell1 0
 print "mem at 0 again"
-print t1
+print &t1
 end

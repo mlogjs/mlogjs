@@ -1,11 +1,11 @@
 set 1:4 0
-op lessThan t0 1:4 100
-jump 10 equal t0 0
-op rand t1
-op greaterThan t1 t1 0.5
-jump 7 equal t1 0
+op lessThan &t0 1:4 100
+jump 10 equal &t0 0
+op rand &t1
+op greaterThan &t1 &t1 0.5
+jump 7 equal &t1 0
 jump 10 always
-set t2 1:4
+set &t2 1:4
 op add 1:4 1:4 1
 jump 1 always
 end
