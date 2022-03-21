@@ -1,12 +1,13 @@
 import "./style.css";
 import Editor, { EditorProps, Monaco } from "@monaco-editor/react";
-import { compile } from "mlogjs";
-import React, { Fragment, useEffect, useState } from "react";
+import { Compiler } from "mlogjs";
+import React, { Fragment, useEffect, useMemo, useState } from "react";
 import SplitPane from "react-split-pane";
 import lib from "mlogjs/lib!raw";
 import { editor } from "monaco-editor";
 
 export function App() {
+  const compiler = useMemo(() => new Compiler(), []) // for future editor upgrades
   const [compiled, setCompiled] = useState("");
   const [code, setCode] = useState(localStorage.getItem("code") ?? "");
   const [monaco, setMonaco] = useState<Monaco>(null);
@@ -28,7 +29,7 @@ export function App() {
   function compileAndShow() {
     if (!editor) return;
     const model = editor.getModel();
-    const [output, error, [node]] = compile(code);
+    const [output, error, [node]] = compiler.compile(code);
     const markers: editor.IMarkerData[] = [];
     if (error) {
       if (node) {
