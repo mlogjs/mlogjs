@@ -55,6 +55,9 @@ export const VariableDeclarator: THandler<IValue | null> = (
           "Cannot use array destructuring on non macro values"
         );
 
+      if (kind !== "const")
+        throw new CompilerError("Macro value must be constant.");
+
       if (!(init instanceof ObjectValue)) {
         throw new CompilerError(
           "Array destructuring target must be an object value"
