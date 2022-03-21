@@ -1,3 +1,2 @@
-import { Compiler } from "./Compiler";
-const compiler = new Compiler();
-export const compile = (script: string) => compiler.compile(script);
+export { Compiler, CompilerOptions } from "./Compiler";
+export { CompilerError } from "./CompilerError";
