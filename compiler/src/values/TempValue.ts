@@ -1,4 +1,3 @@
-import { internalPrefix } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
 import { operators } from "../operators";
@@ -19,13 +18,8 @@ export class TempValue extends StoreValue implements IValue {
   readonly renameable: boolean;
 
   constructor({ scope, name, renameable }: TempValueOptions) {
-    super(
-      scope,
-      name ??
-        `${internalPrefix}t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
-    );
+    super(scope, name ?? scope.makeTempName());
     this.renameable = !!renameable;
-    if (!name) scope.ntemp++;
   }
 
   eval(scope: IScope): TValueInstructions {

@@ -35,6 +35,7 @@ export interface IScope {
   hardSet<T extends IValue>(name: string, value: T): T;
   make(name: string, storeName: string): StoreValue;
   copy(): IScope;
+  makeTempName(): string;
 }
 
 // we can't use type maps to define actual methods
