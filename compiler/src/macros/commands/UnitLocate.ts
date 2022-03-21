@@ -38,9 +38,9 @@ export class UnitLocate extends MacroFunction {
           "The others arguments of unitLocate must be literals or stores"
         );
 
-      const outFound = new TempValue({ scope, renameable: true });
-      const outX = new TempValue({ scope, renameable: true });
-      const outY = new TempValue({ scope, renameable: true });
+      const outFound = new TempValue({ scope });
+      const outX = new TempValue({ scope });
+      const outY = new TempValue({ scope });
       const outBuilding = new Building({
         scope,
         name: scope.makeTempName(),

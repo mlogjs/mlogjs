@@ -17,9 +17,9 @@ export class TempValue extends StoreValue implements IValue {
   setInst!: IInstruction;
   readonly renameable: boolean;
 
-  constructor({ scope, name, renameable }: TempValueOptions) {
+  constructor({ scope, name, renameable = true }: TempValueOptions) {
     super(scope, name ?? scope.makeTempName());
-    this.renameable = !!renameable;
+    this.renameable = renameable;
   }
 
   eval(scope: IScope): TValueInstructions {
