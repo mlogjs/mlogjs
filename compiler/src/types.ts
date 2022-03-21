@@ -47,6 +47,7 @@ export interface IValue {
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
+  onScopeSet?(scope: IScope, name: string): void;
 
   // unary operators
   "!"(scope: IScope): TValueInstructions;

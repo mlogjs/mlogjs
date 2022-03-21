@@ -68,7 +68,7 @@ export class Unit extends ObjectValue {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           // special case, should return another unit or building
           const result =
             prop.data === "controller" ? new Unit(scope, temp.name) : temp;
@@ -78,7 +78,7 @@ export class Unit extends ObjectValue {
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -103,7 +103,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const left = new StoreValue(scope, this.name);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, left, right)],

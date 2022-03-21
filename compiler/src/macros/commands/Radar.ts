@@ -56,7 +56,7 @@ export class Radar extends MacroFunction {
       if (!validRadarSorts.includes(sort.data))
         throw new CompilerError("Invalid sort value");
 
-      const temp = new TempValue(scope);
+      const temp = new TempValue({ scope });
       const resultUnit = new Unit(scope, temp.name);
       return [
         resultUnit,

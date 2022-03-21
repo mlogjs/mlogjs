@@ -1,3 +1,4 @@
+import { internalPrefix } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
 import { operators } from "../operators";
@@ -5,16 +6,25 @@ import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
 import { StoreValue } from "./";
 import { LiteralValue } from "./LiteralValue";
 
-export class TempValue extends StoreValue {
+export interface TempValueOptions {
+  scope: IScope;
+  name?: string;
+  renameable?: boolean;
+}
+
+export class TempValue extends StoreValue implements IValue {
   proxied!: IValue;
   canProxy = true;
   setInst!: IInstruction;
+  readonly renameable: boolean;
 
-  constructor(scope: IScope, name?: string) {
+  constructor({ scope, name, renameable }: TempValueOptions) {
     super(
       scope,
-      name ?? `t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
+      name ??
+        `${internalPrefix}t${scope.ntemp}${scope.name ? ":" + scope.name : ""}`
     );
+    this.renameable = !!renameable;
     if (!name) scope.ntemp++;
   }
 
@@ -48,6 +58,7 @@ export class TempValue extends StoreValue {
       "call",
       "toString",
       "proxy",
+      "onScopeSet",
     ] as const) {
       if (key !== "=" && key in value)
         this[key] = (...args: never[]) => {
@@ -69,8 +80,13 @@ export class TempValue extends StoreValue {
       "call",
       "toString",
       "proxy",
+      "onScopeSet",
     ] as const) {
       this[key] = TempValue.prototype[key] as never;
     }
+  }
+
+  onScopeSet(scope: IScope, name: string): void {
+    if (this.renameable) this.name = name;
   }
 }

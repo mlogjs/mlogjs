@@ -12,7 +12,7 @@ import { LiteralValue, TempValue, VoidValue } from ".";
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope): TValueInstructions {
     const [that, inst] = this.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [
@@ -61,7 +61,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [
@@ -86,7 +86,7 @@ for (const key in unaryOperatorMap) {
     scope: IScope
   ): TValueInstructions {
     const [that, inst] = this.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
 }
@@ -132,7 +132,7 @@ for (const key of updateOperators) {
   ): TValueInstructions {
     let [ret, inst] = this.eval(scope);
     if (!prefix) {
-      const temp = new TempValue(scope);
+      const temp = new TempValue({ scope });
       const [tempValue, tempInst] = temp["="](scope, ret);
       ret = tempValue;
       inst.push(...tempInst);

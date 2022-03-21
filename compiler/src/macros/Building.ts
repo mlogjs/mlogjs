@@ -36,14 +36,14 @@ export class Building extends ObjectValue {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [
             temp,
             [new InstructionBase("sensor", temp, this, `@${name}`)],
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new TempValue(scope);
+          const temp = new TempValue({ scope });
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -79,7 +79,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const left = new StoreValue(scope, this.name);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue(scope);
+    const temp = new TempValue({ scope });
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, left, right)],
