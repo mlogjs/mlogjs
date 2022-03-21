@@ -29,6 +29,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
       if (kind === "const" && !init)
         throw new CompilerError("Cannot create constant with void value.");
       if (kind === "const" && init?.constant) {
+        init.rename?.(nodeName(node));
         scope.set(name, init);
         return valinst;
       } else {
@@ -72,6 +73,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const val = init.data[i]!;
+        val.rename?.(nodeName(element));
         scope.set(element.name, val);
       }
       return valinst;
