@@ -22,7 +22,7 @@ yargs(hideBin(process.argv))
         })
         .option("compact-names", {
           type: "boolean",
-          default: true,
+          default: false,
           describe:
             "Wether the compiler should preserve or compact variable and function names",
         });
