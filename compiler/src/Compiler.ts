@@ -11,20 +11,20 @@ type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 export interface CompilerOptions {
   stackName?: string;
 
-  /** Wether the compiler should preserve variable and function names*/
-  preserveNames?: boolean;
+  /** Wether the compiler should preserve or compact variable and function names*/
+  compactNames?: boolean;
 }
 
 export class Compiler {
   protected stackName?: string;
   protected usingStack: boolean;
   protected handlers: THandlerMap = handlers;
-  readonly preserveNames: boolean;
+  readonly compactNames: boolean;
 
-  constructor(options: CompilerOptions = {}) {
-    this.usingStack = !!options.stackName;
-    this.stackName = options.stackName;
-    this.preserveNames = !!options.preserveNames;
+  constructor({ stackName, compactNames = false }: CompilerOptions = {}) {
+    this.usingStack = !!stackName;
+    this.stackName = stackName;
+    this.compactNames = compactNames;
   }
 
   compile(
