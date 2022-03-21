@@ -19,6 +19,12 @@ yargs(hideBin(process.argv))
         .positional("out", {
           describe: "path of the output file",
           type: "string",
+        })
+        .option("compact-names", {
+          type: "boolean",
+          default: true,
+          describe:
+            "Wether the compiler should preserve or compact variable and function names",
         });
     },
     argv => {
@@ -29,7 +35,9 @@ yargs(hideBin(process.argv))
       const out = argv.out ?? defaultOutPath(path);
       if (path == out)
         return console.log("The out path cannot be the same as the input path");
-      const compiler = new Compiler();
+      const compiler = new Compiler({
+        compactNames: argv["compact-names"],
+      });
       const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compiler.compile(code);
       if (error) {
