@@ -9,7 +9,7 @@ ucontrol itemDrop @air 100
 ucontrol itemTake shard1 @copper 10
 ucontrol within 1 2 10 15:6 0
 print 15:6
-ucontrol getBlock 10 20 &t3 18:13 0
-print &t3
+ucontrol getBlock 10 20 18:7 18:13 0
+print 18:7
 print 18:13
 end
