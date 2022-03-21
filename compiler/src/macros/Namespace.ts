@@ -38,7 +38,8 @@ export class VarsNamespace extends NamespaceMacro {
     const $get = this.data.$get as MacroFunction;
     this.data.$get = new MacroFunction(scope, prop => {
       if (prop instanceof LiteralValue) {
-        if (prop.data === "unit") return [new Unit(scope, "@unit"), []];
+        if (prop.data === "unit")
+          return [new Unit({ scope, name: "@unit" }), []];
         if (prop.data === "this")
           return [new Building({ scope, name: "@this" }), []];
       }
@@ -61,8 +62,18 @@ export class UCommandsNamespace extends NamespaceMacro {
   }
 }
 // TODO: repeated logic between UnitMacro and Building
-export class Unit extends ObjectValue {
-  constructor(scope: IScope, public name: string) {
+export class Unit extends ObjectValue implements IValue {
+  readonly renameable: boolean;
+  name: string;
+  constructor({
+    scope,
+    name,
+    renameable,
+  }: {
+    scope: IScope;
+    name: string;
+    renameable?: boolean;
+  }) {
     super(scope, {
       $get: new MacroFunction(scope, prop => {
         if (prop instanceof LiteralValue && typeof prop.data === "string") {
@@ -72,7 +83,13 @@ export class Unit extends ObjectValue {
           const temp = new TempValue({ scope });
           // special case, should return another unit or building
           const result =
-            prop.data === "controller" ? new Unit(scope, temp.name) : temp;
+            prop.data === "controller"
+              ? new Unit({
+                  scope,
+                  name: scope.makeTempName(),
+                  renameable: true,
+                })
+              : temp;
           return [
             result,
             [new InstructionBase("sensor", result, this, `@${name}`)],
@@ -87,10 +104,16 @@ export class Unit extends ObjectValue {
         );
       }),
     });
+    this.name = name;
+    this.renameable = !!renameable;
   }
 
   toString(): string {
     return this.name;
+  }
+
+  rename(name: string): void {
+    if (this.renameable) this.name = name;
   }
 }
 
