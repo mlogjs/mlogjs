@@ -39,7 +39,8 @@ export class VarsNamespace extends NamespaceMacro {
     this.data.$get = new MacroFunction(scope, prop => {
       if (prop instanceof LiteralValue) {
         if (prop.data === "unit") return [new Unit(scope, "@unit"), []];
-        if (prop.data === "this") return [new Building(scope, "@this"), []];
+        if (prop.data === "this")
+          return [new Building({ scope, name: "@this" }), []];
       }
       return $get.call(scope, [prop]);
     });

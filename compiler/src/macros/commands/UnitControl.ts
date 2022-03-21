@@ -56,10 +56,15 @@ export class UnitControl extends MacroFunction<IValue | null> {
       switch (mode.data) {
         case "getBlock": {
           const outType = new TempValue({ scope });
-          const outBuilding = new TempValue({ scope });
+          const outBuilding = new Building({
+            scope,
+            name: scope.makeTempName(),
+            renameable: true,
+          });
+
           result = new ObjectValue(scope, {
             0: outType,
-            1: new Building(scope, outBuilding.name),
+            1: outBuilding,
             length: new LiteralValue(scope, 2),
           });
           extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
