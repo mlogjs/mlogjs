@@ -27,7 +27,7 @@ export const itemNames = [
 
 export class Building extends ObjectValue implements IValue {
   name: string;
-  readonly renameable: boolean;
+  renameable: boolean;
 
   toString() {
     return this.name;
@@ -69,7 +69,9 @@ export class Building extends ObjectValue implements IValue {
   }
 
   rename(name: string): void {
-    if (this.renameable) this.name = name;
+    if (!this.renameable) return;
+    this.name = name;
+    this.renameable = false;
   }
 }
 

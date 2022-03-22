@@ -63,7 +63,7 @@ export class UCommandsNamespace extends NamespaceMacro {
 }
 // TODO: repeated logic between UnitMacro and Building
 export class Unit extends ObjectValue implements IValue {
-  readonly renameable: boolean;
+  renameable: boolean;
   name: string;
   constructor({
     scope,
@@ -113,7 +113,9 @@ export class Unit extends ObjectValue implements IValue {
   }
 
   rename(name: string): void {
-    if (this.renameable) this.name = name;
+    if (!this.renameable) return;
+    this.name = name;
+    this.renameable = false;
   }
 }
 
