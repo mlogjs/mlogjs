@@ -35,14 +35,15 @@ export const ArrowFunctionExpression: THandler = (
   }
 
   return [
-    new FunctionValue(
+    new FunctionValue({
       scope,
       name,
       paramNames,
       paramStores,
-      body as es.BlockStatement,
-      c
-    ),
+      body: body as es.BlockStatement,
+      c,
+      renameable: true,
+    }),
     [],
   ];
 };
@@ -52,13 +53,12 @@ export const FunctionDeclaration: THandler = (
   scope,
   node: es.FunctionDeclaration
 ) => {
-  return [
-    scope.set(
-      (node.id as es.Identifier).name,
-      ArrowFunctionExpression(c, scope, node, null)[0]
-    ),
-    [],
-  ];
+  const functionIns = ArrowFunctionExpression(c, scope, node, null);
+  const name = (node.id as es.Identifier).name;
+  functionIns[0].rename?.(
+    c.compactNames ? nodeName(node) : scope.formatName(name)
+  );
+  return [scope.set(name, functionIns[0]), []];
 };
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;
