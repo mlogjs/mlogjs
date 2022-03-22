@@ -9,17 +9,17 @@ sensor &t2 @unit @health
 print "health: "
 print &t2
 print "\n"
-set 10:4 @copper
-sensor &t3 @unit 10:4
+set item @copper
+sensor &t3 @unit item
 print "amount of "
-print 10:4
+print item
 print " : "
 print &t3
 printflush message1
-radar enemy any any distance cyclone1 1 14:6
-uradar enemy flying any 1 distance 22:6
-sensor &t6 14:6 @health
-sensor &t7 22:6 @health
+radar enemy any any distance cyclone1 1 unitA
+uradar enemy flying any distance 0 1 unitB
+sensor &t6 unitA @health
+sensor &t7 unitB @health
 print &t6
 print &t7
 end
