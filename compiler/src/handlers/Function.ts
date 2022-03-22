@@ -9,7 +9,7 @@ export const ArrowFunctionExpression: THandler = (
   node: es.ArrowFunctionExpression
 ) => {
   const name = nodeName(node);
-  scope = scope.createFunction(name);
+  const functionScope = scope.createFunction(name);
   let { params, body } = node;
 
   if (node.expression) {
@@ -27,9 +27,9 @@ export const ArrowFunctionExpression: THandler = (
   for (const id of params as es.Identifier[]) {
     paramNames.push(id.name);
     paramStores.push(
-      scope.make(
+      functionScope.make(
         id.name,
-        c.compactNames ? nodeName(id) : scope.formatName(id.name)
+        c.compactNames ? nodeName(id) : functionScope.formatName(id.name)
       )
     );
   }
