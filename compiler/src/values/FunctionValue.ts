@@ -1,3 +1,4 @@
+import { internalPrefix } from "src/utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -49,8 +50,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (this.initialized) return;
     this.initialized = true;
     this.addr = new LiteralValue(this.scope, null as never);
-    this.temp = new StoreValue(this.scope, "f" + this.name);
-    this.ret = new StoreValue(this.scope, "r" + this.name);
+    this.temp = new StoreValue(this.scope, `${internalPrefix}f${this.name}`);
+    this.ret = new StoreValue(this.scope, `${internalPrefix}r${this.name}`);
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.scope, this.body)[1],
