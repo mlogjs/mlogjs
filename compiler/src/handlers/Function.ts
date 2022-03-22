@@ -36,7 +36,7 @@ export const ArrowFunctionExpression: THandler = (
 
   return [
     new FunctionValue({
-      scope,
+      scope: functionScope,
       name,
       paramNames,
       paramStores,
