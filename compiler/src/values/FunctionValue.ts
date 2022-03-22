@@ -38,18 +38,19 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private inlineTemp!: TempValue;
   private inlineEnd!: LiteralValue;
   private bundled = false;
-
-  private createValues() {
-    this.addr = new LiteralValue(this.scope, null as never);
-    this.temp = new StoreValue(this.scope, "f" + this.name);
-    this.ret = new StoreValue(this.scope, "r" + this.name);
-  }
+  private renameable: boolean;
+  private initialized = false;
 
   typeof(scope: IScope): TValueInstructions {
     return [new LiteralValue(scope, "function"), []];
   }
 
-  private createInst() {
+  private ensureInit() {
+    if (this.initialized) return;
+    this.initialized = true;
+    this.addr = new LiteralValue(this.scope, null as never);
+    this.temp = new StoreValue(this.scope, "f" + this.name);
+    this.ret = new StoreValue(this.scope, "r" + this.name);
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.scope, this.body)[1],
@@ -57,14 +58,23 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.inst.push(new SetCounterInstruction(this.ret));
   }
 
-  constructor(
-    scope: IScope,
-    name: string,
-    paramNames: string[],
-    paramStores: StoreValue[],
-    body: es.BlockStatement,
-    c: Compiler
-  ) {
+  constructor({
+    scope,
+    name,
+    paramNames,
+    paramStores,
+    body,
+    c,
+    renameable = false,
+  }: {
+    scope: IScope;
+    name: string;
+    paramNames: string[];
+    paramStores: StoreValue[];
+    body: es.BlockStatement;
+    c: Compiler;
+    renameable?: boolean;
+  }) {
     super(scope);
 
     this.name = name;
@@ -72,12 +82,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.paramStores = paramStores;
     this.body = body;
     this.c = c;
+    this.renameable = renameable;
 
     this.callSize = paramStores.length + 2;
     scope.function = this;
-
-    this.createValues();
-    this.createInst();
   }
 
   private normalReturn(
@@ -140,6 +148,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 
   call(scope: IScope, args: IValue[]): TValueInstructions {
+    this.ensureInit();
     if (args.length !== this.paramStores.length)
       throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args);
@@ -149,6 +158,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 
   return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
+    this.ensureInit();
     if (arg && arg.macro) {
       this.inline = true;
       return [null, []];
@@ -159,5 +169,11 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
+  }
+
+  rename(name: string): void {
+    if (!this.renameable) return;
+    this.name = name;
+    this.renameable = false;
   }
 }
