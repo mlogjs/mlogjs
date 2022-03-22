@@ -26,7 +26,12 @@ export const ArrowFunctionExpression: THandler = (
 
   for (const id of params as es.Identifier[]) {
     paramNames.push(id.name);
-    paramStores.push(scope.make(id.name, nodeName(id)));
+    paramStores.push(
+      scope.make(
+        id.name,
+        c.compactNames ? nodeName(id) : scope.formatName(id.name)
+      )
+    );
   }
 
   return [

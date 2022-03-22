@@ -69,10 +69,14 @@ export class Scope implements IScope {
     );
   }
   makeTempName(): string {
-    const name = this.name ? `:${this.name}` : "";
-    const result = `${internalPrefix}t${this.ntemp}${name}`;
+    const result = this.formatName(`${internalPrefix}t${this.ntemp}`);
 
     this.ntemp++;
     return result;
+  }
+
+  formatName(name: string): string {
+    if (!this.name) return name;
+    return `${name}:${this.name}`;
   }
 }

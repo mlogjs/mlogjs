@@ -36,6 +36,7 @@ export interface IScope {
   make(name: string, storeName: string): StoreValue;
   copy(): IScope;
   makeTempName(): string;
+  formatName(name: string): string;
 }
 
 // we can't use type maps to define actual methods
