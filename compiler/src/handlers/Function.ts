@@ -1,18 +1,19 @@
-import { THandler, es } from "../types";
+import { Compiler } from "src/Compiler";
+import { THandler, es, IScope, TValueInstructions } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";
 import { FunctionValue } from "../values/FunctionValue";
 
-export const ArrowFunctionExpression: THandler = (
-  c,
-  scope,
-  node: es.ArrowFunctionExpression
-) => {
-  const name = nodeName(node);
+function handleFunctionNode(
+  c: Compiler,
+  scope: IScope,
+  node: es.Function,
+  name: string
+): TValueInstructions<FunctionValue> {
   const functionScope = scope.createFunction(name);
   let { params, body } = node;
 
-  if (node.expression) {
+  if ("expression" in node && node.expression) {
     body = {
       type: "BlockStatement",
       body: [
@@ -46,6 +47,15 @@ export const ArrowFunctionExpression: THandler = (
     }),
     [],
   ];
+}
+
+export const ArrowFunctionExpression: THandler = (
+  c,
+  scope,
+  node: es.ArrowFunctionExpression
+) => {
+  const name = nodeName(node);
+  return handleFunctionNode(c, scope, node, name);
 };
 
 export const FunctionDeclaration: THandler = (
@@ -53,9 +63,11 @@ export const FunctionDeclaration: THandler = (
   scope,
   node: es.FunctionDeclaration
 ) => {
-  const functionIns = ArrowFunctionExpression(c, scope, node, null);
   const name = (node.id as es.Identifier).name;
-  functionIns[0].rename?.(
+  const functionIns = handleFunctionNode(
+    c,
+    scope,
+    node,
     c.compactNames ? nodeName(node) : scope.formatName(name)
   );
   return [scope.set(name, functionIns[0]), []];
