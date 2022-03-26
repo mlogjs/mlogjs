@@ -171,10 +171,4 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-
-  rename(name: string): void {
-    if (!this.renameable) return;
-    this.name = name;
-    this.renameable = false;
-  }
 }
