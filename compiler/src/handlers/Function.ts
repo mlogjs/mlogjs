@@ -43,7 +43,6 @@ function handleFunctionNode(
       paramStores,
       body: body as es.BlockStatement,
       c,
-      renameable: true,
     }),
     [],
   ];

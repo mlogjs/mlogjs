@@ -39,7 +39,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private inlineTemp!: TempValue;
   private inlineEnd!: LiteralValue;
   private bundled = false;
-  private renameable: boolean;
   private initialized = false;
 
   typeof(scope: IScope): TValueInstructions {
@@ -66,7 +65,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     paramStores,
     body,
     c,
-    renameable = false,
   }: {
     scope: IScope;
     name: string;
@@ -83,7 +81,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.paramStores = paramStores;
     this.body = body;
     this.c = c;
-    this.renameable = renameable;
 
     this.callSize = paramStores.length + 2;
     scope.function = this;
