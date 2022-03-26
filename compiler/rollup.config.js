@@ -4,6 +4,8 @@ import alias from "@rollup/plugin-alias";
 
 import pkg from "./package.json";
 
+const dev = !!process.env.DEV;
+
 const external = [
   ...Object.keys(pkg.dependencies),
   "fs",
@@ -20,10 +22,12 @@ export default defineConfig([
       {
         file: "dist/index.cjs",
         format: "cjs",
+        sourcemap: dev,
       },
       {
         file: "dist/index.mjs",
         format: "esm",
+        sourcemap: dev,
       },
     ],
     plugins: [
@@ -32,6 +36,7 @@ export default defineConfig([
         compilerOptions: {
           declarationDir: "types",
           declaration: true,
+          sourceMap: dev,
         },
       }),
     ],
@@ -44,6 +49,7 @@ export default defineConfig([
       format: "cjs",
       entryFileNames: "[name].cjs",
       banner: "#!/usr/bin/env node",
+      sourcemap: dev,
     },
     external: /.+(?<!\.)/, // ignore everything that isn't a relative module
     plugins: [
@@ -57,6 +63,7 @@ export default defineConfig([
       }),
       typescript({
         tsconfig: "./tsconfig.json",
+        sourceMap: dev,
       }),
     ],
   },
