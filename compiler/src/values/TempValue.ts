@@ -15,7 +15,7 @@ export class TempValue extends StoreValue implements IValue {
   proxied!: IValue;
   canProxy = true;
   setInst!: IInstruction;
-  readonly renameable: boolean;
+  renameable: boolean;
 
   constructor({ scope, name, renameable = true }: TempValueOptions) {
     super(scope, name ?? scope.makeTempName());
@@ -81,6 +81,8 @@ export class TempValue extends StoreValue implements IValue {
   }
 
   rename(name: string): void {
-    if (this.renameable) this.name = name;
+    if (!this.renameable) return;
+    this.name = name;
+    this.renameable = false;
   }
 }

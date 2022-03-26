@@ -25,15 +25,18 @@ export const VariableDeclarator: THandler<IValue | null> = (
   switch (node.id.type) {
     case "Identifier": {
       const { name } = node.id;
+      const identifier = c.compactNames
+        ? nodeName(node)
+        : scope.formatName(name);
       const [init] = valinst;
       if (kind === "const" && !init)
         throw new CompilerError("Cannot create constant with void value.");
       if (kind === "const" && init?.constant) {
-        init.rename?.(nodeName(node));
+        init.rename?.(identifier);
         scope.set(name, init);
         return valinst;
       } else {
-        const value = scope.make(name, nodeName(node));
+        const value = scope.make(name, identifier);
         if (init) {
           if (init.macro)
             throw new CompilerError("Macro value must be constant.");
@@ -76,7 +79,9 @@ export const VariableDeclarator: THandler<IValue | null> = (
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const val = init.data[i]!;
-        val.rename?.(nodeName(element));
+        val.rename?.(
+          c.compactNames ? nodeName(element) : scope.formatName(element.name)
+        );
         scope.set(element.name, val);
       }
       return valinst;

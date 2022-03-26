@@ -1,11 +1,11 @@
-set 2:6 @cryofluid
+set coolant @cryofluid
 sensor &t0 cyclone1 @ammo
 print "current ammo: "
 print &t0
 print "\n"
-sensor &t1 cyclone1 2:6
+sensor &t1 cyclone1 coolant
 print "amount of "
-print 2:6
+print coolant
 print " : "
 print &t1
 print "\n"

@@ -1,18 +1,19 @@
-import { THandler, es } from "../types";
+import { Compiler } from "../Compiler";
+import { THandler, es, IScope, TValueInstructions } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";
 import { FunctionValue } from "../values/FunctionValue";
 
-export const ArrowFunctionExpression: THandler = (
-  c,
-  scope,
-  node: es.ArrowFunctionExpression
-) => {
-  const name = nodeName(node);
-  scope = scope.createFunction(name);
+function handleFunctionNode(
+  c: Compiler,
+  scope: IScope,
+  node: es.Function,
+  name: string
+): TValueInstructions<FunctionValue> {
+  const functionScope = scope.createFunction(name);
   let { params, body } = node;
 
-  if (node.expression) {
+  if ("expression" in node && node.expression) {
     body = {
       type: "BlockStatement",
       body: [
@@ -26,20 +27,34 @@ export const ArrowFunctionExpression: THandler = (
 
   for (const id of params as es.Identifier[]) {
     paramNames.push(id.name);
-    paramStores.push(scope.make(id.name, nodeName(id)));
+    paramStores.push(
+      functionScope.make(
+        id.name,
+        c.compactNames ? nodeName(id) : functionScope.formatName(id.name)
+      )
+    );
   }
 
   return [
-    new FunctionValue(
-      scope,
+    new FunctionValue({
+      scope: functionScope,
       name,
       paramNames,
       paramStores,
-      body as es.BlockStatement,
-      c
-    ),
+      body: body as es.BlockStatement,
+      c,
+    }),
     [],
   ];
+}
+
+export const ArrowFunctionExpression: THandler = (
+  c,
+  scope,
+  node: es.ArrowFunctionExpression
+) => {
+  const name = nodeName(node);
+  return handleFunctionNode(c, scope, node, name);
 };
 
 export const FunctionDeclaration: THandler = (
@@ -47,13 +62,14 @@ export const FunctionDeclaration: THandler = (
   scope,
   node: es.FunctionDeclaration
 ) => {
-  return [
-    scope.set(
-      (node.id as es.Identifier).name,
-      ArrowFunctionExpression(c, scope, node, null)[0]
-    ),
-    [],
-  ];
+  const name = (node.id as es.Identifier).name;
+  const functionIns = handleFunctionNode(
+    c,
+    scope,
+    node,
+    c.compactNames ? nodeName(node) : scope.formatName(name)
+  );
+  return [scope.set(name, functionIns[0]), []];
 };
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;

@@ -1,7 +1,7 @@
-set 1:9 0
+set i 0
 jump 6 equal 1 0
-print 1:9
-set &t0 1:9
-op add 1:9 1:9 1
+print i
+set &t0 i
+op add i i 1
 jump 1 always
 end

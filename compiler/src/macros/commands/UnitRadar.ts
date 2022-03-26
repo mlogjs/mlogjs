@@ -49,8 +49,9 @@ export class UnitRadar extends MacroFunction {
             filter1.data,
             filter2.data,
             filter3.data,
-            order,
             sort.data,
+            "0", // I don't know why, but mindustry requires this extra parameter
+            order,
             outUnit
           ),
         ],

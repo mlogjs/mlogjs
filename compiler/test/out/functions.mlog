@@ -1,38 +1,38 @@
-set 24:4 0
-set 25:4 1
-set 26:4 1
-set 17:12 24:4
-set 17:18 25:4
-set 17:21 26:4
-set r17:0 8
+set type 0
+set a 1
+set b 1
+set type:op type
+set a:op a
+set b:op b
+set &rop 8
 jump 14 always
-set 28:4 f17:0
+set result &fop
 print "Thre result is: "
-print 28:4
+print result
 print "."
 printflush message1
 end
-op strictEqual &t0:17:0 17:12 0
-jump 20 equal &t0:17:0 0
-op add f17:0 17:18 17:21
+op strictEqual &t0:op type:op 0
+jump 20 equal &t0:op 0
+op add &fop a:op b:op
 jump 18 always
-set @counter r17:0
+set @counter &rop
 jump 37 always
-op strictEqual &t2:17:0 17:12 1
-jump 26 equal &t2:17:0 0
-op sub f17:0 17:18 17:21
+op strictEqual &t2:op type:op 1
+jump 26 equal &t2:op 0
+op sub &fop a:op b:op
 jump 24 always
-set @counter r17:0
+set @counter &rop
 jump 37 always
-op strictEqual &t4:17:0 17:12 2
-jump 32 equal &t4:17:0 0
-op mul f17:0 17:18 17:21
+op strictEqual &t4:op type:op 2
+jump 32 equal &t4:op 0
+op mul &fop a:op b:op
 jump 30 always
-set @counter r17:0
+set @counter &rop
 jump 37 always
-op strictEqual &t6:17:0 17:12 3
-jump 37 equal &t6:17:0 0
-op div f17:0 17:18 17:21
+op strictEqual &t6:op type:op 3
+jump 37 equal &t6:op 0
+op div &fop a:op b:op
 jump 36 always
-set @counter r17:0
-set @counter r17:0
+set @counter &rop
+set @counter &rop
