@@ -1,4 +1,4 @@
-import { Compiler } from "src/Compiler";
+import { Compiler } from "../Compiler";
 import { THandler, es, IScope, TValueInstructions } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";

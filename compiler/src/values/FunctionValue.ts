@@ -1,4 +1,4 @@
-import { internalPrefix } from "src/utils";
+import { internalPrefix } from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
