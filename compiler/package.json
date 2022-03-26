@@ -9,6 +9,7 @@
   "scripts": {
     "clean": "rm -rf ../docs dist build",
     "build": "rollup -c",
+    "build:dev": "rollup -c --environment DEV",
     "dev": "ts-node src/bin",
     "test": "jest",
     "lint": "eslint src/**/*.ts",
