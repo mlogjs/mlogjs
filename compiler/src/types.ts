@@ -41,16 +41,7 @@ export interface IScope {
 
 // we can't use type maps to define actual methods
 // and if we don't do this we'll get an error [ts(2425)]
-export interface IValue {
-  // main properties
-  scope: IScope;
-  constant: boolean;
-  macro: boolean;
-  eval(scope: IScope): TValueInstructions;
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
-  get(scope: IScope, name: IValue): TValueInstructions;
-  rename?(name: string): void;
-
+export interface IValueOperators {
   // unary operators
   "!"(scope: IScope): TValueInstructions;
   "u+"(scope: IScope): TValueInstructions;
@@ -105,6 +96,17 @@ export interface IValue {
   "^="(scope: IScope, value: IValue): TValueInstructions;
   "|="(scope: IScope, value: IValue): TValueInstructions;
   "="(scope: IScope, value: IValue): TValueInstructions;
+}
+
+export interface IValue extends IValueOperators {
+  // main properties
+  scope: IScope;
+  constant: boolean;
+  macro: boolean;
+  eval(scope: IScope): TValueInstructions;
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
+  get(scope: IScope, name: IValue): TValueInstructions;
+  rename?(name: string): void;
 }
 
 export type TLiteral = string | number;

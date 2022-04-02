@@ -1,4 +1,4 @@
-import { IScope, IValue, TValueInstructions } from "../types";
+import { IScope, IValue, IValueOperators, TValueInstructions } from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
@@ -24,7 +24,7 @@ export class VoidValue implements IValue {
 }
 
 // tells typescript that VoidValue implements value
-export interface VoidValue extends IValue {}
+export interface VoidValue extends IValueOperators {}
 
 for (const key of operators) {
   VoidValue.prototype[key] = function () {
