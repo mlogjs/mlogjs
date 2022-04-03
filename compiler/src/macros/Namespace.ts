@@ -49,7 +49,7 @@ export class VarsNamespace extends NamespaceMacro {
           const owner = new ValueOwner({
             scope,
             value: new Unit(scope),
-            name: "@this",
+            name: "@unit",
           });
           return [owner.value, []];
         }
