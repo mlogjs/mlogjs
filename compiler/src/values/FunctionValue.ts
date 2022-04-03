@@ -47,54 +47,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private bundled = false;
   private initialized = false;
 
-  typeof(scope: IScope): TValueInstructions {
-    return [new LiteralValue(scope, "function"), []];
-  }
-
-  private ensureInit() {
-    if (this.initialized) return;
-    this.initialized = true;
-    if (!this.owner)
-      throw new CompilerError(`Functions must be owned by a variable`);
-
-    const name = this.c.compactNames
-      ? nodeName(this.node)
-      : this.scope.formatName(this.owner.name);
-
-    this.childScope = this.scope.createFunction(name);
-
-    for (const id of this.params) {
-      this.paramNames.push(id.name);
-      this.paramStores.push(
-        this.childScope.make(
-          id.name,
-          this.c.compactNames
-            ? nodeName(id)
-            : this.childScope.formatName(id.name)
-        )
-      );
-    }
-    this.callSize = this.paramStores.length + 2;
-    this.childScope.function = this;
-
-    this.addr = new LiteralValue(this.childScope, null as never);
-    this.temp = new ValueOwner({
-      scope: this.childScope,
-      name: `${internalPrefix}f${name}`,
-      value: new StoreValue(this.childScope),
-    });
-    this.ret = new ValueOwner({
-      scope: this.childScope,
-      name: `${internalPrefix}r${name}`,
-      value: new StoreValue(this.childScope),
-    });
-    this.inst = [
-      new AddressResolver(this.addr),
-      ...this.c.handle(this.childScope, this.body)[1],
-    ];
-    this.inst.push(new SetCounterInstruction(this.ret.value));
-  }
-
   constructor({
     scope,
     params,
@@ -113,6 +65,56 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.c = c;
     this.node = node;
     this.params = params;
+  }
+
+  typeof(scope: IScope): TValueInstructions {
+    return [new LiteralValue(scope, "function"), []];
+  }
+
+  private initScope(name: string) {
+    this.childScope = this.scope.createFunction(name);
+    this.childScope.function = this;
+    for (const id of this.params) {
+      this.paramNames.push(id.name);
+      this.paramStores.push(
+        this.childScope.make(
+          id.name,
+          this.c.compactNames
+            ? nodeName(id)
+            : this.childScope.formatName(id.name)
+        )
+      );
+    }
+    this.callSize = this.paramStores.length + 2;
+  }
+  private ensureInit() {
+    if (!this.owner)
+      throw new CompilerError(`Functions must be owned by a variable`);
+
+    if (this.initialized) return;
+    this.initialized = true;
+
+    const name = this.c.compactNames
+      ? nodeName(this.node)
+      : this.scope.formatName(this.owner.name);
+    this.initScope(name);
+
+    this.addr = new LiteralValue(this.childScope, null as never);
+    this.temp = new ValueOwner({
+      scope: this.childScope,
+      name: `${internalPrefix}f${name}`,
+      value: new StoreValue(this.childScope),
+    });
+    this.ret = new ValueOwner({
+      scope: this.childScope,
+      name: `${internalPrefix}r${name}`,
+      value: new StoreValue(this.childScope),
+    });
+    this.inst = [
+      new AddressResolver(this.addr),
+      ...this.c.handle(this.childScope, this.body)[1],
+    ];
+    this.inst.push(new SetCounterInstruction(this.ret.value));
   }
 
   private normalReturn(
