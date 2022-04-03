@@ -42,7 +42,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private body: es.BlockStatement;
   private c: Compiler;
   private callSize!: number;
-  private inlineTemp!: StoreValue;
+  private inlineTemp!: ValueOwner<StoreValue>;
   private inlineEnd!: LiteralValue;
   private bundled = false;
   private initialized = false;
@@ -144,13 +144,16 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
+    const argInst = arg ? this.inlineTemp.value["="](scope, arg)[1] : [];
     return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
   }
 
   private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
     // create return value
-    this.inlineTemp = new StoreValue(scope);
+    this.inlineTemp = new ValueOwner({
+      scope: this.childScope,
+      value: new StoreValue(scope),
+    });
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
@@ -173,7 +176,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     inst.push(new AddressResolver(this.inlineEnd));
 
     // return the function value
-    return [this.inlineTemp, inst];
+    return [this.inlineTemp.value, inst];
   }
 
   call(scope: IScope, args: IValue[]): TValueInstructions {
