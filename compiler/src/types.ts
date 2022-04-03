@@ -47,7 +47,8 @@ export interface IValueOwner<T extends IValue = IValue> {
   value: T;
   identifier?: string;
   name: string;
-  own(target: IValue): void;
+  own(target: T): void;
+  replace(target: T): void;
   alias(owner: IValueOwner): void;
 }
 // we can't use type maps to define actual methods
@@ -118,6 +119,7 @@ export interface IValue extends IValueOperators {
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
+  ensureOwned(): void;
 }
 
 export type TLiteral = string | number;

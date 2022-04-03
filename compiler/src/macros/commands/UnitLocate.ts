@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
 
@@ -38,14 +38,10 @@ export class UnitLocate extends MacroFunction {
           "The others arguments of unitLocate must be literals or stores"
         );
 
-      const outFound = new TempValue({ scope });
-      const outX = new TempValue({ scope });
-      const outY = new TempValue({ scope });
-      const outBuilding = new Building({
-        scope,
-        name: scope.makeTempName(),
-        renameable: true,
-      });
+      const outFound = new StoreValue(scope);
+      const outX = new StoreValue(scope);
+      const outY = new StoreValue(scope);
+      const outBuilding = new Building(scope);
       const outArgs = [outX, outY, outFound, outBuilding];
       let inputArgs: (IValue | string)[] = [];
       switch (find.data) {

@@ -1,9 +1,15 @@
-import { IScope, IValue, IValueOperators, TValueInstructions } from "../types";
+import {
+  IScope,
+  IValue,
+  IValueOperators,
+  IValueOwner,
+  TValueInstructions,
+} from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
-  moveable = false;
+  owner: IValueOwner | null = null;
   scope: IScope;
   constant = false;
   macro = false;
@@ -19,8 +25,8 @@ export class VoidValue implements IValue {
   get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
   }
-  move(_scope: IScope, _target?: IValue): void {
-    throw new Error(`${this} cannot be moved`);
+  ensureOwned(): void {
+    throw new CompilerError(`${this} cannot be owned`);
   }
   toString(): string {
     return "void";

@@ -1,16 +1,23 @@
 import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
-import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
+import {
+  IFunctionValue,
+  IInstruction,
+  IScope,
+  IValue,
+  IValueOwner,
+} from "./types";
 import { CompilerError } from "./CompilerError";
 import { internalPrefix } from "./utils";
+import { ValueOwner } from "./values/ValueOwner";
 
 export class Scope implements IScope {
-  data: Record<string, IValue | null>;
+  data: Record<string, IValueOwner | null>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
   constructor(
-    values: Record<string, IValue | null>,
+    values: Record<string, IValueOwner | null>,
     public parent: IScope | null = null,
     public stacked = false,
     public ntemp = 0,
@@ -48,25 +55,46 @@ export class Scope implements IScope {
     return false;
   }
   get(name: string): IValue {
-    const value = this.data[name];
-    if (value) return value;
+    const owner = this.data[name];
+    if (owner) return owner.value;
     if (this.parent) return this.parent.get(name);
     throw new CompilerError(`${name} is not declared.`);
   }
-  set<T extends IValue>(name: string, value: T): T {
+
+  set<T extends IValue>(
+    ...args: [name: string, value: T] | [owner: IValueOwner<T>]
+  ): T {
+    const name = args.length === 1 ? args[0].identifier : args[0];
+    if (!name)
+      throw new CompilerError("Values in a scope must have an identifier");
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
-    return this.hardSet(name, value);
+    return this.hardSet(...args);
   }
-  hardSet<T extends IValue>(name: string, value: T): T {
-    this.data[name] = value;
-    return value;
+
+  hardSet<T extends IValue>(
+    ...args: [name: string, value: T] | [owner: IValueOwner<T>]
+  ): T {
+    const owner =
+      args.length === 1
+        ? args[0]
+        : new ValueOwner({
+            scope: this,
+            name: args[0],
+            value: args[1],
+          });
+
+    this.data[owner.name] = owner;
+    return owner.value;
   }
-  make(name: string, storeName: string): StoreValue {
-    return this.set(
+  make(identifier: string, name: string): StoreValue {
+    const owner = new ValueOwner({
+      scope: this,
+      value: new StoreValue(this),
+      identifier,
       name,
-      this.stacked ? (null as never) : new StoreValue(this, storeName)
-    );
+    });
+    return this.set(owner);
   }
   makeTempName(): string {
     const result = this.formatName(`${internalPrefix}t${this.ntemp}`);

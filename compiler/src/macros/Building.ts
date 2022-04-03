@@ -1,10 +1,11 @@
-import { camelToDashCase } from "../utils";
+import { camelToDashCase, discardedName } from "../utils";
 import { InstructionBase, OperationInstruction } from "../instructions";
 import { IScope, IValue, TValueInstructions } from "../types";
-import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 import { operatorMap } from "../operators";
 import { CompilerError } from "../CompilerError";
+import { ValueOwner } from "../values/ValueOwner";
 
 export const itemNames = [
   "copper",
@@ -25,37 +26,26 @@ export const itemNames = [
   "pyratite",
 ];
 
-export class Building extends ObjectValue implements IValue {
-  name: string;
-  renameable: boolean;
-
+export class Building extends ObjectValue {
   toString() {
-    return this.name;
+    return this.owner?.name ?? discardedName;
   }
 
-  constructor({
-    scope,
-    name,
-    renameable,
-  }: {
-    scope: IScope;
-    name: string;
-    renameable?: boolean;
-  }) {
+  constructor(scope: IScope) {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data === "string") {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new TempValue({ scope });
+          const temp = new StoreValue(scope);
           return [
             temp,
             [new InstructionBase("sensor", temp, this, `@${name}`)],
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new TempValue({ scope });
+          const temp = new StoreValue(scope);
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -63,15 +53,11 @@ export class Building extends ObjectValue implements IValue {
         );
       }),
     });
-    this.name = name;
-
-    this.renameable = !!renameable;
   }
 
-  rename(name: string): void {
-    if (!this.renameable) return;
-    this.name = name;
-    this.renameable = false;
+  eval(scope: IScope): TValueInstructions {
+    this.ensureOwned();
+    return super.eval(scope);
   }
 }
 
@@ -83,7 +69,12 @@ export class BuildingBuilder extends ObjectValue {
           throw new CompilerError("Block name must be a literal.");
         if (typeof nameLit.data !== "string")
           throw new CompilerError("Block name must be a string.");
-        return [new Building({ scope, name: nameLit.data }), []];
+        const owner = new ValueOwner({
+          scope,
+          value: new Building(scope),
+          name: nameLit.data,
+        });
+        return [owner.value, []];
       }),
     });
   }
@@ -97,12 +88,12 @@ for (const key in operatorMap) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    const left = new StoreValue(scope, this.name);
+    this.ensureOwned();
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue({ scope });
+    const temp = new StoreValue(scope);
     return [
       temp,
-      [...rightInst, new OperationInstruction(kind, temp, left, right)],
+      [...rightInst, new OperationInstruction(kind, temp, this, right)],
     ];
   };
 }

@@ -8,6 +8,7 @@ import {
   TValueInstructions,
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
+import { ValueOwner } from "./ValueOwner";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData extends TOperatorMacroMap {
@@ -52,6 +53,10 @@ export class ObjectValue extends VoidValue {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args);
     return $call.call(scope, args);
+  }
+
+  ensureOwned(): void {
+    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }
 

@@ -1,5 +1,4 @@
 import { IScope, IValue, IValueOwner } from "../types";
-import { StoreValue } from "./StoreValue";
 
 export interface IValueOwnerParams<T extends IValue> {
   scope: IScope;
@@ -44,20 +43,14 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
     return this._name;
   }
 
-  static temp(scope: IScope, name?: string) {
-    return new ValueOwner({
-      scope,
-      name,
-      value: new StoreValue(scope),
-    });
-  }
-
   own(target: T): void {
+    target.owner = this;
+  }
+  replace(target: T): void {
     this.value.owner = null;
     target.owner = this;
     this.value = target;
   }
-
   alias(owner: IValueOwner<T>): void {
     this.value = owner.value;
   }

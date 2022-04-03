@@ -2,6 +2,7 @@ import { ObjectValue } from "../values";
 import { THandler, es, TValueInstructions, IValue } from "../types";
 import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
+import { ValueOwner } from "../values/ValueOwner";
 
 export const VariableDeclaration: THandler<null> = (
   c,
@@ -32,14 +33,21 @@ export const VariableDeclarator: THandler<IValue | null> = (
       if (kind === "const" && !init)
         throw new CompilerError("Cannot create constant with void value.");
       if (kind === "const" && init?.constant) {
-        init.rename?.(identifier);
-        scope.set(name, init);
+        const owner = new ValueOwner({
+          scope,
+          identifier: name,
+          name: c.compactNames ? nodeName(node) : scope.formatName(name),
+          value: init,
+          constant: true,
+        });
+        scope.set(owner);
         return valinst;
       } else {
         const value = scope.make(name, identifier);
         if (init) {
           if (init.macro)
             throw new CompilerError("Macro value must be constant.");
+
           valinst[1].push(...value["="](scope, init)[1]);
         }
         if (kind === "const") value.constant = true;
@@ -79,10 +87,17 @@ export const VariableDeclarator: THandler<IValue | null> = (
 
         // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
         const val = init.data[i]!;
-        val.rename?.(
-          c.compactNames ? nodeName(element) : scope.formatName(element.name)
-        );
-        scope.set(element.name, val);
+        const owner = new ValueOwner({
+          scope,
+          identifier: element.name,
+          name: c.compactNames
+            ? nodeName(element)
+            : scope.formatName(element.name),
+          value: val,
+          constant: true,
+        });
+
+        scope.set(owner);
       }
       return valinst;
     }

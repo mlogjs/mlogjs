@@ -18,8 +18,8 @@ import {
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
-import { TempValue } from "./TempValue";
 import { VoidValue } from "./VoidValue";
+import { ValueOwner } from "./ValueOwner";
 
 export class FunctionValue extends VoidValue implements IFunctionValue {
   constant = true;
@@ -28,15 +28,15 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private paramNames: string[];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
-  private temp!: StoreValue;
-  private ret!: StoreValue;
+  private temp!: ValueOwner<StoreValue>;
+  private ret!: ValueOwner<StoreValue>;
   private inline!: boolean;
   private tryingInline!: boolean;
   private body: es.BlockStatement;
   private name: string;
   private c: Compiler;
   private callSize: number;
-  private inlineTemp!: TempValue;
+  private inlineTemp!: StoreValue;
   private inlineEnd!: LiteralValue;
   private bundled = false;
   private initialized = false;
@@ -49,13 +49,21 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (this.initialized) return;
     this.initialized = true;
     this.addr = new LiteralValue(this.scope, null as never);
-    this.temp = new StoreValue(this.scope, `${internalPrefix}f${this.name}`);
-    this.ret = new StoreValue(this.scope, `${internalPrefix}r${this.name}`);
+    this.temp = new ValueOwner({
+      scope: this.scope,
+      name: `${internalPrefix}f${this.name}`,
+      value: new StoreValue(this.scope),
+    });
+    this.ret = new ValueOwner({
+      scope: this.scope,
+      name: `${internalPrefix}r${this.name}`,
+      value: new StoreValue(this.scope),
+    });
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.scope, this.body)[1],
     ];
-    this.inst.push(new SetCounterInstruction(this.ret));
+    this.inst.push(new SetCounterInstruction(this.ret.value));
   }
 
   constructor({
@@ -90,8 +98,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.temp["="](scope, arg)[1] : [];
-    return [null, [...argInst, new SetCounterInstruction(this.ret)]];
+    const argInst = arg ? this.temp.value["="](scope, arg)[1] : [];
+    return [null, [...argInst, new SetCounterInstruction(this.ret.value)]];
   }
 
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
@@ -102,11 +110,11 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       .map((param, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
-        ...this.ret["="](scope, callAddressLiteral)[1],
+        ...this.ret.value["="](scope, callAddressLiteral)[1],
         new JumpInstruction(this.addr, EJumpKind.Always),
         new AddressResolver(callAddressLiteral)
       );
-    return [this.temp, inst];
+    return [this.temp.value, inst];
   }
 
   private inlineReturn(
@@ -119,7 +127,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
     // create return value
-    this.inlineTemp = new TempValue({ scope });
+    this.inlineTemp = new StoreValue(scope);
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
