@@ -20,7 +20,7 @@ export type THandler<T extends IValue | null = IValue> = (
 
 export interface IScope {
   parent: IScope | null;
-  data: Record<string, IValue | null>;
+  data: Record<string, IValueOwner | null>;
   name: string;
   inst: IInstruction[];
   break: AddressResolver;
@@ -32,13 +32,24 @@ export interface IScope {
   has(name: string): boolean;
   get(name: string): IValue;
   set<T extends IValue>(name: string, value: T): T;
+  set<T extends IValue>(owner: IValueOwner<T>): T;
   hardSet<T extends IValue>(name: string, value: T): T;
+  hardSet<T extends IValue>(owner: IValueOwner<T>): T;
   make(name: string, storeName: string): StoreValue;
   copy(): IScope;
   makeTempName(): string;
   formatName(name: string): string;
 }
 
+export interface IValueOwner<T extends IValue = IValue> {
+  scope: IScope;
+  constant: boolean;
+  value: T;
+  identifier?: string;
+  name: string;
+  own(target: IValue): void;
+  alias(owner: IValueOwner): void;
+}
 // we can't use type maps to define actual methods
 // and if we don't do this we'll get an error [ts(2425)]
 export interface IValueOperators {
@@ -100,15 +111,13 @@ export interface IValueOperators {
 
 export interface IValue extends IValueOperators {
   // main properties
+  owner: IValueOwner | null;
   scope: IScope;
   constant: boolean;
   macro: boolean;
-  moveable: boolean;
-  move(scope: IScope, target?: IValue): void;
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
-  rename?(name: string): void;
 }
 
 export type TLiteral = string | number;
