@@ -103,6 +103,8 @@ export interface IValue extends IValueOperators {
   scope: IScope;
   constant: boolean;
   macro: boolean;
+  moveable: boolean;
+  move(scope: IScope, target?: IValue): void;
   eval(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;

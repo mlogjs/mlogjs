@@ -3,6 +3,7 @@ import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
+  moveable = false;
   scope: IScope;
   constant = false;
   macro = false;
@@ -17,6 +18,9 @@ export class VoidValue implements IValue {
   }
   get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
+  }
+  move(_scope: IScope, _target?: IValue): void {
+    throw new Error(`${this} cannot be moved`);
   }
   toString(): string {
     return "void";
