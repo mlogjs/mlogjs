@@ -83,8 +83,10 @@ export class Scope implements IScope {
             name: args[0],
             value: args[1],
           });
-
-    this.data[owner.name] = owner;
+    const { identifier } = owner;
+    if (!identifier)
+      throw new CompilerError("Values in a scope must have an identifier");
+    this.data[identifier] = owner;
     return owner.value;
   }
   make(identifier: string, name: string): StoreValue {
