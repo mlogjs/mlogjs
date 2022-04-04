@@ -80,6 +80,7 @@ export class Scope implements IScope {
         ? args[0]
         : new ValueOwner({
             scope: this,
+            identifier: args[0],
             name: args[0],
             value: args[1],
           });
