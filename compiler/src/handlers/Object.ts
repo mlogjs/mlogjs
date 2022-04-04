@@ -1,6 +1,7 @@
 import { CompilerError } from "../CompilerError";
 import { es, IInstruction, THandler } from "../types";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
+import { ValueOwner } from "../values/ValueOwner";
 
 export const ObjectExpression: THandler = (
   c,
@@ -25,7 +26,12 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`);
     }
     const [member, memberInst] = c.handleEval(scope, value);
-    data[index] = member;
+    const owner = new ValueOwner({
+      scope,
+      constant: true,
+      value: member,
+    });
+    data[index] = owner.value;
     inst.push(...memberInst);
   }
   return [new ObjectValue(scope, data), inst];
