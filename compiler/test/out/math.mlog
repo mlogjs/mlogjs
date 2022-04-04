@@ -1,20 +1,20 @@
 set a 10
 set b 20
-op max &t0 a b
-op min &t1 a b
-op angle &t2 a b
-op len &t3 a b
-op noise &t4 a b
-op abs &t5 a
-op log &t6 a
-op log10 &t7 a
-op sin &t8 a
-op cos &t9 a
-op tan &t10 a
-op floor &t11 a
-op ceil &t12 a
-op sqrt &t13 a
-op rand &t14 a
+op max &_ a b
+op min &_ a b
+op angle &_ a b
+op len &_ a b
+op noise &_ a b
+op abs &_ a
+op log &_ a
+op log10 &_ a
+op sin &_ a
+op cos &_ a
+op tan &_ a
+op floor &_ a
+op ceil &_ a
+op sqrt &_ a
+op rand &_ a
 set temp 0
 set temp 20
 set temp 10.5
