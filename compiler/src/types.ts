@@ -47,6 +47,7 @@ export interface IValueOwner<T extends IValue = IValue> {
   value: T;
   identifier?: string;
   name: string;
+  temporary: boolean;
   own(target: T): void;
   replace(target: T): void;
   alias(owner: IValueOwner): void;

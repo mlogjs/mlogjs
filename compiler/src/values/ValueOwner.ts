@@ -18,7 +18,7 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
   identifier?: string;
   /** The name that the variable will have during transpilation to mlog */
   name: string;
-
+  temporary: boolean;
   /**
    * Creates a new `ValueOwner`, if `value` is already owned,
    * `this` will be aliased to `value`, else `this` will own `value`
@@ -35,6 +35,7 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
     this.value = value;
     this.identifier = identifier;
     this.name = name ?? scope.makeTempName();
+    this.temporary = !name;
     if (!value.owner) this.own(value);
   }
 

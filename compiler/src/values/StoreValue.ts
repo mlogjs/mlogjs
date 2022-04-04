@@ -23,7 +23,7 @@ export class StoreValue extends BaseValue implements IValue {
       throw new CompilerError(`Cannot assign to unmutable store '${this}'.`);
     if (!this.owner)
       throw new CompilerError(`Cannot assign to temporary value`);
-    if (!value.owner) {
+    if (!value.owner || value.owner.temporary) {
       this.owner.own(value);
       if (value instanceof StoreValue) return [this, []];
     }
