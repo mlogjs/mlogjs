@@ -48,8 +48,10 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
 
   replace(target: T): void {
     this.value.owner = null;
-    target.owner = this;
+    this.owned.delete(this.value);
+
     this.value = target;
+    this.own(target);
   }
 
   moveInto(owner: IValueOwner<T>): void {
