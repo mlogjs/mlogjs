@@ -24,7 +24,8 @@ export class StoreValue extends BaseValue implements IValue {
     if (!this.owner)
       throw new CompilerError(`Cannot assign to temporary value`);
     if (!value.owner || value.owner.temporary) {
-      this.owner.own(value);
+      if (!value.owner) this.owner.own(value);
+      else value.owner.moveInto(this.owner);
       if (value instanceof StoreValue) return [this, []];
     }
     const [evalValue, evalInst] = value.eval(scope);
