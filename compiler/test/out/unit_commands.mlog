@@ -3,7 +3,7 @@ ucontrol approach 0 0 5
 ucontrol boost 1
 ucontrol build 0 0 @router 0
 ucontrol flag 123
-ucontrol getBlock 0 0 &t0 &t1 0
+ucontrol getBlock 0 0 &_ &_ 0
 ucontrol idle
 ucontrol itemDrop @air 100
 ucontrol itemTake shard1 @copper 10

@@ -20,7 +20,7 @@ export type THandler<T extends IValue | null = IValue> = (
 
 export interface IScope {
   parent: IScope | null;
-  data: Record<string, IValue | null>;
+  data: Record<string, IValueOwner | null>;
   name: string;
   inst: IInstruction[];
   break: AddressResolver;
@@ -32,25 +32,30 @@ export interface IScope {
   has(name: string): boolean;
   get(name: string): IValue;
   set<T extends IValue>(name: string, value: T): T;
+  set<T extends IValue>(owner: IValueOwner<T>): T;
   hardSet<T extends IValue>(name: string, value: T): T;
+  hardSet<T extends IValue>(owner: IValueOwner<T>): T;
   make(name: string, storeName: string): StoreValue;
   copy(): IScope;
   makeTempName(): string;
   formatName(name: string): string;
 }
 
-// we can't use type maps to define actual methods
-// and if we don't do this we'll get an error [ts(2425)]
-export interface IValue {
-  // main properties
+export interface IValueOwner<T extends IValue = IValue> {
   scope: IScope;
   constant: boolean;
-  macro: boolean;
-  eval(scope: IScope): TValueInstructions;
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
-  get(scope: IScope, name: IValue): TValueInstructions;
-  rename?(name: string): void;
-
+  value: T;
+  identifier?: string;
+  name: string;
+  temporary: boolean;
+  own(target: T): void;
+  replace(target: T): void;
+  /** Moves all values owned by `this` into `owner` */
+  moveInto(owner: IValueOwner<T>): void;
+}
+// we can't use type maps to define actual methods
+// and if we don't do this we'll get an error [ts(2425)]
+export interface IValueOperators {
   // unary operators
   "!"(scope: IScope): TValueInstructions;
   "u+"(scope: IScope): TValueInstructions;
@@ -105,6 +110,18 @@ export interface IValue {
   "^="(scope: IScope, value: IValue): TValueInstructions;
   "|="(scope: IScope, value: IValue): TValueInstructions;
   "="(scope: IScope, value: IValue): TValueInstructions;
+}
+
+export interface IValue extends IValueOperators {
+  // main properties
+  owner: IValueOwner | null;
+  scope: IScope;
+  constant: boolean;
+  macro: boolean;
+  eval(scope: IScope): TValueInstructions;
+  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
+  get(scope: IScope, name: IValue): TValueInstructions;
+  ensureOwned(): void;
 }
 
 export type TLiteral = string | number;

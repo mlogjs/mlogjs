@@ -1,6 +1,7 @@
 import { CompilerError } from "../CompilerError";
 import { IScope, IValue } from "../types";
 import { LiteralValue, StoreValue } from "../values";
+import { ValueOwner } from "../values/ValueOwner";
 import { MacroFunction } from "./Function";
 
 export class RawValueMacro extends MacroFunction {
@@ -11,7 +12,12 @@ export class RawValueMacro extends MacroFunction {
           "The name of the building must be a string literal."
         );
 
-      return [new StoreValue(scope, name.data), []];
+      const owner = new ValueOwner({
+        scope,
+        name: name.data,
+        value: new StoreValue(scope),
+      });
+      return [owner.value, []];
     });
   }
 }

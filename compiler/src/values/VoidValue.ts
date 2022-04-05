@@ -1,8 +1,15 @@
-import { IScope, IValue, TValueInstructions } from "../types";
+import {
+  IScope,
+  IValue,
+  IValueOperators,
+  IValueOwner,
+  TValueInstructions,
+} from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
+  owner: IValueOwner | null = null;
   scope: IScope;
   constant = false;
   macro = false;
@@ -18,13 +25,16 @@ export class VoidValue implements IValue {
   get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
   }
+  ensureOwned(): void {
+    throw new CompilerError(`${this} cannot be owned`);
+  }
   toString(): string {
     return "void";
   }
 }
 
 // tells typescript that VoidValue implements value
-export interface VoidValue extends IValue {}
+export interface VoidValue extends IValueOperators {}
 
 for (const key of operators) {
   VoidValue.prototype[key] = function () {

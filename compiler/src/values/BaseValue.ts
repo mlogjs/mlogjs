@@ -7,12 +7,13 @@ import {
   updateOperators,
 } from "../operators";
 import { IScope, IValue, TValueInstructions } from "../types";
-import { LiteralValue, TempValue, VoidValue } from ".";
+import { LiteralValue, VoidValue, StoreValue } from ".";
+import { ValueOwner } from "./ValueOwner";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope): TValueInstructions {
     const [that, inst] = this.eval(scope);
-    const temp = new TempValue({ scope });
+    const temp = new StoreValue(scope);
     return [
       temp,
       [
@@ -20,6 +21,9 @@ export class BaseValue extends VoidValue implements IValue {
         new OperationInstruction("sub", temp, new LiteralValue(scope, 0), that),
       ],
     ];
+  }
+  ensureOwned(): void {
+    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }
 
@@ -59,9 +63,10 @@ for (const key in operatorMap) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
+    this.ensureOwned();
     const [left, leftInst] = this.eval(scope);
     const [right, rightInst] = value.eval(scope);
-    const temp = new TempValue({ scope });
+    const temp = new StoreValue(scope);
     return [
       temp,
       [
@@ -85,8 +90,9 @@ for (const key in unaryOperatorMap) {
     this: BaseValue,
     scope: IScope
   ): TValueInstructions {
+    this.ensureOwned();
     const [that, inst] = this.eval(scope);
-    const temp = new TempValue({ scope });
+    const temp = new StoreValue(scope);
     return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
 }
@@ -118,6 +124,7 @@ for (const op in assignmentToBinary) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
+    this.ensureOwned();
     const [opValue, opInst] = this[assignmentToBinary[op as K]](scope, value);
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
@@ -130,9 +137,11 @@ for (const key of updateOperators) {
     scope: IScope,
     prefix: boolean
   ): TValueInstructions {
+    this.ensureOwned();
     let [ret, inst] = this.eval(scope);
     if (!prefix) {
-      const temp = new TempValue({ scope });
+      const tempOwner = new ValueOwner({ scope, value: new StoreValue(scope) });
+      const temp = tempOwner.value;
       const [tempValue, tempInst] = temp["="](scope, ret);
       ret = tempValue;
       inst.push(...tempInst);

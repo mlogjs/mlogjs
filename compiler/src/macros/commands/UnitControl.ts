@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue, TempValue } from "../../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
 
@@ -51,16 +51,12 @@ export class UnitControl extends MacroFunction<IValue | null> {
           "The others arguments of unitControl must be literals or stores"
         );
 
-      let result: ObjectValue | TempValue | null = null;
+      let result: ObjectValue | StoreValue | null = null;
       let extraArgs: IValue[] = [];
       switch (mode.data) {
         case "getBlock": {
-          const outType = new TempValue({ scope });
-          const outBuilding = new Building({
-            scope,
-            name: scope.makeTempName(),
-            renameable: true,
-          });
+          const outType = new StoreValue(scope);
+          const outBuilding = new Building(scope);
 
           result = new ObjectValue(scope, {
             0: outType,
@@ -71,7 +67,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
           break;
         }
         case "within": {
-          const temp = new TempValue({ scope });
+          const temp = new StoreValue(scope);
           result = temp;
           extraArgs = [temp, new LiteralValue(scope, 0)];
           break;

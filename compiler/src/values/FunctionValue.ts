@@ -1,4 +1,4 @@
-import { internalPrefix } from "../utils";
+import { internalPrefix, nodeName } from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -18,112 +18,146 @@ import {
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
-import { TempValue } from "./TempValue";
 import { VoidValue } from "./VoidValue";
+import { ValueOwner } from "./ValueOwner";
 
+export type TFunctionValueInitParams = (childScope: IScope) => {
+  paramStores: StoreValue[];
+  paramNames: string[];
+};
 export class FunctionValue extends VoidValue implements IFunctionValue {
   constant = true;
   macro = true;
-  private paramStores: StoreValue[];
-  private paramNames: string[];
+  private node: es.Function;
+  private childScope!: IScope;
+  private params: es.Identifier[];
+  private paramStores: StoreValue[] = [];
+  private paramNames: string[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
-  private temp!: StoreValue;
-  private ret!: StoreValue;
+  private temp!: ValueOwner<StoreValue>;
+  private ret!: ValueOwner<StoreValue>;
   private inline!: boolean;
   private tryingInline!: boolean;
   private body: es.BlockStatement;
-  private name: string;
   private c: Compiler;
-  private callSize: number;
-  private inlineTemp!: TempValue;
+  private callSize!: number;
+  private inlineTemp!: ValueOwner<StoreValue>;
   private inlineEnd!: LiteralValue;
   private bundled = false;
   private initialized = false;
+
+  constructor({
+    scope,
+    params,
+    body,
+    c,
+    node,
+  }: {
+    scope: IScope;
+    body: es.BlockStatement;
+    c: Compiler;
+    node: es.Function;
+    params: es.Identifier[];
+  }) {
+    super(scope);
+    this.body = body;
+    this.c = c;
+    this.node = node;
+    this.params = params;
+  }
 
   typeof(scope: IScope): TValueInstructions {
     return [new LiteralValue(scope, "function"), []];
   }
 
+  private initScope(name: string) {
+    this.childScope = this.scope.createFunction(name);
+    this.childScope.function = this;
+    for (const id of this.params) {
+      this.paramNames.push(id.name);
+      this.paramStores.push(
+        this.childScope.make(
+          id.name,
+          this.c.compactNames
+            ? nodeName(id)
+            : this.childScope.formatName(id.name)
+        )
+      );
+    }
+    this.callSize = this.paramStores.length + 2;
+  }
   private ensureInit() {
+    if (!this.owner)
+      throw new CompilerError(`Functions must be owned by a variable`);
+
     if (this.initialized) return;
     this.initialized = true;
-    this.addr = new LiteralValue(this.scope, null as never);
-    this.temp = new StoreValue(this.scope, `${internalPrefix}f${this.name}`);
-    this.ret = new StoreValue(this.scope, `${internalPrefix}r${this.name}`);
+
+    const name = this.c.compactNames
+      ? nodeName(this.node)
+      : this.scope.formatName(this.owner.name);
+    this.initScope(name);
+
+    this.addr = new LiteralValue(this.childScope, null as never);
+    this.temp = new ValueOwner({
+      scope: this.childScope,
+      name: `${internalPrefix}f${name}`,
+      value: new StoreValue(this.childScope),
+    });
+    this.ret = new ValueOwner({
+      scope: this.childScope,
+      name: `${internalPrefix}r${name}`,
+      value: new StoreValue(this.childScope),
+    });
     this.inst = [
       new AddressResolver(this.addr),
-      ...this.c.handle(this.scope, this.body)[1],
+      ...this.c.handle(this.childScope, this.body)[1],
     ];
-    this.inst.push(new SetCounterInstruction(this.ret));
-  }
-
-  constructor({
-    scope,
-    name,
-    paramNames,
-    paramStores,
-    body,
-    c,
-  }: {
-    scope: IScope;
-    name: string;
-    paramNames: string[];
-    paramStores: StoreValue[];
-    body: es.BlockStatement;
-    c: Compiler;
-    renameable?: boolean;
-  }) {
-    super(scope);
-
-    this.name = name;
-    this.paramNames = paramNames;
-    this.paramStores = paramStores;
-    this.body = body;
-    this.c = c;
-
-    this.callSize = paramStores.length + 2;
-    scope.function = this;
+    this.inst.push(new SetCounterInstruction(this.ret.value));
   }
 
   private normalReturn(
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.temp["="](scope, arg)[1] : [];
-    return [null, [...argInst, new SetCounterInstruction(this.ret)]];
+    const argInst = arg ? this.temp.value["="](scope, arg)[1] : [];
+    return [null, [...argInst, new SetCounterInstruction(this.ret.value)]];
   }
 
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
-    if (!this.bundled) this.scope.inst.push(...this.inst);
+    if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(scope, null as never);
     const inst: IInstruction[] = this.paramStores
       .map((param, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
-        ...this.ret["="](scope, callAddressLiteral)[1],
+        ...this.ret.value["="](scope, callAddressLiteral)[1],
         new JumpInstruction(this.addr, EJumpKind.Always),
         new AddressResolver(callAddressLiteral)
       );
-    return [this.temp, inst];
+    return [this.temp.value, inst];
   }
 
   private inlineReturn(
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
+    const argInst = arg ? this.inlineTemp.value["="](scope, arg)[1] : [];
     return [null, [...argInst, new ReturnInstruction(this.inlineEnd)]];
   }
 
   private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
     // create return value
-    this.inlineTemp = new TempValue({ scope });
+    this.inlineTemp = new ValueOwner({
+      scope: this.childScope,
+      value: new StoreValue(scope),
+    });
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
-    const fnScope = this.scope.copy();
+    const fnScope = this.childScope.copy();
     // hard set variables within the function scope
     this.paramNames.forEach((name, i) => fnScope.hardSet(name, args[i]));
 
@@ -142,7 +176,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     inst.push(new AddressResolver(this.inlineEnd));
 
     // return the function value
-    return [this.inlineTemp, inst];
+    return [this.inlineTemp.value, inst];
   }
 
   call(scope: IScope, args: IValue[]): TValueInstructions {

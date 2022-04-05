@@ -35,11 +35,7 @@ export class UnitRadar extends MacroFunction {
       if (!validRadarSorts.includes(sort.data))
         throw new CompilerError("Invalid sort value");
 
-      const outUnit = new Unit({
-        scope,
-        name: scope.makeTempName(),
-        renameable: true,
-      });
+      const outUnit = new Unit(scope);
 
       return [
         outUnit,

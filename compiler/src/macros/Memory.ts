@@ -1,7 +1,7 @@
 import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
 import { IScope, IValue } from "../types";
-import { BaseValue, LiteralValue, ObjectValue, TempValue } from "../values";
+import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
 
@@ -9,7 +9,7 @@ class MemoryEntry extends ObjectValue {
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
     super(scope, {
       $eval: new MacroFunction(scope, () => {
-        const temp = new TempValue({ scope });
+        const temp = new StoreValue(scope);
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {
