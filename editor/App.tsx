@@ -7,13 +7,7 @@ import lib from "mlogjs/lib!raw";
 import { editor } from "monaco-editor";
 
 export function App() {
-  const compiler = useMemo(
-    () =>
-      new Compiler({
-        compactNames: true,
-      }),
-    []
-  ); // for future editor upgrades
+  const compiler = useMemo(() => new Compiler(), []); // for future editor upgrades
   const [compiled, setCompiled] = useState("");
   const [code, setCode] = useState(localStorage.getItem("code") ?? "");
   const [monaco, setMonaco] = useState<Monaco>(null);
