@@ -50,7 +50,8 @@ export interface IValueOwner<T extends IValue = IValue> {
   temporary: boolean;
   own(target: T): void;
   replace(target: T): void;
-  alias(owner: IValueOwner): void;
+  /** Moves all values owned by `this` into `owner` */
+  moveInto(owner: IValueOwner<T>): void;
 }
 // we can't use type maps to define actual methods
 // and if we don't do this we'll get an error [ts(2425)]
