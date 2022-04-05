@@ -18,20 +18,20 @@ op add &fop a:op b:op
 jump 18 always
 set @counter &rop
 jump 37 always
-op strictEqual &t2:op type:op 1
-jump 26 equal &t2:op 0
+op strictEqual &t1:op type:op 1
+jump 26 equal &t1:op 0
 op sub &fop a:op b:op
 jump 24 always
 set @counter &rop
 jump 37 always
-op strictEqual &t4:op type:op 2
-jump 32 equal &t4:op 0
+op strictEqual &t2:op type:op 2
+jump 32 equal &t2:op 0
 op mul &fop a:op b:op
 jump 30 always
 set @counter &rop
 jump 37 always
-op strictEqual &t6:op type:op 3
-jump 37 equal &t6:op 0
+op strictEqual &t3:op type:op 3
+jump 37 equal &t3:op 0
 op div &fop a:op b:op
 jump 36 always
 set @counter &rop
