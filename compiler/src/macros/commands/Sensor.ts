@@ -14,7 +14,7 @@ export class Sensor extends MacroFunction {
         throw new CompilerError("The sensor target must be a store");
 
       const temp = new StoreValue(scope);
-      return [temp, [new InstructionBase("sensor", temp, property, target)]];
+      return [temp, [new InstructionBase("sensor", temp, target, property)]];
     });
   }
 }
