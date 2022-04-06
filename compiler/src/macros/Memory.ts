@@ -4,18 +4,34 @@ import { IScope, IValue } from "../types";
 import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
+import { deepEval } from "../utils";
 
 class MemoryEntry extends ObjectValue {
+  private _store: StoreValue | null = null;
+
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
     super(scope, {
       $eval: new MacroFunction(scope, () => {
-        const temp = new StoreValue(scope);
+        this.ensureOwned();
+        const temp = this.store;
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {
-        return [value, [new InstructionBase("write", value, mem.cell, prop)]];
+        const [data, dataInst] = deepEval(scope, value);
+        return [
+          data,
+          [...dataInst, new InstructionBase("write", data, mem.cell, prop)],
+        ];
       }),
     });
+  }
+
+  private get store() {
+    if (!this._store) {
+      this._store = new StoreValue(this.scope);
+      this.owner?.own(this._store);
+    }
+    return this._store;
   }
 }
 
