@@ -12,6 +12,7 @@ class MemoryEntry extends ObjectValue {
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
     super(scope, {
       $eval: new MacroFunction(scope, () => {
+        if (this._store) return [this._store, []];
         this.ensureOwned();
         const temp = this.store;
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
