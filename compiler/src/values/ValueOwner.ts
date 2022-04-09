@@ -38,7 +38,7 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
     this.name = name ?? scope.makeTempName();
     this.temporary = !name;
     this.owned = new Set();
-    if (!value.owner) this.own(value);
+    if (!value.owner || value.owner.temporary) this.own(value);
   }
 
   own(target: T): void {
@@ -56,5 +56,6 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
 
   moveInto(owner: IValueOwner<T>): void {
     this.owned.forEach(value => owner.own(value));
+    this.owned.clear();
   }
 }

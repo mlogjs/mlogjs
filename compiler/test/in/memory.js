@@ -1,10 +1,16 @@
-const mem = new Memory(getBuilding("cell1"));
+const bank = getBuilding("bank1");
+const message = getBuilding("message1");
 
-const bigMem = new Memory(getBuilding("bank1"), 512);
+const mem = new Memory(bank, 512); // tell the compiler the size of the memory unit. 64 by default
+print("Expecting ", mem.length, " bytes to be available");
 
-print("Mem size", mem.length, "\n");
-print("Big Mem size", bigMem.length, "\n");
+if (mem[0] == 0) {
+  mem[0] = 1;
+  print("Processor intialized");
+} else {
+  let runs = mem[1];
+  print("This code has run ", runs, " time(s)");
+  mem[1]++;
+}
 
-print("mem at 0", mem[0]);
-mem[0] = 120;
-print("mem at 0 again", mem[0]);
+printFlush(message);
