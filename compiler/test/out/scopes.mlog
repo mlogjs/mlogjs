@@ -2,9 +2,4 @@ set foo 10
 set foo$1 15
 print foo$1
 print foo
-op rand top 20
-op lessThan &t1 top foo
-jump 9 equal &t1 0
-set foo$1 "value"
-print foo$1
 end
