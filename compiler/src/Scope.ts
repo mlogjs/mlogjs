@@ -107,7 +107,23 @@ export class Scope implements IScope {
   }
 
   formatName(name: string): string {
-    if (!this.name) return name;
-    return `${name}:${this.name}`;
+    if (this.name) return `${name}:${this.name}`;
+    const depth = nameDepth(this, name);
+    if (depth) return `${name}$${depth}`;
+    return name;
   }
+}
+
+/**
+ * Gets the name depth of a variable, it indicates how many variables
+ * with the same name exist on the parent unnamed scopes
+ */
+function nameDepth(scope: IScope, name: string): number {
+  let depth = 0;
+  let current: IScope | null = scope.parent;
+  while (current != null && !current.name) {
+    if (name in current.data) depth++;
+    current = current.parent;
+  }
+  return depth;
 }
