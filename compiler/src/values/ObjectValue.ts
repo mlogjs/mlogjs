@@ -26,6 +26,17 @@ export class ObjectValue extends VoidValue {
     this.data = data;
   }
 
+  static fromArray(
+    scope: IScope,
+    items: IObjectValueData[keyof IObjectValueData][]
+  ): ObjectValue {
+    const data: IObjectValueData = {
+      length: new LiteralValue(scope, items.length),
+    };
+    items.forEach((item, i) => (data[i] = item));
+    return new ObjectValue(scope, data);
+  }
+
   typeof(scope: IScope): TValueInstructions {
     return [new LiteralValue(scope, "object"), []];
   }
