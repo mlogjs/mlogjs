@@ -28,7 +28,7 @@ export class BaseValue extends VoidValue implements IValue {
 
   consume(scope: IScope): TValueInstructions {
     const result = this.eval(scope);
-    if (!result[0].owner) new ValueOwner({ scope, value: result[0] });
+    result[0].ensureOwned();
     return result;
   }
 }
