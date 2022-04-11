@@ -26,6 +26,12 @@ export class BaseValue extends VoidValue implements IValue {
   ensureOwned(): void {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
+
+  consume(scope: IScope): TValueInstructions {
+    const result = this.eval(scope);
+    if (!result[0].owner) new ValueOwner({ scope, value: result[0] });
+    return result;
+  }
 }
 
 const operatorMap: Record<
