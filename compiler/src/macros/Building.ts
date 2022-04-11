@@ -1,4 +1,4 @@
-import { camelToDashCase, deepEval, discardedName } from "../utils";
+import { camelToDashCase, discardedName } from "../utils";
 import { InstructionBase, OperationInstruction } from "../instructions";
 import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
@@ -54,11 +54,6 @@ export class Building extends ObjectValue {
       }),
     });
   }
-
-  eval(scope: IScope): TValueInstructions {
-    this.ensureOwned();
-    return super.eval(scope);
-  }
 }
 
 export class BuildingBuilder extends ObjectValue {
@@ -89,7 +84,7 @@ for (const key in operatorMap) {
     value: IValue
   ): TValueInstructions {
     this.ensureOwned();
-    const [right, rightInst] = deepEval(scope, value);
+    const [right, rightInst] = value.consume(scope);
     const temp = new StoreValue(scope);
     return [
       temp,

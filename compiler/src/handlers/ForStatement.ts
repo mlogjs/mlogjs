@@ -11,7 +11,7 @@ export const ForStatement: THandler<null> = (
 
   const initInst = node.init ? c.handle(scope, node.init)[1] : [];
   const [test, testLines] = node.test
-    ? c.handleEval(scope, node.test)
+    ? c.handleConsume(scope, node.test)
     : [new LiteralValue(scope, 1), []];
   const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
   const startLoopAddr = new LiteralValue(scope, null as never);

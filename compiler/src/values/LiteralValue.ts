@@ -32,6 +32,9 @@ export class LiteralValue extends BaseValue implements IBindableValue {
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
+  consume(_scope: IScope): TValueInstructions {
+    return [this, []];
+  }
   toString() {
     return JSON.stringify(this.data);
   }

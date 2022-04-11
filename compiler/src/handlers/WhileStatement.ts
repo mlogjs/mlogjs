@@ -8,7 +8,7 @@ export const WhileStatement: THandler<null> = (
   node: es.WhileStatement
 ) => {
   const lines: IInstruction[] = [];
-  const [test, testLines] = c.handleEval(scope, node.test);
+  const [test, testLines] = c.handleConsume(scope, node.test);
 
   const startLoopAddr = new LiteralValue(scope, null as never);
   const endLoopAddr = new LiteralValue(scope, null as never);
