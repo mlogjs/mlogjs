@@ -15,6 +15,7 @@ export interface IObjectValueData extends TOperatorMacroMap {
   [k: string]: IValue | undefined;
   $get?: MacroFunction<IValue>;
   $eval?: MacroFunction<IValue>;
+  $consume?: MacroFunction<IValue>;
 }
 export class ObjectValue extends VoidValue {
   constant = true;
@@ -48,7 +49,13 @@ export class ObjectValue extends VoidValue {
     if (!$eval) return [this, []];
     return $eval.call(scope, []);
   }
-
+  consume(scope: IScope): TValueInstructions {
+    const { $consume } = this.data;
+    if ($consume) return $consume.call(scope, []);
+    const [res, resInst] = this.eval(scope);
+    res.ensureOwned();
+    return [res, resInst];
+  }
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args);
