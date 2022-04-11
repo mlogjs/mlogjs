@@ -6,7 +6,7 @@ import {
   UnaryOperator,
   updateOperators,
 } from "../operators";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, VoidValue, StoreValue } from ".";
 import { ValueOwner } from "./ValueOwner";
 
@@ -22,13 +22,14 @@ export class BaseValue extends VoidValue implements IValue {
       ],
     ];
   }
-  ensureOwned(): void {
+  ensureOwned(): asserts this is IOwnedValue {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 
   consume(scope: IScope): TValueInstructions {
     const result = this.eval(scope);
-    result[0].ensureOwned();
+    const res: IValue = result[0];
+    res.ensureOwned();
     return result;
   }
 }

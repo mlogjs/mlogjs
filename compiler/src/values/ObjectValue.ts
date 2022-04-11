@@ -2,6 +2,7 @@ import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
+  IOwnedValue,
   IScope,
   IValue,
   TOperatorMacroMap,
@@ -52,9 +53,11 @@ export class ObjectValue extends VoidValue {
   consume(scope: IScope): TValueInstructions {
     const { $consume } = this.data;
     if ($consume) return $consume.call(scope, []);
-    const [res, resInst] = this.eval(scope);
+    const result = this.eval(scope);
+    // required by typescript
+    const res: IValue = result[0];
     res.ensureOwned();
-    return [res, resInst];
+    return result;
   }
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
     const { $call } = this.data;
@@ -62,7 +65,7 @@ export class ObjectValue extends VoidValue {
     return $call.call(scope, args);
   }
 
-  ensureOwned(): void {
+  ensureOwned(): asserts this is IOwnedValue {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }

@@ -131,7 +131,11 @@ export interface IValue extends IValueOperators {
   consume(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
-  ensureOwned(): void;
+  ensureOwned(): asserts this is IOwnedValue;
+}
+/** Helper type that is used in some typescript assertions */
+export interface IOwnedValue extends IValue {
+  owner: Exclude<IValue["owner"], null>;
 }
 
 export type TLiteral = string | number;
