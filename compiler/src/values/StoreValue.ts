@@ -32,6 +32,9 @@ export class StoreValue extends BaseValue implements IValue {
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
   eval(_scope: IScope): TValueInstructions {
+    return [this, []];
+  }
+  consume(_scope: IScope): TValueInstructions {
     this.ensureOwned();
     return [this, []];
   }

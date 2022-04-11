@@ -54,11 +54,6 @@ export class Building extends ObjectValue {
       }),
     });
   }
-
-  eval(scope: IScope): TValueInstructions {
-    this.ensureOwned();
-    return super.eval(scope);
-  }
 }
 
 export class BuildingBuilder extends ObjectValue {

@@ -5,7 +5,7 @@ import { LiteralValue } from "../values";
 
 export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   const inst = [];
-  const [test, testInst] = c.handleEval(scope, node.test);
+  const [test, testInst] = c.handleConsume(scope, node.test);
 
   if (test instanceof LiteralValue) {
     if (test.data) inst.push(...c.handle(scope, node.consequent)[1]);

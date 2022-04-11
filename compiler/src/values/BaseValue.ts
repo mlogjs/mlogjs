@@ -25,13 +25,6 @@ export class BaseValue extends VoidValue implements IValue {
   ensureOwned(): asserts this is IOwnedValue {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
-
-  consume(scope: IScope): TValueInstructions {
-    const result = this.eval(scope);
-    const res: IValue = result[0];
-    res.ensureOwned();
-    return result;
-  }
 }
 
 const operatorMap: Record<
@@ -96,7 +89,6 @@ for (const key in unaryOperatorMap) {
     this: BaseValue,
     scope: IScope
   ): TValueInstructions {
-    this.ensureOwned();
     const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
     return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
@@ -143,7 +135,6 @@ for (const key of updateOperators) {
     scope: IScope,
     prefix: boolean
   ): TValueInstructions {
-    this.ensureOwned();
     let [ret, inst] = this.consume(scope);
     if (!prefix) {
       const tempOwner = new ValueOwner({ scope, value: new StoreValue(scope) });
