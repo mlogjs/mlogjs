@@ -118,7 +118,16 @@ export interface IValue extends IValueOperators {
   scope: IScope;
   constant: boolean;
   macro: boolean;
+  /**
+   * Evaluates `this`, returning it's representation in a more basic
+   * value like `StoreValue` with the instructions required to compute that value
+   */
   eval(scope: IScope): TValueInstructions;
+  /**
+   * Does the same thing as {@link IValue.eval eval}, but ensures that the resulting value has an owner.
+   *
+   * This behaviour is required when dealing with temporary values inside expressions like comparations.
+   */
   consume(scope: IScope): TValueInstructions;
   call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue): TValueInstructions;
