@@ -91,7 +91,7 @@ export class Compiler {
   handleConsume(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [evaluated, evaluatedInst] = res!.eval(scope);
+    const [evaluated, evaluatedInst] = res!.consume(scope);
     return [evaluated, [...inst, ...evaluatedInst]];
   }
 
