@@ -58,11 +58,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
           const outType = new StoreValue(scope);
           const outBuilding = new Building(scope);
 
-          result = new ObjectValue(scope, {
-            0: outType,
-            1: outBuilding,
-            length: new LiteralValue(scope, 2),
-          });
+          result = ObjectValue.fromArray(scope, [outType, outBuilding]);
           extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
           break;
         }

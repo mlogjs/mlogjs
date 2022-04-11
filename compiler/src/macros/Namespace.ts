@@ -1,4 +1,4 @@
-import { camelToDashCase, deepEval, discardedName } from "../utils";
+import { camelToDashCase, discardedName } from "../utils";
 import { MacroFunction } from ".";
 import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
@@ -127,7 +127,7 @@ for (const key in operatorMap) {
     value: IValue
   ): TValueInstructions {
     this.ensureOwned();
-    const [right, rightInst] = deepEval(scope, value);
+    const [right, rightInst] = value.consume(scope);
     const temp = new StoreValue(scope);
     return [
       temp,

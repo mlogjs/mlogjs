@@ -9,7 +9,7 @@ export const CallExpression: THandler<IValue | null> = (
 
   const args = node.arguments.map(node => {
     // TODO: this might be why t0 did not increment
-    const [v, i] = c.handleEval(scope, node);
+    const [v, i] = c.handleConsume(scope, node);
     inst.push(...i);
     return v;
   });

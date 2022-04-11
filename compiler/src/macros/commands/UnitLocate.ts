@@ -73,13 +73,12 @@ export class UnitLocate extends MacroFunction {
         }
       }
       return [
-        new ObjectValue(scope, {
-          0: outFound,
-          1: outX,
-          2: outY,
-          3: outBuilding,
-          length: new LiteralValue(scope, find.data === "ore" ? 3 : 4),
-        }),
+        ObjectValue.fromArray(scope, [
+          outFound,
+          outX,
+          outY,
+          ...(find.data === "ore" ? [outBuilding] : []),
+        ]),
         [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
       ];
     });

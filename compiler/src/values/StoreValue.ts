@@ -2,7 +2,7 @@ import { BaseValue, LiteralValue } from ".";
 import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
 import { IScope, IValue, TValueInstructions } from "../types";
-import { deepEval, discardedName } from "../utils";
+import { discardedName } from "../utils";
 
 /**
  * `StoreValue` represents values unknown at compile time,
@@ -28,10 +28,13 @@ export class StoreValue extends BaseValue implements IValue {
       else value.owner.moveInto(this.owner);
       if (value instanceof StoreValue) return [this, []];
     }
-    const [evalValue, evalInst] = deepEval(scope, value);
+    const [evalValue, evalInst] = value.consume(scope);
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
   eval(_scope: IScope): TValueInstructions {
+    return [this, []];
+  }
+  consume(_scope: IScope): TValueInstructions {
     this.ensureOwned();
     return [this, []];
   }

@@ -6,14 +6,13 @@ import {
   UnaryOperator,
   updateOperators,
 } from "../operators";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, VoidValue, StoreValue } from ".";
 import { ValueOwner } from "./ValueOwner";
-import { deepEval } from "../utils";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope): TValueInstructions {
-    const [that, inst] = deepEval(scope, this);
+    const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
     return [
       temp,
@@ -23,7 +22,7 @@ export class BaseValue extends VoidValue implements IValue {
       ],
     ];
   }
-  ensureOwned(): void {
+  ensureOwned(): asserts this is IOwnedValue {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }
@@ -64,9 +63,8 @@ for (const key in operatorMap) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    this.ensureOwned();
-    const [left, leftInst] = deepEval(scope, this);
-    const [right, rightInst] = deepEval(scope, value);
+    const [left, leftInst] = this.consume(scope);
+    const [right, rightInst] = value.consume(scope);
     const temp = new StoreValue(scope);
     return [
       temp,
@@ -91,8 +89,7 @@ for (const key in unaryOperatorMap) {
     this: BaseValue,
     scope: IScope
   ): TValueInstructions {
-    this.ensureOwned();
-    const [that, inst] = deepEval(scope, this);
+    const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
     return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
@@ -138,8 +135,7 @@ for (const key of updateOperators) {
     scope: IScope,
     prefix: boolean
   ): TValueInstructions {
-    this.ensureOwned();
-    let [ret, inst] = deepEval(scope, this);
+    let [ret, inst] = this.consume(scope);
     if (!prefix) {
       const tempOwner = new ValueOwner({ scope, value: new StoreValue(scope) });
       const temp = tempOwner.value;

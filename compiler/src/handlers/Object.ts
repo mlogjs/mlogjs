@@ -1,5 +1,5 @@
 import { CompilerError } from "../CompilerError";
-import { es, IInstruction, THandler } from "../types";
+import { es, IInstruction, IValue, THandler } from "../types";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 import { ValueOwner } from "../values/ValueOwner";
 
@@ -42,15 +42,15 @@ export const ArrayExpression: THandler = (
   scope,
   node: es.ArrayExpression
 ) => {
-  const data: IObjectValueData = {};
+  const items: IValue[] = [];
   const inst: IInstruction[] = [];
-  node.elements.forEach((element, i) => {
+  node.elements.forEach(element => {
     if (!element) return;
     const [value, valueInst] = c.handleEval(scope, element);
-    data[i] = value;
+    items.push(value);
     inst.push(...valueInst);
   });
-  return [new ObjectValue(scope, data), inst];
+  return [ObjectValue.fromArray(scope, items), inst];
 };
 
 export const MemberExpression: THandler = (
