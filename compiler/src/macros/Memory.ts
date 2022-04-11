@@ -4,7 +4,6 @@ import { IScope, IValue } from "../types";
 import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
-import { deepEval } from "../utils";
 
 class MemoryEntry extends ObjectValue {
   private _store: StoreValue | null = null;
@@ -18,7 +17,7 @@ class MemoryEntry extends ObjectValue {
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       "$=": new MacroFunction(scope, value => {
-        const [data, dataInst] = deepEval(scope, value);
+        const [data, dataInst] = value.consume(scope);
         return [
           data,
           [...dataInst, new InstructionBase("write", data, mem.cell, prop)],

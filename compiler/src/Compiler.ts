@@ -5,7 +5,6 @@ import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import { es, IScope, IValue, THandler, TValueInstructions } from "./types";
-import { deepEval } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
@@ -85,7 +84,15 @@ export class Compiler {
   handleEval(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    return deepEval(scope, res!, inst);
+    const [evaluated, evaluatedInst] = res!.eval(scope);
+    return [evaluated, [...inst, ...evaluatedInst]];
+  }
+
+  handleConsume(scope: IScope, node: es.Node): TValueInstructions {
+    const [res, inst] = this.handle(scope, node);
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    const [evaluated, evaluatedInst] = res!.eval(scope);
+    return [evaluated, [...inst, ...evaluatedInst]];
   }
 
   handleMany<T extends es.Node>(
