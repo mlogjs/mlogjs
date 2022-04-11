@@ -16,11 +16,11 @@ export class VoidValue implements IValue {
   constructor(scope: IScope) {
     this.scope = scope;
   }
-  consume(_scope: IScope): TValueInstructions<IValue> {
-    throw new CompilerError(`${this} cannot be consumed.`);
-  }
   eval(_scope: IScope): TValueInstructions {
     throw new CompilerError(`${this} cannot eval.`);
+  }
+  consume(_scope: IScope): TValueInstructions<IValue> {
+    throw new CompilerError(`${this} cannot be consumed.`);
   }
   call(_scope: IScope, _args: IValue[]): TValueInstructions<IValue | null> {
     throw new CompilerError(`${this} cannot call.`);
