@@ -47,7 +47,7 @@ export interface IValueOwner<T extends IValue = IValue> {
   value: T;
   identifier?: string;
   name: string;
-  temporary: boolean;
+  persistent: boolean;
   own(target: T): void;
   replace(target: T): void;
   /** Moves all values owned by `this` into `owner` */
