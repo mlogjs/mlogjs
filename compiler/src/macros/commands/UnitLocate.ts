@@ -77,7 +77,7 @@ export class UnitLocate extends MacroFunction {
           outFound,
           outX,
           outY,
-          ...(find.data === "ore" ? [outBuilding] : []),
+          ...(find.data !== "ore" ? [outBuilding] : []),
         ]),
         [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
       ];
