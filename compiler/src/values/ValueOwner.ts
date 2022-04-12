@@ -15,9 +15,7 @@ export class ValueOwner<T extends IValue = IValue> implements IValueOwner<T> {
   constant: boolean;
   value: T;
   owned: Set<T>;
-  /** The identifier of the variable that `this` represents */
   identifier?: string;
-  /** The name that the variable will have during transpilation to mlog */
   name: string;
   persistent: boolean;
   /**

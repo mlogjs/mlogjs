@@ -45,10 +45,17 @@ export interface IValueOwner<T extends IValue = IValue> {
   scope: IScope;
   constant: boolean;
   value: T;
+  /** The name of the variable on the source code that generated this value owner */
   identifier?: string;
+  /** The name this owner has in it's mlog representation */
   name: string;
+  /** Whether this owner is temporary or persistent */
   persistent: boolean;
+  /** Set of values owned by this, can be used to get the owned value count  */
+  owned: Set<T>;
+  /** Adds `target` to the {@link owned set of owned values} and sets its owner to `this` */
   own(target: T): void;
+  /** Replaces the currently held value by `target` */
   replace(target: T): void;
   /** Moves all values owned by `this` into `owner` */
   moveInto(owner: IValueOwner<T>): void;
