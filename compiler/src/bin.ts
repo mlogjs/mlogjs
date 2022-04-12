@@ -41,7 +41,11 @@ yargs(hideBin(process.argv))
       const code = readFileSync(path, "utf8");
       const [output, error, [node]] = compiler.compile(code);
       if (error) {
-        let start = (error as CompilerError).loc as {
+        if (!(error instanceof CompilerError)) {
+          console.error(error);
+          return;
+        }
+        let start = error.loc as {
           line: number;
           column: number;
         };
