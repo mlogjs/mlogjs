@@ -18,26 +18,88 @@ export type THandler<T extends IValue | null = IValue> = (
   arg: any
 ) => TValueInstructions<T>;
 
+/**
+ * The scope manages the source code generated variables and their owners,
+ * as well as break and continue statements and they also work as function
+ * bodies.
+ */
 export interface IScope {
+  /** Every scope except the top level one has a parent */
   parent: IScope | null;
+  /** The registry of variables contained by this scope */
   data: Record<string, IValueOwner | null>;
   name: string;
+  /**
+   * Additional instructions required by this scope, such as
+   * the instructions that make the body of a function
+   */
   inst: IInstruction[];
+  /** Where to jump to on a break statement */
   break: AddressResolver;
+  /** Where to jump to on a continue statement */
   continue: AddressResolver;
+  /** The function linked to `this`, is `null` when the scope is not inside a function. */
   function: IFunctionValue;
+  /** Counts the number of temp variables generated during compilaton */
   ntemp: number;
+  /**
+   * Creates a new scope that has `this` as it's parent.
+   */
   createScope(): IScope;
+  /**
+   * Creates a new scope to be used by a function value, the scope has the following properties:
+   * - uses `name` as it's primary name, it changes how variable names are formatted.
+   * - it has `this` as it's parent
+   * - independent variable registry
+   * @param name The name of the scope
+   * @param stacked
+   */
   createFunction(name: string, stacked?: boolean): IScope;
+  /** Checks if there is an owner registered with `name` as an identifier */
   has(name: string): boolean;
-  get(name: string): IValue;
+  /** Gets a value by their owner's identifier */
+  get(name: string): IOwnedValue;
+  /**
+   * Registers `value` with an owner that uses `name` as both it's name and identifier,
+   * throws an error if there already is an owner with the same identitifer.
+   * @param name
+   * @param value
+   */
   set<T extends IValue>(name: string, value: T): T;
+  /**
+   * Registers `owner` and it's inner value, throws an error
+   * if there already is an owner with the same identifier.
+   */
   set<T extends IValue>(owner: IValueOwner<T>): T;
+  /**
+   * Registers `value` with an owner that uses `name` as both it's name and identifier,
+   * overriding any preexisting variables with the same identifier.
+   * @param name
+   * @param value
+   */
   hardSet<T extends IValue>(name: string, value: T): T;
+  /**
+   * Registers `owner` and it's inner value, overriding
+   * any preexisting variables with the same identifier.
+   * @param owner
+   */
   hardSet<T extends IValue>(owner: IValueOwner<T>): T;
+  /**
+   * Creates an owned store and registers it to this scope.
+   * @param name The name of the variable that will hold the store
+   * @param storeName The mlog name that the owner will have
+   */
   make(name: string, storeName: string): StoreValue;
+  /**
+   * Creates a shallow copy of this scope.
+   *
+   * Be aware that since the copy is shallow, changes on object fields (except `data`)
+   * reflect on the original scope. Note that changes to the children of data also follow this rule.
+   */
   copy(): IScope;
+  /** Creates a temporary mlog variable name */
   makeTempName(): string;
+  /** Formats the name of a variable to make it unique in the mlog output */
   formatName(name: string): string;
 }
 
