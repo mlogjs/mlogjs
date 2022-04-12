@@ -1,7 +1,12 @@
 import { camelToDashCase, discardedName } from "../utils";
 import { MacroFunction } from ".";
 import { IScope, IValue, TValueInstructions } from "../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../values";
+import {
+  IObjectValueData,
+  LiteralValue,
+  ObjectValue,
+  StoreValue,
+} from "../values";
 import { Building, itemNames } from "./Building";
 import { InstructionBase, OperationInstruction } from "../instructions";
 import { operatorMap } from "../operators";
@@ -42,27 +47,17 @@ export class NamespaceMacro extends ObjectValue {
 export class VarsNamespace extends NamespaceMacro {
   constructor(scope: IScope) {
     super(scope);
-    const $get = this.data.$get as MacroFunction;
-    this.data.$get = new MacroFunction(scope, prop => {
-      if (prop instanceof LiteralValue) {
-        if (prop.data === "unit") {
-          const owner = new ValueOwner({
-            scope,
-            value: new Unit(scope),
-            name: "@unit",
-          });
-          return [owner.value, []];
-        }
-        if (prop.data === "this") {
-          const owner = new ValueOwner({
-            scope,
-            value: new Building(scope),
-            name: "@this",
-          });
-          return [owner.value, []];
-        }
-      }
-      return $get.call(scope, [prop]);
+    Object.assign<IObjectValueData, IObjectValueData>(this.data, {
+      unit: new ValueOwner({
+        scope,
+        name: "@unit",
+        value: new Unit(scope),
+      }).value,
+      this: new ValueOwner({
+        scope,
+        name: "@this",
+        value: new Building(scope),
+      }).value,
     });
   }
 }
