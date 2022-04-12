@@ -2,8 +2,8 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../../values";
-import { Unit } from "../Namespace";
 import { CompilerError } from "../../CompilerError";
+import { Unit } from "../Entities";
 
 export const validRadarFilters = [
   "any",

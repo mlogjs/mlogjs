@@ -1,17 +1,15 @@
-import { camelToDashCase, discardedName } from "../utils";
+import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { IScope } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
   StoreValue,
 } from "../values";
-import { Building, itemNames } from "./Building";
-import { InstructionBase, OperationInstruction } from "../instructions";
-import { operatorMap } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
+import { Building, Unit } from "./Entities";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -79,54 +77,4 @@ export class UCommandsNamespace extends NamespaceMacro {
       return [owner.value, []];
     });
   }
-}
-// TODO: repeated logic between UnitMacro and Building
-export class Unit extends ObjectValue implements IValue {
-  constructor(scope: IScope) {
-    super(scope, {
-      $get: new MacroFunction(scope, prop => {
-        if (prop instanceof LiteralValue && typeof prop.data === "string") {
-          const name = itemNames.includes(prop.data)
-            ? camelToDashCase(prop.data)
-            : prop.data;
-          const temp = new StoreValue(scope);
-          // special case, should return another unit or building
-          const result = prop.data === "controller" ? new Unit(scope) : temp;
-          return [
-            result,
-            [new InstructionBase("sensor", result, this, `@${name}`)],
-          ];
-        }
-        if (prop instanceof StoreValue) {
-          const temp = new StoreValue(scope);
-          return [temp, [new InstructionBase("sensor", temp, this, prop)]];
-        }
-        throw new CompilerError(
-          "Building property acessors must be string literals or stores"
-        );
-      }),
-    });
-  }
-
-  toString(): string {
-    return this.owner?.name ?? discardedName;
-  }
-}
-
-for (const key in operatorMap) {
-  type K = keyof typeof operatorMap;
-  const kind = operatorMap[key as K];
-  Unit.prototype[key as K] = function (
-    this: Unit,
-    scope: IScope,
-    value: IValue
-  ): TValueInstructions {
-    this.ensureOwned();
-    const [right, rightInst] = value.consume(scope);
-    const temp = new StoreValue(scope);
-    return [
-      temp,
-      [...rightInst, new OperationInstruction(kind, temp, this, right)],
-    ];
-  };
 }
