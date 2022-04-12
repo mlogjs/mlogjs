@@ -31,8 +31,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private node: es.Function;
   private childScope!: IScope;
   private params: es.Identifier[];
-  private paramStores: StoreValue[] = [];
-  private paramNames: string[] = [];
+  private paramOwners: ValueOwner<StoreValue>[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
   private temp!: ValueOwner<StoreValue>;
@@ -75,17 +74,19 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.childScope = this.scope.createFunction(name);
     this.childScope.function = this;
     for (const id of this.params) {
-      this.paramNames.push(id.name);
-      this.paramStores.push(
-        this.childScope.make(
-          id.name,
-          this.c.compactNames
-            ? nodeName(id)
-            : this.childScope.formatName(id.name)
-        )
-      );
+      const name = this.c.compactNames
+        ? nodeName(id)
+        : this.childScope.formatName(id.name);
+      const owner = new ValueOwner({
+        scope: this.childScope,
+        value: new StoreValue(this.childScope),
+        identifier: id.name,
+        name,
+      });
+      this.childScope.set(owner);
+      this.paramOwners.push(owner);
     }
-    this.callSize = this.paramStores.length + 2;
+    this.callSize = this.paramOwners.length + 2;
   }
   private ensureInit() {
     if (!this.owner)
@@ -129,8 +130,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(scope, null as never);
-    const inst: IInstruction[] = this.paramStores
-      .map((param, i) => param["="](scope, args[i])[1])
+    const inst: IInstruction[] = this.paramOwners
+      .map(({ value: param }, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
         ...this.ret.value["="](scope, callAddressLiteral)[1],
@@ -159,7 +160,16 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
     // hard set variables within the function scope
-    this.paramNames.forEach((name, i) => fnScope.hardSet(name, args[i]));
+    this.paramOwners.forEach((owner, i) => {
+      fnScope.hardSet(
+        new ValueOwner({
+          scope: fnScope,
+          value: args[i],
+          identifier: owner.identifier,
+          name: owner.name,
+        })
+      );
+    });
 
     this.tryingInline = true;
     const inst = this.c.handle(fnScope, this.body)[1];
@@ -181,7 +191,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   call(scope: IScope, args: IValue[]): TValueInstructions {
     this.ensureInit();
-    if (args.length !== this.paramStores.length)
+    if (args.length !== this.paramOwners.length)
       throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
