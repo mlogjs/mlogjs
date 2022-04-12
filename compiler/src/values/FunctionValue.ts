@@ -161,10 +161,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     const fnScope = this.childScope.copy();
     // hard set variables within the function scope
     this.paramOwners.forEach((owner, i) => {
+      const value = args[i];
+      if (!value.owner?.persistent) owner.own(value);
       fnScope.hardSet(
         new ValueOwner({
           scope: fnScope,
-          value: args[i],
+          value,
           identifier: owner.identifier,
           name: owner.name,
         })
