@@ -100,7 +100,8 @@ export class Scope implements IScope {
     return this.set(owner);
   }
   makeTempName(): string {
-    const result = this.formatName(`${internalPrefix}t${this.ntemp}`);
+    let result = `${internalPrefix}t${this.ntemp}`;
+    if (this.name) result += `:${this.name}`;
 
     this.ntemp++;
     return result;
