@@ -77,7 +77,7 @@ export class Unit extends ObjectValue implements IValue {
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
-          "Building property acessors must be string literals or stores"
+          "Unit property acessors must be string literals or stores"
         );
       }),
     });

@@ -24,7 +24,7 @@ export class NamespaceMacro extends ObjectValue {
       $get: new MacroFunction(scope, prop => {
         if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
           throw new CompilerError(
-            "Cannot use dynamic properties on object macros"
+            "Cannot use dynamic properties on namespace macros"
           );
         const symbolName = this.changeCasing
           ? camelToDashCase(prop.data)
@@ -66,7 +66,7 @@ export class UCommandsNamespace extends NamespaceMacro {
     this.data.$get = new MacroFunction(scope, prop => {
       if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
         throw new CompilerError(
-          "Cannot use dynamic properties on object macros"
+          "Cannot use dynamic properties on namespace macros"
         );
       const symbolName = prop.data[0].toUpperCase() + prop.data.slice(1);
       const owner = new ValueOwner({
