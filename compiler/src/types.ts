@@ -219,11 +219,13 @@ export interface IFunctionValue extends IValue {
   ): TValueInstructions<IValue | null>;
 }
 
+/** Contains a value and the instructions required to compute it */
 export type TValueInstructions<Content extends IValue | null = IValue> = [
   Content,
   IInstruction[]
 ];
 
+/** Map of overridable operators in object macros */
 export type TOperatorMacroMap = {
   [K in
     | UnaryOperator
