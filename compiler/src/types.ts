@@ -22,10 +22,10 @@ export interface IScope {
   parent: IScope | null;
   data: Record<string, IValueOwner | null>;
   name: string;
-  inst: IInstruction[];
   break: AddressResolver;
   continue: AddressResolver;
   function: IFunctionValue;
+  functions: IFunctionValue[];
   ntemp: number;
   createScope(): IScope;
   createFunction(name: string, stacked?: boolean): IScope;
@@ -39,6 +39,7 @@ export interface IScope {
   copy(): IScope;
   makeTempName(): string;
   formatName(name: string): string;
+  isRecursion(fn: IFunctionValue): boolean;
 }
 
 export interface IValueOwner<T extends IValue = IValue> {
@@ -144,6 +145,8 @@ export interface IBindableValue extends IValue {
 }
 
 export interface IFunctionValue extends IValue {
+  bundled: boolean;
+  inst: IInstruction[];
   return(
     scope: IScope,
     argument: IValue | null

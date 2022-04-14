@@ -2,7 +2,6 @@ import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
   IFunctionValue,
-  IInstruction,
   IScope,
   IValue,
   IValueOwner,
@@ -22,7 +21,7 @@ export class Scope implements IScope {
     public stacked = false,
     public ntemp = 0,
     public name = "",
-    public inst: IInstruction[] = []
+    public functions: IFunctionValue[] = []
   ) {
     this.data = values;
   }
@@ -33,7 +32,7 @@ export class Scope implements IScope {
       this.stacked,
       this.ntemp,
       this.name,
-      this.inst
+      this.functions
     );
     scope.break = this.break;
     scope.continue = this.continue;
@@ -47,7 +46,18 @@ export class Scope implements IScope {
     return scope;
   }
   createFunction(name: string, stacked?: boolean): IScope {
-    return new Scope({}, this, stacked ?? this.stacked, 0, name, this.inst);
+    return new Scope(
+      {},
+      this,
+      stacked ?? this.stacked,
+      0,
+      name,
+      this.functions
+    );
+  }
+  isRecursion(fn: IFunctionValue) {
+    if (fn === this.function) return true;
+    return this.parent?.isRecursion(fn) ?? false;
   }
   has(name: string): boolean {
     if (name in this.data) return true;

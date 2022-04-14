@@ -15,3 +15,9 @@ export function nodeName(node: es.Node) {
 export function camelToDashCase(name: string) {
   return name.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`);
 }
+
+export function hoistFunctions(nodes: es.Node[]) {
+  return nodes.sort(a =>
+    a.type === "FunctionDeclaration" ? -1 : 0
+  );
+}

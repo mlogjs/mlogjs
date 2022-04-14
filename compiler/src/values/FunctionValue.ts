@@ -28,11 +28,12 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
 export class FunctionValue extends VoidValue implements IFunctionValue {
   constant = true;
   macro = true;
+  bundled = false;
+  inst!: IInstruction[];
   private node: es.Function;
   private childScope!: IScope;
   private params: es.Identifier[];
   private paramOwners: ValueOwner<StoreValue>[] = [];
-  private inst!: IInstruction[];
   private addr!: LiteralValue;
   private temp!: ValueOwner<StoreValue>;
   private ret!: ValueOwner<StoreValue>;
@@ -43,7 +44,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private callSize!: number;
   private inlineTemp!: ValueOwner<StoreValue>;
   private inlineEnd!: LiteralValue;
-  private bundled = false;
   private initialized = false;
 
   constructor({
@@ -95,6 +95,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (this.initialized) return;
     this.initialized = true;
 
+    this.scope.functions.push(this);
+
     const name = this.c.compactNames
       ? nodeName(this.node)
       : this.scope.formatName(this.owner.name);
@@ -114,8 +116,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.childScope, this.body)[1],
+      new SetCounterInstruction(this.ret.value),
     ];
-    this.inst.push(new SetCounterInstruction(this.ret.value));
   }
 
   private normalReturn(
@@ -127,7 +129,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
-    if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(scope, null as never);
     const inst: IInstruction[] = this.paramOwners
@@ -195,9 +196,16 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.ensureInit();
     if (args.length !== this.paramOwners.length)
       throw new CompilerError("Cannot call: argument count not matching.");
+
+    if (scope.isRecursion(this)) {
+      // TODO: implement recursive call method, possibly rewrite this.inst into stacked version...
+      return this.normalCall(scope, args);
+    }
+
     const inlineCall = this.inlineCall(scope, args);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;
+
     return this.normalCall(scope, args);
   }
 

@@ -38,7 +38,13 @@ export class Compiler {
       initScope(scope);
 
       const valueInst = this.handle(scope, program);
-      valueInst[1].push(new EndInstruction(), ...scope.inst);
+      valueInst[1].push(
+        new EndInstruction(),
+        ...scope.functions
+          .filter(f => f.bundled)
+          .map(f => f.inst)
+          .reduce((flat, inst) => flat.concat(inst), [])
+      );
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
     } catch (error) {
