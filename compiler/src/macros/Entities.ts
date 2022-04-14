@@ -64,9 +64,15 @@ export class Unit extends ObjectValue implements IValue {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new StoreValue(scope);
           // special case, should return another unit or building
-          const result = prop.data === "controller" ? new Unit(scope) : temp;
+          // as of writing this comment, units are virtually the
+          // same as buildings, except that they have a `controller`
+          // field that buildings don't have
+          // so that's why I chose to return an unit
+          const result =
+            prop.data === "controller"
+              ? new Unit(scope)
+              : new StoreValue(scope);
           return [
             result,
             [new InstructionBase("sensor", result, this, `@${name}`)],
