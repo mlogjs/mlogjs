@@ -15,3 +15,22 @@ export function nodeName(node: es.Node) {
 export function camelToDashCase(name: string) {
   return name.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`);
 }
+
+export const itemNames = [
+  "copper",
+  "lead",
+  "metaglass",
+  "graphite",
+  "sand",
+  "coal",
+  "titanium",
+  "thorium",
+  "scrap",
+  "silicon",
+  "plastanium",
+  "phaseFabric",
+  "surgeAlloy",
+  "sporePod",
+  "blastCompound",
+  "pyratite",
+];

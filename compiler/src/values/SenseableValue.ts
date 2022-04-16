@@ -1,8 +1,7 @@
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { itemNames } from "../macros/Building";
 import { IScope, IValue, TValueInstructions } from "../types";
-import { camelToDashCase } from "../utils";
+import { camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 
