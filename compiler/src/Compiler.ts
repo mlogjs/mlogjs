@@ -5,6 +5,8 @@ import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import { es, IScope, IValue, THandler, TValueInstructions } from "./types";
+import { ValueOwner } from "./values/ValueOwner";
+import { createTemp } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
@@ -16,14 +18,12 @@ export interface CompilerOptions {
 }
 
 export class Compiler {
-  protected stackName?: string;
-  protected usingStack: boolean;
+  protected stackName: string;
   protected handlers: THandlerMap = handlers;
   readonly compactNames: boolean;
 
   constructor({ stackName, compactNames = false }: CompilerOptions = {}) {
-    this.usingStack = !!stackName;
-    this.stackName = stackName;
+    this.stackName = stackName ?? "bank1";
     this.compactNames = compactNames;
   }
 
@@ -36,6 +36,22 @@ export class Compiler {
       const scope = new Scope({});
 
       initScope(scope);
+
+      scope.stackMemory = new ValueOwner({
+        scope,
+        value: createTemp(scope),
+        name: this.stackName,
+      }).value;
+      scope.stackPointer = new ValueOwner({
+        scope,
+        value: createTemp(scope),
+        name: this.stackName + ":sp",
+      }).value;
+      scope.stackFrame = new ValueOwner({
+        scope,
+        value: createTemp(scope),
+        name: this.stackName + ":sf",
+      }).value;
 
       const valueInst = this.handle(scope, program);
       valueInst[1].push(

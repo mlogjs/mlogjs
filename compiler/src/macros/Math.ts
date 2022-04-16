@@ -2,8 +2,9 @@
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
 import { IScope, IValue } from "../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../values";
+import { LiteralValue, ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
+import { createTemp } from "../utils";
 
 const mathOperations: Record<
   string,
@@ -42,7 +43,7 @@ function createMacroMathOperations(scope: IScope) {
             );
           return [new LiteralValue(scope, fn(a.num, b.num)), []];
         }
-        const temp = new StoreValue(scope);
+        const temp = createTemp(scope);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -53,7 +54,7 @@ function createMacroMathOperations(scope: IScope) {
 
         return [new LiteralValue(scope, fn(a.num)), []];
       }
-      const temp = new StoreValue(scope);
+      const temp = createTemp(scope);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
     });
   }

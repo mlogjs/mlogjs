@@ -4,6 +4,7 @@ import { IScope, IValue } from "../types";
 import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
+import { createTemp } from "../utils";
 
 class MemoryEntry extends ObjectValue {
   private store: StoreValue | null = null;
@@ -12,13 +13,13 @@ class MemoryEntry extends ObjectValue {
     super(scope, {
       $eval: new MacroFunction(scope, () => {
         if (this.store) return [this.store, []];
-        const temp = new StoreValue(scope);
+        const temp = createTemp(scope);
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
       $consume: new MacroFunction(scope, () => {
         if (this.store) return [this.store, []];
         this.ensureOwned();
-        this.store = new StoreValue(scope);
+        this.store = createTemp(scope);
         this.owner.own(this.store);
         return [
           this.store,

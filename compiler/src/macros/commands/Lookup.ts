@@ -3,6 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { createTemp } from "../../utils";
 
 const validKinds = ["block", "unit", "item", "liquid"];
 export class Lookup extends MacroFunction {
@@ -22,7 +23,7 @@ export class Lookup extends MacroFunction {
           "The lookup index must be a number literal or a store"
         );
 
-      const temp = new StoreValue(scope);
+      const temp = createTemp(scope);
       return [temp, [new InstructionBase("lookup", kind.data, temp, index)]];
     });
   }

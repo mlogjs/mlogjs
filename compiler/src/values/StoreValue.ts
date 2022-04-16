@@ -11,6 +11,7 @@ import { discardedName } from "../utils";
 export class StoreValue extends BaseValue implements IValue {
   constant = false;
   constructor(scope: IScope) {
+    
     super(scope);
   }
 

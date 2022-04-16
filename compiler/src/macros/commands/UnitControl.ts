@@ -4,6 +4,7 @@ import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
+import { createTemp } from "../../utils";
 
 const validModes = [
   "idle",
@@ -55,7 +56,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
       let extraArgs: IValue[] = [];
       switch (mode.data) {
         case "getBlock": {
-          const outType = new StoreValue(scope);
+          const outType = createTemp(scope);
           const outBuilding = new Building(scope);
 
           result = ObjectValue.fromArray(scope, [outType, outBuilding]);
@@ -63,7 +64,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
           break;
         }
         case "within": {
-          const temp = new StoreValue(scope);
+          const temp = createTemp(scope);
           result = temp;
           extraArgs = [temp, new LiteralValue(scope, 0)];
           break;

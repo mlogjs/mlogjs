@@ -27,6 +27,10 @@ export interface IScope {
   function: IFunctionValue;
   functions: IFunctionValue[];
   ntemp: number;
+  stacked: boolean;
+  stackMemory: StoreValue;
+  stackPointer: StoreValue;
+  stackFrame: StoreValue;
   createScope(): IScope;
   createFunction(name: string, stacked?: boolean): IScope;
   has(name: string): boolean;

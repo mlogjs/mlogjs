@@ -1,20 +1,19 @@
 import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
-import {
-  IFunctionValue,
-  IScope,
-  IValue,
-  IValueOwner,
-} from "./types";
+import { IFunctionValue, IScope, IValue, IValueOwner } from "./types";
 import { CompilerError } from "./CompilerError";
 import { internalPrefix } from "./utils";
 import { ValueOwner } from "./values/ValueOwner";
+import { createTemp } from "./utils";
 
 export class Scope implements IScope {
   data: Record<string, IValueOwner | null>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
+  stackMemory!: StoreValue;
+  stackPointer!: StoreValue;
+  stackFrame!: StoreValue;
   constructor(
     values: Record<string, IValueOwner | null>,
     public parent: IScope | null = null,
@@ -37,6 +36,9 @@ export class Scope implements IScope {
     scope.break = this.break;
     scope.continue = this.continue;
     scope.function = this.function;
+    scope.stackMemory = this.stackMemory;
+    scope.stackPointer = this.stackPointer;
+    scope.stackFrame = this.stackFrame;
     return scope;
   }
   createScope(): IScope {
@@ -46,7 +48,7 @@ export class Scope implements IScope {
     return scope;
   }
   createFunction(name: string, stacked?: boolean): IScope {
-    return new Scope(
+    const scope = new Scope(
       {},
       this,
       stacked ?? this.stacked,
@@ -54,6 +56,10 @@ export class Scope implements IScope {
       name,
       this.functions
     );
+    scope.stackMemory = this.stackMemory;
+    scope.stackPointer = this.stackPointer;
+    scope.stackFrame = this.stackFrame;
+    return scope;
   }
   isRecursion(fn: IFunctionValue) {
     if (fn === this.function) return true;
@@ -103,7 +109,7 @@ export class Scope implements IScope {
   make(identifier: string, name: string): StoreValue {
     const owner = new ValueOwner({
       scope: this,
-      value: new StoreValue(this),
+      value: createTemp(this),
       identifier,
       name,
     });

@@ -1,0 +1,62 @@
+write bank1:sf bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+write &rfactorial bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+set bank1:sf bank1:sp
+write 5 bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+set &rfactorial 9
+jump 12 always
+print &ffactorial
+printflush message1
+end
+op add &t0:factorial 0 bank1:sf
+read &t0:factorial bank1 &t0:factorial
+op add &_ 0 bank1:sf
+read &_ bank1 &_
+op lessThanEq &t1:factorial &_ 1
+op add &_ 1 bank1:sf
+read &_ bank1 &_
+jump 29 equal &_ 0
+set bank1:sp bank1:sf
+set &ffactorial 1
+set @counter &rfactorial
+op sub bank1:sp bank1:sp 1
+read &_ bank1 bank1:sp
+set &rfactorial &_
+op sub bank1:sp bank1:sp 1
+read &_ bank1 bank1:sp
+set bank1:sf &_
+op add &t4:factorial 0 bank1:sf
+read &t4:factorial bank1 &t4:factorial
+op add &t2:factorial 0 bank1:sf
+read &t2:factorial bank1 &t2:factorial
+op add &_ 2 bank1:sf
+read &_ bank1 &_
+op sub &t3:factorial &_ 1
+op add &_ 3 bank1:sf
+read &_ bank1 &_
+write bank1:sf bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+write &rfactorial bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+set bank1:sf bank1:sp
+write &_ bank1 bank1:sp
+op add bank1:sp bank1:sp 1
+set &rfactorial 47
+jump 12 always
+op add &_ 2 bank1:sf
+read &_ bank1 &_
+op mul &ffactorial &_ &ffactorial
+set bank1:sp bank1:sf
+op add &_ 5 bank1:sf
+read &_ bank1 &_
+set &ffactorial &_
+set @counter &rfactorial
+op sub bank1:sp bank1:sp 1
+read &_ bank1 bank1:sp
+set &rfactorial &_
+op sub bank1:sp bank1:sp 1
+read &_ bank1 bank1:sp
+set bank1:sf &_
+set @counter &rfactorial

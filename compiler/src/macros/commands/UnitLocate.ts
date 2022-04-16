@@ -4,6 +4,7 @@ import { IScope, IValue } from "../../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
+import { createTemp } from "../../utils";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];
 
@@ -38,9 +39,9 @@ export class UnitLocate extends MacroFunction {
           "The others arguments of unitLocate must be literals or stores"
         );
 
-      const outFound = new StoreValue(scope);
-      const outX = new StoreValue(scope);
-      const outY = new StoreValue(scope);
+      const outFound = createTemp(scope);
+      const outX = createTemp(scope);
+      const outY = createTemp(scope);
       const outBuilding = new Building(scope);
       const outArgs = [outX, outY, outFound, outBuilding];
       let inputArgs: (IValue | string)[] = [];

@@ -7,6 +7,7 @@ import { InstructionBase, OperationInstruction } from "../instructions";
 import { operatorMap } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
+import { createTemp } from "../utils";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -29,7 +30,7 @@ export class NamespaceMacro extends ObjectValue {
 
         const owner = new ValueOwner({
           scope,
-          value: new StoreValue(scope),
+          value: createTemp(scope),
           name: `@${symbolName}`,
         });
         return [owner.value, []];
@@ -79,7 +80,7 @@ export class UCommandsNamespace extends NamespaceMacro {
       const owner = new ValueOwner({
         scope,
         name: `@command${symbolName}`,
-        value: new StoreValue(scope),
+        value: createTemp(scope),
       });
       return [owner.value, []];
     });
@@ -94,7 +95,7 @@ export class Unit extends ObjectValue implements IValue {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new StoreValue(scope);
+          const temp = createTemp(scope);
           // special case, should return another unit or building
           const result = prop.data === "controller" ? new Unit(scope) : temp;
           return [
@@ -103,7 +104,7 @@ export class Unit extends ObjectValue implements IValue {
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new StoreValue(scope);
+          const temp = createTemp(scope);
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -128,7 +129,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     this.ensureOwned();
     const [right, rightInst] = value.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = createTemp(scope);
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, this, right)],

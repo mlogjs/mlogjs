@@ -6,6 +6,7 @@ import { MacroFunction } from "./Function";
 import { operatorMap } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
+import { createTemp } from "../utils";
 
 export const itemNames = [
   "copper",
@@ -38,14 +39,14 @@ export class Building extends ObjectValue {
           const name = itemNames.includes(prop.data)
             ? camelToDashCase(prop.data)
             : prop.data;
-          const temp = new StoreValue(scope);
+          const temp = createTemp(scope);
           return [
             temp,
             [new InstructionBase("sensor", temp, this, `@${name}`)],
           ];
         }
         if (prop instanceof StoreValue) {
-          const temp = new StoreValue(scope);
+          const temp = createTemp(scope);
           return [temp, [new InstructionBase("sensor", temp, this, prop)]];
         }
         throw new CompilerError(
@@ -85,7 +86,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     this.ensureOwned();
     const [right, rightInst] = value.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = createTemp(scope);
     return [
       temp,
       [...rightInst, new OperationInstruction(kind, temp, this, right)],

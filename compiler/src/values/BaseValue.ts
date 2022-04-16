@@ -7,13 +7,14 @@ import {
   updateOperators,
 } from "../operators";
 import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
-import { LiteralValue, VoidValue, StoreValue } from ".";
+import { LiteralValue, VoidValue } from ".";
 import { ValueOwner } from "./ValueOwner";
+import { createTemp } from "../utils";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = createTemp(scope);
     return [
       temp,
       [
@@ -65,7 +66,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const [left, leftInst] = this.consume(scope);
     const [right, rightInst] = value.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = createTemp(scope);
     return [
       temp,
       [
@@ -90,7 +91,7 @@ for (const key in unaryOperatorMap) {
     scope: IScope
   ): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = createTemp(scope);
     return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
 }
@@ -137,7 +138,7 @@ for (const key of updateOperators) {
   ): TValueInstructions {
     let [ret, inst] = this.consume(scope);
     if (!prefix) {
-      const tempOwner = new ValueOwner({ scope, value: new StoreValue(scope) });
+      const tempOwner = new ValueOwner({ scope, value: createTemp(scope) });
       const temp = tempOwner.value;
       const [tempValue, tempInst] = temp["="](scope, ret);
       ret = tempValue;

@@ -1,4 +1,10 @@
-import { internalPrefix, nodeName } from "../utils";
+import {
+  internalPrefix,
+  nodeName,
+  createTemp,
+  pushTemp,
+  popTemp,
+} from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -7,6 +13,7 @@ import {
   JumpInstruction,
   ReturnInstruction,
   SetCounterInstruction,
+  SetInstruction,
 } from "../instructions";
 import {
   es,
@@ -30,6 +37,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   macro = true;
   bundled = false;
   inst!: IInstruction[];
+  private recursive = false;
   private node: es.Function;
   private childScope!: IScope;
   private params: es.Identifier[];
@@ -70,22 +78,23 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [new LiteralValue(scope, "function"), []];
   }
 
-  private initScope(name: string) {
-    this.childScope = this.scope.createFunction(name);
+  private initScope(name: string, stacked = false) {
+    this.childScope = this.scope.createFunction(name, stacked);
     this.childScope.function = this;
-    for (const id of this.params) {
+
+    this.paramOwners = this.params.map(id => {
       const name = this.c.compactNames
         ? nodeName(id)
         : this.childScope.formatName(id.name);
       const owner = new ValueOwner({
         scope: this.childScope,
-        value: new StoreValue(this.childScope),
+        value: createTemp(this.childScope),
         identifier: id.name,
         name,
       });
       this.childScope.set(owner);
-      this.paramOwners.push(owner);
-    }
+      return owner;
+    });
     this.callSize = this.paramOwners.length + 2;
   }
   private ensureInit() {
@@ -106,18 +115,70 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
-      value: new StoreValue(this.childScope),
+      value: createTemp(this.childScope),
     });
     this.ret = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}r${name}`,
-      value: new StoreValue(this.childScope),
+      value: createTemp(this.childScope),
     });
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.childScope, this.body)[1],
       new SetCounterInstruction(this.ret.value),
     ];
+
+    if (this.recursive) {
+      this.initScope(name, true);
+      this.inst = [
+        new AddressResolver(this.addr),
+        ...this.c.handle(this.childScope, this.body)[1],
+        new SetCounterInstruction(this.ret.value),
+      ];
+    }
+  }
+
+  private recursiveReturn(
+    scope: IScope,
+    returned: IValue | null
+  ): TValueInstructions<null> {
+    const returnedInst = returned
+      ? this.temp.value["="](scope, returned)[1]
+      : [];
+    const [ret, retInst] = popTemp(scope);
+    const [stackFrame, stackFrameInst] = popTemp(scope);
+    return [
+      null,
+      [
+        // collapse stack frame
+        new SetInstruction(scope.stackPointer, scope.stackFrame),
+        ...returnedInst,
+        new SetCounterInstruction(this.ret.value),
+        ...retInst,
+        new SetInstruction(this.ret.value, ret),
+        ...stackFrameInst,
+        new SetInstruction(scope.stackFrame, stackFrame),
+      ],
+    ];
+  }
+
+  private recursiveCall(scope: IScope, args: IValue[]): TValueInstructions {
+    this.bundled = true;
+    const callAddressLiteral = new LiteralValue(scope, null as never);
+    const inst: IInstruction[] = [
+      ...pushTemp(scope, scope.stackFrame),
+      ...pushTemp(scope, this.ret.value),
+      new SetInstruction(scope.stackFrame, scope.stackPointer),
+    ];
+    for (const arg of args) {
+      inst.push(...pushTemp(scope, arg));
+    }
+    inst.push(
+      ...this.ret.value["="](scope, callAddressLiteral)[1],
+      new JumpInstruction(this.addr, EJumpKind.Always),
+      new AddressResolver(callAddressLiteral)
+    );
+    return [this.temp.value, inst];
   }
 
   private normalReturn(
@@ -154,7 +215,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // create return value
     this.inlineTemp = new ValueOwner({
       scope: this.childScope,
-      value: new StoreValue(scope),
+      value: createTemp(scope),
     });
     this.inlineEnd = new LiteralValue(scope, null as never);
 
@@ -198,8 +259,11 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       throw new CompilerError("Cannot call: argument count not matching.");
 
     if (scope.isRecursion(this)) {
-      // TODO: implement recursive call method, possibly rewrite this.inst into stacked version...
-      return this.normalCall(scope, args);
+      this.recursive = true;
+    }
+
+    if (this.recursive) {
+      return this.recursiveCall(scope, args);
     }
 
     const inlineCall = this.inlineCall(scope, args);
@@ -211,6 +275,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
     this.ensureInit();
+    if (this.recursive) {
+      return this.recursiveReturn(scope, arg);
+    }
     if (arg && arg.macro) {
       this.inline = true;
       return [null, []];
