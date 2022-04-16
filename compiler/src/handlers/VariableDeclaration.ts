@@ -36,7 +36,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
         const owner = new ValueOwner({
           scope,
           identifier: name,
-          name: c.compactNames ? nodeName(node) : scope.formatName(name),
+          name: identifier,
           value: init,
           constant: true,
         });
