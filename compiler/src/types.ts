@@ -3,7 +3,7 @@ import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
 import { MacroFunction } from "./macros";
 import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
-import { StoreValue } from "./values";
+
 export interface IInstruction {
   hidden: boolean;
   resolve(i: number): void;
@@ -89,7 +89,7 @@ export interface IScope {
    * @param name The name of the variable that will hold the store
    * @param storeName The mlog name that the owner will have
    */
-  make(name: string, storeName: string): StoreValue;
+  make(name: string, storeName: string): IValue;
   /**
    * Creates a shallow copy of this scope.
    *
