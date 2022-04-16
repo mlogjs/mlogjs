@@ -103,6 +103,13 @@ export interface IScope {
   formatName(name: string): string;
 }
 
+/**
+ * Owners track how variables will behave when it comes to their usage.
+ *
+ * As an example, Stores use their owners to determine what to do during
+ * assignments, like making a compile time alias, moving the values or generating
+ * a `set` instruction.
+ */
 export interface IValueOwner<T extends IValue = IValue> {
   scope: IScope;
   constant: boolean;
