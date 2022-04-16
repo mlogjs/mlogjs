@@ -53,4 +53,8 @@ export class SenseableValue extends StoreValue {
     }
     throw new CompilerError(`Cannot sense "${prop}" property`);
   }
+
+  typeof(scope: IScope): TValueInstructions<IValue> {
+    return [new LiteralValue(scope, "senseable"), []];
+  }
 }
