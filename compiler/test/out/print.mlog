@@ -2,6 +2,5 @@ print "single"
 print "first"
 print "second"
 print "third"
-set variable @foo
-print variable
+print @foo
 end
