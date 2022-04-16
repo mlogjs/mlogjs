@@ -1,7 +1,13 @@
 import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
 import { IScope, IValue } from "../types";
-import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
+import {
+  BaseValue,
+  LiteralValue,
+  ObjectValue,
+  SenseableValue,
+  StoreValue,
+} from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
 
@@ -52,7 +58,7 @@ class MemoryMacro extends ObjectValue {
   toString() {
     return this.name;
   }
-  constructor(scope: IScope, public cell: ObjectValue, size: LiteralValue) {
+  constructor(scope: IScope, public cell: SenseableValue, size: LiteralValue) {
     super(scope, {
       $get: new MacroFunction(scope, (prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
@@ -76,8 +82,8 @@ export class MemoryBuilder extends ObjectValue {
       $call: new MacroFunction(
         scope,
         (cell: IValue, size: IValue = new LiteralValue(scope, 64)) => {
-          if (!(cell instanceof ObjectValue))
-            throw new CompilerError("Memory cell must be a building object.");
+          if (!(cell instanceof SenseableValue))
+            throw new CompilerError("Memory cell must be a senseable value.");
 
           if (!(size instanceof LiteralValue && typeof size.data === "number"))
             throw new CompilerError(
