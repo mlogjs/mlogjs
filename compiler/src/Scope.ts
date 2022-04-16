@@ -1,4 +1,4 @@
-import { StoreValue } from "./values";
+import { SenseableValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
   IFunctionValue,
@@ -90,10 +90,13 @@ export class Scope implements IScope {
     this.data[identifier] = owner;
     return owner.value;
   }
-  make(identifier: string, name: string): StoreValue {
+  make(identifier: string, name: string): SenseableValue {
+    const value = new SenseableValue(this);
+    value.constant = false;
+
     const owner = new ValueOwner({
       scope: this,
-      value: new StoreValue(this),
+      value,
       identifier,
       name,
     });
