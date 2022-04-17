@@ -45,7 +45,6 @@ export class NamespaceMacro extends ObjectValue {
 export class VarsNamespace extends NamespaceMacro {
   constructor(scope: IScope) {
     super(scope);
-
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
       unit: new ValueOwner({
         scope,
