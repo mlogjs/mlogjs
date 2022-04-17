@@ -5,11 +5,11 @@ import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
+  SenseableValue,
   StoreValue,
 } from "../values";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
-import { Building, Unit } from "./Entities";
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -49,12 +49,12 @@ export class VarsNamespace extends NamespaceMacro {
       unit: new ValueOwner({
         scope,
         name: "@unit",
-        value: new Unit(scope),
+        value: new SenseableValue(scope),
       }).value,
       this: new ValueOwner({
         scope,
         name: "@this",
-        value: new Building(scope),
+        value: new SenseableValue(scope),
       }).value,
     });
   }

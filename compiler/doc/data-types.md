@@ -30,6 +30,20 @@ let b = "string"; // is a store string
 typeof b === "store"; // true
 ```
 
+## Senseable
+
+Senseable values are a special type of store that can have it's properties "sensed"
+by accessing it in a member syntax.
+
+```js
+const building = getBuilding("conveyor1");
+print(building.ammo); // results in a sensor instruction followed by a print instruction
+
+const item = Items.coal;
+
+print(building[item]); // this works too
+```
+
 ## Function
 
 Function values are constants.

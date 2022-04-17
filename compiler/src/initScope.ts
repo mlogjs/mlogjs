@@ -1,5 +1,4 @@
 import {
-  BuildingBuilder,
   commands,
   Concat,
   MemoryBuilder,
@@ -8,7 +7,7 @@ import {
   VarsNamespace,
 } from "./macros";
 import { UCommandsNamespace } from "./macros/Namespace";
-import { RawValueMacro } from "./macros/RawValue";
+import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 
 /**
@@ -26,8 +25,8 @@ export function initScope(scope: Scope) {
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods
-  scope.hardSet("getBuilding", new BuildingBuilder(scope));
-  scope.hardSet("getVar", new RawValueMacro(scope));
+  scope.hardSet("getBuilding", new GetGlobal(scope));
+  scope.hardSet("getVar", new GetGlobal(scope));
   scope.hardSet("concat", new Concat(scope));
 
   scope.hardSet("Math", new MlogMath(scope));

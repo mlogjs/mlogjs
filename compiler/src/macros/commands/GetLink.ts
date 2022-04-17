@@ -1,9 +1,8 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { Building } from "../Entities";
 
 export class GetLink extends MacroFunction {
   constructor(scope: IScope) {
@@ -15,7 +14,7 @@ export class GetLink extends MacroFunction {
         throw new CompilerError(
           "The getlink index must be a number literal or a store"
         );
-      const outBuild = new Building(scope);
+      const outBuild = new SenseableValue(scope);
       return [outBuild, [new InstructionBase("getlink", outBuild, index)]];
     });
   }

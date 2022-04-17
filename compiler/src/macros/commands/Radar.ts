@@ -1,9 +1,8 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../../values";
+import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { Unit } from "../Entities";
 
 export const validRadarFilters = [
   "any",
@@ -27,8 +26,8 @@ export const validRadarSorts = [
 export class Radar extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (building, filter1, filter2, filter3, order, sort) => {
-      if (!(building instanceof ObjectValue))
-        throw new CompilerError("The building must a store");
+      if (!(building instanceof SenseableValue))
+        throw new CompilerError("The building must a senseable value");
 
       if (
         !(filter1 instanceof LiteralValue) ||
@@ -55,7 +54,7 @@ export class Radar extends MacroFunction {
 
       if (!validRadarSorts.includes(sort.data))
         throw new CompilerError("Invalid sort value");
-      const outUnit = new Unit(scope);
+      const outUnit = new SenseableValue(scope);
       return [
         outUnit,
         [

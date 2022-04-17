@@ -1,9 +1,13 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../../values";
+import {
+  LiteralValue,
+  ObjectValue,
+  SenseableValue,
+  StoreValue,
+} from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { Building } from "../Entities";
 
 const validFinds = ["ore", "building", "spawn", "damaged"];
 
@@ -41,7 +45,7 @@ export class UnitLocate extends MacroFunction {
       const outFound = new StoreValue(scope);
       const outX = new StoreValue(scope);
       const outY = new StoreValue(scope);
-      const outBuilding = new Building(scope);
+      const outBuilding = new SenseableValue(scope);
       const outArgs = [outX, outY, outFound, outBuilding];
       let inputArgs: (IValue | string)[] = [];
       switch (find.data) {

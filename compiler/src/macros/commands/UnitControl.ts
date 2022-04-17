@@ -1,9 +1,13 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../../values";
+import {
+  LiteralValue,
+  ObjectValue,
+  SenseableValue,
+  StoreValue,
+} from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { Building } from "../Entities";
 
 const validModes = [
   "idle",
@@ -40,11 +44,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
       if (
         args.some(
           value =>
-            !(
-              value instanceof StoreValue ||
-              value instanceof LiteralValue ||
-              value instanceof ObjectValue
-            )
+            !(value instanceof StoreValue || value instanceof LiteralValue)
         )
       )
         throw new CompilerError(
@@ -56,7 +56,7 @@ export class UnitControl extends MacroFunction<IValue | null> {
       switch (mode.data) {
         case "getBlock": {
           const outType = new StoreValue(scope);
-          const outBuilding = new Building(scope);
+          const outBuilding = new SenseableValue(scope);
 
           result = ObjectValue.fromArray(scope, [outType, outBuilding]);
           extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];

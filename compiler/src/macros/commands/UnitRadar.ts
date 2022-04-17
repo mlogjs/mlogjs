@@ -1,10 +1,9 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
+import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
 import { CompilerError } from "../../CompilerError";
-import { Unit } from "../Entities";
 
 export class UnitRadar extends MacroFunction {
   constructor(scope: IScope) {
@@ -35,7 +34,7 @@ export class UnitRadar extends MacroFunction {
       if (!validRadarSorts.includes(sort.data))
         throw new CompilerError("Invalid sort value");
 
-      const outUnit = new Unit(scope);
+      const outUnit = new SenseableValue(scope);
 
       return [
         outUnit,
