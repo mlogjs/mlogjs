@@ -15,7 +15,7 @@ Allows you to access symbols that are not available through the [namespaces](/na
 
 ```js
 const building = getBuilding("container1");
-let customSymbol = getVar("@awesome-mod-symbol");
+const customSymbol = getVar("@awesome-mod-symbol");
 
 let value = sensor(customSymbol, building);
 
