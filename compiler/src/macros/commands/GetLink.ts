@@ -2,8 +2,8 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import { LiteralValue, StoreValue } from "../../values";
-import { Building } from "../Building";
 import { CompilerError } from "../../CompilerError";
+import { Building } from "../Entities";
 
 export class GetLink extends MacroFunction {
   constructor(scope: IScope) {

@@ -7,114 +7,135 @@ type WithSymbols<T extends Record<string, unknown>> = T & {
 };
 
 declare global {
-  type LiquidHolder = WithSymbols<
-    {
-      readonly [L in keyof typeof Liquids]: number;
-    } & {
-      readonly totalLiquids: number;
-      readonly liquidCapacity: number;
-    }
-  >;
+  interface LiquidHolder
+    extends WithSymbols<
+      {
+        readonly [L in keyof typeof Liquids]: number;
+      } & {
+        readonly totalLiquids: number;
+        readonly liquidCapacity: number;
+      }
+    > {}
 
-  type ItemHolder = WithSymbols<
-    {
-      readonly [I in keyof typeof Items]: number;
-    } & {
-      readonly totalItems: number;
-      readonly firstItem: ItemSymbol | null;
-      readonly itemCapacity: number;
-    }
-  >;
+  interface ItemHolder
+    extends WithSymbols<
+      {
+        readonly [I in keyof typeof Items]: number;
+      } & {
+        readonly totalItems: number;
+        readonly firstItem: ItemSymbol | null;
+        readonly itemCapacity: number;
+      }
+    > {}
 
-  type PowerHolder = WithSymbols<{
-    readonly totalPower: number;
-    readonly powerCapacity: number;
-    readonly powerNetStored: number;
-    readonly powerNetCapacity: number;
-    readonly powerNetIn: number;
-    readonly powerNetOut: number;
-  }>;
+  interface PowerHolder
+    extends WithSymbols<{
+      readonly totalPower: number;
+      readonly powerCapacity: number;
+      readonly powerNetStored: number;
+      readonly powerNetCapacity: number;
+      readonly powerNetIn: number;
+      readonly powerNetOut: number;
+    }> {}
 
-  type Shooting = WithSymbols<{
-    readonly shootX: number;
-    readonly shootY: number;
-    readonly ammo: number;
-    readonly ammoCapacity: number;
-  }>;
+  interface Shooting
+    extends WithSymbols<{
+      readonly shootX: number;
+      readonly shootY: number;
+      readonly ammo: number;
+      readonly ammoCapacity: number;
+    }> {}
 
-  type WithHealth = WithSymbols<{
-    readonly health: number;
-    readonly maxHealth: number;
-    readonly dead: boolean;
-  }>;
+  interface WithHealth
+    extends WithSymbols<{
+      readonly health: number;
+      readonly maxHealth: number;
+      readonly dead: boolean;
+    }> {}
 
-  type Heatable = WithSymbols<{
-    readonly heat: number;
-  }>;
+  interface Heatable
+    extends WithSymbols<{
+      readonly heat: number;
+    }> {}
 
-  type WithEffiency = WithSymbols<{
-    readonly efficiency: number;
-  }>;
+  interface WithEffiency
+    extends WithSymbols<{
+      readonly efficiency: number;
+    }> {}
 
-  type WithProgress = WithSymbols<{
-    readonly progress: number;
-  }>;
+  interface WithProgress
+    extends WithSymbols<{
+      readonly progress: number;
+    }> {}
 
-  type WithTimescale = WithSymbols<{
-    readonly timescale: number;
-  }>;
+  interface WithTimescale
+    extends WithSymbols<{
+      readonly timescale: number;
+    }> {}
 
-  type Rotatable = WithSymbols<{
-    readonly rotation: number;
-  }>;
+  interface Rotatable
+    extends WithSymbols<{
+      readonly rotation: number;
+    }> {}
 
-  type Spaced = WithSymbols<{
-    readonly x: number;
-    readonly y: number;
-    readonly size: number;
-  }>;
+  interface Spaced
+    extends WithSymbols<{
+      readonly x: number;
+      readonly y: number;
+      readonly size: number;
+    }> {}
 
-  type Ranged = WithSymbols<{
-    readonly range: number;
-  }>;
+  interface Ranged
+    extends WithSymbols<{
+      readonly range: number;
+    }> {}
 
-  type Boosted = WithSymbols<{
-    readonly boosting: number;
-  }>;
+  interface Boosted
+    extends WithSymbols<{
+      readonly boosting: number;
+    }> {}
 
-  type Mining = WithSymbols<{
-    readonly mineX: number;
-    readonly mineY: number;
-    readonly mining: number;
-  }>;
+  interface Mining
+    extends WithSymbols<{
+      readonly mineX: number;
+      readonly mineY: number;
+      readonly mining: number;
+    }> {}
 
-  type Typed<T extends symbol = symbol> = WithSymbols<{
-    readonly type: T;
-  }>;
-  type Flagged = WithSymbols<{
-    readonly flag: number;
-  }>;
+  interface Typed<T extends symbol = symbol>
+    extends WithSymbols<{
+      readonly type: T;
+    }> {}
+  interface Flagged
+    extends WithSymbols<{
+      readonly flag: number;
+    }> {}
 
-  type Controllable = WithSymbols<{
-    readonly controlled: 0 | ControlKind;
-    readonly controller: AnyUnit | BasicBuilding;
-  }>;
+  interface Controllable
+    extends WithSymbols<{
+      readonly controlled: 0 | ControlKind;
+      readonly controller: AnyUnit | BasicBuilding;
+    }> {}
 
-  type Nameable = WithSymbols<{
-    readonly name: string | null;
-  }>;
+  interface Nameable
+    extends WithSymbols<{
+      readonly name: string | null;
+    }> {}
 
-  type PayloadHolder = WithSymbols<{
-    readonly payloadCount: number;
-    readonly payloadType: symbol | null;
-  }>;
+  interface PayloadHolder
+    extends WithSymbols<{
+      readonly payloadCount: number;
+      readonly payloadType: symbol | null;
+    }> {}
 
-  type WithEnable = WithSymbols<{
-    enabled: boolean;
-  }>;
+  interface WithEnable
+    extends WithSymbols<{
+      enabled: boolean;
+    }> {}
 
-  type WithConfig<T extends symbol | number | null = symbol | null> =
-    WithSymbols<{
+  interface WithConfig<
+    T extends symbol | number | null = symbol | null
+  > extends WithSymbols<{
       readonly config: T;
-    }>;
+    }> {}
 }

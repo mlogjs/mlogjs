@@ -9,7 +9,7 @@ export class RawValueMacro extends MacroFunction {
     super(scope, (name: IValue) => {
       if (!(name instanceof LiteralValue) || typeof name.data !== "string")
         throw new CompilerError(
-          "The name of the building must be a string literal."
+          "The name of the value must be a string literal."
         );
 
       const owner = new ValueOwner({
