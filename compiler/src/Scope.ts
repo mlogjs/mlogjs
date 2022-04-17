@@ -3,6 +3,7 @@ import { AddressResolver } from "./instructions";
 import {
   IFunctionValue,
   IInstruction,
+  IOwnedValue,
   IScope,
   IValue,
   IValueOwner,
@@ -46,19 +47,19 @@ export class Scope implements IScope {
     scope.parent = this;
     return scope;
   }
-  createFunction(name: string, stacked?: boolean): IScope {
-    return new Scope({}, this, stacked ?? this.stacked, 0, name, this.inst);
+  createFunction(name: string, stacked = this.stacked): IScope {
+    return new Scope({}, this, stacked, 0, name, this.inst);
   }
-  has(name: string): boolean {
-    if (name in this.data) return true;
-    if (this.parent) return this.parent.has(name);
+  has(identifier: string): boolean {
+    if (identifier in this.data) return true;
+    if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(name: string): IValue {
-    const owner = this.data[name];
-    if (owner) return owner.value;
-    if (this.parent) return this.parent.get(name);
-    throw new CompilerError(`${name} is not declared.`);
+  get(identifier: string): IOwnedValue {
+    const owner = this.data[identifier];
+    if (owner) return owner.value as IOwnedValue;
+    if (this.parent) return this.parent.get(identifier);
+    throw new CompilerError(`${identifier} is not declared.`);
   }
 
   set<T extends IValue>(
@@ -103,7 +104,8 @@ export class Scope implements IScope {
     return this.set(owner);
   }
   makeTempName(): string {
-    const result = this.formatName(`${internalPrefix}t${this.ntemp}`);
+    let result = `${internalPrefix}t${this.ntemp}`;
+    if (this.name) result += `:${this.name}`;
 
     this.ntemp++;
     return result;

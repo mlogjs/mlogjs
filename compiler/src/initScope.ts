@@ -10,6 +10,9 @@ import { UCommandsNamespace } from "./macros/Namespace";
 import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 
+/**
+ * Adds all the compiler globals to `scope`
+ */
 export function initScope(scope: Scope) {
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro(scope));

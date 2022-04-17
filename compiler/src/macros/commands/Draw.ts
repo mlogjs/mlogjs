@@ -8,7 +8,7 @@ export class Draw extends MacroFunction<null> {
   constructor(scope: IScope) {
     super(scope, (kind: IValue, ...args: IValue[]) => {
       if (!(kind instanceof LiteralValue && typeof kind.data === "string"))
-        throw new CompilerError("Draw kind must be literal.");
+        throw new CompilerError("Draw kind must be a string literal.");
       if (
         [
           "clear",
@@ -23,7 +23,7 @@ export class Draw extends MacroFunction<null> {
           "image",
         ].indexOf(kind.data) === -1
       )
-        throw new CompilerError("Draw kind must be valid");
+        throw new CompilerError("Invalid draw kind");
       return [
         null,
         [

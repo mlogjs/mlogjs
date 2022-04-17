@@ -2,6 +2,7 @@ import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
 import { IScope } from "../types";
 import {
+  IObjectValueData,
   LiteralValue,
   ObjectValue,
   SenseableValue,
@@ -23,7 +24,7 @@ export class NamespaceMacro extends ObjectValue {
       $get: new MacroFunction(scope, prop => {
         if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
           throw new CompilerError(
-            "Cannot use dynamic properties on object macros"
+            "Cannot use dynamic properties on namespace macros"
           );
         const symbolName = this.changeCasing
           ? camelToDashCase(prop.data)
@@ -44,27 +45,18 @@ export class NamespaceMacro extends ObjectValue {
 export class VarsNamespace extends NamespaceMacro {
   constructor(scope: IScope) {
     super(scope);
-    const $get = this.data.$get as MacroFunction;
-    this.data.$get = new MacroFunction(scope, prop => {
-      if (prop instanceof LiteralValue) {
-        if (prop.data === "unit") {
-          const owner = new ValueOwner({
-            scope,
-            value: new SenseableValue(scope),
-            name: "@unit",
-          });
-          return [owner.value, []];
-        }
-        if (prop.data === "this") {
-          const owner = new ValueOwner({
-            scope,
-            value: new SenseableValue(scope),
-            name: "@this",
-          });
-          return [owner.value, []];
-        }
-      }
-      return $get.call(scope, [prop]);
+
+    Object.assign<IObjectValueData, IObjectValueData>(this.data, {
+      unit: new ValueOwner({
+        scope,
+        name: "@unit",
+        value: new SenseableValue(scope),
+      }).value,
+      this: new ValueOwner({
+        scope,
+        name: "@this",
+        value: new SenseableValue(scope),
+      }).value,
     });
   }
 }
@@ -75,7 +67,7 @@ export class UCommandsNamespace extends NamespaceMacro {
     this.data.$get = new MacroFunction(scope, prop => {
       if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
         throw new CompilerError(
-          "Cannot use dynamic properties on object macros"
+          "Cannot use dynamic properties on namespace macros"
         );
       const symbolName = prop.data[0].toUpperCase() + prop.data.slice(1);
       const owner = new ValueOwner({
