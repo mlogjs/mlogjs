@@ -50,16 +50,16 @@ export class Scope implements IScope {
   createFunction(name: string, stacked = this.stacked): IScope {
     return new Scope({}, this, stacked, 0, name, this.inst);
   }
-  has(name: string): boolean {
-    if (name in this.data) return true;
-    if (this.parent) return this.parent.has(name);
+  has(identifier: string): boolean {
+    if (identifier in this.data) return true;
+    if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(name: string): IOwnedValue {
-    const owner = this.data[name];
+  get(identifier: string): IOwnedValue {
+    const owner = this.data[identifier];
     if (owner) return owner.value as IOwnedValue;
-    if (this.parent) return this.parent.get(name);
-    throw new CompilerError(`${name} is not declared.`);
+    if (this.parent) return this.parent.get(identifier);
+    throw new CompilerError(`${identifier} is not declared.`);
   }
 
   set<T extends IValue>(

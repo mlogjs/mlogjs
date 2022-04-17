@@ -25,25 +25,25 @@ export const VariableDeclarator: THandler<IValue | null> = (
     : [null, []];
   switch (node.id.type) {
     case "Identifier": {
-      const { name } = node.id;
-      const identifier = c.compactNames
+      const { name: identifier } = node.id;
+      const name = c.compactNames
         ? nodeName(node)
-        : scope.formatName(name);
+        : scope.formatName(identifier);
       const [init] = valinst;
       if (kind === "const" && !init)
         throw new CompilerError("Constants must be initialized.");
       if (kind === "const" && init?.constant) {
         const owner = new ValueOwner({
           scope,
-          identifier: name,
-          name: identifier,
+          identifier,
+          name,
           value: init,
           constant: true,
         });
         scope.set(owner);
         return valinst;
       } else {
-        const value = scope.make(name, identifier);
+        const value = scope.make(identifier, name);
         if (init) {
           if (init.macro)
             throw new CompilerError("Macro values must be held by constants");

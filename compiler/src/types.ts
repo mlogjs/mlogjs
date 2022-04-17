@@ -55,10 +55,10 @@ export interface IScope {
    * @param stacked
    */
   createFunction(name: string, stacked?: boolean): IScope;
-  /** Checks if there is an owner registered with `name` as an identifier */
-  has(name: string): boolean;
+  /** Checks if there is an owner registered with the specified identifier */
+  has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(name: string): IOwnedValue;
+  get(identifier: string): IOwnedValue;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and identifier,
    * throws an error if there already is an owner with the same identitifer.
@@ -86,10 +86,10 @@ export interface IScope {
   hardSet<T extends IValue>(owner: IValueOwner<T>): T;
   /**
    * Creates an owned store and registers it to this scope.
-   * @param name The name of the variable that will hold the store
-   * @param storeName The mlog name that the owner will have
+   * @param identifier The name of the variable that will hold the store
+   * @param name The mlog name that the owner will have
    */
-  make(name: string, storeName: string): IValue;
+  make(identifier: string, name: string): IValue;
   /**
    * Creates a shallow copy of this scope.
    *
