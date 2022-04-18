@@ -7,9 +7,9 @@
  * already accessible under the namespaces `Units`, `Blocks`,
  * `Items`, `Liquids`, `ControlKind`, `Vars` and `UnitCommands`.
  *
- * @param key The identifier of the value
+ * @param name The identifier of the value
  */
-declare function getVar<T>(key: string): T;
+declare function getVar<T>(name: string): T;
 
 /**
  * Gets a building linked to the processor by its name.

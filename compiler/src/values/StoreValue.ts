@@ -20,7 +20,7 @@ export class StoreValue extends BaseValue implements IValue {
 
   "="(scope: IScope, value: IValue): TValueInstructions {
     if (this.constant)
-      throw new CompilerError(`Cannot assign to unmutable store '${this}'.`);
+      throw new CompilerError(`Cannot assign to immutable store '${this}'.`);
     if (this.owner) {
       if (this.owner === value.owner && value instanceof StoreValue)
         return [this, []];

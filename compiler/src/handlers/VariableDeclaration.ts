@@ -25,28 +25,28 @@ export const VariableDeclarator: THandler<IValue | null> = (
     : [null, []];
   switch (node.id.type) {
     case "Identifier": {
-      const { name } = node.id;
-      const identifier = c.compactNames
+      const { name: identifier } = node.id;
+      const name = c.compactNames
         ? nodeName(node)
-        : scope.formatName(name);
+        : scope.formatName(identifier);
       const [init] = valinst;
       if (kind === "const" && !init)
-        throw new CompilerError("Cannot create constant with void value.");
+        throw new CompilerError("Constants must be initialized.");
       if (kind === "const" && init?.constant) {
         const owner = new ValueOwner({
           scope,
-          identifier: name,
-          name: c.compactNames ? nodeName(node) : scope.formatName(name),
+          identifier,
+          name,
           value: init,
           constant: true,
         });
         scope.set(owner);
         return valinst;
       } else {
-        const value = scope.make(name, identifier);
+        const value = scope.make(identifier, name);
         if (init) {
           if (init.macro)
-            throw new CompilerError("Macro value must be constant.");
+            throw new CompilerError("Macro values must be held by constants");
 
           valinst[1].push(...value["="](scope, init)[1]);
         }
@@ -59,7 +59,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
       const [init] = valinst;
       if (!init)
         throw new CompilerError(
-          "Cannot use array destructuring with constant with void value."
+          "Cannot use array destructuring without an initializer"
         );
       if (!init.macro)
         throw new CompilerError(
@@ -67,7 +67,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
         );
 
       if (kind !== "const")
-        throw new CompilerError("Macro value must be constant.");
+        throw new CompilerError("Macro values must be held by constants");
 
       if (!(init instanceof ObjectValue)) {
         throw new CompilerError(
@@ -85,8 +85,11 @@ export const VariableDeclarator: THandler<IValue | null> = (
           );
         }
 
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const val = init.data[i]!;
+        const val = init.data[i];
+        if (!val)
+          throw new CompilerError(
+            `The property "${i}" does not exist on the target object`
+          );
         const owner = new ValueOwner({
           scope,
           identifier: element.name,
@@ -102,6 +105,8 @@ export const VariableDeclarator: THandler<IValue | null> = (
       return valinst;
     }
     default:
-      throw new CompilerError("");
+      throw new CompilerError(
+        `Unsupported variable declaration type: ${node.id.type}`
+      );
   }
 };

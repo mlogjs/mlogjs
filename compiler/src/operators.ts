@@ -93,7 +93,7 @@ export type Operator = typeof operators[number];
 export const operatorMap: {
   [k in
     | Exclude<BinaryOperator, "instanceof" | "in">
-    | Extract<LogicalOperator, "&&" | "||">]: string;
+    | Exclude<LogicalOperator, "??">]: string;
 } = {
   "==": "equal",
   "===": "strictEqual",

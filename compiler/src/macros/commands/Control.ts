@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { LiteralValue, ObjectValue } from "../../values";
+import { LiteralValue, SenseableValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 const validKinds = ["enabled", "shoot", "shootp", "config", "color"];
@@ -14,8 +14,8 @@ export class Control extends MacroFunction<null> {
       if (!validKinds.includes(kind.data))
         throw new CompilerError("Invalid control kind");
 
-      if (!(building instanceof ObjectValue))
-        throw new CompilerError("The building must be an object value");
+      if (!(building instanceof SenseableValue))
+        throw new CompilerError("The building must be a senseable value");
 
       return [
         null,
