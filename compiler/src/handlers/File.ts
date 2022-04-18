@@ -1,4 +1,4 @@
-import { SetInstruction } from "src/instructions";
+import { SetInstruction } from "../instructions";
 import { Scope } from "../Scope";
 import { es, IInstruction, IValue, THandler } from "../types";
 
