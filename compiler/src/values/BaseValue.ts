@@ -137,8 +137,7 @@ for (const key of updateOperators) {
   ): TValueInstructions {
     let [ret, inst] = this.consume(scope);
     if (!prefix) {
-      const tempOwner = new ValueOwner({ scope, value: new StoreValue(scope) });
-      const temp = tempOwner.value;
+      const temp = new StoreValue(scope);
       const [tempValue, tempInst] = temp["="](scope, ret);
       ret = tempValue;
       inst.push(...tempInst);

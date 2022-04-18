@@ -1,6 +1,18 @@
+import { SetInstruction } from "../instructions";
 import { Scope } from "../Scope";
-import { es, IValue, THandler } from "../types";
+import { es, IInstruction, IValue, THandler } from "../types";
 
 export const File: THandler<IValue | null> = (c, scope, node: es.File) => {
-  return c.handle(scope ?? new Scope({}), node.program);
+  const [value, instructions] = c.handle(scope ?? new Scope({}), node.program);
+
+  for (const inst of instructions) {
+    if (isUnusedSetInst(inst)) {
+      inst.hidden = true;
+    }
+  }
+  return [value, instructions];
 };
+
+function isUnusedSetInst(inst: IInstruction) {
+  return inst instanceof SetInstruction && !(inst.args[1] as IValue).owner;
+}

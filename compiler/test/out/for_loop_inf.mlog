@@ -1,7 +1,6 @@
 set i 0
-jump 6 equal 1 0
+jump 5 equal 1 0
 print i
-set &t0 i
 op add i i 1
 jump 1 always
 end
