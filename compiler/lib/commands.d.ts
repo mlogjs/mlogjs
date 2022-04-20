@@ -272,9 +272,21 @@ declare global {
    */
   function wait(seconds: number): void;
 
+  /**
+   * Looks up a block symbol by it's index on the content registry
+   */
   function lookup(kind: "block", index: number): BlockSymbol | null;
+  /**
+   * Looks up an unit symbol by it's index on the content registry
+   */
   function lookup(kind: "unit", index: number): UnitSymbol | null;
+  /**
+   * Looks up an item symbol by it's index on the content registry
+   */
   function lookup(kind: "item", index: number): ItemSymbol | null;
+  /**
+   * Looks up a liquid symbol by it's index on the content registry
+   */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
   function unitBind(type: UnitSymbol): void;
