@@ -289,6 +289,9 @@ declare global {
    */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
+  /**
+   * Binds an unit to the this processor. The unit is accessible at `Vars.unit`
+   */
   function unitBind(type: UnitSymbol): void;
 
   function unitControl(mode: "idle"): void;
