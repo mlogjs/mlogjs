@@ -33,6 +33,7 @@ export const AssignmentExpression: THandler = (
   }
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
+  // doesn't need to consume because the operators already do that
   const [right, rightInst] = c.handleEval(scope, node.right);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = left![node.operator](scope, right);
