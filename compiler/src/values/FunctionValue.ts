@@ -216,7 +216,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 
   consume(_scope: IScope): TValueInstructions {
-    this.ensureOwned();
     return [this, []];
   }
 }
