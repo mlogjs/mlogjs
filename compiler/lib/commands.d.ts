@@ -12,18 +12,16 @@ declare global {
   function print(...items: unknown[]): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Fills the screen with a color.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(mode: "clear", r: number, g: number, b: number): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Sets the color for the next drawing operations.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "color",
@@ -34,18 +32,16 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Sets the width of the next lines to be drawn.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(mode: "stroke", width: number): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a line between two points.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "line",
@@ -56,10 +52,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled rectangle.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "rect",
@@ -70,10 +65,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a rectangle outline.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "lineRect",
@@ -84,10 +78,12 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled, regular polygon.
+   * @param sides The number of sides the polygon should have
+   * @param radius The smallest distance between a line and the center of the polygon
+   * @param rotation The rotation of the polygon in degrees
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "poly",
@@ -99,10 +95,13 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws the outline of a regular polygon.
+   * @param sides The number of sides the polygon should have
+   * @param radius The smallest distance between a line and the center of the polygon
+   * @param rotation The rotation of the polygon in degrees
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   *
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "linePoly",
@@ -114,10 +113,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled triangle.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "triangle",
@@ -130,10 +128,19 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
+   * @param image The symbol for the image to be drawn.
+   * @param rotation The rotation of the image in degrees.
+   * @example
+   * ```
+   * // draw a router
+   * draw("image", 30, 30, Blocks.router, 15, 0);
+   *
+   * // draw the unit bound to the processor
+   * draw("image", 60, 60, Vars.unit.type, 15, 0);
+   * ```
    */
   function draw(
     mode: "image",
