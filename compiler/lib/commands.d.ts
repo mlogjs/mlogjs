@@ -294,40 +294,104 @@ declare global {
    */
   function unitBind(type: UnitSymbol): void;
 
+  /**
+   * Makes the unit bound to this processor stop moving but
+   * allows it to keep doing it's action (like mining or building)
+   */
   function unitControl(mode: "idle"): void;
+  /**
+   * Makes the unit bound to this processor stop mining, building and moving
+   */
   function unitControl(mode: "stop"): void;
+  /**
+   * Makes the unit bound to this processor move to the given position
+   */
   function unitControl(mode: "move", x: number, y: number): void;
+  /**
+   * Makes the unit bound to this processor approach the given position at the given radius
+   * @param radius How distant to the position the unit can be
+   */
   function unitControl(
     mode: "approach",
     x: number,
     y: number,
     radius: number
   ): void;
+  /**
+   * Whether the unit bound to this processor should be boosted (floating)
+   */
   function unitControl(mode: "boost", enable: boolean): void;
+  /**
+   * Makes the unit bound to this processor move to the enemy spawn
+   */
   function unitControl(mode: "pathfind"): void;
+  /**
+   * Makes the unit bound to this processor shoot/aim at the given position
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function unitControl(
     mode: "target",
     x: number,
     y: number,
     shoot: boolean
   ): void;
+  /**
+   * Makes the unit bound to this processor target an unit with velocity prediction
+   * @param unit The shoot target
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function unitControl(mode: "targetp", unit: BasicUnit, shoot: boolean): void;
+  /**
+   * Makes the unit bound to this processor drop it's held items onto the given target
+   * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+   * @param amount How many items should be dropped
+   */
   function unitControl(
     mode: "itemDrop",
     target: BasicBuilding | typeof Blocks.air,
     amount: number
   ): void;
+  /**
+   * Makes the unit bound to this processor take items from a building
+   * @param target The building that will have it's items taken
+   * @param item The kind of item to take
+   * @param amount How many items should be taken
+   */
   function unitControl(
     mode: "itemTake",
     target: BasicBuilding,
     item: ItemSymbol,
     amount: number
   ): void;
+  /**
+   * Makes the unit bound to this processor drop one entity from it's payload
+   */
   function unitControl(mode: "payDrop"): void;
+  /**
+   * Makes the unit bound to this processor take an entity into it's payload
+   * @param takeUnits Whether to take units or buildings
+   */
   function unitControl(mode: "payTake", takeUnits: boolean): void;
+  /**
+   * Makes the unit bound to this processor enter/land on the
+   * payload block the unit is on
+   */
   function unitControl(mode: "payEnter"): void;
+  /**
+   * Makes the unit bound to this processor mine at the given position
+   */
   function unitControl(mode: "mine", x: number, y: number): void;
+  /**
+   * Sets the numeric flag of the unit bound to this processor
+   */
   function unitControl(mode: "flag", value: number): void;
+  /**
+   * Makes the unit bound to this processor build a building with the
+   * given properties
+   * @param block The kind of building to build
+   * @param rotation The rotation of the building, ranges from 0 to 3
+   * @param config The config of the building
+   */
   function unitControl(
     mode: "build",
     x: number,
@@ -336,11 +400,17 @@ declare global {
     rotation: number,
     config: unknown
   ): void;
+  /**
+   * Makes the unit bound to this processor data about a block at the given position
+   */
   function unitControl<T extends BasicBuilding = AnyBuilding>(
     mode: "getBlock",
     x: number,
     y: number
   ): [type: BlockSymbol | null, building: T | null];
+  /**
+   * Checks if the unit bound to this processor is within a radius of a given position.
+   */
   function unitControl(
     mode: "within",
     x: number,
