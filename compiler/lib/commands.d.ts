@@ -418,6 +418,19 @@ declare global {
     radius: number
   ): boolean;
 
+  /**
+   * Finds an unit near the unit bound to this processor
+   * @param filter1 First filter for selecting a target. Setting it to "any" ignores it
+   * @param filter2 Second filter for selecting a target. Setting it to "any" ignores it
+   * @param filter3 Third filter for selecting a target. Setting it to "any" ignores it
+   * @param order The n th unit that fits these requirements based on the sorting method
+   *  (1 => first unit, 2 => second unit and so on)
+   * @param sort The method on which the results should be sorted
+   *
+   * @example
+   *  // returns the second nearest enemy unit
+   *  const result = unitRadar("enemy", "any", "any", 2, "distance")
+   */
   function unitRadar<T extends BasicUnit = AnyUnit>(
     filter1: TRadarFilter,
     filter2: TRadarFilter,
