@@ -267,6 +267,9 @@ declare global {
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
+  /**
+   * Stops the execution for the given amount of seconds
+   */
   function wait(seconds: number): void;
 
   function lookup(kind: "block", index: number): BlockSymbol | null;
