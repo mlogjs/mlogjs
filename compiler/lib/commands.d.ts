@@ -418,7 +418,7 @@ declare global {
     radius: number
   ): boolean;
 
-  function unitRadar<T extends BasicUnit>(
+  function unitRadar<T extends BasicUnit = AnyUnit>(
     filter1: TRadarFilter,
     filter2: TRadarFilter,
     filter3: TRadarFilter,
