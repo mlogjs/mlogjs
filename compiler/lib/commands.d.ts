@@ -171,12 +171,20 @@ declare global {
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
+  /**
+   * Sets whether the building is enabled or disabled.
+   */
   function control(
     kind: "enabled",
     building: BasicBuilding,
     value: boolean
   ): void;
 
+  /**
+   * Makes the building shoot or aim at the given position
+   * @param building The shooting building
+   * @param shoot `true` to shoot, `false` to just aim at the position
+   */
   function control(
     kind: "shoot",
     building: BasicBuilding & Shooting,
@@ -185,6 +193,12 @@ declare global {
     shoot: boolean
   ): void;
 
+  /**
+   * Shoot at an unit with velocity prediction
+   * @param building The shooting building
+   * @param unit The target unit
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function control(
     kind: "shootp",
     building: BasicBuilding & Shooting,
@@ -192,12 +206,18 @@ declare global {
     shoot: boolean
   ): void;
 
+  /**
+   * Sets the config of a block (like the item of a sorter)
+   */
   function control(
     kind: "config",
     building: BasicBuilding,
     value: symbol
   ): void;
 
+  /**
+   * Sets the color of an illuminator
+   */
   function control(
     kind: "color",
     building: BasicBuilding,
