@@ -58,10 +58,10 @@ export const MemberExpression: THandler = (
   scope,
   node: es.MemberExpression
 ) => {
-  const [obj, objInst] = c.handleEval(scope, node.object);
+  const [obj, objInst] = c.handleConsume(scope, node.object);
 
   const [prop, propInst] = node.computed
-    ? c.handleEval(scope, node.property)
+    ? c.handleConsume(scope, node.property)
     : [new LiteralValue(scope, (node.property as es.Identifier).name), []];
 
   const [got, gotInst] = obj.get(scope, prop);
