@@ -167,7 +167,16 @@ declare global {
 
   /**
    * Gets a block link by its index.
+   *
+   * To make safe queries it is recommended to check an index
+   * before trying to get a link. This can be done by using `Vars.links`.
    * @param index
+   * @example
+   * ```
+   * if(index < Vars.links) {
+   *   myBlock = getLink(index)
+   * }
+   * ```
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
