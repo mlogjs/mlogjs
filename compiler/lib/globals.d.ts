@@ -28,6 +28,14 @@ interface Vars {
   readonly ipt: number;
   /** The unit bound to this processor */
   readonly unit: AnyUnit;
+  /** Total amount of items existent, can be used to check if an ID is valid*/
+  readonly itemCount: number;
+  /** Total amount of liquids existent, can be used to check if an ID is valid*/
+  readonly liquidCount: number;
+  /** Total amount of units existent, can be used to check if an ID is valid*/
+  readonly unitCount: number;
+  /** Total amount of blocks existent, can be used to check if an ID is valid*/
+  readonly blockCount: number;
 }
 
 declare const Vars: Vars;
