@@ -282,19 +282,55 @@ declare global {
   function wait(seconds: number): void;
 
   /**
-   * Looks up a block symbol by it's index on the content registry
+   * Looks up a block symbol by it's index on the content registry.
+   *
+   * Use `Vars.blockCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.blockCount) {
+   *   let blockKind = lookup("block", index);
+   * }
+   * ```
    */
-  function lookup(kind: "block", index: number): BlockSymbol | null;
+  function lookup(kind: "block", index: number): BlockSymbol;
   /**
-   * Looks up an unit symbol by it's index on the content registry
+   * Looks up an unit symbol by it's index on the content registry.
+   *
+   * Use `Vars.unitCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.unitCount) {
+   *   let unitKind = lookup("unit", index);
+   * }
+   * ```
    */
   function lookup(kind: "unit", index: number): UnitSymbol | null;
   /**
-   * Looks up an item symbol by it's index on the content registry
+   * Looks up an item symbol by it's index on the content registry.
+   *
+   * Use `Vars.itemCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.itemCount) {
+   *   let itemKind = lookup("item", index);
+   * }
+   * ```
    */
   function lookup(kind: "item", index: number): ItemSymbol | null;
   /**
-   * Looks up a liquid symbol by it's index on the content registry
+   * Looks up a liquid symbol by it's index on the content registry.
+   *
+   * Use `Vars.liquidCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.liquidCount) {
+   *   let liquidKind = lookup("liquid", index);
+   * }
+   * ```
    */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
