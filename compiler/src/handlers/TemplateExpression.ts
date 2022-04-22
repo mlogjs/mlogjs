@@ -9,7 +9,7 @@ export const TemplateLiteral: THandler<null> = (
   const args: (string | IValue)[] = [];
   const inst: IInstruction[] = [];
   node.expressions.forEach((expression, i) => {
-    const [v, vi] = c.handleEval(scope, expression);
+    const [v, vi] = c.handleConsume(scope, expression);
     inst.push(...vi);
     args.push(node.quasis[i].value.raw, v);
   });
