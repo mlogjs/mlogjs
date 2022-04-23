@@ -13,3 +13,4 @@ export * from "./Object";
 export * from "./TemplateExpression";
 export * from "./BlockStatement";
 export * from "./File";
+export * from "./Typescript";
