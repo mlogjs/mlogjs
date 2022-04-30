@@ -52,17 +52,14 @@ export const DoWhileStatement: THandler<null> = (
   const [test, testLines] = c.handleConsume(scope, node.test);
 
   const startLoopAddr = new LiteralValue(scope, null as never);
-  const endLoopAddr = new LiteralValue(scope, null as never);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
-  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
 
   if (test instanceof LiteralValue) {
     if (test.data) {
       lines.push(
         startLoopLine,
         ...c.handle(scope, node.body)[1],
-        new JumpInstruction(startLoopAddr, EJumpKind.Always),
-        endLoopLine
+        new JumpInstruction(startLoopAddr, EJumpKind.Always)
       );
     }
     return [null, lines];
@@ -77,8 +74,7 @@ export const DoWhileStatement: THandler<null> = (
       EJumpKind.Equal,
       test,
       new LiteralValue(scope, 1)
-    ),
-    endLoopLine
+    )
   );
   return [null, lines];
 };
