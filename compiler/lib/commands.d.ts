@@ -512,7 +512,7 @@ declare global {
     find: "spawn"
   ): [found: false] | [found: true, x: number, y: number, building: T];
   /**
-   * Uses the unit bound to this processor to find a damaged ally building anywhere on the map
+   * Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
    * @param find
    */
   function unitLocate<T extends BasicBuilding = AnyBuilding>(
