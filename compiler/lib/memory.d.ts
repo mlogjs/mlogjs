@@ -2,7 +2,7 @@
 
 type MemoryCapacity = 64 | 512;
 /**
- * A wrapper around memory cells/banks that is compatible with custom types.
+ * Allows you to view and modify the data of memory cells and memory banks.
  */
 declare class Memory<S extends MemoryCapacity = 64> {
   constructor(cell: BasicBuilding, size?: S);
