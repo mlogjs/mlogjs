@@ -1,12 +1,13 @@
 import { es, THandler, TValueInstructions } from "../types";
 
-const Expression: THandler = (
+const TypeCastExpression: THandler = (
   c,
   scope,
   node: es.TSAsExpression | es.TSTypeAssertion
 ) => {
   return c.handle(scope, node.expression) as TValueInstructions;
 };
-export const TSAsExpression = Expression;
 
-export const TSTypeAssertion = Expression;
+export const TSAsExpression = TypeCastExpression;
+
+export const TSTypeAssertion = TypeCastExpression;
