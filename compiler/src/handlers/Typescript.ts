@@ -11,3 +11,9 @@ const TypeCastExpression: THandler = (
 export const TSAsExpression = TypeCastExpression;
 
 export const TSTypeAssertion = TypeCastExpression;
+
+const IgnoredHandler: THandler<null> = () => [null, []];
+
+export const TSInterfaceDeclaration = IgnoredHandler;
+
+export const TSTypeAliasDeclaration = IgnoredHandler;
