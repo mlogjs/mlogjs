@@ -77,7 +77,7 @@ export const ConditionalExpression: THandler = (
     return c.handleEval(scope, node.alternate);
   }
   // TODO: this creates those annoying jumps on the
-  // temp counter
+  // temp counter, specially if you nest ternary operators
   const result: StoreValue = new StoreValue(scope);
   result.ensureOwned();
   const consequent = c.handleEval(scope, node.consequent);
