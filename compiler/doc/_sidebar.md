@@ -1,6 +1,6 @@
 - [MlogJS](/)
 - [Getting Started](/getting-started)
-- [Typescript setup](/typescript-setup)
+- [Typescript support](/typescript)
 - [Data Types](/data-types)
 - [Namespaces](/namespaces)
 - [Helper methods](/helper-methods)
