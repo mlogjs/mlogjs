@@ -76,9 +76,12 @@ export const ConditionalExpression: THandler = (
     if (test.data) return c.handleEval(scope, node.consequent);
     return c.handleEval(scope, node.alternate);
   }
-  const result = new StoreValue(scope);
-  const consequent = c.handleConsume(scope, node.consequent);
-  const alternate = c.handleConsume(scope, node.alternate);
+  // TODO: this creates those annoying jumps on the
+  // temp counter
+  const result: StoreValue = new StoreValue(scope);
+  result.ensureOwned();
+  const consequent = c.handleEval(scope, node.consequent);
+  const alternate = c.handleEval(scope, node.alternate);
   const alternateStartAdress = new LiteralValue(scope, null as never);
   const endExpressionAdress = new LiteralValue(scope, null as never);
 
