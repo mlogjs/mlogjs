@@ -97,7 +97,7 @@ Contains all units available
 
 ## LAccess
 
-This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/macros#sensing-properties-of-entities)
+This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/data-types#senseable)
 
 - `totalItems`
 - `firstItem`
