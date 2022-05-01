@@ -1,15 +1,26 @@
 # Getting started.
 
-## How to use it?
+## Online editor
 
-You can use it through the online version or the command-line interface tool (usually along an IDE such as [VS Code](https://code.visualstudio.com/)).
+The quickest way to get started on the compiler is with the
+[web editor](https://mlogjs.github.io/mlogjs/editor/). There you can write javascript/typescript code and benefit from the built-in autocompletion and live compilation features.
 
-## CLI installation
+## Local setup
+
+This section assumes that you are familiar with the following concepts:
+
+- The command line terminal
+- Using javascript package managers
+
+If you want to edit your scripts in your preferred editor you can install
+the compiler locally by running the command bellow.
 
 ```
 npm i -g mlogjs
 ```
 
-## Web version
+Then you will be able to compile your scripts with the `mlogjs` command:
 
-https://mlogjs.github.io/mlogjs/editor/
+```
+mlogjs my_script.js
+```
