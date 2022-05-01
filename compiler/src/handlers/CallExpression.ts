@@ -14,7 +14,7 @@ export const CallExpression: THandler<IValue | null> = (
     return v;
   });
 
-  const [callee, calleeInst] = c.handleEval(scope, node.callee);
+  const [callee, calleeInst] = c.handleConsume(scope, node.callee);
   inst.push(...calleeInst);
 
   const [callValue, callInst] = callee.call(scope, args);

@@ -12,18 +12,16 @@ declare global {
   function print(...items: unknown[]): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Fills the screen with a color.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(mode: "clear", r: number, g: number, b: number): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Sets the color for the next drawing operations.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "color",
@@ -34,18 +32,16 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Sets the width of the next lines to be drawn.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(mode: "stroke", width: number): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a line between two points.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "line",
@@ -56,10 +52,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled rectangle.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "rect",
@@ -70,10 +65,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a rectangle outline.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "lineRect",
@@ -84,10 +78,12 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled, regular polygon.
+   * @param sides The number of sides the polygon should have
+   * @param radius The smallest distance between a line and the center of the polygon
+   * @param rotation The rotation of the polygon in degrees
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "poly",
@@ -99,10 +95,13 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws the outline of a regular polygon.
+   * @param sides The number of sides the polygon should have
+   * @param radius The smallest distance between a line and the center of the polygon
+   * @param rotation The rotation of the polygon in degrees
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   *
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "linePoly",
@@ -114,10 +113,9 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws a filled triangle.
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
    */
   function draw(
     mode: "triangle",
@@ -130,10 +128,19 @@ declare global {
   ): void;
 
   /**
-   * Appends draw contents to the draw buffer.
+   * Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
    *
-   * Warning: these methods only append data to the draw buffer,
-   * which is used by `drawFlush` to actually draw content on a display.
+   * Warning: nothing is drawn until `drawFlush` is called.
+   * @param image The symbol for the image to be drawn.
+   * @param rotation The rotation of the image in degrees.
+   * @example
+   * ```
+   * // draw a router
+   * draw("image", 30, 30, Blocks.router, 15, 0);
+   *
+   * // draw the unit bound to the processor
+   * draw("image", 60, 60, Vars.unit.type, 15, 0);
+   * ```
    */
   function draw(
     mode: "image",
@@ -160,16 +167,33 @@ declare global {
 
   /**
    * Gets a block link by its index.
+   *
+   * To make safe queries it is recommended to check an index
+   * before trying to get a link. This can be done by using `Vars.links`.
    * @param index
+   * @example
+   * ```
+   * if(index < Vars.links) {
+   *   myBlock = getLink(index)
+   * }
+   * ```
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
+  /**
+   * Sets whether the building is enabled or disabled.
+   */
   function control(
     kind: "enabled",
     building: BasicBuilding,
     value: boolean
   ): void;
 
+  /**
+   * Makes the building shoot or aim at the given position
+   * @param building The shooting building
+   * @param shoot `true` to shoot, `false` to just aim at the position
+   */
   function control(
     kind: "shoot",
     building: BasicBuilding & Shooting,
@@ -178,6 +202,12 @@ declare global {
     shoot: boolean
   ): void;
 
+  /**
+   * Shoot at an unit with velocity prediction
+   * @param building The shooting building
+   * @param unit The target unit
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function control(
     kind: "shootp",
     building: BasicBuilding & Shooting,
@@ -185,12 +215,18 @@ declare global {
     shoot: boolean
   ): void;
 
+  /**
+   * Sets the config of a block (like the item of a sorter)
+   */
   function control(
     kind: "config",
     building: BasicBuilding,
     value: symbol
   ): void;
 
+  /**
+   * Sets the color of an illuminator
+   */
   function control(
     kind: "color",
     building: BasicBuilding,
@@ -240,49 +276,167 @@ declare global {
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
+  /**
+   * Stops the execution for the given amount of seconds
+   */
   function wait(seconds: number): void;
 
-  function lookup(kind: "block", index: number): BlockSymbol | null;
+  /**
+   * Looks up a block symbol by it's index on the content registry.
+   *
+   * Use `Vars.blockCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.blockCount) {
+   *   let blockKind = lookup("block", index);
+   * }
+   * ```
+   */
+  function lookup(kind: "block", index: number): BlockSymbol;
+  /**
+   * Looks up an unit symbol by it's index on the content registry.
+   *
+   * Use `Vars.unitCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.unitCount) {
+   *   let unitKind = lookup("unit", index);
+   * }
+   * ```
+   */
   function lookup(kind: "unit", index: number): UnitSymbol | null;
+  /**
+   * Looks up an item symbol by it's index on the content registry.
+   *
+   * Use `Vars.itemCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.itemCount) {
+   *   let itemKind = lookup("item", index);
+   * }
+   * ```
+   */
   function lookup(kind: "item", index: number): ItemSymbol | null;
+  /**
+   * Looks up a liquid symbol by it's index on the content registry.
+   *
+   * Use `Vars.liquidCount` to check the maximum index allowed.
+   *
+   * @example
+   * ```
+   * if(index < Vars.liquidCount) {
+   *   let liquidKind = lookup("liquid", index);
+   * }
+   * ```
+   */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
+  /**
+   * Binds an unit to the this processor. The unit is accessible at `Vars.unit`
+   */
   function unitBind(type: UnitSymbol): void;
 
+  /**
+   * Makes the unit bound to this processor stop moving but
+   * allows it to keep doing it's action (like mining or building)
+   */
   function unitControl(mode: "idle"): void;
+  /**
+   * Makes the unit bound to this processor stop mining, building and moving
+   */
   function unitControl(mode: "stop"): void;
+  /**
+   * Makes the unit bound to this processor move to the given position
+   */
   function unitControl(mode: "move", x: number, y: number): void;
+  /**
+   * Makes the unit bound to this processor approach the given position at the given radius
+   * @param radius How distant to the position the unit can be
+   */
   function unitControl(
     mode: "approach",
     x: number,
     y: number,
     radius: number
   ): void;
+  /**
+   * Whether the unit bound to this processor should be boosted (floating)
+   */
   function unitControl(mode: "boost", enable: boolean): void;
+  /**
+   * Makes the unit bound to this processor move to the enemy spawn
+   */
   function unitControl(mode: "pathfind"): void;
+  /**
+   * Makes the unit bound to this processor shoot/aim at the given position
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function unitControl(
     mode: "target",
     x: number,
     y: number,
     shoot: boolean
   ): void;
+  /**
+   * Makes the unit bound to this processor target an unit with velocity prediction
+   * @param unit The shoot target
+   * @param shoot `true` to shoot, `false` to just aim
+   */
   function unitControl(mode: "targetp", unit: BasicUnit, shoot: boolean): void;
+  /**
+   * Makes the unit bound to this processor drop it's held items onto the given target
+   * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+   * @param amount How many items should be dropped
+   */
   function unitControl(
     mode: "itemDrop",
     target: BasicBuilding | typeof Blocks.air,
     amount: number
   ): void;
+  /**
+   * Makes the unit bound to this processor take items from a building
+   * @param target The building that will have it's items taken
+   * @param item The kind of item to take
+   * @param amount How many items should be taken
+   */
   function unitControl(
     mode: "itemTake",
     target: BasicBuilding,
     item: ItemSymbol,
     amount: number
   ): void;
+  /**
+   * Makes the unit bound to this processor drop one entity from it's payload
+   */
   function unitControl(mode: "payDrop"): void;
+  /**
+   * Makes the unit bound to this processor take an entity into it's payload
+   * @param takeUnits Whether to take units or buildings
+   */
   function unitControl(mode: "payTake", takeUnits: boolean): void;
+  /**
+   * Makes the unit bound to this processor enter/land on the
+   * payload block the unit is on
+   */
   function unitControl(mode: "payEnter"): void;
+  /**
+   * Makes the unit bound to this processor mine at the given position
+   */
   function unitControl(mode: "mine", x: number, y: number): void;
+  /**
+   * Sets the numeric flag of the unit bound to this processor
+   */
   function unitControl(mode: "flag", value: number): void;
+  /**
+   * Makes the unit bound to this processor build a building with the
+   * given properties
+   * @param block The kind of building to build
+   * @param rotation The rotation of the building, ranges from 0 to 3
+   * @param config The config of the building
+   */
   function unitControl(
     mode: "build",
     x: number,
@@ -291,11 +445,17 @@ declare global {
     rotation: number,
     config: unknown
   ): void;
+  /**
+   * Makes the unit bound to this processor data about a block at the given position
+   */
   function unitControl<T extends BasicBuilding = AnyBuilding>(
     mode: "getBlock",
     x: number,
     y: number
   ): [type: BlockSymbol | null, building: T | null];
+  /**
+   * Checks if the unit bound to this processor is within a radius of a given position.
+   */
   function unitControl(
     mode: "within",
     x: number,
@@ -303,7 +463,20 @@ declare global {
     radius: number
   ): boolean;
 
-  function unitRadar<T extends BasicUnit>(
+  /**
+   * Finds an unit near the unit bound to this processor
+   * @param filter1 First filter for selecting a target. Setting it to "any" ignores it
+   * @param filter2 Second filter for selecting a target. Setting it to "any" ignores it
+   * @param filter3 Third filter for selecting a target. Setting it to "any" ignores it
+   * @param order The n th unit that fits these requirements based on the sorting method
+   *  (1 => first unit, 2 => second unit and so on)
+   * @param sort The method on which the results should be sorted
+   *
+   * @example
+   *  // returns the second nearest enemy unit
+   *  const result = unitRadar("enemy", "any", "any", 2, "distance")
+   */
+  function unitRadar<T extends BasicUnit = AnyUnit>(
     filter1: TRadarFilter,
     filter2: TRadarFilter,
     filter3: TRadarFilter,
@@ -311,16 +484,38 @@ declare global {
     sort: TRadarSort
   ): T;
 
+  /**
+   * Uses the unit bound to this processor to find an ore vein anywhere on the map
+   * @param ore The kind of item the ore should contain
+   */
   function unitLocate(
     find: "ore",
     ore: ItemSymbol
   ): [found: false] | [found: true, x: number, y: number];
+  /**
+   * Uses the unit bound to this processor to find a building anywhere on the map
+   * @param group The group that the building belongs to
+   * @param enemy Whether it should be an enemy building or an ally one
+   */
   function unitLocate<T extends BasicBuilding = AnyBuilding>(
     find: "building",
     group: TUnitLocateBuildingGroup,
     enemy: boolean
   ): [found: false] | [found: true, x: number, y: number, building: T];
+  /**
+   * Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
+   *
+   * May return a building (a core) or a position
+   * @param find
+   */
   function unitLocate<T extends BasicBuilding = AnyBuilding>(
-    find: "spawn" | "damaged"
+    find: "spawn"
+  ): [found: false] | [found: true, x: number, y: number, building: T];
+  /**
+   * Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
+   * @param find
+   */
+  function unitLocate<T extends BasicBuilding = AnyBuilding>(
+    find: "damaged"
   ): [found: false] | [found: true, x: number, y: number, building: T];
 }

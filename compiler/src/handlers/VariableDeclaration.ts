@@ -81,14 +81,16 @@ export const VariableDeclarator: THandler<IValue | null> = (
         if (!element) continue;
         if (element.type !== "Identifier") {
           throw new CompilerError(
-            "Array destructuring expression can only have empty items or identifiers"
+            "Array destructuring expression can only have empty items or identifiers",
+            [element]
           );
         }
 
         const val = init.data[i];
         if (!val)
           throw new CompilerError(
-            `The property "${i}" does not exist on the target object`
+            `The property "${i}" does not exist on the target object`,
+            [element]
           );
         const owner = new ValueOwner({
           scope,
