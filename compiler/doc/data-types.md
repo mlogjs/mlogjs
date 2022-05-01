@@ -6,6 +6,7 @@ There are a total of four different data types:
 
 - Literal
 - Store
+- Senseable
 - Function
 - Object
 
