@@ -72,3 +72,11 @@ export const TSEnumDeclaration: THandler<null> = (
 
   return [null, []];
 };
+
+export const TSNonNullExpression: THandler = (
+  c,
+  scope,
+  node: es.TSNonNullExpression
+) => {
+  return c.handle(scope, node.expression) as TValueInstructions;
+};
