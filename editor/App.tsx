@@ -62,7 +62,10 @@ export function App() {
           onMount={onMount}
           value={code}
         />
-        <Editor value={compiled} options={{ readOnly: true }}></Editor>
+        <Editor
+          value={compiled}
+          options={{ readOnly: true, lineNumbers: n => `${n - 1}` }}
+        ></Editor>
       </SplitPane>
     </Fragment>
   );
