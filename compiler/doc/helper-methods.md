@@ -11,7 +11,7 @@ const turret = getBuilding("cyclone1");
 
 ## getVar
 
-Allows you to access symbols that are not available through the [namespaces](/namespaces).
+Allows you to access symbols or variables that are not available through the [namespaces](/namespaces).
 
 ```js
 const building = getBuilding("container1");
