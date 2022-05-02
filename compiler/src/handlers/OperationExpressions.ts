@@ -1,10 +1,12 @@
 import { CompilerError } from "../CompilerError";
+import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import {
   AssignementOperator,
   BinaryOperator,
   LogicalOperator,
 } from "../operators";
 import { THandler, es } from "../types";
+import { LiteralValue, StoreValue } from "../values";
 
 export const LRExpression: THandler = (
   c,
@@ -63,4 +65,44 @@ export const UpdateExpression: THandler = (
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = arg![operator](scope, prefix);
   return [op, [...argInst, ...opInst]];
+};
+
+export const ConditionalExpression: THandler = (
+  c,
+  scope,
+  node: es.ConditionalExpression
+) => {
+  const [test, testInst] = c.handleConsume(scope, node.test);
+  if (test instanceof LiteralValue) {
+    if (test.data) return c.handleEval(scope, node.consequent);
+    return c.handleEval(scope, node.alternate);
+  }
+  // TODO: this creates those annoying jumps on the
+  // temp counter, specially if you nest ternary operators
+  const result: StoreValue = new StoreValue(scope);
+  result.ensureOwned();
+  const consequent = c.handleEval(scope, node.consequent);
+  const alternate = c.handleEval(scope, node.alternate);
+  const alternateStartAdress = new LiteralValue(scope, null as never);
+  const endExpressionAdress = new LiteralValue(scope, null as never);
+
+  return [
+    result,
+    [
+      ...testInst,
+      new JumpInstruction(
+        alternateStartAdress,
+        EJumpKind.Equal,
+        test,
+        new LiteralValue(scope, 0)
+      ),
+      ...consequent[1],
+      ...result["="](scope, consequent[0])[1],
+      new JumpInstruction(endExpressionAdress, EJumpKind.Always),
+      new AddressResolver(alternateStartAdress),
+      ...alternate[1],
+      ...result["="](scope, alternate[0])[1],
+      new AddressResolver(endExpressionAdress),
+    ],
+  ];
 };
