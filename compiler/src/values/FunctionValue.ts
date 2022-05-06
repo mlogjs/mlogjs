@@ -74,9 +74,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.childScope = this.scope.createFunction(name);
     this.childScope.function = this;
     for (const id of this.params) {
-      const name = this.c.compactNames
-        ? nodeName(id)
-        : this.childScope.formatName(id.name);
+      const name = nodeName(id, !this.c.compactNames && id.name);
       const owner = new ValueOwner({
         scope: this.childScope,
         value: new StoreValue(this.childScope),
@@ -95,9 +93,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (this.initialized) return;
     this.initialized = true;
 
-    const name = this.c.compactNames
-      ? nodeName(this.node)
-      : this.scope.formatName(this.owner.name);
+    const name = nodeName(this.node, !this.c.compactNames && this.owner.name);
     this.initScope(name);
 
     this.addr = new LiteralValue(this.childScope, null as never);

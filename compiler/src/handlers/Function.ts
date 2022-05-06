@@ -46,7 +46,7 @@ export const FunctionDeclaration: THandler = (
   node: es.FunctionDeclaration
 ) => {
   const identifier = (node.id as es.Identifier).name;
-  const name = c.compactNames ? nodeName(node) : scope.formatName(identifier);
+  const name = nodeName(node, !c.compactNames && identifier);
   const functionIns = handleFunctionNode(c, scope, node);
   const owner = new ValueOwner({
     scope,
