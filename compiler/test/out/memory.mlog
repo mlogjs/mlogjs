@@ -7,9 +7,9 @@ jump 9 equal &t1 0
 write 1 bank1 0
 print "Processor intialized"
 jump 16 always
-read runs bank1 1
+read runs:11:6 bank1 1
 print "This code has run "
-print runs
+print runs:11:6
 print " time(s)"
 read &t2 bank1 1
 op add &t2 &t2 1

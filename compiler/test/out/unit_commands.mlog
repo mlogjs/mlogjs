@@ -7,9 +7,9 @@ ucontrol getBlock 0 0 &_ &_ 0
 ucontrol idle
 ucontrol itemDrop @air 100
 ucontrol itemTake shard1 @copper 10
-ucontrol within 1 2 10 isWithin 0
-print isWithin
-ucontrol getBlock 10 20 type building 0
-print type
-print building
+ucontrol within 1 2 10 isWithin:15:6 0
+print isWithin:15:6
+ucontrol getBlock 10 20 type:18:7 building:18:13 0
+print type:18:7
+print building:18:13
 end
