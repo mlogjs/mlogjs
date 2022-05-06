@@ -1,10 +1,10 @@
-set i 0
-op lessThan &t0 i 100
+set i:1:4 0
+op lessThan &t0 i:1:4 100
 jump 9 equal &t0 0
 op rand &t1
 op greaterThan &t1 &t1 0.5
 jump 7 equal &t1 0
 jump 9 always
-op add i i 1
+op add i:1:4 i:1:4 1
 jump 1 always
 end

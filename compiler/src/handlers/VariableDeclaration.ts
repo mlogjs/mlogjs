@@ -26,9 +26,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
   switch (node.id.type) {
     case "Identifier": {
       const { name: identifier } = node.id;
-      const name = c.compactNames
-        ? nodeName(node)
-        : scope.formatName(identifier);
+      const name = nodeName(node, !c.compactNames && identifier);
       const [init] = valinst;
       if (kind === "const" && !init)
         throw new CompilerError("Constants must be initialized.");
@@ -95,9 +93,7 @@ export const VariableDeclarator: THandler<IValue | null> = (
         const owner = new ValueOwner({
           scope,
           identifier: element.name,
-          name: c.compactNames
-            ? nodeName(element)
-            : scope.formatName(element.name),
+          name: nodeName(element, !c.compactNames && element.name),
           value: val,
           constant: true,
         });

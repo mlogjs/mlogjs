@@ -66,7 +66,7 @@ export const TSEnumDeclaration: THandler<null> = (
       value: new ObjectValue(scope, data),
       constant: true,
       identifier: node.id.name,
-      name: c.compactNames ? nodeName(node) : scope.formatName(node.id.name),
+      name: nodeName(node, !c.compactNames && node.id.name),
     })
   );
 

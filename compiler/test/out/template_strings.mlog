@@ -1,7 +1,7 @@
-set first 10
-set second 0.2
+set first:3:4 10
+set second:4:4 0.2
 radar player enemy any distance cyclone1 1 radarResult
-op add &t0 first second
+op add &t0 first:3:4 second:4:4
 op mul foo &t0 2
 print radarResult
 print foo

@@ -99,8 +99,6 @@ export interface IScope {
   copy(): IScope;
   /** Creates a temporary mlog variable name */
   makeTempName(): string;
-  /** Formats the name of a variable to make it unique in the mlog output */
-  formatName(name: string): string;
 }
 
 /**
