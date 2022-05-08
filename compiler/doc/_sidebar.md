@@ -6,3 +6,4 @@
 - [Helper methods](/helper-methods)
 - [Commands](/commands)
 - [Memory Api](/memory-api)
+- [Supported Syntax](/syntax-support)
