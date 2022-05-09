@@ -27,56 +27,8 @@ export const VariableDeclarator: THandler<IValue | null> = (
   switch (node.id.type) {
     case "Identifier":
       return DeclareIdentifier(c, scope, node.id, kind, valinst);
-    case "ArrayPattern": {
-      const { elements } = node.id;
-      const [init] = valinst;
-      if (!init)
-        throw new CompilerError(
-          "Cannot use array destructuring without an initializer"
-        );
-      if (!init.macro)
-        throw new CompilerError(
-          "Cannot use array destructuring on non macro values"
-        );
-
-      if (kind !== "const")
-        throw new CompilerError("Macro values must be held by constants");
-
-      if (!(init instanceof ObjectValue)) {
-        throw new CompilerError(
-          "Array destructuring target must be an object value"
-        );
-      }
-
-      for (let i = 0; i < elements.length; i++) {
-        const element = elements[i];
-
-        if (!element) continue;
-        if (element.type !== "Identifier") {
-          throw new CompilerError(
-            "Array destructuring expression can only have empty items or identifiers",
-            [element]
-          );
-        }
-
-        const val = init.data[i];
-        if (!val)
-          throw new CompilerError(
-            `The property "${i}" does not exist on the target object`,
-            [element]
-          );
-        const owner = new ValueOwner({
-          scope,
-          identifier: element.name,
-          name: nodeName(element, !c.compactNames && element.name),
-          value: val,
-          constant: true,
-        });
-
-        scope.set(owner);
-      }
-      return valinst;
-    }
+    case "ArrayPattern":
+      return DeclareArrayPattern(c, scope, node.id, kind, valinst);
     default:
       throw new CompilerError(
         `Unsupported variable declaration type: ${node.id.type}`
@@ -91,6 +43,7 @@ type TDeclareHandler<T extends es.Node> = (
   kind: "let" | "const" | "var",
   valinst: TValueInstructions<IValue | null>
 ) => TValueInstructions<null>;
+
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
   scope,
@@ -124,4 +77,61 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
     if (kind === "const") value.constant = true;
     return [null, valinst[1]];
   }
+};
+
+const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
+  c,
+  scope,
+  node,
+  kind,
+  valinst
+) => {
+  const { elements } = node;
+  const [init] = valinst;
+  if (!init)
+    throw new CompilerError(
+      "Cannot use array destructuring without an initializer"
+    );
+  if (!init.macro)
+    throw new CompilerError(
+      "Cannot use array destructuring on non macro values"
+    );
+
+  if (kind !== "const")
+    throw new CompilerError("Macro values must be held by constants");
+
+  if (!(init instanceof ObjectValue)) {
+    throw new CompilerError(
+      "Array destructuring target must be an object value"
+    );
+  }
+
+  for (let i = 0; i < elements.length; i++) {
+    const element = elements[i];
+
+    if (!element) continue;
+    if (element.type !== "Identifier") {
+      throw new CompilerError(
+        "Array destructuring expression can only have empty items or identifiers",
+        [element]
+      );
+    }
+
+    const val = init.data[i];
+    if (!val)
+      throw new CompilerError(
+        `The property "${i}" does not exist on the target object`,
+        [element]
+      );
+    const owner = new ValueOwner({
+      scope,
+      identifier: element.name,
+      name: nodeName(element, !c.compactNames && element.name),
+      value: val,
+      constant: true,
+    });
+
+    scope.set(owner);
+  }
+  return [null, valinst[1]];
 };
