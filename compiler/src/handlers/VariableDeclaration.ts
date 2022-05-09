@@ -55,7 +55,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   const name = nodeName(node, !c.compactNames && identifier);
   const [init] = valinst;
   if (kind === "const" && !init)
-    throw new CompilerError("Constants must be initialized.");
+    throw new CompilerError("Constants must be initialized.", [node]);
   if (kind === "const" && init?.constant) {
     const owner = new ValueOwner({
       scope,
@@ -70,7 +70,9 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
     const value = scope.make(identifier, name);
     if (init) {
       if (init.macro)
-        throw new CompilerError("Macro values must be held by constants");
+        throw new CompilerError("Macro values must be held by constants", [
+          node,
+        ]);
 
       valinst[1].push(...value["="](scope, init)[1]);
     }
@@ -90,16 +92,19 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
   const [init] = valinst;
   if (!init)
     throw new CompilerError(
-      "Cannot use array destructuring without an initializer"
+      "Cannot use array destructuring without an initializer",
+      [node]
     );
   if (!init.macro)
     throw new CompilerError(
-      "Cannot use array destructuring on non macro values"
+      "Cannot use array destructuring on non macro values",
+      [node]
     );
 
   if (!(init instanceof ObjectValue)) {
     throw new CompilerError(
-      "Array destructuring target must be an object value"
+      "Array destructuring target must be an object value",
+      [node]
     );
   }
 
