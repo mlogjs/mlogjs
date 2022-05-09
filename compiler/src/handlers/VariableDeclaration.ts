@@ -1,8 +1,9 @@
 import { ObjectValue } from "../values";
-import { THandler, es, TValueInstructions, IValue } from "../types";
+import { THandler, es, TValueInstructions, IValue, IScope } from "../types";
 import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
+import { Compiler } from "../Compiler";
 
 export const VariableDeclaration: THandler<null> = (
   c,
@@ -24,34 +25,8 @@ export const VariableDeclarator: THandler<IValue | null> = (
     ? c.handleEval(scope, node.init)
     : [null, []];
   switch (node.id.type) {
-    case "Identifier": {
-      const { name: identifier } = node.id;
-      const name = nodeName(node, !c.compactNames && identifier);
-      const [init] = valinst;
-      if (kind === "const" && !init)
-        throw new CompilerError("Constants must be initialized.");
-      if (kind === "const" && init?.constant) {
-        const owner = new ValueOwner({
-          scope,
-          identifier,
-          name,
-          value: init,
-          constant: true,
-        });
-        scope.set(owner);
-        return valinst;
-      } else {
-        const value = scope.make(identifier, name);
-        if (init) {
-          if (init.macro)
-            throw new CompilerError("Macro values must be held by constants");
-
-          valinst[1].push(...value["="](scope, init)[1]);
-        }
-        if (kind === "const") value.constant = true;
-        return valinst;
-      }
-    }
+    case "Identifier":
+      return DeclareIdentifier(c, scope, node.id, kind, valinst);
     case "ArrayPattern": {
       const { elements } = node.id;
       const [init] = valinst;
@@ -106,5 +81,47 @@ export const VariableDeclarator: THandler<IValue | null> = (
       throw new CompilerError(
         `Unsupported variable declaration type: ${node.id.type}`
       );
+  }
+};
+
+type TDeclareHandler<T extends es.Node> = (
+  c: Compiler,
+  scope: IScope,
+  node: T,
+  kind: "let" | "const" | "var",
+  valinst: TValueInstructions<IValue | null>
+) => TValueInstructions<null>;
+const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
+  c,
+  scope,
+  node,
+  kind,
+  valinst
+) => {
+  const { name: identifier } = node;
+  const name = nodeName(node, !c.compactNames && identifier);
+  const [init] = valinst;
+  if (kind === "const" && !init)
+    throw new CompilerError("Constants must be initialized.");
+  if (kind === "const" && init?.constant) {
+    const owner = new ValueOwner({
+      scope,
+      identifier,
+      name,
+      value: init,
+      constant: true,
+    });
+    scope.set(owner);
+    return [null, valinst[1]];
+  } else {
+    const value = scope.make(identifier, name);
+    if (init) {
+      if (init.macro)
+        throw new CompilerError("Macro values must be held by constants");
+
+      valinst[1].push(...value["="](scope, init)[1]);
+    }
+    if (kind === "const") value.constant = true;
+    return [null, valinst[1]];
   }
 };
