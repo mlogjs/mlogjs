@@ -97,9 +97,6 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
       "Cannot use array destructuring on non macro values"
     );
 
-  if (kind !== "const")
-    throw new CompilerError("Macro values must be held by constants");
-
   if (!(init instanceof ObjectValue)) {
     throw new CompilerError(
       "Array destructuring target must be an object value"
@@ -110,28 +107,27 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     const element = elements[i];
 
     if (!element) continue;
-    if (element.type !== "Identifier") {
-      throw new CompilerError(
-        "Array destructuring expression can only have empty items or identifiers",
-        [element]
-      );
-    }
-
     const val = init.data[i];
+
     if (!val)
       throw new CompilerError(
         `The property "${i}" does not exist on the target object`,
         [element]
       );
-    const owner = new ValueOwner({
-      scope,
-      identifier: element.name,
-      name: nodeName(element, !c.compactNames && element.name),
-      value: val,
-      constant: true,
-    });
 
-    scope.set(owner);
+    switch (element.type) {
+      case "Identifier":
+        DeclareIdentifier(c, scope, element, kind, [val, valinst[1]]);
+        break;
+      case "ArrayPattern":
+        DeclareArrayPattern(c, scope, element, kind, [val, valinst[1]]);
+        break;
+      default:
+        throw new CompilerError(
+          `Unsupported declaration type: ${element.type}`,
+          [element]
+        );
+    }
   }
   return [null, valinst[1]];
 };
