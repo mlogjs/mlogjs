@@ -59,3 +59,25 @@ Limitations:
 - No proper support for closures
 - No support for generators
 - No support for `async`/`await`
+
+## Typescript
+
+### Enums
+
+You can declare `const` `enum`s on your code as if it were regular typescript
+
+```ts
+const enum Status {
+  traveling,
+  mining,
+}
+```
+
+Behavior:
+
+- Each enum member will be bound to a number by default (with auto incrementing indexes), they can also be string literals
+- Just like [constants](#variable-declarations), enum members are replaced with their literal values
+
+Limitations:
+
+- All enums must be `const`, since dynamic objects are not supported in the mlog runtime
