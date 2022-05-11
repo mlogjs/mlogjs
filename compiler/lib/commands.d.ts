@@ -518,4 +518,7 @@ declare global {
   function unitLocate<T extends BasicBuilding = AnyBuilding>(
     find: "damaged"
   ): [found: false] | [found: true, x: number, y: number, building: T];
+
+  /** Ends the execution of this script */
+  function end(): never;
 }
