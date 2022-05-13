@@ -60,6 +60,59 @@ Limitations:
 - No support for generators
 - No support for `async`/`await`
 
+### For loops
+
+You can define the regular style `for` loops:
+
+```js
+for (let i = 0; i < 10; i++) {
+  print(i);
+}
+printFlush(getBuilding("message1"));
+```
+
+Behavior:
+
+- Supports `break` and `continue` statements
+
+Limitations:
+
+- No support for the `for ... of` syntax
+- No support for the `for ... in` syntax
+
+### While loop
+
+Repeats the code block while the condition resolves to `true`
+
+```js
+let i = 0;
+while (i < 10) {
+  print(i);
+  i++;
+}
+printFlush(getBuilding("message1"));
+```
+
+Behavior:
+
+- Supports `break` and `continue` statements
+
+### Do while loop
+
+Executes the code and repeats it while the condition resolves to `true`
+
+```js
+let i = 0;
+do {
+  print(i);
+  i++;
+} while (i < 10);
+```
+
+Behavior:
+
+- Supports `break` and `continue` statements
+
 ## Typescript
 
 ### Enums
