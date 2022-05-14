@@ -6,6 +6,7 @@ There are a total of four different data types:
 
 - Literal
 - Store
+- Senseable
 - Function
 - Object
 
@@ -32,7 +33,7 @@ typeof b === "store"; // true
 
 ## Senseable
 
-Senseable values are a special type of store that can have it's properties "sensed"
+Senseable values are a special type of store that can have its properties "sensed"
 by accessing it in a member syntax.
 
 ```js
@@ -59,7 +60,7 @@ typeof add === "function"; // true
 
 Object values are constants and support operator overriding.
 
-Note that operator overriding cannot be checked by typescript, so it's use is not recommended.
+Note that operator overriding cannot be checked by typescript, so its use is not recommended.
 
 ```js
 const obj = {

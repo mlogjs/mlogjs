@@ -21,6 +21,10 @@ Allows you to access processor variables.
 - `maph` - The height of the map.
 - `links` - The number of blocks linked to this processor.
 - `unit` - The unit currently bound to this processor.
+- `itemCount` - Total amount of items existent, can be used to check if an item ID is valid
+- `liquidCount` - Total amount of liquids existent, can be used to check if a liquid ID is valid
+- `unitCount` - Total amount of units existent, can be used to check if an unit ID is valid
+- `blockCount` - Total amount of blocks existent, can be used to check if a block ID is valid
 
 ## Items
 
@@ -97,7 +101,7 @@ Contains all units available
 
 ## LAccess
 
-This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/macros#sensing-properties-of-entities)
+This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/data-types#senseable)
 
 - `totalItems`
 - `firstItem`
@@ -160,33 +164,24 @@ Contains the available symbols for blocks.
 
 - `air`
 - `solid`
+- `graphitePress`
+- `multiPress`
 - `siliconSmelter`
 - `siliconCrucible`
 - `kiln`
-- `graphitePress`
 - `plastaniumCompressor`
-- `multiPress`
 - `phaseWeaver`
-- `surgeSmelter`
+- `alloySmelter`
+- `cryofluidMixer`
 - `pyratiteMixer`
 - `blastMixer`
-- `cryofluidMixer`
 - `melter`
 - `separator`
 - `disassembler`
 - `sporePress`
 - `pulverizer`
-- `incinerator`
 - `coalCentrifuge`
-- `powerSource`
-- `powerVoid`
-- `itemSource`
-- `itemVoid`
-- `liquidSource`
-- `liquidVoid`
-- `payloadSource`
-- `payloadVoid`
-- `illuminator`
+- `incinerator`
 - `copperWall`
 - `copperWallLarge`
 - `titaniumWall`
@@ -195,34 +190,34 @@ Contains the available symbols for blocks.
 - `plastaniumWallLarge`
 - `thoriumWall`
 - `thoriumWallLarge`
-- `door`
-- `doorLarge`
 - `phaseWall`
 - `phaseWallLarge`
 - `surgeWall`
 - `surgeWallLarge`
+- `door`
+- `doorLarge`
+- `scrapWall`
+- `scrapWallLarge`
+- `scrapWallHuge`
+- `scrapWallGigantic`
+- `thruster`
 - `mender`
 - `mendProjector`
 - `overdriveProjector`
 - `overdriveDome`
 - `forceProjector`
 - `shockMine`
-- `scrapWall`
-- `scrapWallLarge`
-- `scrapWallHuge`
-- `scrapWallGigantic`
-- `thruster`
 - `conveyor`
 - `titaniumConveyor`
 - `plastaniumConveyor`
 - `armoredConveyor`
-- `distributor`
 - `junction`
-- `itemBridge`
+- `bridgeConveyor`
 - `phaseConveyor`
 - `sorter`
 - `invertedSorter`
 - `router`
+- `distributor`
 - `overflowGate`
 - `underflowGate`
 - `massDriver`
@@ -241,28 +236,28 @@ Contains the available symbols for blocks.
 - `liquidJunction`
 - `bridgeConduit`
 - `phaseConduit`
+- `powerNode`
+- `powerNodeLarge`
+- `surgeTower`
+- `diode`
+- `battery`
+- `batteryLarge`
 - `combustionGenerator`
 - `thermalGenerator`
 - `steamGenerator`
 - `differentialGenerator`
 - `rtgGenerator`
 - `solarPanel`
-- `largeSolarPanel`
+- `solarPanelLarge`
 - `thoriumReactor`
 - `impactReactor`
-- `battery`
-- `batteryLarge`
-- `powerNode`
-- `powerNodeLarge`
-- `surgeTower`
-- `diode`
 - `mechanicalDrill`
 - `pneumaticDrill`
 - `laserDrill`
 - `blastDrill`
 - `waterExtractor`
-- `oilExtractor`
 - `cultivator`
+- `oilExtractor`
 - `coreShard`
 - `coreFoundation`
 - `coreNucleus`
@@ -273,20 +268,20 @@ Contains the available symbols for blocks.
 - `scatter`
 - `scorch`
 - `hail`
-- `arc`
 - `wave`
 - `lancer`
+- `arc`
+- `parallax`
 - `swarmer`
 - `salvo`
+- `segment`
+- `tsunami`
 - `fuse`
 - `ripple`
 - `cyclone`
 - `foreshadow`
 - `spectre`
 - `meltdown`
-- `segment`
-- `parallax`
-- `tsunami`
 - `commandCenter`
 - `groundFactory`
 - `airFactory`
@@ -305,14 +300,23 @@ Contains the available symbols for blocks.
 - `largeConstructor`
 - `payloadLoader`
 - `payloadUnloader`
+- `powerSource`
+- `powerVoid`
+- `itemSource`
+- `itemVoid`
+- `liquidSource`
+- `liquidVoid`
+- `payloadSource`
+- `payloadVoid`
+- `illuminator`
+- `launchPad`
+- `interplanetaryAccelerator`
 - `message`
-- `switchBlock`
+- `switch`
 - `microProcessor`
 - `logicProcessor`
 - `hyperProcessor`
-- `largeLogicDisplay`
-- `logicDisplay`
 - `memoryCell`
 - `memoryBank`
-- `launchPad`
-- `interplanetaryAccelerator`
+- `logicDisplay`
+- `largeLogicDisplay`
