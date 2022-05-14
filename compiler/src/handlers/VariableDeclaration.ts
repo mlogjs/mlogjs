@@ -130,6 +130,8 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
         `The property "${i}" does not exist on the target object`,
         [element]
       );
+    if (kind === "const" && val.macro)
+      throw new CompilerError("Macros must be held by constants", [element]);
 
     switch (element.type) {
       case "Identifier":
