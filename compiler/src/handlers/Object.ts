@@ -1,6 +1,17 @@
 import { CompilerError } from "../CompilerError";
-import { es, IInstruction, IValue, THandler } from "../types";
-import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
+import {
+  es,
+  IInstruction,
+  IValue,
+  THandler,
+  TValueInstructions,
+} from "../types";
+import {
+  DestructuringValue,
+  IObjectValueData,
+  LiteralValue,
+  ObjectValue,
+} from "../values";
 import { ValueOwner } from "../values/ValueOwner";
 
 export const ObjectExpression: THandler = (
@@ -68,4 +79,41 @@ export const MemberExpression: THandler = (
 
   const [got, gotInst] = obj.get(scope, prop);
   return [got, [...objInst, ...propInst, ...gotInst]];
+};
+
+export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
+  const inst: IInstruction[] = [];
+  const members = new Map<IValue, IValue>();
+  for (let i = 0; i < node.elements.length; i++) {
+    const element = node.elements[i];
+    if (!element) continue;
+    const valueInst = c.handleEval(scope, element);
+    inst.push(...valueInst[1]);
+    members.set(new LiteralValue(scope, i), valueInst[0]);
+  }
+  return [new DestructuringValue(scope, members), inst];
+};
+
+export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
+  const inst: IInstruction[] = [];
+  const members = new Map<IValue, IValue>();
+  for (const prop of node.properties) {
+    if (prop.type === "RestElement")
+      throw new CompilerError("The rest operator is not supported");
+
+    if (!prop) continue;
+
+    const { key } = prop;
+    const keyInst: TValueInstructions =
+      !prop.computed && key.type === "Identifier"
+        ? [new LiteralValue(scope, key.name), []]
+        : c.handleEval(scope, prop.key);
+    inst.push(...keyInst[1]);
+
+    const valueInst = c.handleEval(scope, prop.value);
+    inst.push(...valueInst[1]);
+
+    members.set(keyInst[0], valueInst[0]);
+  }
+  return [new DestructuringValue(scope, members), inst];
 };
