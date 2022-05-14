@@ -132,6 +132,34 @@ Behavior:
 
 - Supports `break` and `continue` statements
 
+### Template strings
+
+Template strings in javascript allow you to interpolate values with strings in
+a convenient way.
+
+But since the mlog runtime doesn't support string contenation template are used to
+inline mlog code.
+
+The following has it's last line inlined onto the output.
+
+```js
+const conveyor = getBuilding("conveyor1");
+const message = getBuilding("message1");
+
+print(conveyor.x, conveyor.y);
+
+`printflush ${message}`;
+```
+
+```
+sensor &t0 conveyor1 @x
+sensor &t1 conveyor1 @y
+print &t0
+print &t1
+printflush message1
+end
+```
+
 ## Typescript
 
 ### Enums
