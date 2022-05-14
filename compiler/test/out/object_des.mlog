@@ -1,0 +1,20 @@
+sensor x:1:6 cyclone1 @x
+sensor y:1:9 cyclone1 @y
+sensor health:1:12 cyclone1 @health
+ulocate building core 1 @copper &_ &_ &_ &t0
+sensor coreType:3:21 &t0 @type
+print x:1:6
+print y:1:9
+print health:1:12
+print coreType:3:21
+printflush message1
+set x:1:6 10
+set y:1:9 20
+set health:1:12 200
+set x:1:6 30
+set y:1:9 40
+set health:1:12 500
+print x:1:6
+print y:1:9
+print health:1:12
+end
