@@ -32,18 +32,7 @@ export const VariableDeclarator: THandler<null> = (
     ? c.handleEval(scope, node.init)
     : [null, []];
 
-  switch (node.id.type) {
-    case "Identifier":
-      inst.push(...DeclareIdentifier(c, scope, node.id, kind, init)[1]);
-      break;
-    case "ArrayPattern":
-      inst.push(...DeclareArrayPattern(c, scope, node.id, kind, init)[1]);
-      break;
-    default:
-      throw new CompilerError(
-        `Unsupported variable declaration type: ${node.id.type}`
-      );
-  }
+  inst.push(...Declare(c, scope, node.id, kind, init)[1]);
   return [null, inst];
 };
 
@@ -55,6 +44,20 @@ type TDeclareHandler<T extends es.Node> = (
   init: IValue | null
 ) => TValueInstructions<null>;
 
+const Declare: TDeclareHandler<es.Node> = (c, scope, node, kind, init) => {
+  switch (node.type) {
+    case "Identifier":
+      return DeclareIdentifier(c, scope, node, kind, init);
+    case "ArrayPattern":
+      return DeclareArrayPattern(c, scope, node, kind, init);
+    case "ObjectPattern":
+      return DeclareObjectPattern(c, scope, node, kind, init);
+    default:
+      throw new CompilerError(`Unsupported declaration type: ${node.type}`, [
+        node,
+      ]);
+  }
+};
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
   scope,
@@ -133,19 +136,37 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     if (kind === "const" && val.macro)
       throw new CompilerError("Macros must be held by constants", [element]);
 
-    switch (element.type) {
-      case "Identifier":
-        inst.push(...DeclareIdentifier(c, scope, element, kind, val)[1]);
-        break;
-      case "ArrayPattern":
-        inst.push(...DeclareArrayPattern(c, scope, element, kind, val)[1]);
-        break;
-      default:
-        throw new CompilerError(
-          `Unsupported declaration type: ${element.type}`,
-          [element]
-        );
-    }
+    inst.push(...Declare(c, scope, element, kind, val)[1]);
+  }
+  return [null, inst];
+};
+
+const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
+  c,
+  scope,
+  node,
+  kind,
+  init
+) => {
+  if (!init)
+    throw new CompilerError(
+      "Cannot use object destructuring without an initializer",
+      [node]
+    );
+  const { properties } = node;
+  const inst: IInstruction[] = [];
+  for (const prop of properties) {
+    if (prop.type === "RestElement")
+      throw new CompilerError("The rest operator is not supported", [prop]);
+
+    const key = c.handleConsume(scope, prop.key);
+    inst.push(...key[1]);
+
+    const propInit = init.get(scope, key[0]);
+    inst.push(...propInit[1]);
+
+    const { value } = prop;
+    inst.push(...Declare(c, scope, value, kind, propInit[0])[1]);
   }
   return [null, inst];
 };
