@@ -4,3 +4,4 @@ export * from "./LiteralValue";
 export * from "./StoreValue";
 export * from "./ObjectValue";
 export * from "./SenseableValue";
+export * from "./DestructuringValue";
