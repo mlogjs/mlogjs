@@ -2,4 +2,16 @@ print 5
 print 19
 print 123
 print "foo"
+set e:12:5 5
+set f:12:8 19
+set g:12:11 123
+set h:12:14 "foo"
+set h:12:14 5
+set g:12:11 19
+set f:12:8 123
+set e:12:5 "foo"
+print e:12:5
+print f:12:8
+print g:12:11
+print h:12:14
 end
