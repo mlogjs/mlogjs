@@ -6,7 +6,7 @@ You can create a memory view like in the example bellow.
 
 ```js
 const bank = getBuilding("bank1");
-const memory = new Memory(bank, 512); // must be specified when using memory banks
+const memory = new Memory(bank, 512); // the memory size must be specified when using memory banks
 ```
 
 Memory views can be indexed by numbers and also have a `length` property,
