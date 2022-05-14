@@ -1,5 +1,12 @@
 import { ObjectValue } from "../values";
-import { THandler, es, TValueInstructions, IValue, IScope } from "../types";
+import {
+  THandler,
+  es,
+  TValueInstructions,
+  IValue,
+  IScope,
+  IInstruction,
+} from "../types";
 import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
@@ -15,25 +22,29 @@ export const VariableDeclaration: THandler<null> = (
   );
 };
 
-export const VariableDeclarator: THandler<IValue | null> = (
+export const VariableDeclarator: THandler<null> = (
   c,
   scope,
   node: es.VariableDeclarator,
   kind: "let" | "var" | "const" = "let"
 ) => {
-  const valinst: TValueInstructions<IValue | null> = node.init
+  const [init, inst]: TValueInstructions<IValue | null> = node.init
     ? c.handleEval(scope, node.init)
     : [null, []];
+
   switch (node.id.type) {
     case "Identifier":
-      return DeclareIdentifier(c, scope, node.id, kind, valinst);
+      inst.push(...DeclareIdentifier(c, scope, node.id, kind, init)[1]);
+      break;
     case "ArrayPattern":
-      return DeclareArrayPattern(c, scope, node.id, kind, valinst);
+      inst.push(...DeclareArrayPattern(c, scope, node.id, kind, init)[1]);
+      break;
     default:
       throw new CompilerError(
         `Unsupported variable declaration type: ${node.id.type}`
       );
   }
+  return [null, inst];
 };
 
 type TDeclareHandler<T extends es.Node> = (
@@ -41,7 +52,7 @@ type TDeclareHandler<T extends es.Node> = (
   scope: IScope,
   node: T,
   kind: "let" | "const" | "var",
-  valinst: TValueInstructions<IValue | null>
+  init: IValue | null
 ) => TValueInstructions<null>;
 
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
@@ -49,11 +60,10 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   scope,
   node,
   kind,
-  valinst
+  init
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
-  const [init] = valinst;
   if (kind === "const" && !init)
     throw new CompilerError("Constants must be initialized.", [node]);
   if (kind === "const" && init?.constant) {
@@ -65,19 +75,20 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
       constant: true,
     });
     scope.set(owner);
-    return [null, valinst[1]];
+    return [null, []];
   } else {
     const value = scope.make(identifier, name);
+    const inst: IInstruction[] = [];
     if (init) {
       if (init.macro)
         throw new CompilerError("Macro values must be held by constants", [
           node,
         ]);
 
-      valinst[1].push(...value["="](scope, init)[1]);
+      inst.push(...value["="](scope, init)[1]);
     }
     if (kind === "const") value.constant = true;
-    return [null, valinst[1]];
+    return [null, inst];
   }
 };
 
@@ -86,10 +97,9 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
   scope,
   node,
   kind,
-  valinst
+  init
 ) => {
   const { elements } = node;
-  const [init] = valinst;
   if (!init)
     throw new CompilerError(
       "Cannot use array destructuring without an initializer",
@@ -108,6 +118,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     );
   }
 
+  const inst: IInstruction[] = [];
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
 
@@ -122,10 +133,10 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
 
     switch (element.type) {
       case "Identifier":
-        DeclareIdentifier(c, scope, element, kind, [val, valinst[1]]);
+        inst.push(...DeclareIdentifier(c, scope, element, kind, val)[1]);
         break;
       case "ArrayPattern":
-        DeclareArrayPattern(c, scope, element, kind, [val, valinst[1]]);
+        inst.push(...DeclareArrayPattern(c, scope, element, kind, val)[1]);
         break;
       default:
         throw new CompilerError(
@@ -134,5 +145,5 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
         );
     }
   }
-  return [null, valinst[1]];
+  return [null, inst];
 };
