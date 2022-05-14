@@ -33,6 +33,25 @@ Limitations:
 
 - Variables declared with `var` are not hoisted.
 
+### If/else statements
+
+You can use `if` and `else` statements just like in regular javascript without limitations.
+
+```js
+const message = getBuilding("message1");
+const building = getLink(0);
+
+if (building.type === Blocks.message) {
+  print("Linked to message block");
+} else if (building.type === Blocks.memoryCell) {
+  print("Ready to read memory");
+} else {
+  print("Linked to some block");
+}
+
+printFlush(message);
+```
+
 ### Functions
 
 You can declare regular functions using your preferred style:
