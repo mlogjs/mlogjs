@@ -1,4 +1,4 @@
-import { ObjectValue } from "../values";
+import { LiteralValue, ObjectValue } from "../values";
 import {
   THandler,
   es,
@@ -44,7 +44,7 @@ type TDeclareHandler<T extends es.Node> = (
   init: IValue | null
 ) => TValueInstructions<null>;
 
-const Declare: TDeclareHandler<es.Node> = (c, scope, node, kind, init) => {
+const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind, init) => {
   switch (node.type) {
     case "Identifier":
       return DeclareIdentifier(c, scope, node, kind, init);
@@ -146,27 +146,32 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   scope,
   node,
   kind,
-  init
+  base
 ) => {
-  if (!init)
+  if (!base)
     throw new CompilerError(
       "Cannot use object destructuring without an initializer",
       [node]
     );
   const { properties } = node;
-  const inst: IInstruction[] = [];
+  const [init, inst] = base.consume(scope);
   for (const prop of properties) {
     if (prop.type === "RestElement")
       throw new CompilerError("The rest operator is not supported", [prop]);
 
-    const key = c.handleConsume(scope, prop.key);
-    inst.push(...key[1]);
+    const { key, value } = prop;
 
-    const propInit = init.get(scope, key[0]);
+    const child: TValueInstructions =
+      key.type === "Identifier" && !prop.computed
+        ? [new LiteralValue(scope, key.name), []]
+        : c.handleConsume(scope, prop.key);
+
+    inst.push(...child[1]);
+
+    const propInit = init.get(scope, child[0]);
     inst.push(...propInit[1]);
 
-    const { value } = prop;
-    inst.push(...Declare(c, scope, value, kind, propInit[0])[1]);
+    inst.push(...Declare(c, scope, value as es.LVal, kind, propInit[0])[1]);
   }
   return [null, inst];
 };
