@@ -133,7 +133,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
         `The property "${i}" does not exist on the target object`,
         [element]
       );
-    if (kind === "const" && val.macro)
+    if (kind !== "const" && val.macro)
       throw new CompilerError("Macros must be held by constants", [element]);
 
     inst.push(...Declare(c, scope, element, kind, val)[1]);
@@ -170,6 +170,9 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
 
     const propInit = init.get(scope, child[0]);
     inst.push(...propInit[1]);
+
+    if (kind !== "const" && propInit[0].macro)
+      throw new CompilerError("Macros must be held by constants", [prop]);
 
     inst.push(...Declare(c, scope, value as es.LVal, kind, propInit[0])[1]);
   }
