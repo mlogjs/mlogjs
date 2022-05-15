@@ -227,3 +227,7 @@ Note that the mlogjs compiler does not take in account for the typescript types 
 ### Types/interfaces
 
 You can declare custom type aliases and interfaces. Since the compiler does not perform typescript's type checking, it will simply ignore these kinds of declarations.
+
+### Non null assertions
+
+Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check nullable variables is before using them.
