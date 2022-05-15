@@ -217,3 +217,13 @@ Behavior:
 Limitations:
 
 - All enums must be `const`, since dynamic objects are not supported in the mlog runtime
+
+### Type casts
+
+You can type cast variables to narrow the type of a variable.
+
+Note that the mlogjs compiler does not take in account for the typescript types of variables and expressions.
+
+### Types/interfaces
+
+You can declare custom type aliases and interfaces. Since the compiler does not perform typescript's type checking, it will simply ignore these kinds of declarations.
