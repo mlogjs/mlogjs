@@ -132,12 +132,48 @@ Behavior:
 
 - Supports `break` and `continue` statements
 
+### Destructuring
+
+You can use destructuring to assign or declare variables.
+
+It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same output:
+
+```js
+const turret = getBuilding("cyclone1");
+const { x, y, health } = turret;
+```
+
+```js
+const turret = getBuilding("cyclone1");
+const x = turret.x;
+const y = turret.y;
+const health = turret.health;
+```
+
+Behavior:
+
+- Assigns each destructured expression in the declaration order
+- Destructuring expressions CAN be nested.
+
+```js
+const [found, x, y, { totalItems }] = unitLocate("building", "core", false);
+```
+
+Limitations:
+
+- Because this is just syntactic sugar to make multiple assignments, you can't do variable swaps.
+
+```js
+// WARNING: does not work
+[a, b] = [b, a];
+```
+
 ### Template strings
 
 Template strings in javascript allow you to interpolate values with strings in
 a convenient way.
 
-But since the mlog runtime doesn't support string contenation template are used to
+But since the mlog runtime doesn't support string contenation template strings are used to
 inline mlog code.
 
 The following has it's last line inlined onto the output.
