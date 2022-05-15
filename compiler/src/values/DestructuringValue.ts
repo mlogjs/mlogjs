@@ -1,5 +1,5 @@
 import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
-import { ObjectValue } from "./ObjectValue";
+import { VoidValue } from "./VoidValue";
 
 /**
  * Specific case class, required on the ArrayPattern and ObjectPattern handlers
@@ -8,7 +8,9 @@ import { ObjectValue } from "./ObjectValue";
  * When it is assign a value, it will get it's own properties and recursively assign
  * each of them to their counterparts on the right hand value.
  */
-export class DestructuringValue extends ObjectValue {
+export class DestructuringValue extends VoidValue {
+  macro = true;
+
   constructor(scope: IScope, public members: Map<IValue, IValue>) {
     super(scope);
   }
@@ -22,5 +24,13 @@ export class DestructuringValue extends ObjectValue {
       inst.push(...value["="](scope, item)[1]);
     }
     return [right, inst];
+  }
+
+  eval(_scope: IScope): TValueInstructions<IValue> {
+    return [this, []];
+  }
+
+  consume(_scope: IScope): TValueInstructions<IValue> {
+    return [this, []];
   }
 }
