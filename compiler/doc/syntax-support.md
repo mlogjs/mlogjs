@@ -230,4 +230,4 @@ You can declare custom type aliases and interfaces. Since the compiler does not 
 
 ### Non null assertions
 
-Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check nullable variables is before using them.
+Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `null` before using them.
