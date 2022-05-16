@@ -133,8 +133,9 @@ declare global {
    * Warning: nothing is drawn until `drawFlush` is called.
    * @param image The symbol for the image to be drawn.
    * @param rotation The rotation of the image in degrees.
-   * @example
-   * ```
+   *
+   * Example:
+   * ```js
    * // draw a router
    * draw("image", 30, 30, Blocks.router, 15, 0);
    *
@@ -171,8 +172,9 @@ declare global {
    * To make safe queries it is recommended to check an index
    * before trying to get a link. This can be done by using `Vars.links`.
    * @param index
-   * @example
-   * ```
+   *
+   * Example:
+   * ```js
    * if(index < Vars.links) {
    *   myBlock = getLink(index)
    * }
@@ -245,10 +247,12 @@ declare global {
    *  (1 => first unit, 2 => second unit and so on)
    * @param sort The method on which the results should be sorted
    *
-   * @example
+   * Example:
+   * ```js
    *  const turret = getBuilding("cyclone1")
    *  // returns the second nearest enemy unit
    *  const result = radar(turret, "enemy", "any", "any", 2, "distance")
+   * ```
    */
   function radar<T extends BasicUnit = AnyUnit>(
     building: BasicBuilding,
@@ -267,12 +271,14 @@ declare global {
    * @param property The property to be sensed on the building
    * @param target
    *
-   * @example
+   * Example:
+   * ```js
    *  let myBuilding = getBuilding("container1")
    *  // jsdoc doesn't allow me to type this
    * // variable, but you should type it as a symbol in this case
    *  let myCustomSymbol = getVar("@custom-symbol") // problably defined by a mod
    *  let result = sensor(myCustomSymbol, myBuilding)
+   * ```
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
@@ -286,8 +292,8 @@ declare global {
    *
    * Use `Vars.blockCount` to check the maximum index allowed.
    *
-   * @example
-   * ```
+   * Example:
+   * ```js
    * if(index < Vars.blockCount) {
    *   let blockKind = lookup("block", index);
    * }
@@ -299,8 +305,8 @@ declare global {
    *
    * Use `Vars.unitCount` to check the maximum index allowed.
    *
-   * @example
-   * ```
+   * Example:
+   * ```js
    * if(index < Vars.unitCount) {
    *   let unitKind = lookup("unit", index);
    * }
@@ -312,8 +318,8 @@ declare global {
    *
    * Use `Vars.itemCount` to check the maximum index allowed.
    *
-   * @example
-   * ```
+   * Example:
+   * ```js
    * if(index < Vars.itemCount) {
    *   let itemKind = lookup("item", index);
    * }
@@ -325,8 +331,8 @@ declare global {
    *
    * Use `Vars.liquidCount` to check the maximum index allowed.
    *
-   * @example
-   * ```
+   * Example:
+   * ```js
    * if(index < Vars.liquidCount) {
    *   let liquidKind = lookup("liquid", index);
    * }
@@ -472,9 +478,11 @@ declare global {
    *  (1 => first unit, 2 => second unit and so on)
    * @param sort The method on which the results should be sorted
    *
-   * @example
+   * Example:
+   * ```js
    *  // returns the second nearest enemy unit
    *  const result = unitRadar("enemy", "any", "any", 2, "distance")
+   * ```
    */
   function unitRadar<T extends BasicUnit = AnyUnit>(
     filter1: TRadarFilter,
