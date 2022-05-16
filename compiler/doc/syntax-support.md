@@ -132,6 +132,31 @@ Behavior:
 
 - Supports `break` and `continue` statements
 
+### Math and related operators
+
+All the mathematical operators for numbers are supported and will be transpiled into mlog code.
+
+But the `Math` object has been modified to match the other math functions
+available on the mlog runtime. They are listed bellow:
+
+- `abs` - Absolute value of a number
+- `angle` - Angle of a vector in degrees
+- `ceil` - Rounds the number to the closest bigger integer
+- `cos` - Cosine of an angle in degrees
+- `floor` - Rounds the number to the closest smaller integer
+- `len` - Length of a vector
+- `log` - Natural logarithm of a number
+- `log10` - Base 10 logarithm of a number
+- `max` - Returns the biggest of two values
+- `min` - Returns the smallest of two values
+- `noise` - 2D simplex noise
+- `rand` - Random number between 0 (inclusive) and the specified number (exclusive)
+- `sin` - Sine of an angle in degrees
+- `sqrt` - Square root of a number
+- `tan` - Tangent of an angle in degrees
+
+Check out the [online editor](https://mlogjs.github.io/mlogjs/editor/) to see how each one works!
+
 ### Destructuring
 
 You can use destructuring to assign or declare variables.
