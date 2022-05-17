@@ -87,7 +87,13 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
   for (let i = 0; i < node.elements.length; i++) {
     const element = node.elements[i];
     if (!element) continue;
-    const valueInst = c.handleEval(scope, element);
+    const valueInst = c.handle(scope, element);
+
+    if (!valueInst[0])
+      throw new CompilerError("Destructuring element must resolve to a value", [
+        element,
+      ]);
+
     inst.push(...valueInst[1]);
     members.set(new LiteralValue(scope, i), valueInst[0]);
   }
@@ -107,10 +113,16 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const keyInst: TValueInstructions =
       !prop.computed && key.type === "Identifier"
         ? [new LiteralValue(scope, key.name), []]
-        : c.handleEval(scope, prop.key);
+        : c.handleConsume(scope, prop.key);
     inst.push(...keyInst[1]);
 
-    const valueInst = c.handleEval(scope, prop.value);
+    const valueInst = c.handle(scope, prop.value);
+
+    if (!valueInst[0])
+      throw new CompilerError("Destructuring member must resolve to a value", [
+        prop.value,
+      ]);
+
     inst.push(...valueInst[1]);
 
     members.set(keyInst[0], valueInst[0]);
