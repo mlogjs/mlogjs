@@ -132,12 +132,98 @@ Behavior:
 
 - Supports `break` and `continue` statements
 
+### Math and related operators
+
+All the mathematical operators for numbers are supported and will be transpiled into mlog code.
+
+But the `Math` object has been modified to match the other math functions
+available on the mlog runtime. They are listed bellow:
+
+- `abs` - Absolute value of a number
+- `angle` - Angle of a vector in degrees
+- `ceil` - Rounds the number to the closest bigger integer
+- `cos` - Cosine of an angle in degrees
+- `floor` - Rounds the number to the closest smaller integer
+- `len` - Length of a vector
+- `log` - Natural logarithm of a number
+- `log10` - Base 10 logarithm of a number
+- `max` - Returns the biggest of two values
+- `min` - Returns the smallest of two values
+- `noise` - 2D simplex noise
+- `rand` - Random number between 0 (inclusive) and the specified number (exclusive)
+- `sin` - Sine of an angle in degrees
+- `sqrt` - Square root of a number
+- `tan` - Tangent of an angle in degrees
+
+Check out the [online editor](https://mlogjs.github.io/mlogjs/editor/) to see how each one works!
+
+### Logical operators
+
+The logical operators `&&` (and) and `||` (or) are supported, although they DO NOT short-circuit. See [What is short-circuiting?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation)
+
+Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
+
+```js
+// WARNING: does not work
+// first: both expressions are evaluated because there is no
+// short circuiting
+//
+// second: the final value will be a boolean, not
+// whathever object getSomething returns
+let foo = isEnabled && getSomething();
+```
+
+Behavior:
+
+- The operators evaluate all of the expressions and return a boolean value
+
+Limitations:
+
+- No short-circuiting support
+- These expressions cannot return anything other than a boolean
+
+### Destructuring
+
+You can use destructuring to assign or declare variables.
+
+It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same output:
+
+```js
+const turret = getBuilding("cyclone1");
+const { x, y, health } = turret;
+```
+
+```js
+const turret = getBuilding("cyclone1");
+const x = turret.x;
+const y = turret.y;
+const health = turret.health;
+```
+
+Behavior:
+
+- Assigns each destructured expression in the declaration order
+- Destructuring expressions CAN be nested.
+
+```js
+const [found, x, y, { totalItems }] = unitLocate("building", "core", false);
+```
+
+Limitations:
+
+- Because this is just syntactic sugar to make multiple assignments, you can't do variable swaps.
+
+```js
+// WARNING: does not work
+[a, b] = [b, a];
+```
+
 ### Template strings
 
 Template strings in javascript allow you to interpolate values with strings in
 a convenient way.
 
-But since the mlog runtime doesn't support string contenation template are used to
+But since the mlog runtime doesn't support string contenation template strings are used to
 inline mlog code.
 
 The following has it's last line inlined onto the output.
@@ -181,3 +267,17 @@ Behavior:
 Limitations:
 
 - All enums must be `const`, since dynamic objects are not supported in the mlog runtime
+
+### Type casts
+
+You can type cast variables to narrow the type of a variable.
+
+Note that the mlogjs compiler does not take in account for the typescript types of variables and expressions.
+
+### Types/interfaces
+
+You can declare custom type aliases and interfaces. Since the compiler does not perform typescript's type checking, it will simply ignore these kinds of declarations.
+
+### Non null assertions
+
+Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `null` before using them.
