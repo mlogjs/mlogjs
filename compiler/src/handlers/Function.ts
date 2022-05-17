@@ -11,13 +11,8 @@ function handleFunctionNode(
 ): TValueInstructions<FunctionValue> {
   let { params, body } = node;
 
-  if ("expression" in node && node.expression) {
-    body = {
-      type: "BlockStatement",
-      body: [
-        { ...body, type: "ReturnStatement", argument: body as es.Expression },
-      ],
-    } as es.BlockStatement;
+  if (es.isExpression(body)) {
+    body = es.blockStatement([es.returnStatement(body)]);
   }
 
   return [
@@ -25,7 +20,7 @@ function handleFunctionNode(
       node,
       scope,
       params: params as es.Identifier[],
-      body: body as es.BlockStatement,
+      body,
       c,
     }),
     [],
