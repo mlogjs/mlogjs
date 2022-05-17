@@ -1,6 +1,6 @@
-function add(a, b) {
-  return a + b;
-}
+// tests arrow functions
+
+const add = (a, b) => a + b;
 
 function sub(a, b) {
   return a - b;
