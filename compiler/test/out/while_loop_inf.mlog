@@ -1,0 +1,9 @@
+set i:1:4 0
+print "data"
+op mod &t0 i:1:4 10
+op equal &t1 &t0 0
+jump 7 equal &t1 0
+print i:1:4
+print " ends on zero"
+jump 1 always
+end
