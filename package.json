@@ -3,7 +3,7 @@
     "editor",
     "compiler"
   ],
-  "packageManager": "yarn@3.2.0",
+  "packageManager": "pnpm@7.1.2",
   "devDependencies": {
     "prettier": "^2.5.1",
     "typescript": "^4.6.2",

@@ -25,7 +25,6 @@
     "type": "git",
     "url": "git+https://github.com/weisrc/mlogjs.git"
   },
-  "packageManager": "yarn@3.2.0",
   "keywords": [],
   "author": "str1z",
   "license": "MIT",
