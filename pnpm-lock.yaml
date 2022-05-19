@@ -25,7 +25,6 @@ importers:
       '@types/yargs': ^16.0.1
       '@typescript-eslint/eslint-plugin': ^5.15.0
       '@typescript-eslint/parser': ^5.15.0
-      chalk: ^5.0.1
       cli-highlight: ^2.1.11
       eslint: ^8.11.0
       jest: ^27.5.1
@@ -39,7 +38,6 @@ importers:
       yargs: ^17.0.1
     dependencies:
       '@babel/parser': 7.17.12
-      chalk: 5.0.1
       cli-highlight: 2.1.11
       yargs: 17.5.1
     devDependencies:
@@ -1458,11 +1456,6 @@ packages:
     dependencies:
       ansi-styles: 4.3.0
       supports-color: 7.2.0
-
-  /chalk/5.0.1:
-    resolution: {integrity: sha512-Fo07WOYGqMfCWHOzSXOt2CxDbC6skS/jO9ynEcmpANMoPrD+W1r1K6Vx7iNm+AQmETU1Xr2t+n8nzkV9t6xh3w==}
-    engines: {node: ^12.17.0 || ^14.13 || >=16.0.0}
-    dev: false
 
   /char-regex/1.0.2:
     resolution: {integrity: sha512-kWWXztvZ5SBQV+eRgKFeh8q5sLuZY2+8WUIzlxWVTg+oGwY14qylx1KbKzHd8P6ZYkAg0xyIDU9JMHhyJMZ1jw==}
