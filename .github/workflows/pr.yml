@@ -12,8 +12,8 @@ jobs:
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - run: yarn install --immutable
-      - run: yarn workspace mlogjs clean
-      - run: yarn workspace mlogjs coverage
-      - run: yarn workspace mlogjs run-p build docs
-      - run: yarn workspace editor build
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C compiler clean
+      - run: pnpm -C compiler coverage
+      - run: pnpm -C compiler run-p build docs
+      - run: pnpm -C editor build
