@@ -19,5 +19,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C compiler clean
       - run: pnpm -C compiler coverage
-      - run: pnpm -C compiler run-p build docs
+      - run: pnpm -C compiler build
+      - run: pnpm -C compiler docs
       - run: pnpm -C editor build
