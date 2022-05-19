@@ -4,12 +4,10 @@ docs
 doc
 editor
 .github
-.yarn
 samples
 .gitignore
 .gitattribute
 .prettierrc.json
-.yarnrc.yml
 jest.config.ts
 tsconfig.json
 vite.config.ts
