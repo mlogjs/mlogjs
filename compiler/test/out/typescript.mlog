@@ -1,0 +1,9 @@
+print 10
+print 11
+print "off"
+print 13
+set foo:11:4 @unknown
+set bar:13:4 foo:11:4
+set baz:15:4 foo:11:4
+set last:17:4 foo:11:4
+end

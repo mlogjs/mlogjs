@@ -1,0 +1,22 @@
+op rand pos:1:6 10
+op lessThan &t0 pos:1:6 2
+jump 5 equal &t0 0
+set content:3:6 "low"
+jump 14 always
+op lessThan &t2 pos:1:6 4
+jump 9 equal &t2 0
+set content:3:6 "medium"
+jump 14 always
+op lessThan &t4 pos:1:6 6
+jump 13 equal &t4 0
+set content:3:6 "high"
+jump 14 always
+set content:3:6 "very high"
+print content:3:6
+op sub offset:8:6 pos:1:6 5
+op sub &t6 0 offset:8:6
+print &t6
+print offset:8:6
+print 10
+print "huh, true"
+end

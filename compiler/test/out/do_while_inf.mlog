@@ -1,0 +1,12 @@
+set i:1:4 0
+print i:1:4
+print "\n"
+op rand &t0 1
+op greaterThan &t0 &t0 0.5
+jump 8 equal &t0 0
+set &t1 2
+jump 9 always
+set &t1 1
+op add i:1:4 i:1:4 &t1
+jump 1 always
+end
