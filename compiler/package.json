@@ -34,6 +34,7 @@
   "homepage": "https://github.com/weisrc/mlogjs#readme",
   "dependencies": {
     "@babel/parser": "^7.17.7",
+    "chalk": "^5.0.1",
     "cli-highlight": "^2.1.11",
     "yargs": "^17.0.1"
   },
