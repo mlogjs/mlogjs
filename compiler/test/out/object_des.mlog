@@ -22,7 +22,6 @@ print y:3:9
 print health:3:12
 print &t9
 ulocate building core 1 @copper &_ &_ &_ &t0:computed:31:6:31:17
-jump 25 always
 sensor x:3:6 &t0:computed:31:6:31:17 @x
 sensor y:3:9 &t0:computed:31:6:31:17 @y
 end

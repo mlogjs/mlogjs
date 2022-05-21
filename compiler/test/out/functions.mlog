@@ -13,26 +13,22 @@ print "."
 printflush message1
 end
 op strictEqual &t0:op:17:0:17:0 type:17:12 0
-jump 20 equal &t0:op:17:0:17:0 0
+jump 19 equal &t0:op:17:0:17:0 0
 op add &fop:17:0:17:0 a:17:18 b:17:21
-jump 18 always
 set @counter &rop:17:0:17:0
-jump 37 always
+jump 33 always
 op strictEqual &t1:op:17:0:17:0 type:17:12 1
-jump 26 equal &t1:op:17:0:17:0 0
+jump 24 equal &t1:op:17:0:17:0 0
 op sub &fop:17:0:17:0 a:17:18 b:17:21
-jump 24 always
 set @counter &rop:17:0:17:0
-jump 37 always
+jump 33 always
 op strictEqual &t2:op:17:0:17:0 type:17:12 2
-jump 32 equal &t2:op:17:0:17:0 0
+jump 29 equal &t2:op:17:0:17:0 0
 op mul &fop:17:0:17:0 a:17:18 b:17:21
-jump 30 always
 set @counter &rop:17:0:17:0
-jump 37 always
+jump 33 always
 op strictEqual &t3:op:17:0:17:0 type:17:12 3
-jump 37 equal &t3:op:17:0:17:0 0
+jump 33 equal &t3:op:17:0:17:0 0
 op div &fop:17:0:17:0 a:17:18 b:17:21
-jump 36 always
 set @counter &rop:17:0:17:0
 set @counter &rop:17:0:17:0
