@@ -12,9 +12,3 @@ export class ContinueInstruction extends JumpInstruction {
     super(address, EJumpKind.Always);
   }
 }
-
-export class ReturnInstruction extends JumpInstruction {
-  constructor(address: IBindableValue) {
-    super(address, EJumpKind.Always);
-  }
-}
