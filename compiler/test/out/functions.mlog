@@ -31,4 +31,3 @@ op strictEqual &t3:op:17:0:17:0 type:17:12 3
 jump 33 equal &t3:op:17:0:17:0 0
 op div &fop:17:0:17:0 a:17:18 b:17:21
 set @counter &rop:17:0:17:0
-set @counter &rop:17:0:17:0

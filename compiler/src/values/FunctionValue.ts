@@ -112,7 +112,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       new AddressResolver(this.addr),
       ...this.c.handle(this.childScope, this.body)[1],
     ];
-    this.inst.push(new SetCounterInstruction(this.ret.value));
+
+    if (!endsWithReturn(this.inst)) {
+      this.inst.push(new SetCounterInstruction(this.ret.value));
+    }
   }
 
   private normalReturn(
@@ -216,4 +219,13 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   consume(_scope: IScope): TValueInstructions {
     return [this, []];
   }
+}
+
+function endsWithReturn(inst: IInstruction[]) {
+  for (let i = inst.length - 1; i >= 0; i--) {
+    const instruction = inst[i];
+    if (instruction.hidden) continue;
+    return instruction instanceof SetCounterInstruction;
+  }
+  return false;
 }
