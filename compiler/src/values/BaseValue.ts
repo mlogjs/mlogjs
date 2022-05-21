@@ -23,7 +23,7 @@ export class BaseValue extends VoidValue implements IValue {
     ];
   }
   "u+"(scope: IScope): TValueInstructions {
-    // TODO: should it return be 0 + this ?
+    // TODO: should it return 0 + this ?
     return this.eval(scope);
   }
   ensureOwned(): asserts this is IOwnedValue {
