@@ -105,7 +105,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
   const { elements } = node;
   if (!(init instanceof ObjectValue))
     throw new CompilerError(
-      "Expected object value on array destructuring declaration"
+      "The value being destructured must be an object value"
     );
 
   const inst: IInstruction[] = [];
