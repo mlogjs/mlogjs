@@ -20,7 +20,7 @@ const rawResolver: PluginOption = {
     if (!id.endsWith("!raw")) return null;
     const base = id.startsWith(".")
       ? dirname(from)
-      : resolve(__dirname, "../node_modules");
+      : resolve(__dirname, "./node_modules");
     return "\0raw" + resolve(base, id.slice(0, -4));
   },
   load: async id =>

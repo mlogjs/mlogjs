@@ -9,11 +9,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.0.1
+        with:
+          version: 7.1.2
       - uses: actions/setup-node@v2
         with:
           node-version: 16.x
-      - run: yarn install --immutable
-      - run: yarn workspace mlogjs clean
-      - run: yarn workspace mlogjs coverage
-      - run: yarn workspace mlogjs run-p build docs
-      - run: yarn workspace editor build
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C compiler clean
+      - run: pnpm -C compiler coverage
+      - run: pnpm -C compiler build
+      - run: pnpm -C compiler docs
+      - run: pnpm -C editor build

@@ -6,13 +6,16 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
+      - uses: pnpm/action-setup@v2.0.1
         with:
-          ref: ci
+          version: 7.1.2
       - uses: actions/setup-node@v2
         with:
-          node-version: "16.x"
+          node-version: 16.x
           registry-url: "https://registry.npmjs.org"
-      - run: yarn install --immutable
-      - run: yarn workspace mlogjs npm publish --access public
+          cache: pnpm
+
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm -C compiler publish --access public
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
