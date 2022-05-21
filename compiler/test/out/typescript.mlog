@@ -2,8 +2,9 @@ print 10
 print 11
 print "off"
 print 13
-set foo:11:4 @unknown
-set bar:13:4 foo:11:4
-set baz:15:4 foo:11:4
-set last:17:4 foo:11:4
+print 14
+set foo:18:4 @unknown
+set bar:20:4 foo:18:4
+set baz:22:4 foo:18:4
+set last:24:4 foo:18:4
 end

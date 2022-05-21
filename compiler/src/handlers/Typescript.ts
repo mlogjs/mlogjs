@@ -32,12 +32,12 @@ export const TSEnumDeclaration: THandler<null> = (
       "All enums must be declared with the const keyword before enum"
     );
   let counter = 0;
-  let hasString = false;
+  let lastType: "string" | "number" = "number";
 
   const data: IObjectValueData = {};
 
   for (const member of node.members) {
-    if (hasString && !member.initializer)
+    if (lastType === "string" && !member.initializer)
       throw new CompilerError("This enum member must be initialized", [member]);
 
     const [value] = member.initializer
@@ -50,9 +50,10 @@ export const TSEnumDeclaration: THandler<null> = (
       ]);
 
     if (typeof value.data === "number") {
+      lastType = "number";
       counter = value.data + 1;
     } else {
-      hasString = true;
+      lastType = "string";
     }
 
     const name =
