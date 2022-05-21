@@ -218,6 +218,19 @@ Limitations:
 [a, b] = [b, a];
 ```
 
+- There is no support for default values inside destructuring assignments/declarations.
+
+```js
+// WARNING: does not work
+const { firstItem = Items.copper } = building;
+```
+
+> This happens because this feature _should_ only assign the default value if the object
+> does not have the wanted key, but this can't be safely done on the compiler side because it
+> doesn't know whether the object has such property, and cheking for `null`
+> is not a viable option because returning `null` does not necessarily mean
+> that the property doesn't exist.
+
 ### Template strings
 
 Template strings in javascript allow you to interpolate values with strings in
