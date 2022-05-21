@@ -55,11 +55,12 @@ export const ArrayExpression: THandler = (
   scope,
   node: es.ArrayExpression
 ) => {
-  const items: IValue[] = [];
+  const items: (IValue | undefined)[] = [];
   const inst: IInstruction[] = [];
   node.elements.forEach(element => {
-    if (!element) return;
-    const [value, valueInst] = c.handleEval(scope, element);
+    const [value, valueInst] = element
+      ? c.handleEval(scope, element)
+      : [undefined, []];
     items.push(value);
     inst.push(...valueInst);
   });
