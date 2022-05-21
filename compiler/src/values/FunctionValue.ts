@@ -20,6 +20,7 @@ import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 import { VoidValue } from "./VoidValue";
 import { ValueOwner } from "./ValueOwner";
+import { SenseableValue } from "./SenseableValue";
 
 export type TFunctionValueInitParams = (childScope: IScope) => {
   paramStores: StoreValue[];
@@ -34,14 +35,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private paramOwners: ValueOwner<StoreValue>[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
-  private temp!: ValueOwner<StoreValue>;
+  private temp!: ValueOwner<SenseableValue>;
   private ret!: ValueOwner<StoreValue>;
   private inline!: boolean;
   private tryingInline!: boolean;
   private body: es.BlockStatement;
   private c: Compiler;
   private callSize!: number;
-  private inlineTemp!: ValueOwner<StoreValue>;
+  private inlineTemp!: ValueOwner<SenseableValue>;
   private inlineEnd!: LiteralValue;
   private bundled = false;
   private initialized = false;
@@ -100,8 +101,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
-      value: new StoreValue(this.childScope),
+      value: new SenseableValue(this.childScope),
     });
+    this.temp.value.constant = false;
     this.ret = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}r${name}`,
@@ -149,8 +151,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // create return value
     this.inlineTemp = new ValueOwner({
       scope: this.childScope,
-      value: new StoreValue(scope),
+      value: new SenseableValue(scope),
     });
+    this.inlineTemp.value.constant = false;
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
