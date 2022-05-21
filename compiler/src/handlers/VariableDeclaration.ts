@@ -115,7 +115,6 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     if (!element) continue;
     const val = init.data[i];
 
-    // TODO: make better error message
     if (!val)
       throw new CompilerError(
         `The target object does not have a value at index ${i}`,
