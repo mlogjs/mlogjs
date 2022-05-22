@@ -182,6 +182,23 @@ Limitations:
 - No short-circuiting support
 - These expressions cannot return anything other than a boolean
 
+### Ternary operator (conditional expression)
+
+The ternary operator allows you to conditionally return a value based on an expression.
+
+```js
+const container = getBuilding("container1");
+
+const item = container.totalItems < 200 ? Items.titanium : Items.lead;
+
+print(item);
+printFlush(getBuilding("message1"));
+```
+
+Behavior:
+
+- Unlike the [logical operators](#logical-operators) it evaluates each return value lazily.
+
 ### Destructuring
 
 You can use destructuring to assign or declare variables.
