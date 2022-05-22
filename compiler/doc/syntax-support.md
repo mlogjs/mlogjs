@@ -211,7 +211,11 @@ const builds = {
   turret: getBuilding("cyclone1"),
 };
 
-print(builds.turret.type, " has ", builds.turret.ammo, " ammo left");
+const target = radar(builds.turret, "player", "enemy", "any", 1, "distance");
+
+control("shootp", builds.turret, target, true);
+
+print("Shooting ", target);
 printFlush(builds.message);
 ```
 
