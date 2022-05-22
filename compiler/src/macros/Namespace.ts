@@ -35,6 +35,7 @@ export class NamespaceMacro extends ObjectValue {
           value: new StoreValue(scope),
           name: `@${symbolName}`,
         });
+        owner.value.constant = true;
         return [owner.value, []];
       }),
     });
@@ -74,6 +75,7 @@ export class UCommandsNamespace extends NamespaceMacro {
         name: `@command${symbolName}`,
         value: new StoreValue(scope),
       });
+      owner.value.constant = true;
       return [owner.value, []];
     });
   }
