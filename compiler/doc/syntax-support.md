@@ -199,6 +199,31 @@ Behavior:
 
 - Unlike the [logical operators](#logical-operators) it evaluates each return value lazily.
 
+### Object literals
+
+Objects and arrays are [compile time constants](/data-types#objects), which means that the values they hold can be mutated but not reassigned.
+
+Their most common use case is scoping data in a convenient way.
+
+```js
+const builds = {
+  message: getBuilding("message1"),
+  turret: getBuilding("cyclone1"),
+};
+
+print(turret.type, " has ", turret.ammo, " ammo left");
+printFlush(builds.message);
+```
+
+Behavior:
+
+- Works just like [constants](#variable-declarations), inlines each value on the places it's used.
+- Arrays have a compile time constant `length` property.
+
+Limitations:
+
+- These kinds of objects and arrays cannot be mutated.
+
 ### Destructuring
 
 You can use destructuring to assign or declare variables.
