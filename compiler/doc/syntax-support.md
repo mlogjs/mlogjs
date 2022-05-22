@@ -199,7 +199,7 @@ Behavior:
 
 - Unlike the [logical operators](#logical-operators) it evaluates each return value lazily.
 
-### Object literals
+### Object/array literals
 
 Objects and arrays are [compile time constants](/data-types#objects), which means that the values they hold can be mutated but not reassigned.
 
@@ -211,7 +211,7 @@ const builds = {
   turret: getBuilding("cyclone1"),
 };
 
-print(turret.type, " has ", turret.ammo, " ammo left");
+print(builds.turret.type, " has ", builds.turret.ammo, " ammo left");
 printFlush(builds.message);
 ```
 
