@@ -528,5 +528,5 @@ declare global {
   ): [found: false] | [found: true, x: number, y: number, building: T];
 
   /** Ends the execution of this script */
-  function end(): never;
+  function endScript(): never;
 }
