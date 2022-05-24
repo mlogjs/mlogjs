@@ -4,7 +4,7 @@
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
-  "bin": "./dist/index.cjs",
+  "bin": "./dist/bin.cjs",
   "types": "./dist/types",
   "scripts": {
     "clean": "rm -rf ../docs dist build",
