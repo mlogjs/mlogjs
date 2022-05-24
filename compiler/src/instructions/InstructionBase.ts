@@ -1,7 +1,7 @@
 import { IInstruction, IValue } from "../types";
 
 export class InstructionBase implements IInstruction {
-  private _hidden = false;
+  protected _hidden = false;
   public get hidden() {
     return this._hidden;
   }
