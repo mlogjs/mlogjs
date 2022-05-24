@@ -8,9 +8,8 @@ if (i > 10) {
   }
 }
 
-if(a < 1) {
-  print("Disappears")
-}
-else {
-  print("Stays")
+if (a < 1) {
+  print("Disappears");
+} else {
+  print("Stays");
 }
