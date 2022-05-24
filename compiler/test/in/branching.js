@@ -7,3 +7,9 @@ if (i > 10) {
     print("I will never show up in the code");
   }
 }
+
+if (a < 1) {
+  print("Disappears");
+} else {
+  print("Stays");
+}

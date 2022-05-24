@@ -9,6 +9,7 @@ export const CallExpression: THandler<IValue | null> = (
 
   const args = node.arguments.map(node => {
     // TODO: this might be why t0 did not increment
+    // TODO: figure out if the previous todo is still relevant
     const [v, i] = c.handleConsume(scope, node);
     inst.push(...i);
     return v;

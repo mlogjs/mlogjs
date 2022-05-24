@@ -1,0 +1,11 @@
+drawflush display1
+printflush message1
+getlink block:10:6 1
+control color illuminator1 10 50 9
+control enabled block:10:6 0
+control config sorter1 @plastanium
+control shoot cyclone1 20 40 1
+control shootp cyclone1 @unit 1
+radar enemy boss flying maxHealth cyclone1 1 &_
+sensor &_ cyclone1 @health
+end

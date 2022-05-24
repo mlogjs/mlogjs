@@ -2,4 +2,5 @@ set i:1:4 1
 op greaterThan &t0 i:1:4 10
 jump 4 equal &t0 0
 print "I will always show up in the code"
+print "Stays"
 end

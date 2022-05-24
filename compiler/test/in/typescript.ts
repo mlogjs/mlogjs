@@ -4,9 +4,16 @@ const enum State {
   awaiting,
   inactive = "off",
   deactivated = 13,
+  incremented,
 }
 
-print(State.active, State.awaiting, State.inactive, State.deactivated);
+print(
+  State.active,
+  State.awaiting,
+  State.inactive,
+  State.deactivated,
+  State.incremented
+);
 
 let foo = getVar<number | symbol | null>("@unknown");
 

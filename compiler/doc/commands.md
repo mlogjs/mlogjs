@@ -18,3 +18,4 @@ Here is a list of them, some have multiple overloads
 - `unitControl` - Controls the unit bound to the processor
 - `unitRadar` - Uses the unit bound to the processor to find nearby units
 - `unitLocate` - Uses the unit bound to the processor to find blocks
+- `endScript` - Ends the execution of the script (compiles into an `end` instruction)

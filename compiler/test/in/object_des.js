@@ -26,3 +26,8 @@ printFlush(getBuilding("message1"));
 });
 
 print(x, y, health, mem[0]);
+
+// tests with function return values
+const computed = enemy => unitLocate("building", "core", enemy)[3];
+
+({ x, y } = computed(true));

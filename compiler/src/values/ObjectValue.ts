@@ -35,7 +35,9 @@ export class ObjectValue extends VoidValue {
     const data: IObjectValueData = {
       length: new LiteralValue(scope, items.length),
     };
-    items.forEach((item, i) => (data[i] = item));
+    items.forEach((item, i) => {
+      if (item) data[i] = item;
+    });
     return new ObjectValue(scope, data);
   }
 

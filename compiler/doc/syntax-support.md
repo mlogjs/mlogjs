@@ -182,6 +182,52 @@ Limitations:
 - No short-circuiting support
 - These expressions cannot return anything other than a boolean
 
+### Ternary operator (conditional expression)
+
+The ternary operator allows you to conditionally return a value based on an expression.
+
+```js
+const container = getBuilding("container1");
+
+const item = container.totalItems < 200 ? Items.titanium : Items.lead;
+
+print(item);
+printFlush(getBuilding("message1"));
+```
+
+Behavior:
+
+- Unlike the [logical operators](#logical-operators) it evaluates each return value lazily.
+
+### Object/array literals
+
+Objects and arrays are [compile time constants](/data-types#objects), which means that the values they hold can be mutated but not reassigned.
+
+Their most common use case is scoping data in a convenient way.
+
+```js
+const builds = {
+  message: getBuilding("message1"),
+  turret: getBuilding("cyclone1"),
+};
+
+const target = radar(builds.turret, "player", "enemy", "any", 1, "distance");
+
+control("shootp", builds.turret, target, true);
+
+print("Shooting ", target);
+printFlush(builds.message);
+```
+
+Behavior:
+
+- Works just like [constants](#variable-declarations), inlines each value on the places it's used.
+- Arrays have a compile time constant `length` property.
+
+Limitations:
+
+- These kinds of objects and arrays cannot be mutated.
+
 ### Destructuring
 
 You can use destructuring to assign or declare variables.
@@ -217,6 +263,19 @@ Limitations:
 // WARNING: does not work
 [a, b] = [b, a];
 ```
+
+- There is no support for default values inside destructuring assignments/declarations.
+
+```js
+// WARNING: does not work
+const { firstItem = Items.copper } = building;
+```
+
+> This happens because this feature _should_ only assign the default value if the object
+> does not have the wanted key, but this can't be safely done on the compiler side because it
+> doesn't know whether the object has such property, and cheking for `null`
+> is not a viable option because returning `null` does not necessarily mean
+> that the property doesn't exist.
 
 ### Template strings
 

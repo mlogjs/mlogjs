@@ -18,3 +18,8 @@ print(isWithin);
 const [type, building] = unitControl("getBlock", 10, 20);
 
 print(type, building);
+
+let [coreFound, coreX, coreY, core] = unitLocate("building", "core", false);
+let [oreFound, oreX, oreY] = unitLocate("ore", Items.lead);
+let [dFound, dX, dY, dBuilding] = unitLocate("damaged");
+let [sFound, sX, sY, sBuilding] = unitLocate("spawn");
