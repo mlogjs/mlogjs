@@ -28,6 +28,10 @@ interface Vars {
   readonly ipt: number;
   /** The unit bound to this processor */
   readonly unit: AnyUnit;
+  /** The amount of ticks that happened since the map started*/
+  readonly tick: number;
+  /** The current UNIX timestamp in milliseconds */
+  readonly time: number;
   /** Total amount of items existent, can be used to check if an ID is valid*/
   readonly itemCount: number;
   /** Total amount of liquids existent, can be used to check if an ID is valid*/
