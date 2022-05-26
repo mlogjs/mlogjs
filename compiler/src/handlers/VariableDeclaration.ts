@@ -6,6 +6,7 @@ import {
   IValue,
   IScope,
   IInstruction,
+  EMutability,
 } from "../types";
 import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
@@ -69,7 +70,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   const name = nodeName(node, !c.compactNames && identifier);
   if (kind === "const" && !init)
     throw new CompilerError("Constants must be initialized.", [node]);
-  if (kind === "const" && init?.constant) {
+  if (kind === "const" && init?.mutability === EMutability.constant) {
     const owner = new ValueOwner({
       scope,
       identifier,
@@ -90,7 +91,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
 
       inst.push(...value["="](scope, init)[1]);
     }
-    if (kind === "const") value.constant = true;
+    if (kind === "const") value.mutability = EMutability.constant;
     return [null, inst];
   }
 };

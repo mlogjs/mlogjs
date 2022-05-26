@@ -1,6 +1,7 @@
 import { SenseableValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
+  EMutability,
   IFunctionValue,
   IInstruction,
   IOwnedValue,
@@ -93,7 +94,7 @@ export class Scope implements IScope {
   }
   make(identifier: string, name: string): SenseableValue {
     const value = new SenseableValue(this);
-    value.constant = false;
+    value.mutability = EMutability.mutable;
 
     const owner = new ValueOwner({
       scope: this,

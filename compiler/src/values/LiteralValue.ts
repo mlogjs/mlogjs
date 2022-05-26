@@ -4,6 +4,7 @@ import {
   TLiteral,
   TValueInstructions,
   IValue,
+  EMutability,
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
@@ -24,7 +25,7 @@ const literalMethods: Record<
 
 export class LiteralValue extends BaseValue implements IBindableValue {
   data: TLiteral;
-  constant = true;
+  mutability = EMutability.constant;
   constructor(scope: IScope, data: TLiteral) {
     super(scope);
     this.data = data;

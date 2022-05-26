@@ -2,6 +2,7 @@ import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
+  EMutability,
   IOwnedValue,
   IScope,
   IValue,
@@ -19,7 +20,7 @@ export interface IObjectValueData extends TOperatorMacroMap {
   $consume?: MacroFunction<IValue>;
 }
 export class ObjectValue extends VoidValue {
-  constant = true;
+  mutability = EMutability.constant;
   macro = true;
   data: IObjectValueData;
 

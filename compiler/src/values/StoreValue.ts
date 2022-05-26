@@ -1,7 +1,7 @@
 import { BaseValue, LiteralValue } from ".";
 import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { EMutability, IScope, IValue, TValueInstructions } from "../types";
 import { discardedName } from "../utils";
 
 /**
@@ -9,7 +9,7 @@ import { discardedName } from "../utils";
  * mostly used with mutable variables and temporary values
  */
 export class StoreValue extends BaseValue implements IValue {
-  constant = false;
+  mutability = EMutability.mutable;
   constructor(scope: IScope) {
     super(scope);
   }
@@ -19,7 +19,7 @@ export class StoreValue extends BaseValue implements IValue {
   }
 
   "="(scope: IScope, value: IValue): TValueInstructions {
-    if (this.constant)
+    if (this.mutability !== EMutability.mutable)
       throw new CompilerError(`Cannot assign to immutable store '${this}'.`);
     if (this.owner) {
       if (this.owner === value.owner && value instanceof StoreValue)

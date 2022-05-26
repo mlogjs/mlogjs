@@ -186,11 +186,27 @@ export interface IValueOperators {
   "="(scope: IScope, value: IValue): TValueInstructions;
 }
 
+/** Defines the possible types of mutability of a value */
+export enum EMutability {
+  /**
+   * The value can be changed by the user's code,
+   * by the mlog runtime, or us
+   */
+  mutable,
+  /**
+   * The value cannot be directly assigned,
+   * but it's still not safe from mutations coming from the runtime.
+   */
+  readonly,
+  /** Constant values, won't change during execution */
+  constant,
+}
+
 export interface IValue extends IValueOperators {
   // main properties
   owner: IValueOwner | null;
   scope: IScope;
-  constant: boolean;
+  mutability: EMutability;
   macro: boolean;
   /**
    * Evaluates `this`, returning it's representation in a more basic

@@ -8,6 +8,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import {
+  EMutability,
   es,
   IFunctionValue,
   IInstruction,
@@ -26,7 +27,7 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
   paramNames: string[];
 };
 export class FunctionValue extends VoidValue implements IFunctionValue {
-  constant = true;
+  mutability = EMutability.constant;
   macro = true;
   private node: es.Function;
   private childScope!: IScope;
@@ -102,7 +103,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       name: `${internalPrefix}f${name}`,
       value: new SenseableValue(this.childScope),
     });
-    this.temp.value.constant = false;
+    this.temp.value.mutability = EMutability.mutable;
     this.ret = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}r${name}`,
@@ -155,7 +156,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       scope: this.childScope,
       value: new SenseableValue(scope),
     });
-    this.inlineTemp.value.constant = false;
+    this.inlineTemp.value.mutability = EMutability.mutable;
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope

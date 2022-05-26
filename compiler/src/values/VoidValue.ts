@@ -1,4 +1,5 @@
 import {
+  EMutability,
   IScope,
   IValue,
   IValueOperators,
@@ -11,7 +12,7 @@ import { CompilerError } from "../CompilerError";
 export class VoidValue implements IValue {
   owner: IValueOwner | null = null;
   scope: IScope;
-  constant = false;
+  mutability = EMutability.mutable;
   macro = false;
   constructor(scope: IScope) {
     this.scope = scope;
