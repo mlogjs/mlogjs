@@ -93,7 +93,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (this.initialized) return;
     this.initialized = true;
 
-    const name = nodeName(this.node, !this.c.compactNames && this.owner.name);
+    const { name } = this.owner;
     this.initScope(name);
 
     this.addr = new LiteralValue(this.childScope, null as never);
