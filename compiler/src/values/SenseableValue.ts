@@ -1,6 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { EMutability, IScope, IValue, TValueInstructions } from "../types";
 import { camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
@@ -26,7 +26,7 @@ const senseableProps = ["controller"];
  * ```
  */
 export class SenseableValue extends StoreValue {
-  constant = true;
+  mutability = EMutability.constant;
 
   constructor(scope: IScope) {
     super(scope);

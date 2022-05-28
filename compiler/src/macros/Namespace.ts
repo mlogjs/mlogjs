@@ -1,6 +1,6 @@
-import { camelToDashCase } from "../utils";
+import { assign, camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
-import { IScope } from "../types";
+import { EMutability, IScope } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
@@ -10,6 +10,8 @@ import {
 } from "../values";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
+
+const dynamicVars = ["time", "tick"];
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -30,9 +32,15 @@ export class NamespaceMacro extends ObjectValue {
           ? camelToDashCase(prop.data)
           : prop.data;
 
+        const mutability = dynamicVars.includes(symbolName)
+          ? EMutability.readonly
+          : EMutability.constant;
+
         const owner = new ValueOwner({
           scope,
-          value: new StoreValue(scope),
+          value: assign(new StoreValue(scope), {
+            mutability,
+          }),
           name: `@${symbolName}`,
         });
         return [owner.value, []];
@@ -72,7 +80,9 @@ export class UCommandsNamespace extends NamespaceMacro {
       const owner = new ValueOwner({
         scope,
         name: `@command${symbolName}`,
-        value: new StoreValue(scope),
+        value: assign(new StoreValue(scope), {
+          mutability: EMutability.constant,
+        }),
       });
       return [owner.value, []];
     });

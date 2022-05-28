@@ -1,4 +1,4 @@
-import { internalPrefix, nodeName } from "../utils";
+import { assign, internalPrefix, nodeName } from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -8,6 +8,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import {
+  EMutability,
   es,
   IFunctionValue,
   IInstruction,
@@ -26,7 +27,7 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
   paramNames: string[];
 };
 export class FunctionValue extends VoidValue implements IFunctionValue {
-  constant = true;
+  mutability = EMutability.constant;
   macro = true;
   private node: es.Function;
   private childScope!: IScope;
@@ -100,9 +101,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
-      value: new SenseableValue(this.childScope),
+      value: assign(new SenseableValue(this.childScope), {
+        mutability: EMutability.mutable,
+      }),
     });
-    this.temp.value.constant = false;
     this.ret = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}r${name}`,
@@ -153,9 +155,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // create return value
     this.inlineTemp = new ValueOwner({
       scope: this.childScope,
-      value: new SenseableValue(scope),
+      value: assign(new SenseableValue(scope), {
+        mutability: EMutability.mutable,
+      }),
     });
-    this.inlineTemp.value.constant = false;
     this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
