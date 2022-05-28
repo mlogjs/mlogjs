@@ -9,6 +9,7 @@ import {
 import { UCommandsNamespace } from "./macros/Namespace";
 import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
+import { EMutability } from "./types";
 
 /**
  * Adds all the compiler globals to `scope`
@@ -25,8 +26,8 @@ export function initScope(scope: Scope) {
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods
-  scope.hardSet("getBuilding", new GetGlobal(scope));
-  scope.hardSet("getVar", new GetGlobal(scope));
+  scope.hardSet("getBuilding", new GetGlobal(scope, EMutability.constant));
+  scope.hardSet("getVar", new GetGlobal(scope, EMutability.mutable));
   scope.hardSet("concat", new Concat(scope));
 
   scope.hardSet("Math", new MlogMath(scope));
