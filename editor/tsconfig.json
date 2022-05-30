@@ -5,5 +5,5 @@
     "lib": ["ES2019", "DOM"],
     "noEmit": true
   },
-  "include": ["./*"]
+  "include": ["./*", "src/*"]
 }
