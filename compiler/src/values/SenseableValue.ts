@@ -21,8 +21,9 @@ const senseableProps = ["controller"];
  * Note that these values are constant by default, so make sure
  * to set that field to `false` if you want them to be assignable. Example:
  * ```
- * const value = new SenseableValue(scope)
- * value.constant = false
+ * const value = assign(new SenseableValue(scope), {
+ *   mutability: EMutability.mutable
+ * })
  * ```
  */
 export class SenseableValue extends StoreValue {
