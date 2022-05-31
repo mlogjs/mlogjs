@@ -1,4 +1,4 @@
-import "./style.css";
+import "../style.css";
 import Editor, { EditorProps, Monaco } from "@monaco-editor/react";
 import { Compiler } from "mlogjs";
 import React, { Fragment, useEffect, useMemo, useState } from "react";
