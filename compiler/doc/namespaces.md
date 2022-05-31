@@ -25,6 +25,8 @@ Allows you to access processor variables.
 - `liquidCount` - Total amount of liquids existent, can be used to check if a liquid ID is valid
 - `unitCount` - Total amount of units existent, can be used to check if an unit ID is valid
 - `blockCount` - Total amount of blocks existent, can be used to check if a block ID is valid
+- `tick` - The amount of ticks that happened since the map started
+- `time` - The current UNIX timestamp in milliseconds
 
 ## Items
 
