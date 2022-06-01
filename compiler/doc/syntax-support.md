@@ -292,7 +292,7 @@ a convenient way.
 But since the mlog runtime doesn't support string contenation template strings are used to
 inline mlog code.
 
-The following has it's last line inlined onto the output.
+You can see a demonstration bellow.
 
 ```js
 const conveyor = getBuilding("conveyor1");
@@ -311,6 +311,10 @@ print &t1
 printflush message1
 end
 ```
+
+Behavior:
+
+- Variables inlined on the template string will have their mlog representation on the final code. Works with expressions too.
 
 ## Typescript
 
