@@ -13,18 +13,25 @@ You can declare variables (global or scoped) with the `let`, `const` and `var` k
 
 Behavior:
 
-- `const` variables holding a literal will inline that value on the output code.
+- `const` variables holding values that are also constant will inline that value on the output code.
 
 ```js
-const foo = "string";
-print(foo);
-print(foo, " and another");
+const a = "string";
+const b = Vars.this;
+const c = getBuilding("message1");
+print(a, " is a string", "\n");
+print(b, "\n");
+printFlush(c);
 ```
 
 ```
 print "string"
-print "string"
-print " and another"
+print " is a string"
+print "\n"
+print @this
+print "\n"
+printflush message1
+end
 ```
 
 - `var` behaves the same as `let` (see limitations)
