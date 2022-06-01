@@ -13,18 +13,25 @@ You can declare variables (global or scoped) with the `let`, `const` and `var` k
 
 Behavior:
 
-- `const` variables holding a literal will inline that value on the output code.
+- `const` variables holding values that are also constant will inline that value on the output code.
 
 ```js
-const foo = "string";
-print(foo);
-print(foo, " and another");
+const a = "string";
+const b = Vars.this;
+const c = getBuilding("message1");
+print(a, " is a string", "\n");
+print(b, "\n");
+printFlush(c);
 ```
 
 ```
 print "string"
-print "string"
-print " and another"
+print " is a string"
+print "\n"
+print @this
+print "\n"
+printflush message1
+end
 ```
 
 - `var` behaves the same as `let` (see limitations)
@@ -161,17 +168,17 @@ Check out the [online editor](https://mlogjs.github.io/mlogjs/editor/) to see ho
 
 The logical operators `&&` (and) and `||` (or) are supported, although they DO NOT short-circuit. See [What is short-circuiting?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation)
 
-Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
-
-```js
-// WARNING: does not work
-// first: both expressions are evaluated because there is no
-// short circuiting
-//
-// second: the final value will be a boolean, not
-// whathever object getSomething returns
-let foo = isEnabled && getSomething();
-```
+> Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
+>
+> ```js
+> // WARNING: does not work
+> // first: both expressions are evaluated because there is no
+> // short circuiting
+> //
+> // second: the final value will be a boolean, not
+> // whathever object getSomething returns
+> let foo = isEnabled && getSomething();
+> ```
 
 Behavior:
 
@@ -232,7 +239,7 @@ Limitations:
 
 You can use destructuring to assign or declare variables.
 
-It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same output:
+It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same behavior:
 
 ```js
 const turret = getBuilding("cyclone1");
@@ -285,7 +292,7 @@ a convenient way.
 But since the mlog runtime doesn't support string contenation template strings are used to
 inline mlog code.
 
-The following has it's last line inlined onto the output.
+You can see a demonstration bellow.
 
 ```js
 const conveyor = getBuilding("conveyor1");
@@ -304,6 +311,10 @@ print &t1
 printflush message1
 end
 ```
+
+Behavior:
+
+- Variables inlined on the template string will have their mlog representation on the final code. Works with expressions too.
 
 ## Typescript
 
