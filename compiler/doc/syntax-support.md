@@ -239,7 +239,7 @@ Limitations:
 
 You can use destructuring to assign or declare variables.
 
-It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same output:
+It is treated by the compiler as a sintactic sugar for assignments/declarations that are based on object properties. The following examples have exactly the same behavior:
 
 ```js
 const turret = getBuilding("cyclone1");
