@@ -1,7 +1,7 @@
 # Typescript Support
 
-Mlogjs supports typescript out of the box, meaning that it can parse and compile typescript files
-without any extra compilation steps.
+Mlogjs supports typescript out of the box, meaning that you can feed them
+to the compiler and it should work as expected.
 
 ## Local installation
 
