@@ -69,16 +69,22 @@ export function App() {
 
   return (
     <Fragment>
-      <SplitPane split="horizontal" defaultSize="50%">
+      <SplitPane
+        split="horizontal"
+        defaultSize="50%"
+        style={{ backgroundColor: "gray" }}
+      >
         <Editor
           onChange={setCode}
           language="typescript"
           onMount={onMount}
           value={code}
+          theme={"vs-dark"}
         />
         <Editor
           value={compiled}
           options={{ readOnly: true, lineNumbers: n => `${n - 1}` }}
+          theme={"vs-dark"}
         ></Editor>
       </SplitPane>
     </Fragment>
