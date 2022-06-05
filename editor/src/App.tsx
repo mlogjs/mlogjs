@@ -1,13 +1,16 @@
 import "../style.css";
 import Editor, { EditorProps, Monaco } from "@monaco-editor/react";
-import { Compiler } from "mlogjs";
-import React, { Fragment, useEffect, useMemo, useState } from "react";
+import { CompilerOptions } from "mlogjs";
+import React, { Fragment, useEffect, useState } from "react";
 import SplitPane from "react-split-pane";
 import lib from "mlogjs/lib!raw";
 import { editor } from "monaco-editor";
+import { compile } from "./compiler";
 
 export function App() {
-  const compiler = useMemo(() => new Compiler(), []); // for future editor upgrades
+  const [options] = useState<CompilerOptions>({
+    compactNames: true,
+  });
   const [compiled, setCompiled] = useState("");
   const [code, setCode] = useState(localStorage.getItem("code") ?? "");
   const [monaco, setMonaco] = useState<Monaco>(null);
@@ -26,32 +29,43 @@ export function App() {
     setEditor(editor);
   };
 
-  function compileAndShow() {
-    if (!editor) return;
-    const model = editor.getModel();
-    const [output, error, [node]] = compiler.compile(code);
-    const markers: editor.IMarkerData[] = [];
-    if (error) {
-      if (node) {
-        const { start, end } = node.loc;
-        markers.push({
-          message: error.message,
-          startLineNumber: start.line,
-          startColumn: start.column + 1,
-          endLineNumber: end.line,
-          endColumn: end.column + 1,
-          severity: monaco.MarkerSeverity.Error,
-        });
-      }
-      setCompiled(error.message);
-    } else {
-      setCompiled(output);
-    }
-    localStorage.setItem("code", code);
-    monaco.editor.setModelMarkers(model, "mlogjs", markers);
-  }
+  useEffect(() => {
+    let subscribed = true;
 
-  useEffect(compileAndShow, [code, editor]);
+    async function compileAndShow() {
+      if (!editor) return;
+      const model = editor.getModel();
+      const [output, error, [node]] = await compile(code, options);
+      const markers: editor.IMarkerData[] = [];
+      let content: string;
+      if (error) {
+        if (node) {
+          const { start, end } = node.loc;
+          markers.push({
+            message: error.message,
+            startLineNumber: start.line,
+            startColumn: start.column + 1,
+            endLineNumber: end.line,
+            endColumn: end.column + 1,
+            severity: monaco.MarkerSeverity.Error,
+          });
+        }
+        content = error.message;
+      } else {
+        content = output;
+      }
+      if (subscribed) {
+        setCompiled(content);
+        localStorage.setItem("code", code);
+        monaco.editor.setModelMarkers(model, "mlogjs", markers);
+      }
+    }
+
+    compileAndShow();
+    return () => {
+      subscribed = false;
+    };
+  }, [code, editor]);
 
   return (
     <Fragment>
