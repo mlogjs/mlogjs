@@ -3,7 +3,9 @@
     "allowSyntheticDefaultImports": true,
     "jsx": "react-jsx",
     "lib": ["ES2019", "DOM"],
-    "noEmit": true
+    "noEmit": true,
+    "module": "ESNext",
+    "moduleResolution": "node"
   },
-  "include": ["./*", "src/*"]
+  "include": ["./*", "src/"]
 }
