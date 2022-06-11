@@ -35,12 +35,12 @@ export function App() {
     async function compileAndShow() {
       if (!editor) return;
       const model = editor.getModel();
-      const [output, error, [node]] = await compile(code, options);
+      const [output, error] = await compile(code, options);
       const markers: editor.IMarkerData[] = [];
       let content: string;
       if (error) {
-        if (node) {
-          const { start, end } = node.loc;
+        if (error.loc) {
+          const { start, end } = error.loc;
           markers.push({
             message: error.message,
             startLineNumber: start.line,
