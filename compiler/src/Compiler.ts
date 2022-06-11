@@ -27,9 +27,7 @@ export class Compiler {
     this.compactNames = compactNames;
   }
 
-  compile(
-    script: string
-  ): [string, null, es.Node[]] | [null, Error | CompilerError, es.Node[]] {
+  compile(script: string): [string, null] | [null, CompilerError] {
     let output: string;
     try {
       const program = this.parse(script);
@@ -42,10 +40,11 @@ export class Compiler {
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
     } catch (error) {
-      const nodeStack = error instanceof CompilerError ? error.nodeStack : [];
-      return [null, error as Error, nodeStack];
+      const err =
+        error instanceof CompilerError ? error : CompilerError.from(error);
+      return [null, err];
     }
-    return [output, null, []];
+    return [output, null];
   }
 
   protected resolve(valueInst: TValueInstructions<IValue | null>) {
@@ -75,7 +74,7 @@ export class Compiler {
       return handler(this, scope, node, null);
     } catch (error) {
       if (error instanceof CompilerError) {
-        error.nodeStack.push(node);
+        error.loc ??= node.loc as es.SourceLocation;
       }
       throw error;
     }

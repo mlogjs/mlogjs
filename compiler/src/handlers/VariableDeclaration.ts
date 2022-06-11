@@ -54,9 +54,10 @@ const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind, init) => {
     case "ObjectPattern":
       return DeclareObjectPattern(c, scope, node, kind, init);
     default:
-      throw new CompilerError(`Unsupported declaration type: ${node.type}`, [
-        node,
-      ]);
+      throw new CompilerError(
+        `Unsupported declaration type: ${node.type}`,
+        node
+      );
   }
 };
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
@@ -69,7 +70,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
   if (kind === "const" && !init)
-    throw new CompilerError("Constants must be initialized.", [node]);
+    throw new CompilerError("Constants must be initialized.", node);
   if (kind === "const" && init?.mutability === EMutability.constant) {
     const owner = new ValueOwner({
       scope,
@@ -85,9 +86,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
     const inst: IInstruction[] = [];
     if (init) {
       if (init.macro)
-        throw new CompilerError("Macro values must be held by constants", [
-          node,
-        ]);
+        throw new CompilerError("Macro values must be held by constants", node);
 
       inst.push(...value["="](scope, init)[1]);
     }
@@ -119,7 +118,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     if (!val)
       throw new CompilerError(
         `The target object does not have a value at index ${i}`,
-        [element]
+        element
       );
 
     inst.push(...Declare(c, scope, element, kind, val)[1]);
@@ -137,13 +136,13 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   if (!base)
     throw new CompilerError(
       "Cannot use object destructuring without an initializer",
-      [node]
+      node
     );
   const { properties } = node;
   const [init, inst] = base.consume(scope);
   for (const prop of properties) {
     if (prop.type === "RestElement")
-      throw new CompilerError("The rest operator is not supported", [prop]);
+      throw new CompilerError("The rest operator is not supported", prop);
 
     const { key, value } = prop;
 

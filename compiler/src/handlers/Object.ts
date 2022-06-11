@@ -23,9 +23,9 @@ export const ObjectExpression: THandler = (
   const inst = [];
   for (const prop of node.properties) {
     if (prop.type === "SpreadElement")
-      throw new CompilerError("Cannot handle spread element", [prop]);
+      throw new CompilerError("Cannot handle spread element", prop);
     if (prop.computed)
-      throw new CompilerError("Cannot handle computed property.", [prop]);
+      throw new CompilerError("Cannot handle computed property.", prop);
     const { key } = prop;
     const value = prop.type === "ObjectProperty" ? prop.value : prop;
     let index: string;
@@ -34,9 +34,7 @@ export const ObjectExpression: THandler = (
     } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
       index = `${key.value}`;
     } else {
-      throw new CompilerError(`Unsupported object key type: ${key.type}`, [
-        key,
-      ]);
+      throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
     const [member, memberInst] = c.handleEval(scope, value);
     const owner = new ValueOwner({
@@ -91,9 +89,10 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
     const valueInst = c.handle(scope, element);
 
     if (!valueInst[0])
-      throw new CompilerError("Destructuring element must resolve to a value", [
-        element,
-      ]);
+      throw new CompilerError(
+        "Destructuring element must resolve to a value",
+        element
+      );
 
     inst.push(...valueInst[1]);
     members.set(new LiteralValue(scope, i), valueInst[0]);
@@ -120,9 +119,10 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const valueInst = c.handle(scope, prop.value);
 
     if (!valueInst[0])
-      throw new CompilerError("Destructuring member must resolve to a value", [
-        prop.value,
-      ]);
+      throw new CompilerError(
+        "Destructuring member must resolve to a value",
+        prop.value
+      );
 
     inst.push(...valueInst[1]);
 
