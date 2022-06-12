@@ -1,7 +1,9 @@
 import { CompilerOptions } from "mlogjs";
-import monaco, { editor } from "monaco-editor";
+import * as monaco from "monaco-editor";
+import { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 import { compile } from "../compiler";
+import { CompilerResult } from "../compiler/types";
 
 interface Params {
   code: string;
@@ -11,6 +13,7 @@ interface Params {
 
 export function useCompiler({ code, editor, options }: Params) {
   const [compiled, setCompiled] = useState("");
+  const [sourcemaps, setSourcemaps] = useState<CompilerResult[2]>(undefined);
 
   useEffect(() => {
     let subscribed = true;
@@ -39,6 +42,7 @@ export function useCompiler({ code, editor, options }: Params) {
       }
       if (subscribed) {
         setCompiled(content);
+        setSourcemaps(sourcemaps);
         localStorage.setItem("code", code);
         monaco.editor.setModelMarkers(model, "mlogjs", markers);
       }
@@ -50,5 +54,5 @@ export function useCompiler({ code, editor, options }: Params) {
     };
   }, [code, editor]);
 
-  return [compiled] as const;
+  return [compiled, sourcemaps] as const;
 }
