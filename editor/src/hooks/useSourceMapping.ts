@@ -1,6 +1,6 @@
 import * as monaco from "monaco-editor";
 import { editor } from "monaco-editor";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { CompilerResult } from "../compiler/types";
 
 interface Params {
@@ -10,9 +10,10 @@ interface Params {
 }
 export function useSourceMapping({ editor, outEditor, sourcemaps }: Params) {
   useEffect(() => {
-    let decorations: string[] = [];
+    if (!(editor && outEditor)) return;
 
-    if (!(editor && outEditor && sourcemaps)) return;
+    let inputDecorations: string[] = [];
+    let outputDecorations: string[] = [];
 
     const listener = outEditor.onDidChangeCursorSelection(e => {
       if (!sourcemaps) return;
@@ -34,18 +35,28 @@ export function useSourceMapping({ editor, outEditor, sourcemaps }: Params) {
           ),
         });
       }
-      decorations = editor.deltaDecorations(decorations, newDecorations);
+      inputDecorations = editor.deltaDecorations(
+        inputDecorations,
+        newDecorations
+      );
       const firstSelection = sourcemaps[startLineNumber - 1];
-      if (firstSelection) {
+      if (
+        firstSelection &&
+        e.reason === monaco.editor.CursorChangeReason.Explicit
+      ) {
         editor.revealLine(firstSelection.start.line);
       }
     });
     const eraserListener = editor.onDidChangeCursorSelection(e => {
-      decorations = editor.deltaDecorations(decorations, []);
+      inputDecorations = editor.deltaDecorations(inputDecorations, []);
+      const { startLineNumber, startColumn, endLineNumber, endColumn } =
+        e.selection;
     });
     return () => {
       listener.dispose();
       eraserListener.dispose();
+      editor.deltaDecorations(inputDecorations, []);
+      outEditor.deltaDecorations(outputDecorations, []);
     };
   }, [editor, outEditor, sourcemaps]);
 }
