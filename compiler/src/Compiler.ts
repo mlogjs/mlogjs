@@ -13,6 +13,8 @@ export interface CompilerOptions {
 
   /** Wether the compiler should preserve or compact variable and function names*/
   compactNames?: boolean;
+
+  sourcemap?: boolean;
 }
 
 export class Compiler {
@@ -20,15 +22,25 @@ export class Compiler {
   protected usingStack: boolean;
   protected handlers: THandlerMap = handlers;
   readonly compactNames: boolean;
+  readonly sourcemap: boolean;
 
-  constructor({ stackName, compactNames = false }: CompilerOptions = {}) {
+  constructor({
+    stackName,
+    compactNames = false,
+    sourcemap = false,
+  }: CompilerOptions = {}) {
     this.usingStack = !!stackName;
     this.stackName = stackName;
     this.compactNames = compactNames;
+    this.sourcemap = sourcemap;
   }
 
-  compile(script: string): [string, null] | [null, CompilerError] {
+  compile(
+    script: string
+  ): [string, null, es.SourceLocation[] | undefined] | [null, CompilerError] {
     let output: string;
+    let sourcemaps: es.SourceLocation[] | undefined;
+
     try {
       const program = this.parse(script);
       const scope = new Scope({});
@@ -39,12 +51,15 @@ export class Compiler {
       valueInst[1].push(new EndInstruction(), ...scope.inst);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
+      if (this.sourcemap) {
+        sourcemaps = this.mapSources(valueInst);
+      }
     } catch (error) {
       const err =
         error instanceof CompilerError ? error : CompilerError.from(error);
       return [null, err];
     }
-    return [output, null];
+    return [output, null, sourcemaps];
   }
 
   protected resolve(valueInst: TValueInstructions<IValue | null>) {
@@ -67,11 +82,34 @@ export class Compiler {
     });
   }
 
-  handle(scope: IScope, node: es.Node): TValueInstructions<IValue | null> {
+  protected mapSources(
+    valueInst: TValueInstructions<IValue | null>
+  ): es.SourceLocation[] {
+    const result: es.SourceLocation[] = [];
+
+    for (const inst of valueInst[1]) {
+      if (!inst.hidden) result.push(inst.source as es.SourceLocation);
+    }
+
+    return result;
+  }
+
+  handle(
+    scope: IScope,
+    node: es.Node,
+    handler = this.handlers[node.type]
+  ): TValueInstructions<IValue | null> {
     try {
-      const handler = this.handlers[node.type];
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      return handler(this, scope, node, null);
+      const result = handler(this, scope, node, null);
+
+      if (this.sourcemap) {
+        for (const inst of result[1]) {
+          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          inst.source ??= node.loc!;
+        }
+      }
+      return result;
     } catch (error) {
       if (error instanceof CompilerError) {
         error.loc ??= node.loc as es.SourceLocation;
@@ -82,15 +120,19 @@ export class Compiler {
 
   handleEval(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [evaluated, evaluatedInst] = res!.eval(scope);
+
+    if (!res) throw new CompilerError("Cannot eval null", node);
+
+    const [evaluated, evaluatedInst] = res.eval(scope);
     return [evaluated, [...inst, ...evaluatedInst]];
   }
 
   handleConsume(scope: IScope, node: es.Node): TValueInstructions {
     const [res, inst] = this.handle(scope, node);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-    const [evaluated, evaluatedInst] = res!.consume(scope);
+
+    if (!res) throw new CompilerError("Cannot consume null", node);
+
+    const [evaluated, evaluatedInst] = res.consume(scope);
     return [evaluated, [...inst, ...evaluatedInst]];
   }
 
