@@ -1,4 +1,5 @@
 export * as es from "@babel/types";
+import * as es from "@babel/types";
 import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
 import { MacroFunction } from "./macros";
@@ -7,6 +8,7 @@ import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
 export interface IInstruction {
   hidden: boolean;
   resolve(i: number): void;
+  source?: es.SourceLocation;
 }
 
 export type THandler<T extends IValue | null = IValue> = (
