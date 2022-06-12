@@ -5,6 +5,7 @@ import { initScope } from "./initScope";
 import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import { es, IScope, IValue, THandler, TValueInstructions } from "./types";
+import { appendSourceLocations } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
@@ -102,13 +103,7 @@ export class Compiler {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
       const result = handler(this, scope, node, null);
-
-      if (this.sourcemap) {
-        for (const inst of result[1]) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          inst.source ??= node.loc!;
-        }
-      }
+      if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {
       if (error instanceof CompilerError) {
@@ -124,7 +119,10 @@ export class Compiler {
     if (!res) throw new CompilerError("Cannot eval null", node);
 
     const [evaluated, evaluatedInst] = res.eval(scope);
-    return [evaluated, [...inst, ...evaluatedInst]];
+    const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
+
+    if (this.sourcemap) return appendSourceLocations(result, node);
+    return result;
   }
 
   handleConsume(scope: IScope, node: es.Node): TValueInstructions {
@@ -133,7 +131,10 @@ export class Compiler {
     if (!res) throw new CompilerError("Cannot consume null", node);
 
     const [evaluated, evaluatedInst] = res.consume(scope);
-    return [evaluated, [...inst, ...evaluatedInst]];
+    const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
+
+    if (this.sourcemap) return appendSourceLocations(result, node);
+    return result;
   }
 
   handleMany<T extends es.Node>(
