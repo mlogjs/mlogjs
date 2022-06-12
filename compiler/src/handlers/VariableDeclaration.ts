@@ -46,19 +46,21 @@ type TDeclareHandler<T extends es.Node> = (
 ) => TValueInstructions<null>;
 
 const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind, init) => {
-  switch (node.type) {
-    case "Identifier":
-      return DeclareIdentifier(c, scope, node, kind, init);
-    case "ArrayPattern":
-      return DeclareArrayPattern(c, scope, node, kind, init);
-    case "ObjectPattern":
-      return DeclareObjectPattern(c, scope, node, kind, init);
-    default:
-      throw new CompilerError(
-        `Unsupported declaration type: ${node.type}`,
-        node
-      );
-  }
+  return c.handle(scope, node, () => {
+    switch (node.type) {
+      case "Identifier":
+        return DeclareIdentifier(c, scope, node, kind, init);
+      case "ArrayPattern":
+        return DeclareArrayPattern(c, scope, node, kind, init);
+      case "ObjectPattern":
+        return DeclareObjectPattern(c, scope, node, kind, init);
+      default:
+        throw new CompilerError(
+          `Unsupported declaration type: ${node.type}`,
+          node
+        );
+    }
+  }) as TValueInstructions<null>;
 };
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
