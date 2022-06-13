@@ -1,12 +1,13 @@
 import "../style.css";
 import Editor, { EditorProps, Monaco } from "@monaco-editor/react";
 import { CompilerOptions } from "mlogjs";
-import React, { Fragment, useEffect, useState } from "react";
+import React, { Fragment, useState } from "react";
 import SplitPane from "react-split-pane";
 import lib from "mlogjs/lib!raw";
 import { editor } from "monaco-editor";
 import { useCompiler } from "./hooks/useCompiler";
 import { useSourceMapping } from "./hooks/useSourceMapping";
+import { registerMlogLang } from "./mlog/lang";
 
 export function App() {
   const [options] = useState<CompilerOptions>({
@@ -34,6 +35,10 @@ export function App() {
     setMonaco(monaco);
   };
 
+  const outOnMount: EditorProps["onMount"] = (editor, monaco) => {
+    registerMlogLang(monaco);
+    setOutEditor(editor);
+  };
   return (
     <Fragment>
       <SplitPane
@@ -52,7 +57,8 @@ export function App() {
           value={compiled}
           options={{ readOnly: true, lineNumbers: n => `${n - 1}` }}
           theme={"vs-dark"}
-          onMount={editor => setOutEditor(editor)}
+          onMount={outOnMount}
+          language="mlog"
         ></Editor>
       </SplitPane>
     </Fragment>
