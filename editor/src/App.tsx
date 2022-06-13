@@ -15,7 +15,8 @@ export function App() {
   });
   const [code, setCode] = useState(localStorage.getItem("code") ?? "");
   const [editor, setEditor] = useState<editor.IStandaloneCodeEditor>(null);
-  const [compiled, sourcemaps] = useCompiler({ code, editor, options });
+  const [monaco, setMonaco] = useState<Monaco>(null);
+  const [compiled, sourcemaps] = useCompiler({ code, editor, options, monaco });
   const [outEditor, setOutEditor] =
     useState<editor.IStandaloneCodeEditor>(null);
   useSourceMapping({ editor, outEditor, sourcemaps });
@@ -30,6 +31,7 @@ export function App() {
       defaults.addExtraLib(content, name);
     }
     setEditor(editor);
+    setMonaco(monaco);
   };
 
   return (
