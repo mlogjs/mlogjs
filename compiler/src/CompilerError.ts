@@ -22,7 +22,7 @@ type CompilerErrorSource =
       column: number;
     };
 export class CompilerError extends Error {
-  _loc?: es.SourceLocation;
+  protected _loc?: es.SourceLocation;
   /**
    * The error that preceded this `CompilerError`.
    *
