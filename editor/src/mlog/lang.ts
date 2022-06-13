@@ -89,6 +89,7 @@ export function registerMlogLang(monaco: Monaco) {
         [/&[a-z0-9:]+/, "variable.predefined"],
         [/[\-+]?\d+\.\d+/, "number.float"],
         [/[\-+]?\d+\b/, "number"],
+        [/".+"/, "string"],
       ],
     },
   });
