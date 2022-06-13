@@ -49,7 +49,7 @@ export function useSourceMapping({ editor, outEditor, sourcemaps }: Params) {
         firstSelection &&
         e.reason === monaco.editor.CursorChangeReason.Explicit
       ) {
-        editor.revealLine(firstSelection.start.line);
+        editor.revealLineInCenter(firstSelection.start.line);
       }
     });
 
@@ -129,7 +129,7 @@ export function useSourceMapping({ editor, outEditor, sourcemaps }: Params) {
         decorationStart &&
         e.reason === monaco.editor.CursorChangeReason.Explicit
       ) {
-        outEditor.revealLine(decorationStart);
+        outEditor.revealLineInCenter(decorationStart);
       }
     });
     return () => {
