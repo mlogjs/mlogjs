@@ -1,5 +1,5 @@
+import { Monaco } from "@monaco-editor/react";
 import { CompilerOptions } from "mlogjs";
-import * as monaco from "monaco-editor";
 import { editor } from "monaco-editor";
 import { useEffect, useState } from "react";
 import { compile } from "../compiler";
@@ -9,9 +9,10 @@ interface Params {
   code: string;
   editor: editor.IStandaloneCodeEditor | null;
   options: CompilerOptions;
+  monaco: Monaco;
 }
 
-export function useCompiler({ code, editor, options }: Params) {
+export function useCompiler({ code, editor, options, monaco }: Params) {
   const [compiled, setCompiled] = useState("");
   const [sourcemaps, setSourcemaps] = useState<CompilerResult[2]>(undefined);
 
@@ -52,7 +53,7 @@ export function useCompiler({ code, editor, options }: Params) {
     return () => {
       subscribed = false;
     };
-  }, [code, editor]);
+  }, [code, editor, options, monaco]);
 
   return [compiled, sourcemaps] as const;
 }
