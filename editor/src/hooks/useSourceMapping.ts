@@ -150,8 +150,8 @@ function getOutputDecorations(
     }
   }
 
-  if (outerSources.length > 0 && decorations.length === 0) {
-    revealedLine = outerSources[0]?.[0];
+  if (decorations.length === 0 && outerSources.length > 0) {
+    revealedLine = outerSources[0][0] + 1;
     for (const [i] of outerSources) {
       decorations.push({
         options: {
