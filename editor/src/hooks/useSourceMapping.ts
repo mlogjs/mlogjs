@@ -1,10 +1,9 @@
 import * as monaco from "monaco-editor";
 import { editor } from "monaco-editor";
 import { useEffect } from "react";
-import { CompilerResult } from "../compiler/types";
+import { SourceLocation } from "../compiler/types";
 
-type Sourcemaps = CompilerResult[2];
-type SourceLocation = Sourcemaps[number];
+type Sourcemaps = SourceLocation[];
 
 interface Params {
   editor: editor.IStandaloneCodeEditor | null;
