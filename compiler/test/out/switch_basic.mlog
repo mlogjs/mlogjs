@@ -1,29 +1,38 @@
 set dynamicItem:61:4 4
 set n:3:19 dynamicItem:61:4
 set &rmatchItem:3:0 4
-jump 9 always
+jump 18 always
 print &fmatchItem:3:0
 set &t1:matchItem:3:0 @sand
 print &t1:matchItem:3:0
+set item:42:18 @copper
+set &ritemUses:42:0 10
+jump 69 always
+set item:42:18 @coal
+set &ritemUses:42:0 13
+jump 69 always
+set item:42:18 @silicon
+set &ritemUses:42:0 16
+jump 69 always
 printflush message1
 end
-jump 26 strictEqual n:3:19 1
-jump 28 strictEqual n:3:19 2
-jump 30 strictEqual n:3:19 3
-jump 32 strictEqual n:3:19 4
-jump 34 strictEqual n:3:19 5
-jump 36 strictEqual n:3:19 6
-jump 38 strictEqual n:3:19 7
-jump 40 strictEqual n:3:19 8
-jump 42 strictEqual n:3:19 9
-jump 44 strictEqual n:3:19 10
-jump 46 strictEqual n:3:19 11
-jump 48 strictEqual n:3:19 12
-jump 50 strictEqual n:3:19 13
-jump 52 strictEqual n:3:19 14
-jump 54 strictEqual n:3:19 15
-jump 56 strictEqual n:3:19 16
-jump 58 always
+jump 35 strictEqual n:3:19 1
+jump 37 strictEqual n:3:19 2
+jump 39 strictEqual n:3:19 3
+jump 41 strictEqual n:3:19 4
+jump 43 strictEqual n:3:19 5
+jump 45 strictEqual n:3:19 6
+jump 47 strictEqual n:3:19 7
+jump 49 strictEqual n:3:19 8
+jump 51 strictEqual n:3:19 9
+jump 53 strictEqual n:3:19 10
+jump 55 strictEqual n:3:19 11
+jump 57 strictEqual n:3:19 12
+jump 59 strictEqual n:3:19 13
+jump 61 strictEqual n:3:19 14
+jump 63 strictEqual n:3:19 15
+jump 65 strictEqual n:3:19 16
+jump 67 always
 set &fmatchItem:3:0 @copper
 set @counter &rmatchItem:3:0
 set &fmatchItem:3:0 @lead
@@ -58,3 +67,18 @@ set &fmatchItem:3:0 @pyratite
 set @counter &rmatchItem:3:0
 set &fmatchItem:3:0 null
 set @counter &rmatchItem:3:0
+jump 73 strictEqual item:42:18 @copper
+jump 77 strictEqual item:42:18 @coal
+jump 81 strictEqual item:42:18 @silicon
+jump 82 always
+print "Basic material\n"
+print "Ammo for some units\n"
+print "Duo ammo\n"
+jump 82 always
+print "Burn things\n"
+print "Scorch ammo\n"
+print "Energy\n"
+jump 82 always
+print "Silligone\n"
+print "Something at the end\n"
+set @counter &ritemUses:42:0

@@ -64,4 +64,8 @@ const constantItem = 5;
 print(matchItem(dynamicItem));
 print(matchItem(constantItem));
 
+itemUses(Items.copper);
+itemUses(Items.coal);
+itemUses(Items.silicon);
+
 printFlush(getBuilding("message1"));
