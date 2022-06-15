@@ -5,6 +5,7 @@ export * from "./OperationExpressions";
 export * from "./Identifier";
 export * from "./Statements";
 export * from "./IfStatement";
+export * from "./SwitchStatement";
 export * from "./WhileStatement";
 export * from "./ForStatement";
 export * from "./Function";
