@@ -68,4 +68,9 @@ itemUses(Items.copper);
 itemUses(Items.coal);
 itemUses(Items.silicon);
 
+switch (dynamicItem) {
+  default:
+    print("always runs!\n");
+}
+
 printFlush(getBuilding("message1"));
