@@ -1,0 +1,60 @@
+set dynamicItem:61:4 4
+set n:3:19 dynamicItem:61:4
+set &rmatchItem:3:0 4
+jump 9 always
+print &fmatchItem:3:0
+set &t1:matchItem:3:0 @sand
+print &t1:matchItem:3:0
+printflush message1
+end
+jump 26 strictEqual n:3:19 1
+jump 28 strictEqual n:3:19 2
+jump 30 strictEqual n:3:19 3
+jump 32 strictEqual n:3:19 4
+jump 34 strictEqual n:3:19 5
+jump 36 strictEqual n:3:19 6
+jump 38 strictEqual n:3:19 7
+jump 40 strictEqual n:3:19 8
+jump 42 strictEqual n:3:19 9
+jump 44 strictEqual n:3:19 10
+jump 46 strictEqual n:3:19 11
+jump 48 strictEqual n:3:19 12
+jump 50 strictEqual n:3:19 13
+jump 52 strictEqual n:3:19 14
+jump 54 strictEqual n:3:19 15
+jump 56 strictEqual n:3:19 16
+jump 58 always
+set &fmatchItem:3:0 @copper
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @lead
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @metaglass
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @graphite
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @sand
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @coal
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @titanium
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @thorium
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @scrap
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @silicon
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @plastanium
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @phase-fabric
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @surge-alloy
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @spore-pod
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @blast-compound
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 @pyratite
+set @counter &rmatchItem:3:0
+set &fmatchItem:3:0 null
+set @counter &rmatchItem:3:0
