@@ -59,6 +59,35 @@ if (building.type === Blocks.message) {
 printFlush(message);
 ```
 
+### Switch statements
+
+Switch statements allow you to compare an expressions against many others.
+
+```js
+const item = Vars.unit.firstItem;
+
+switch (item) {
+  case Items.copper:
+  case Items.coal:
+  case Items.lead:
+    print("Going to cache");
+    break;
+  case Items.blastCompound:
+  case Items.pyratite:
+  case Items.silicon:
+    print("Going to nearby factory");
+    break;
+  default:
+    print("Nowhere to go");
+}
+
+printFlush(getBuilding("message1"));
+```
+
+Behavior:
+
+- Works just like a javascript switch statement
+
 ### Functions
 
 You can declare regular functions using your preferred style:
