@@ -218,6 +218,23 @@ Limitations:
 - No short-circuiting support
 - These expressions cannot return anything other than a boolean
 
+### Null coalescing operator
+
+The null coalescing operator (`??`) allows you to lazily evaluated the right side
+of the expression when the left side is `null`.
+
+```js
+const sorter = getBuilding("sorter1");
+
+const itemToFetch = sorter.config ?? Items.graphite;
+
+// make an unit fetch the item
+```
+
+Behavior:
+
+- Evaluates the left side, if it resolves to `null` it evaluates the right side and returns its value
+
 ### Ternary operator (conditional expression)
 
 The ternary operator allows you to conditionally return a value based on an expression.

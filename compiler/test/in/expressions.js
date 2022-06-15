@@ -12,3 +12,9 @@ print(+offset);
 // should be evaluated at compile time to 10
 print(1 + 2 > 1.4 ? 10 : -5);
 print(1 + 1 != 2 ? "it's false" : "huh, true");
+
+print(
+  null ?? "null is null",
+  offset ?? "offset is null?",
+  "preserved" ?? "should not appear"
+);
