@@ -24,7 +24,43 @@ export const LRExpression: THandler = (
 };
 
 export const BinaryExpression: THandler = LRExpression;
-export const LogicalExpression: THandler = LRExpression;
+export const LogicalExpression: THandler = (
+  c,
+  scope,
+  node: es.LogicalExpression
+) => {
+  if (node.operator !== "??") return LRExpression(c, scope, node, null);
+
+  const nullLiteral = new LiteralValue(scope, null as never);
+  const endAdress = new LiteralValue(scope, null as never);
+
+  const [left, leftInst] = c.handleEval(scope, node.left);
+
+  const [nullTest] = left["=="](scope, nullLiteral);
+
+  if (nullTest instanceof LiteralValue) {
+    if (nullTest.data) return c.handleEval(scope, node.right);
+    else return [left, leftInst];
+  }
+
+  const [right, rightInst] = c.handleEval(scope, node.right);
+
+  const result: StoreValue = new StoreValue(scope);
+  result.ensureOwned();
+
+  return [
+    result,
+    [
+      ...leftInst,
+      ...result["="](scope, left)[1],
+      new JumpInstruction(endAdress, EJumpKind.NotEqual, left, nullLiteral),
+      ...rightInst,
+      ...result["="](scope, right)[1],
+      new AddressResolver(endAdress),
+    ],
+  ];
+};
+
 export const AssignmentExpression: THandler = (
   c,
   scope,
