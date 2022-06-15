@@ -65,7 +65,7 @@ export const SwitchStatement: THandler<null> = (
     [
       ...refInst,
       ...caseJumps,
-      ...(defaultJump && caseJumps.length > 0 ? [defaultJump] : []),
+      ...(caseJumps.length > 0 ? [defaultJump] : []),
       ...inst,
       endLine,
     ],
