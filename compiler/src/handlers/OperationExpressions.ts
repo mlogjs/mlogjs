@@ -53,7 +53,7 @@ export const LogicalExpression: THandler = (
     [
       ...leftInst,
       ...result["="](scope, left)[1],
-      new JumpInstruction(endAdress, EJumpKind.NotEqual, left, nullLiteral),
+      new JumpInstruction(endAdress, EJumpKind.NotEqual, result, nullLiteral),
       ...rightInst,
       ...result["="](scope, right)[1],
       new AddressResolver(endAdress),
