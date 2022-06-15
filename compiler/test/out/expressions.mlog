@@ -19,4 +19,10 @@ print &t6
 print offset:8:6
 print 10
 print "huh, true"
+set &t7 offset:8:6
+jump 24 notEqual offset:8:6 null
+set &t7 "offset is null?"
+print "null is null"
+print &t7
+print "preserved"
 end
