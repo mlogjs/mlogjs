@@ -56,6 +56,10 @@ export const SwitchStatement: THandler<null> = (
     inst.push(bodyLine, ...bodyInst);
   }
 
+  // ensures that the processor exits
+  // the switch if no cases match
+  defaultJump ??= new JumpInstruction(endAdress, EJumpKind.Always);
+
   return [
     null,
     [
