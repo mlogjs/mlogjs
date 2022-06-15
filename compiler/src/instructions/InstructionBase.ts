@@ -1,3 +1,4 @@
+import { SourceLocation } from "@babel/types";
 import { IInstruction, IValue } from "../types";
 
 export class InstructionBase implements IInstruction {
@@ -9,6 +10,9 @@ export class InstructionBase implements IInstruction {
     this._hidden = value;
   }
   args: (string | IValue | null)[];
+
+  source?: SourceLocation;
+
   constructor(...args: (string | IValue | null)[]) {
     this.args = args;
   }

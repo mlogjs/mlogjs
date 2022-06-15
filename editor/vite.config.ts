@@ -30,6 +30,9 @@ const rawResolver: PluginOption = {
 };
 
 export default defineConfig({
+  define: {
+    "process.env": {},
+  },
   build: {
     outDir: resolve(__dirname, "../docs/editor"),
     emptyOutDir: true,

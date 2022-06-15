@@ -38,16 +38,17 @@ export const TSEnumDeclaration: THandler<null> = (
 
   for (const member of node.members) {
     if (lastType === "string" && !member.initializer)
-      throw new CompilerError("This enum member must be initialized", [member]);
+      throw new CompilerError("This enum member must be initialized", member);
 
     const [value] = member.initializer
       ? c.handleEval(scope, member.initializer)
       : [new LiteralValue(scope, counter)];
 
     if (!(value instanceof LiteralValue))
-      throw new CompilerError("Enum members must contain literal values", [
-        member,
-      ]);
+      throw new CompilerError(
+        "Enum members must contain literal values",
+        member
+      );
 
     if (typeof value.data === "number") {
       lastType = "number";

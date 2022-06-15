@@ -64,7 +64,9 @@ type TOperationFn = (a: number, b?: number) => number;
 type TBinOperationFn = (a: number, b: number) => number;
 
 const operatorMap: {
-  [k in BinaryOperator | LogicalOperator]?: TBinOperationFn;
+  [k in
+    | Exclude<BinaryOperator, "instanceof" | "in">
+    | Exclude<LogicalOperator, "??">]: TBinOperationFn;
 } = {
   "==": (a, b) => +(a == b),
   "===": (a, b) => +(a === b),
@@ -92,7 +94,7 @@ const operatorMap: {
 
 for (const key in operatorMap) {
   type K = keyof typeof operatorMap;
-  const fn = operatorMap[key as K] as TOperationFn;
+  const fn = operatorMap[key as K];
   LiteralValue.prototype[key as K] = function (
     this: LiteralValue,
     scope: IScope,
@@ -101,19 +103,20 @@ for (const key in operatorMap) {
     if (!(value instanceof LiteralValue)) {
       return BaseValue.prototype[key as K].apply(this, [scope, value]);
     }
-    return [new LiteralValue(scope, fn(this.num, value.num)), []];
+    return [
+      new LiteralValue(scope, fn(this.data as never, value.data as never)),
+      [],
+    ];
   };
 }
 
 const unaryOperatorMap: {
-  [k in Exclude<
-    UnaryOperator,
-    "u+" | "delete" | "typeof" | "void"
-  >]: TOperationFn;
+  [k in Exclude<UnaryOperator, "delete" | "typeof" | "void">]: TOperationFn;
 } = {
   "!": v => +!v,
   "~": v => ~v,
   "u-": v => -v,
+  "u+": v => +v,
 } as const;
 
 for (const key in unaryOperatorMap) {
@@ -123,6 +126,6 @@ for (const key in unaryOperatorMap) {
     scope: IScope
   ): TValueInstructions {
     const fn = unaryOperatorMap[key as K];
-    return [new LiteralValue(scope, fn(this.num)), []];
+    return [new LiteralValue(scope, fn(this.data as never)), []];
   };
 }

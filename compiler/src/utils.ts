@@ -1,4 +1,4 @@
-import { es } from "./types";
+import { es, IValue, TValueInstructions } from "./types";
 
 /**
  * The prefix for internal variables inside the compiler output
@@ -62,4 +62,15 @@ export function assign<T>(
   }
 ): T {
   return Object.assign(obj, props);
+}
+
+export function appendSourceLocations<T extends IValue | null>(
+  valueInst: TValueInstructions<T>,
+  node: es.Node
+): TValueInstructions<T> {
+  for (const inst of valueInst[1]) {
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+    inst.source ??= node.loc!;
+  }
+  return valueInst;
 }

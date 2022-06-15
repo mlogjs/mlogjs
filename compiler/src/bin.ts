@@ -1,6 +1,6 @@
 import { existsSync, readFileSync, writeFileSync } from "fs";
 import { hideBin } from "yargs/helpers";
-import { Compiler, CompilerError } from ".";
+import { Compiler } from ".";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
@@ -39,24 +39,13 @@ yargs(hideBin(process.argv))
         compactNames: argv["compact-names"],
       });
       const code = readFileSync(path, "utf8");
-      const [output, error, [node]] = compiler.compile(code);
+      const [output, error] = compiler.compile(code);
       if (error) {
-        if (!(error instanceof CompilerError)) {
-          console.error(error);
+        if (!error.loc) {
+          console.log(error.inner ?? error);
           return;
         }
-        let start = error.loc as {
-          line: number;
-          column: number;
-        };
-        let end = start;
-
-        if (node) {
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          start = node.loc!.start;
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-          end = node.loc!.end;
-        }
+        const { start, end } = error.loc;
 
         const lines = code.split("\n");
         console.log(
@@ -68,13 +57,12 @@ yargs(hideBin(process.argv))
           i++
         ) {
           const n = i + 1;
+          if (n !== start.line) continue;
           const head = chalk.gray(`${n} | `.padStart(6, " "));
           console.log(head + highlight(lines[i], { language: "js" }));
-          if (n === start.line) {
-            console.log(
-              chalk.red(" ".repeat(6 + start.column) + "^ " + error.message)
-            );
-          }
+          console.log(
+            chalk.red(" ".repeat(6 + start.column) + "^ " + error.message)
+          );
         }
 
         return;

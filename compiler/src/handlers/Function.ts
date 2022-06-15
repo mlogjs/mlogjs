@@ -12,7 +12,11 @@ function handleFunctionNode(
   let { params, body } = node;
 
   if (es.isExpression(body)) {
-    body = es.blockStatement([es.returnStatement(body)]);
+    const { loc } = body;
+    const statement = es.returnStatement(body);
+    statement.loc = loc;
+    body = es.blockStatement([statement]);
+    body.loc = loc;
   }
 
   return [
