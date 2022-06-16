@@ -43,7 +43,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private c: Compiler;
   private callSize!: number;
   private inlineTemp!: ValueOwner<SenseableValue>;
-  private inlineEnd!: LiteralValue;
   private bundled = false;
   private initialized = false;
 
@@ -159,7 +158,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
         mutability: EMutability.mutable,
       }),
     });
-    this.inlineEnd = new LiteralValue(scope, null as never);
 
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
@@ -180,16 +178,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.tryingInline = true;
     const inst = this.c.handle(fnScope, this.body)[1];
     this.tryingInline = false;
-
-    // removing useless instruction
-    // get the last instructions
-    // const [jump] = inst.slice(-1);
-    // if (jump instanceof JumpInstruction) {
-    // 	// remove useless jump
-    // 	if (jump.args[1] === this.inlineEnd) inst.pop();
-    // }
-
-    inst.push(new AddressResolver(this.inlineEnd));
 
     // return the function value
     return [this.inlineTemp.value, inst];
