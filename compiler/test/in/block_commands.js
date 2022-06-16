@@ -1,12 +1,18 @@
 const conveyor = getBuilding("conveyor1");
-const message = getBuilding("message1");
-const display = getBuilding("display1");
+const message = getBuilding("message3");
+const display = getBuilding("display3");
 const sorter = getBuilding("sorter1");
 const illuminator = getBuilding("illuminator1");
 const cyclone = getBuilding("cyclone1");
 
+// specific ones
 drawFlush(display);
 printFlush(message);
+
+// default ones
+printFlush();
+drawFlush();
+
 const block = getLink(1);
 
 control("color", illuminator, 10, 50, 9);
