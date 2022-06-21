@@ -18,7 +18,7 @@ export const VariableDeclaration: THandler<null> = (
   scope,
   node: es.VariableDeclaration
 ) => {
-  return c.handleMany(scope, node.declarations, (scope, child) =>
+  return c.handleMany(scope, node.declarations, child =>
     VariableDeclarator(c, scope, child, node.kind)
   );
 };

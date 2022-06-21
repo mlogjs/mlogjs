@@ -140,14 +140,14 @@ export class Compiler {
   handleMany<T extends es.Node>(
     scope: IScope,
     nodes: T[],
-    handler?: (scope: IScope, node: T) => TValueInstructions<IValue | null>
+    handler?: (node: T) => TValueInstructions<IValue | null>
   ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
       const [, nodeLines] = this.handle(
         scope,
         node,
-        handler && (() => handler(scope, node))
+        handler && (() => handler(node))
       );
       lines.push(...nodeLines);
     }
