@@ -137,17 +137,28 @@ export class Compiler {
     return result;
   }
 
+  /**
+   * Handles many nodes in order.
+   *
+   * The usage of this method over a regular loop over an array of nodes
+   * is only required if the code inside the loop generates
+   * instructions that are not tracked by the compiler
+   * handler methods ({@link handle}, {@link handleEval}, {@link handleConsume}
+   * and {@link handleMany})
+   *
+   */
   handleMany<T extends es.Node>(
     scope: IScope,
     nodes: T[],
-    handler: (
-      scope: IScope,
-      node: T
-    ) => TValueInstructions<IValue | null> = this.handle.bind(this)
+    handler?: (node: T) => TValueInstructions<IValue | null>
   ): TValueInstructions<null> {
     const lines = [];
     for (const node of nodes) {
-      const [, nodeLines] = handler(scope, node);
+      const [, nodeLines] = this.handle(
+        scope,
+        node,
+        handler && (() => handler(node))
+      );
       lines.push(...nodeLines);
     }
     return [null, lines];
