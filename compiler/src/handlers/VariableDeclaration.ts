@@ -142,23 +142,30 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
     );
   const { properties } = node;
   const [init, inst] = base.consume(scope);
-  for (const prop of properties) {
+
+  const propertiesInst = c.handleMany(scope, properties, prop => {
     if (prop.type === "RestElement")
       throw new CompilerError("The rest operator is not supported", prop);
 
     const { key, value } = prop;
 
-    const child: TValueInstructions =
+    const keyInst: TValueInstructions =
       key.type === "Identifier" && !prop.computed
         ? [new LiteralValue(scope, key.name), []]
         : c.handleConsume(scope, prop.key);
 
-    inst.push(...child[1]);
+    const propInit = init.get(scope, keyInst[0]);
 
-    const propInit = init.get(scope, child[0]);
-    inst.push(...propInit[1]);
+    const declarationInst = Declare(
+      c,
+      scope,
+      value as es.LVal,
+      kind,
+      propInit[0]
+    );
 
-    inst.push(...Declare(c, scope, value as es.LVal, kind, propInit[0])[1]);
-  }
-  return [null, inst];
+    return [null, [...keyInst[1], ...propInit[1], ...declarationInst[1]]];
+  });
+
+  return [null, [...inst, ...propertiesInst[1]]];
 };
