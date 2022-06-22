@@ -1,7 +1,7 @@
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
 import { EMutability, IScope, IValue, TValueInstructions } from "../types";
-import { camelToDashCase, itemNames } from "../utils";
+import { assign, camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 
@@ -48,7 +48,9 @@ export class SenseableValue extends StoreValue {
       ];
     }
     if (prop instanceof StoreValue) {
-      const temp = new StoreValue(scope);
+      const temp = assign(new SenseableValue(scope), {
+        mutability: EMutability.readonly,
+      });
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
     throw new CompilerError(`Cannot sense "${prop}" property`);
