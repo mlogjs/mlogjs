@@ -78,7 +78,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       const name = nodeName(id, !this.c.compactNames && id.name);
       const owner = new ValueOwner({
         scope: this.childScope,
-        value: new StoreValue(this.childScope),
+        value: assign(new SenseableValue(this.childScope), {
+          mutability: EMutability.mutable,
+        }),
         identifier: id.name,
         name,
       });
