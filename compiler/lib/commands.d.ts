@@ -155,16 +155,20 @@ declare global {
   /**
    * Writes the contents of the print buffer into the target message
    * and clears the buffer afterwards.
-   * @param target
+   * @param target The message building to write to. Writes to `message1` by default.
+   *
+   * Note that the default value only applies if you don't pass any parameter to this function.
    */
-  function printFlush(target: BasicBuilding): void;
+  function printFlush(target?: BasicBuilding): void;
 
   /**
    * Writes the contents of the draw buffer into the target display
    * and clears the buffer afterwards.
-   * @param target
+   * @param target The display building to write to. Writes to `display1` by default.
+   *
+   * Note that the default value only applies if you don't pass any parameter to this function.
    */
-  function drawFlush(target: BasicBuilding): void;
+  function drawFlush(target?: BasicBuilding): void;
 
   /**
    * Gets a block link by its index.

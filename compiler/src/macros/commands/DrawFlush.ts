@@ -4,9 +4,14 @@ import { IScope, IValue } from "../../types";
 import { SenseableValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
+const defaultTargetName = "display1";
+
 export class DrawFlush extends MacroFunction<null> {
   constructor(scope: IScope) {
-    super(scope, (target: IValue) => {
+    super(scope, (target?: IValue) => {
+      if (!target)
+        return [null, [new InstructionBase("drawflush", defaultTargetName)]];
+
       if (!(target instanceof SenseableValue))
         throw new CompilerError(
           "The drawflush target must be a senseable value"
