@@ -1,7 +1,10 @@
 import { SourceLocation } from "@babel/types";
-import { IInstruction, IValue } from "../types";
+import { EInstIntent, IInstruction, IValue } from "../types";
 
 export class InstructionBase implements IInstruction {
+  intent = EInstIntent.none;
+  alwaysRuns = true;
+
   protected _hidden = false;
   public get hidden() {
     return this._hidden;

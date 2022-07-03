@@ -8,6 +8,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import {
+  EInstIntent,
   EMutability,
   es,
   IFunctionValue,
@@ -115,7 +116,11 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     ];
 
     if (!endsWithReturn(this.inst)) {
-      this.inst.push(new SetCounterInstruction(this.ret.value));
+      this.inst.push(
+        assign(new SetCounterInstruction(this.ret.value), {
+          intent: EInstIntent.return,
+        })
+      );
     }
   }
 
@@ -124,7 +129,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     arg: IValue | null
   ): TValueInstructions<null> {
     const argInst = arg ? this.temp.value["="](scope, arg)[1] : [];
-    return [null, [...argInst, new SetCounterInstruction(this.ret.value)]];
+    const returnInst = assign(new SetCounterInstruction(this.ret.value), {
+      intent: EInstIntent.return,
+    });
+    return [null, [...argInst, returnInst]];
   }
 
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
@@ -147,6 +155,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     arg: IValue | null
   ): TValueInstructions<null> {
     const argInst = arg ? this.inlineTemp.value["="](scope, arg)[1] : [];
+    argInst.forEach(inst => (inst.intent = EInstIntent.return));
     return [null, argInst];
   }
 
@@ -176,7 +185,13 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     });
 
     this.tryingInline = true;
-    const inst = this.c.handle(fnScope, this.body)[1];
+    let inst = this.c.handle(fnScope, this.body)[1];
+
+    const returnIndex = inst.findIndex(
+      i => i.alwaysRuns && i.intent === EInstIntent.return
+    );
+    if (returnIndex !== -1) inst = inst.slice(0, returnIndex + 1);
+
     this.tryingInline = false;
 
     // return the function value

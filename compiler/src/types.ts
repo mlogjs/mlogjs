@@ -5,10 +5,23 @@ import { AddressResolver } from "./instructions";
 import { MacroFunction } from "./macros";
 import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
 
+export enum EInstIntent {
+  none,
+  break,
+  continue,
+  return,
+}
+
 export interface IInstruction {
+  intent: EInstIntent;
   hidden: boolean;
   resolve(i: number): void;
   source?: es.SourceLocation;
+  /**
+   * Helps analyzing control flow, handlers should
+   * indicate which instructions returned are guaranteed to run
+   */
+  alwaysRuns: boolean;
 }
 
 export type THandler<T extends IValue | null = IValue> = (
