@@ -74,3 +74,11 @@ export function appendSourceLocations<T extends IValue | null>(
   }
   return valueInst;
 }
+
+export function withAlwaysRuns<T extends IValue | null>(
+  valueInst: TValueInstructions<T>,
+  value: boolean
+) {
+  valueInst[1].forEach(inst => (inst.alwaysRuns = value));
+  return valueInst;
+}

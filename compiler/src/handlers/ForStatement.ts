@@ -1,5 +1,6 @@
 import { AddressResolver, JumpInstruction, EJumpKind } from "../instructions";
 import { es, THandler } from "../types";
+import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const ForStatement: THandler<null> = (
@@ -32,7 +33,7 @@ export const ForStatement: THandler<null> = (
         test,
         new LiteralValue(scope, 0)
       ),
-      ...c.handle(scope, node.body)[1],
+      ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
       ...updateLines,
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
       endLoopLine,

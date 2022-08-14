@@ -1,5 +1,6 @@
 import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import { es, IInstruction, THandler } from "../types";
+import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const WhileStatement: THandler<null> = (
@@ -36,7 +37,7 @@ export const WhileStatement: THandler<null> = (
       test,
       new LiteralValue(scope, 0)
     ),
-    ...c.handle(scope, node.body)[1],
+    ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
     new JumpInstruction(startLoopAddr, EJumpKind.Always),
     endLoopLine
   );

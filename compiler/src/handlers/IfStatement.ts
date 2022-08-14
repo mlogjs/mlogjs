@@ -1,6 +1,7 @@
 import { JumpInstruction, AddressResolver } from "../instructions";
 import { EJumpKind } from "../instructions";
 import { THandler, es } from "../types";
+import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
@@ -14,6 +15,7 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   }
 
   const endIfAddr = new LiteralValue(scope, null as never);
+
   inst.push(
     ...testInst,
     new JumpInstruction(
@@ -22,16 +24,18 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
       test,
       new LiteralValue(scope, 0)
     ),
-    ...c.handle(scope, node.consequent)[1],
+    ...withAlwaysRuns(c.handle(scope, node.consequent), false)[1],
     new AddressResolver(endIfAddr)
   );
+
   const endElseAddr = new LiteralValue(scope, null as never);
-  if (node.alternate)
+  if (node.alternate) {
     inst.push(
       new JumpInstruction(endElseAddr, EJumpKind.Always),
       new AddressResolver(endIfAddr),
-      ...c.handle(scope, node.alternate)[1],
+      ...withAlwaysRuns(c.handle(scope, node.alternate), false)[1],
       new AddressResolver(endElseAddr)
     );
+  }
   return [null, inst];
 };

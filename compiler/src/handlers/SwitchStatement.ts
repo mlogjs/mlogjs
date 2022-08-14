@@ -1,5 +1,6 @@
 import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import { es, IInstruction, THandler } from "../types";
+import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const SwitchStatement: THandler<null> = (
@@ -59,6 +60,12 @@ export const SwitchStatement: THandler<null> = (
   // ensures that the processor exits
   // the switch if no cases match
   defaultJump ??= new JumpInstruction(endAdress, EJumpKind.Always);
+
+  if (caseJumps.length > 0) {
+    withAlwaysRuns([null, inst], false);
+    withAlwaysRuns([null, [...caseJumps.slice(1), defaultJump]], false);
+    withAlwaysRuns([null, inst], false);
+  }
 
   return [
     null,
