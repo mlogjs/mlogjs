@@ -31,9 +31,11 @@ export class ObjectValue extends VoidValue {
 
   static fromArray(
     scope: IScope,
-    items: IObjectValueData[keyof IObjectValueData][]
+    items: IObjectValueData[keyof IObjectValueData][],
+    intialData?: IObjectValueData
   ): ObjectValue {
     const data: IObjectValueData = {
+      ...intialData,
       length: new LiteralValue(scope, items.length),
     };
     items.forEach((item, i) => {
