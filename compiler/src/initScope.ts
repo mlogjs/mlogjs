@@ -10,6 +10,7 @@ import { UCommandsNamespace } from "./macros/Namespace";
 import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 import { EMutability } from "./types";
+import { Asm } from "./macros/Asm";
 
 /**
  * Adds all the compiler globals to `scope`
@@ -29,6 +30,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("getBuilding", new GetGlobal(scope, EMutability.constant));
   scope.hardSet("getVar", new GetGlobal(scope, EMutability.mutable));
   scope.hardSet("concat", new Concat(scope));
+  scope.hardSet("asm", new Asm(scope));
 
   scope.hardSet("Math", new MlogMath(scope));
   scope.hardSet("Memory", new MemoryBuilder(scope));
