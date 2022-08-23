@@ -1,4 +1,5 @@
 import { es, IValue, TValueInstructions } from "./types";
+import { IObjectValueData, LiteralValue, ObjectValue } from "./values";
 
 /**
  * The prefix for internal variables inside the compiler output
@@ -81,4 +82,28 @@ export function withAlwaysRuns<T extends IValue | null>(
 ) {
   valueInst[1].forEach(inst => (inst.alwaysRuns = value));
   return valueInst;
+}
+
+export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
+  data: IObjectValueData & {
+    raw: ObjectValue & {
+      data: IObjectValueData & {
+        length: LiteralValue & {
+          data: number;
+        };
+      };
+    };
+    length: LiteralValue & {
+      data: number;
+    };
+  };
+} {
+  return (
+    value instanceof ObjectValue &&
+    value.data.length instanceof LiteralValue &&
+    typeof value.data.length.data === "number" &&
+    value.data.raw instanceof ObjectValue &&
+    value.data.raw.data.length instanceof LiteralValue &&
+    typeof value.data.raw.data.length.data === "number"
+  );
 }

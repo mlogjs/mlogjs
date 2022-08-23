@@ -8,6 +8,14 @@ declare global {
    * To print the contents of the print buffer and empty it call `printFlush`.
    *
    * @param items The items to be added to the print buffer.
+   *
+   * ```js
+   *  // call normally
+   *  print("a + b = ", left, " + ", right, " = ", left + right)
+   *
+   *  // call with tagged string templates
+   *  print`a + b = ${left} + ${right} = ${left + right}`
+   * ```
    */
   function print(...items: unknown[]): void;
 
@@ -533,4 +541,18 @@ declare global {
 
   /** Ends the execution of this script */
   function endScript(): never;
+
+  /**
+   * Inlines raw mlog code. Variables and expressions can be placed inside.
+   *
+   * Although possible, using this function is heavily not recommended since
+   * you lose the benefits of getting type cheking and validation for some
+   * commands.
+   *
+   * ```js
+   *  let x = 10
+   *  asm`ucontrol build ${x} ${x * 2} @router 0 0`
+   * ```
+   */
+  function asm(strings: TemplateStringsArray, ...values: unknown[]): void;
 }

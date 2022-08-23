@@ -4,4 +4,7 @@ print "second"
 print "third"
 set variable:4:6 @foo
 print variable:4:6
+print "variable "
+print variable:4:6
+print "\nusing\ntagged\ntemplates"
 end

@@ -1,4 +1,5 @@
 import { es, IInstruction, IValue, THandler } from "../types";
+import { LiteralValue, ObjectValue } from "../values";
 
 export const CallExpression: THandler<IValue | null> = (
   c,
@@ -25,3 +26,39 @@ export const CallExpression: THandler<IValue | null> = (
 };
 
 export const NewExpression = CallExpression;
+
+export const TaggedTemplateExpression: THandler<IValue | null> = (
+  c,
+  scope,
+  node: es.TaggedTemplateExpression
+) => {
+  const [tag, tagInst] = c.handleConsume(scope, node.tag);
+
+  const template = node.quasi;
+
+  const stringsObject = ObjectValue.fromArray(
+    scope,
+    template.quasis.map(
+      quasi => new LiteralValue(scope, quasi.value.cooked ?? "")
+    ),
+    {
+      raw: ObjectValue.fromArray(
+        scope,
+        template.quasis.map(quasi => new LiteralValue(scope, quasi.value.raw))
+      ),
+    }
+  );
+
+  const expressions: IValue[] = [];
+  const expressionInsts: IInstruction[] = [];
+
+  template.expressions.forEach(expression => {
+    const [value, inst] = c.handleConsume(scope, expression);
+    expressions.push(value);
+    expressionInsts.push(...inst);
+  });
+
+  const [result, resultInst] = tag.call(scope, [stringsObject, ...expressions]);
+
+  return [result, [...expressionInsts, ...tagInst, ...resultInst]];
+};
