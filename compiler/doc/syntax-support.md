@@ -103,6 +103,20 @@ const other = function () {};
 Behavior:
 
 - Functions will be automatically inlined when the size of the body is smaller than the size of the call
+- Some built-in functions such as [asm](/commands) or [print](/commands) can be called with tagged template strings.
+
+```js
+let a = 1;
+let b = 2;
+let c = 3;
+
+print("regular style with ", a, " and ", b, " and ", c);
+print`new style with ${a} and ${b} and ${c}`;
+asm`this is inlined into the final code`;
+```
+
+> This is only possible because the arguments are known at compile time,
+> making it possible for the compiler to know how to deal with each case.
 
 Limitations:
 
@@ -114,6 +128,9 @@ Limitations:
 - No proper support for closures
 - No support for generators
 - No support for `async`/`await`
+- No support for spread syntax
+- No support for destructuring syntax
+- No support for declaring functions that take tagged template strings.
 
 ### For loops
 
@@ -329,38 +346,6 @@ const { firstItem = Items.copper } = building;
 > doesn't know whether the object has such property, and cheking for `null`
 > is not a viable option because returning `null` does not necessarily mean
 > that the property doesn't exist.
-
-### Template strings
-
-Template strings in javascript allow you to interpolate values with strings in
-a convenient way.
-
-But since the mlog runtime doesn't support string contenation template strings are used to
-inline mlog code.
-
-You can see a demonstration bellow.
-
-```js
-const conveyor = getBuilding("conveyor1");
-const message = getBuilding("message1");
-
-print(conveyor.x, conveyor.y);
-
-`printflush ${message}`;
-```
-
-```
-sensor &t0 conveyor1 @x
-sensor &t1 conveyor1 @y
-print &t0
-print &t1
-printflush message1
-end
-```
-
-Behavior:
-
-- Variables inlined on the template string will have their mlog representation on the final code. Works with expressions too.
 
 ## Typescript
 
