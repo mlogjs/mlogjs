@@ -19,3 +19,4 @@ Here is a list of them, some have multiple overloads
 - `unitRadar` - Uses the unit bound to the processor to find nearby units
 - `unitLocate` - Uses the unit bound to the processor to find blocks
 - `endScript` - Ends the execution of the script (compiles into an `end` instruction)
+- `asm` - Inlines mlog code (can be used with variables and expressions)
