@@ -8,6 +8,14 @@ declare global {
    * To print the contents of the print buffer and empty it call `printFlush`.
    *
    * @param items The items to be added to the print buffer.
+   *
+   * ```js
+   *  // call normally
+   *  print("a + b = ", left, " + ", right, " = ", left + right)
+   *
+   *  // call with tagged string templates
+   *  print`a + b = ${left} + ${right} = ${left + right}`
+   * ```
    */
   function print(...items: unknown[]): void;
 
