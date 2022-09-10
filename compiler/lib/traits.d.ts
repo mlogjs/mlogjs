@@ -40,6 +40,7 @@ declare global {
 
   interface Shooting
     extends WithSymbols<{
+      readonly shooting: boolean;
       readonly shootX: number;
       readonly shootY: number;
       readonly ammo: number;
