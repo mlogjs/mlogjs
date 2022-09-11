@@ -10,7 +10,8 @@ interface BasicUnit
     Typed<UnitSymbol>,
     Flagged,
     Controllable,
-    Nameable {}
+    Nameable,
+    WithSpeed {}
 
 interface AnyUnit extends BasicUnit, Boosted {}
 

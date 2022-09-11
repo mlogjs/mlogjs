@@ -139,4 +139,9 @@ declare global {
   > extends WithSymbols<{
       readonly config: T;
     }> {}
+
+  interface WithSpeed
+    extends WithSymbols<{
+      speed: number;
+    }> {}
 }

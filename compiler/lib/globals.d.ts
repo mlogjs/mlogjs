@@ -235,12 +235,12 @@ declare namespace LAccess {
   const mineX: unique symbol;
   const mineY: unique symbol;
   const mining: unique symbol;
+  const speed: unique symbol;
   const team: unique symbol;
   const type: unique symbol;
   const flag: unique symbol;
   const controlled: unique symbol;
   const controller: unique symbol;
-  const commanded: unique symbol;
   const name: unique symbol;
   const payloadCount: unique symbol;
   const payloadType: unique symbol;
