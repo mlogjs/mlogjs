@@ -1,0 +1,5 @@
+set r:1:4 12
+set b:2:2 245
+packcolor &t0 r:1:4 60 b:2:2 255
+print &t0
+end

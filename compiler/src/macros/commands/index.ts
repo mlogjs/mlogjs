@@ -8,6 +8,7 @@ export { Radar } from "./Radar";
 export * from "./Sensor";
 export * from "./Wait";
 export * from "./Lookup";
+export * from "./PackColor";
 export * from "./End";
 export * from "./UnitBind";
 export * from "./UnitControl";

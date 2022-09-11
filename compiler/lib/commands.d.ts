@@ -352,6 +352,9 @@ declare global {
    */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
+  /** Packs RGBA color information into a single number */
+  function packColor(r: number, g: number, b: number, a: number): number;
+
   /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`
    */
