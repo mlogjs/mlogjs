@@ -251,14 +251,6 @@ declare namespace LAccess {
   const color: unique symbol;
 }
 
-declare namespace UnitCommands {
-  const attack: unique symbol;
-  const rally: unique symbol;
-  const idle: unique symbol;
-}
-
-type UnitCommandSymbol = typeof UnitCommands[keyof typeof UnitCommands];
-
 interface Blocks {
   // special "blocks" to reference stuff from the environment
   readonly air: unique symbol;
@@ -424,3 +416,6 @@ interface Blocks {
 
 declare const Blocks: Blocks;
 type BlockSymbol = typeof Blocks[keyof typeof Blocks];
+
+/** Contains symbols for environment blocks */
+declare namespace Environment {}
