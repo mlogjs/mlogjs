@@ -542,8 +542,11 @@ declare global {
     find: "damaged"
   ): [found: false] | [found: true, x: number, y: number, building: T];
 
-  /** Ends the execution of this script */
+  /**Jumps to the top of the instruction stack*/
   function endScript(): never;
+
+  /** Halts the execution of this processor */
+  function stopScript(): never;
 
   /**
    * Inlines raw mlog code. Variables and expressions can be placed inside.

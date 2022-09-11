@@ -48,6 +48,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("lookup", new commands.Lookup(scope));
   scope.hardSet("packColor", new commands.PackColor(scope));
   scope.hardSet("endScript", new commands.End(scope));
+  scope.hardSet("stopScript", new commands.Stop(scope));
   scope.hardSet("unitBind", new commands.UnitBind(scope));
   scope.hardSet("unitControl", new commands.UnitControl(scope));
   scope.hardSet("unitRadar", new commands.UnitRadar(scope));
