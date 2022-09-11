@@ -1,0 +1,10 @@
+{
+  "compilerOptions": {
+    "moduleDetection": "force",
+    "allowJs": true,
+    "checkJs": true,
+    "noLib": true,
+    "noEmit": true
+  },
+  "include": ["./in", "./fail", "../lib"]
+}
