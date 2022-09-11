@@ -27,6 +27,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("EnvBlocks", new NamespaceMacro(scope, { changeCasing: true }));
+  scope.hardSet("Ores", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(scope, EMutability.constant));

@@ -618,3 +618,21 @@ declare namespace EnvBlocks {
 }
 
 type EnvBlockSymbol = typeof EnvBlocks[keyof typeof EnvBlocks];
+
+declare namespace Ores {
+  const oreCopper: unique symbol;
+  const oreLead: unique symbol;
+  const oreScrap: unique symbol;
+  const oreCoal: unique symbol;
+  const oreTitanium: unique symbol;
+  const oreThorium: unique symbol;
+  const oreBeryllium: unique symbol;
+  const oreTungsten: unique symbol;
+  const oreCrystalThorium: unique symbol;
+  const oreWallThorium: unique symbol;
+  const oreWallBeryllium: unique symbol;
+  const graphiticWall: unique symbol;
+  const oreWallTungsten: unique symbol;
+}
+
+type OreSymbol = typeof Ores[keyof typeof Ores];

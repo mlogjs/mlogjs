@@ -296,3 +296,5 @@ print(
 );
 
 print(EnvBlocks.air, EnvBlocks.basalt); // they run the same code
+
+print(Ores.oreBeryllium, Ores.oreCopper);
