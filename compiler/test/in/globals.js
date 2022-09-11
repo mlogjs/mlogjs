@@ -125,7 +125,6 @@ print(
   LAccess.flag,
   LAccess.controlled,
   LAccess.controller,
-  LAccess.commanded,
   LAccess.name,
   LAccess.payloadCount,
   LAccess.payloadType,
@@ -135,8 +134,6 @@ print(
   LAccess.config,
   LAccess.color
 );
-
-print(UnitCommands.attack, UnitCommands.idle, UnitCommands.rally);
 
 print(
   Blocks.air,
@@ -212,7 +209,7 @@ print(
   Blocks.ductBridge,
   Blocks.mechanicalPump,
   Blocks.rotaryPump,
-  Blocks.thermalPump,
+  Blocks.impulsePump,
   Blocks.conduit,
   Blocks.pulseConduit,
   Blocks.platedConduit,
@@ -268,7 +265,6 @@ print(
   Blocks.segment,
   Blocks.parallax,
   Blocks.tsunami,
-  Blocks.commandCenter,
   Blocks.groundFactory,
   Blocks.airFactory,
   Blocks.navalFactory,

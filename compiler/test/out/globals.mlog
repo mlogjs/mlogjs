@@ -110,7 +110,6 @@ print @type
 print @flag
 print @controlled
 print @controller
-print @commanded
 print @name
 print @payloadCount
 print @payloadType
@@ -119,9 +118,6 @@ print @shoot
 print @shootp
 print @config
 print @color
-print @commandAttack
-print @commandIdle
-print @commandRally
 print @air
 print @solid
 print @silicon-smelter
@@ -195,7 +191,7 @@ print @duct-router
 print @duct-bridge
 print @mechanical-pump
 print @rotary-pump
-print @thermal-pump
+print @impulse-pump
 print @conduit
 print @pulse-conduit
 print @plated-conduit
@@ -251,7 +247,6 @@ print @meltdown
 print @segment
 print @parallax
 print @tsunami
-print @command-center
 print @ground-factory
 print @air-factory
 print @naval-factory
@@ -280,4 +275,6 @@ print @memory-cell
 print @memory-bank
 print @launch-pad
 print @interplanetary-accelerator
+print @air
+print @basalt
 end
