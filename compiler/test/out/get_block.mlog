@@ -1,0 +1,16 @@
+getblock block block:1:6 10 10
+getblock building building:2:6 10 10
+getblock floor floor:3:6 10 10
+getblock ore ore:4:6 10 10
+print "there is a "
+print block:1:6
+print " on top of a "
+print floor:3:6
+print " and "
+print ore:4:6
+print "\n"
+sensor &t0 building:2:6 @health
+print "the building has "
+print &t0
+print " health"
+end

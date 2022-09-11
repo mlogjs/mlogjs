@@ -53,4 +53,8 @@ export function initScope(scope: Scope) {
   scope.hardSet("unitControl", new commands.UnitControl(scope));
   scope.hardSet("unitRadar", new commands.UnitRadar(scope));
   scope.hardSet("unitLocate", new commands.UnitLocate(scope));
+
+  // world processor commands
+
+  scope.hardSet("getBlock", new commands.GetBlock(scope));
 }
