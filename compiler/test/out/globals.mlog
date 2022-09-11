@@ -9,6 +9,12 @@ print @this
 print @thisx
 print @thisy
 print @unit
+print @blue
+print @crux
+print @delerict
+print @green
+print @malis
+print @sharded
 print @blast-compound
 print @coal
 print @copper

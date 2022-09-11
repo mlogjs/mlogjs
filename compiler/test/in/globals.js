@@ -17,6 +17,15 @@ print(
 );
 
 print(
+  Teams.blue,
+  Teams.crux,
+  Teams.delerict,
+  Teams.green,
+  Teams.malis,
+  Teams.sharded
+);
+
+print(
   Items.blastCompound,
   Items.coal,
   Items.copper,

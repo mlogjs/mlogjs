@@ -67,6 +67,32 @@ interface Vars {
 
 declare const Vars: Vars;
 
+/** Contains the base game teams. */
+declare namespace Teams {
+  /** The gray team. */
+  const delerict: unique symbol;
+  /** The yellow team. */
+  const sharded: unique symbol;
+  /** The red team. */
+  const crux: unique symbol;
+  /** The purple team. */
+  const malis: unique symbol;
+  /**
+   * The green team.
+   *
+   * Warning: this name might change in the future.
+   */
+  const green: unique symbol;
+  /**
+   * The blue team.
+   *
+   * Warning: this name might change in the future.
+   */
+  const blue: unique symbol;
+}
+
+type TeamSymbol = typeof Teams[keyof typeof Teams];
+
 declare namespace Items {
   const copper: unique symbol;
   const lead: unique symbol;

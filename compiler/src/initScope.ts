@@ -19,6 +19,7 @@ export function initScope(scope: Scope) {
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro(scope));
   scope.hardSet("Vars", new VarsNamespace(scope));
+  scope.hardSet("Teams", new NamespaceMacro(scope));
   scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("Liquids", new NamespaceMacro(scope));
   scope.hardSet("Units", new NamespaceMacro(scope));
