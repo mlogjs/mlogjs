@@ -409,12 +409,12 @@ declare global {
   function unitControl(mode: "targetp", unit: BasicUnit, shoot: boolean): void;
   /**
    * Makes the unit bound to this processor drop it's held items onto the given target
-   * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+   * @param target Where to drop the items, if `EnvBlocks.air`, the unit will throw it's items away
    * @param amount How many items should be dropped
    */
   function unitControl(
     mode: "itemDrop",
-    target: BasicBuilding | typeof Blocks.air,
+    target: BasicBuilding | typeof EnvBlocks.air,
     amount: number
   ): void;
   /**

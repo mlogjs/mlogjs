@@ -298,3 +298,5 @@ print(
   Blocks.launchPad,
   Blocks.interplanetaryAccelerator
 );
+
+print(EnvBlocks.air, EnvBlocks.basalt); // they run the same code

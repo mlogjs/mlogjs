@@ -253,8 +253,9 @@ declare namespace LAccess {
 
 interface Blocks {
   // special "blocks" to reference stuff from the environment
-  readonly air: unique symbol;
-  readonly solid: unique symbol;
+  /** @deprecated Use `EnvBlocks.air` instead */
+  readonly air: typeof EnvBlocks.air;
+  readonly solid: typeof EnvBlocks.stoneWall;
 
   readonly graphitePress: unique symbol;
   readonly multiPress: unique symbol;
@@ -500,5 +501,120 @@ interface Blocks {
 declare const Blocks: Blocks;
 type BlockSymbol = typeof Blocks[keyof typeof Blocks];
 
-/** Contains symbols for environment blocks */
-declare namespace Environment {}
+/** Contains symbols for environment blocks*/
+declare namespace EnvBlocks {
+  const air: unique symbol;
+  const spawn: unique symbol;
+  const cliff: unique symbol;
+  const deepWater: unique symbol;
+  const shallowWater: unique symbol;
+  const taintedWater: unique symbol;
+  const deepTaintedWater: unique symbol;
+  const darksandTaintedWater: unique symbol;
+  const sandWater: unique symbol;
+  const darksandWater: unique symbol;
+  const tar: unique symbol;
+  const pooledCryofluid: unique symbol;
+  const moltenSlag: unique symbol;
+  const space: unique symbol;
+  const empty: unique symbol;
+  const stone: unique symbol;
+  const craterStone: unique symbol;
+  const char: unique symbol;
+  const basalt: unique symbol;
+  const hotrock: unique symbol;
+  const magmarock: unique symbol;
+  const sandFloor: unique symbol;
+  const darksand: unique symbol;
+  const dirt: unique symbol;
+  const mud: unique symbol;
+  const dacite: unique symbol;
+  const rhyolite: unique symbol;
+  const rhyoliteCrater: unique symbol;
+  const roughRhyolite: unique symbol;
+  const regolith: unique symbol;
+  const yellowStone: unique symbol;
+  const carbonStone: unique symbol;
+  const ferricStone: unique symbol;
+  const ferricCraters: unique symbol;
+  const beryllicStone: unique symbol;
+  const crystallineStone: unique symbol;
+  const crystalFloor: unique symbol;
+  const yellowStonePlates: unique symbol;
+  const redStone: unique symbol;
+  const denseRedStone: unique symbol;
+  const redIce: unique symbol;
+  const arkyciteFloor: unique symbol;
+  const arkyicStone: unique symbol;
+  const rhyoliteVent: unique symbol;
+  const carbonVent: unique symbol;
+  const arkyicVent: unique symbol;
+  const yellowStoneVent: unique symbol;
+  const redStoneVent: unique symbol;
+  const redmat: unique symbol;
+  const bluemat: unique symbol;
+  const grass: unique symbol;
+  const salt: unique symbol;
+  const snow: unique symbol;
+  const ice: unique symbol;
+  const iceSnow: unique symbol;
+  const shale: unique symbol;
+  const moss: unique symbol;
+  const coreZone: unique symbol;
+  const sporeMoss: unique symbol;
+  const stoneWall: unique symbol;
+  const sporeWall: unique symbol;
+  const dirtWall: unique symbol;
+  const daciteWall: unique symbol;
+  const iceWall: unique symbol;
+  const snowWall: unique symbol;
+  const duneWall: unique symbol;
+  const regolithWall: unique symbol;
+  const yellowStoneWall: unique symbol;
+  const rhyoliteWall: unique symbol;
+  const carbonWall: unique symbol;
+  const ferricStoneWall: unique symbol;
+  const beryllicStoneWall: unique symbol;
+  const arkyicWall: unique symbol;
+  const crystallineStoneWall: unique symbol;
+  const redIceWall: unique symbol;
+  const redStoneWall: unique symbol;
+  const redDiamondWall: unique symbol;
+  const sandWall: unique symbol;
+  const saltWall: unique symbol;
+  const shrubs: unique symbol;
+  const shaleWall: unique symbol;
+  const sporePine: unique symbol;
+  const snowPine: unique symbol;
+  const pine: unique symbol;
+  const whiteTreeDead: unique symbol;
+  const whiteTree: unique symbol;
+  const sporeCluster: unique symbol;
+  const redweed: unique symbol;
+  const purBush: unique symbol;
+  const yellowcoral: unique symbol;
+  const boulder: unique symbol;
+  const snowBoulder: unique symbol;
+  const shaleBoulder: unique symbol;
+  const sandBoulder: unique symbol;
+  const daciteBoulder: unique symbol;
+  const basaltBoulder: unique symbol;
+  const carbonBoulder: unique symbol;
+  const ferricBoulder: unique symbol;
+  const beryllicBoulder: unique symbol;
+  const yellowStoneBoulder: unique symbol;
+  const arkyicBoulder: unique symbol;
+  const crystalCluster: unique symbol;
+  const vibrantCrystalCluster: unique symbol;
+  const crystalBlocks: unique symbol;
+  const crystalOrbs: unique symbol;
+  const crystallineBoulder: unique symbol;
+  const redIceBoulder: unique symbol;
+  const rhyoliteBoulder: unique symbol;
+  const redStoneBoulder: unique symbol;
+  const darkMetal: unique symbol;
+  const pebbles: unique symbol;
+  const tendrils: unique symbol;
+}
+
+type EnvBlockSymbol = typeof EnvBlocks[keyof typeof EnvBlocks];
