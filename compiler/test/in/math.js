@@ -1,4 +1,3 @@
-/// <reference path="../../lib/index.d.ts" />
 let a = 10;
 let b = 20;
 Math.max(a, b);

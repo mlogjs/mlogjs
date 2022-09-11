@@ -1,6 +1,3 @@
-/// <reference path="../../lib/index.d.ts" />
-// @ts-check
-
 unitBind(Units.flare);
 unitControl("approach", 0, 0, 5);
 unitControl("boost", true);
