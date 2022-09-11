@@ -176,7 +176,7 @@ print @plastanium-conveyor
 print @armored-conveyor
 print @distributor
 print @junction
-print @item-bridge
+print @bridge-conveyor
 print @phase-conveyor
 print @sorter
 print @inverted-sorter
@@ -205,7 +205,7 @@ print @steam-generator
 print @differential-generator
 print @rtg-generator
 print @solar-panel
-print @large-solar-panel
+print @solar-panel-large
 print @thorium-reactor
 print @impact-reactor
 print @battery
@@ -264,7 +264,7 @@ print @large-constructor
 print @payload-loader
 print @payload-unloader
 print @message
-print @switch-block
+print @switch
 print @micro-processor
 print @logic-processor
 print @hyper-processor
