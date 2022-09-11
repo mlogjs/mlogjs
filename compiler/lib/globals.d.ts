@@ -110,6 +110,12 @@ declare namespace Items {
   const sporePod: unique symbol;
   const blastCompound: unique symbol;
   const pyratite: unique symbol;
+  const beryllium: unique symbol;
+  const tungsten: unique symbol;
+  const oxide: unique symbol;
+  const carbide: unique symbol;
+  const fissileMatter: unique symbol;
+  const dormantCyst: unique symbol;
 }
 
 type ItemSymbol = typeof Items[keyof typeof Items];
