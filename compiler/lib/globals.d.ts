@@ -125,6 +125,13 @@ declare namespace Liquids {
   const slag: unique symbol;
   const oil: unique symbol;
   const cryofluid: unique symbol;
+  const neoplasm: unique symbol;
+  const arkycite: unique symbol;
+  const gallium: unique symbol;
+  const ozone: unique symbol;
+  const hydrogen: unique symbol;
+  const nitrogen: unique symbol;
+  const cyanogen: unique symbol;
 }
 
 type LiquidSymbol = typeof Liquids[keyof typeof Liquids];
