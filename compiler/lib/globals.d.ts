@@ -186,7 +186,7 @@ interface Blocks {
   readonly kiln: unique symbol;
   readonly plastaniumCompressor: unique symbol;
   readonly phaseWeaver: unique symbol;
-  readonly alloySmelter: unique symbol;
+  readonly surgeSmelter: unique symbol;
   readonly cryofluidMixer: unique symbol;
   readonly pyratiteMixer: unique symbol;
   readonly blastMixer: unique symbol;
