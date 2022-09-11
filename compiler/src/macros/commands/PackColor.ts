@@ -17,7 +17,7 @@ export class PackColor extends MacroFunction {
         !args.every(
           (value): value is StoreValue | LiteralValue =>
             value instanceof StoreValue ||
-            (value instanceof LiteralValue && typeof value.data !== "number")
+            (value instanceof LiteralValue && typeof value.data === "number")
         )
       ) {
         throw new CompilerError(
