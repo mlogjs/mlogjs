@@ -22,7 +22,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("Teams", new NamespaceMacro(scope));
   scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("Liquids", new NamespaceMacro(scope));
-  scope.hardSet("Units", new NamespaceMacro(scope));
+  scope.hardSet("Units", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("LAccess", new NamespaceMacro(scope));
   scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));

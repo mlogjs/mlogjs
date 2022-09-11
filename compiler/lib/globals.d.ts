@@ -175,6 +175,29 @@ declare namespace Units {
   const alpha: unique symbol;
   const beta: unique symbol;
   const gamma: unique symbol;
+  const stell: unique symbol;
+  const locus: unique symbol;
+  const precept: unique symbol;
+  const vanquish: unique symbol;
+  const conquer: unique symbol;
+  const merui: unique symbol;
+  const cleroi: unique symbol;
+  const anthicus: unique symbol;
+  const tecta: unique symbol;
+  const collaris: unique symbol;
+  const elude: unique symbol;
+  const avert: unique symbol;
+  const obviate: unique symbol;
+  const quell: unique symbol;
+  const disrupt: unique symbol;
+  const renale: unique symbol;
+  const latum: unique symbol;
+  const evoke: unique symbol;
+  const incite: unique symbol;
+  const emanate: unique symbol;
+  const block: unique symbol;
+  const manifold: unique symbol;
+  const assemblyDrone: unique symbol;
 }
 
 type UnitSymbol = typeof Units[keyof typeof Units];
