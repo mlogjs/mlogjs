@@ -549,9 +549,9 @@ declare global {
   function stopScript(): never;
 
   // TODO: requires floor block symbols
-  function getBlock(type: "floor", x: number, y: number): symbol;
-  function getBlock(type: "ore", x: number, y: number): ItemSymbol;
-  function getBlock(type: "block", x: number, y: number): BlockSymbol;
+  function getBlock(kind: "floor", x: number, y: number): symbol;
+  function getBlock(kind: "ore", x: number, y: number): ItemSymbol;
+  function getBlock(kind: "block", x: number, y: number): BlockSymbol;
   function getBlock<T extends BasicBuilding>(
     type: "building",
     x: number,
