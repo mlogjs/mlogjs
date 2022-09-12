@@ -275,8 +275,4 @@ print @memory-cell
 print @memory-bank
 print @launch-pad
 print @interplanetary-accelerator
-print @air
-print @basalt
-print @ore-beryllium
-print @ore-copper
 end
