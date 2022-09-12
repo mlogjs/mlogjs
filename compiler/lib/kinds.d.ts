@@ -25,7 +25,7 @@ interface BasicBuilding
     Rotatable,
     Spaced,
     Ranged,
-    Typed<BlockSymbol>,
+    Typed<BuildingSymbol>,
     WithEnable,
     WithConfig {}
 

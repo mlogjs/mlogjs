@@ -414,7 +414,7 @@ declare global {
    */
   function unitControl(
     mode: "itemDrop",
-    target: BasicBuilding | typeof EnvBlocks.air,
+    target: BasicBuilding | typeof Blocks.air,
     amount: number
   ): void;
   /**
@@ -462,7 +462,7 @@ declare global {
     mode: "build",
     x: number,
     y: number,
-    block: BlockSymbol,
+    block: BuildingSymbol,
     rotation: number,
     config: unknown
   ): void;
@@ -548,9 +548,12 @@ declare global {
   /** Halts the execution of this processor */
   function stopScript(): never;
 
-  // TODO: requires floor block symbols
-  function getBlock(kind: "floor", x: number, y: number): symbol;
-  function getBlock(kind: "ore", x: number, y: number): ItemSymbol;
+  function getBlock(kind: "floor", x: number, y: number): EnvBlockSymbol;
+  function getBlock(
+    kind: "ore",
+    x: number,
+    y: number
+  ): OreSymbol | typeof Blocks.air;
   function getBlock(kind: "block", x: number, y: number): BlockSymbol;
   function getBlock<T extends BasicBuilding>(
     type: "building",
