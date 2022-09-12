@@ -6,7 +6,6 @@ import {
   NamespaceMacro,
   VarsNamespace,
 } from "./macros";
-import { UCommandsNamespace } from "./macros/Namespace";
 import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 import { EMutability } from "./types";
@@ -24,7 +23,6 @@ export function initScope(scope: Scope) {
   scope.hardSet("Liquids", new NamespaceMacro(scope));
   scope.hardSet("Units", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("LAccess", new NamespaceMacro(scope));
-  scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods

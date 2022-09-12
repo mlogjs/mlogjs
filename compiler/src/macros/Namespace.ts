@@ -67,24 +67,3 @@ export class VarsNamespace extends NamespaceMacro {
     });
   }
 }
-
-export class UCommandsNamespace extends NamespaceMacro {
-  constructor(scope: IScope) {
-    super(scope);
-    this.data.$get = new MacroFunction(scope, prop => {
-      if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
-        throw new CompilerError(
-          "Cannot use dynamic properties on namespace macros"
-        );
-      const symbolName = prop.data[0].toUpperCase() + prop.data.slice(1);
-      const owner = new ValueOwner({
-        scope,
-        name: `@command${symbolName}`,
-        value: assign(new StoreValue(scope), {
-          mutability: EMutability.constant,
-        }),
-      });
-      return [owner.value, []];
-    });
-  }
-}
