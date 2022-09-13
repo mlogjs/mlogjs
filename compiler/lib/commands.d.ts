@@ -589,4 +589,13 @@ declare global {
     team: TeamSymbol,
     rotation: number
   ): void;
+
+  /** Spawns an unit at the given location */
+  function spawnUnit<T extends BasicUnit = AnyUnit>(
+    type: UnitSymbol,
+    x: number,
+    y: number,
+    team: TeamSymbol,
+    rotation?: number
+  ): T;
 }
