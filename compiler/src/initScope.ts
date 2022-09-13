@@ -56,4 +56,5 @@ export function initScope(scope: Scope) {
   // world processor commands
 
   scope.hardSet("getBlock", new commands.GetBlock(scope));
+  scope.hardSet("setBlock", new commands.SetBlock(scope));
 }

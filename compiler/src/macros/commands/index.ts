@@ -11,6 +11,7 @@ export * from "./Wait";
 export * from "./Lookup";
 export * from "./PackColor";
 export * from "./End";
+export * from "./SetBlock";
 export * from "./Stop";
 export * from "./UnitBind";
 export * from "./UnitControl";

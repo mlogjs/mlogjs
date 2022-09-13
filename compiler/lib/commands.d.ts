@@ -560,4 +560,21 @@ declare global {
     x: number,
     y: number
   ): T;
+
+  // TODO: maybe have a separate floor symbol type?
+  function setBlock(
+    kind: "floor",
+    x: number,
+    y: number,
+    to: EnvBlockSymbol
+  ): void;
+  function setBlock(kind: "ore", x: number, y: number, to: OreSymbol): void;
+  function setBlock(
+    kind: "block",
+    x: number,
+    y: number,
+    to: EnvBlockSymbol | BuildingSymbol,
+    team: TeamSymbol,
+    rotation: number
+  ): void;
 }
