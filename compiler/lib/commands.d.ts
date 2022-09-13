@@ -548,27 +548,39 @@ declare global {
   /** Halts the execution of this processor */
   function stopScript(): never;
 
+  /** Gets the floor type on the given location */
   function getBlock(kind: "floor", x: number, y: number): EnvBlockSymbol;
+  /** Gets the ore type on the given location. `Blocks.air` if there is no ore */
   function getBlock(
     kind: "ore",
     x: number,
     y: number
   ): OreSymbol | typeof Blocks.air;
+  /** Gets the block type on the give location. `Blocks.air` if there is no block. */
   function getBlock(kind: "block", x: number, y: number): BlockSymbol;
+  /** Gets the building on the given location. `null` if there is no building. */
   function getBlock<T extends BasicBuilding>(
     type: "building",
     x: number,
     y: number
-  ): T;
+  ): T | null;
 
   // TODO: maybe have a separate floor symbol type?
+  /** Sets the floor of the tile at the given location. */
   function setBlock(
     kind: "floor",
     x: number,
     y: number,
     to: EnvBlockSymbol
   ): void;
-  function setBlock(kind: "ore", x: number, y: number, to: OreSymbol): void;
+  /** Sets the ore at the given location. Use `Blocks.air` to remove any ore. */
+  function setBlock(
+    kind: "ore",
+    x: number,
+    y: number,
+    to: OreSymbol | typeof Blocks.air
+  ): void;
+  /** Sets the block at a given location, it can be a regular building or an environment block. */
   function setBlock(
     kind: "block",
     x: number,
