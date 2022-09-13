@@ -559,7 +559,7 @@ declare global {
   /** Gets the block type on the give location. `Blocks.air` if there is no block. */
   function getBlock(kind: "block", x: number, y: number): BlockSymbol;
   /** Gets the building on the given location. `null` if there is no building. */
-  function getBlock<T extends BasicBuilding>(
+  function getBlock<T extends BasicBuilding = AnyBuilding>(
     type: "building",
     x: number,
     y: number
