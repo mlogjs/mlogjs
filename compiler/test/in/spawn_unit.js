@@ -2,8 +2,7 @@ unitBind(Units.gamma);
 
 const { shootX, shootY, shooting } = Vars.unit;
 
-// TODO: !shooting doesn't work
-if (shooting == false) endScript();
+if (!shooting) endScript();
 
 const unit = spawnUnit(Units.eclipse, shootX, shootY, Teams.malis);
 
