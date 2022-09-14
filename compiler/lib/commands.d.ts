@@ -635,4 +635,99 @@ declare global {
    */
   function spawnWave(natural: true): void;
   function spawnWave(natural: false, x: number, y: number): void;
+
+  /** Sets the wave countdown in seconds. */
+  function setRule(rule: "currentWaveTime", seconds: number): void;
+  /** Enables/disables the wave timer. */
+  function setRule(rule: "waveTimer", enabled: boolean): void;
+  /** Allows or prevents waves from spawning. */
+  function setRule(rule: "waves", enabled: boolean): void;
+  /** Sets the current wave number. */
+  function setRule(rule: "wave", number: number): void;
+  /** Sets the time between waves in seconds. */
+  function setRule(rule: "waveSpacing", seconds: number): void;
+  /** Sets wether waves can be manually summoned by pressing the play button. */
+  function setRule(rule: "waveSending", enabled: boolean): void;
+  /** Sets wether the gamemode is the attack mode */
+  function setRule(rule: "attackMode", enabled: boolean): void;
+  /** Sets the radius of the no-build zone around enemy cores. */
+  function setRule(rule: "enemyCoreBuildRadius", radius: number): void;
+  /** Sets the radius around enemy wave drop zones. */
+  function setRule(rule: "dropZoneRadius", radius: number): void;
+  /** Sets the base unit cap. */
+  function setRule(rule: "unitCap", cap: number): void;
+  /** Sets the playable map area. Blocks that are out of the new bounds will be removed.  */
+  function setRule(
+    rule: "mapArea",
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
+  /** Sets wether ambient lighting is enabled */
+  function setRule(rule: "lighting", enabled: boolean): void;
+  /**
+   * Sets the ambient light color.
+   *
+   * `packColor` can be used to get the rgba data recevied by this function.
+   *
+   *
+   * ```js
+   * // enables lighting and sets the color to gray
+   * setRule("lighting", true);
+   * setRule("ambientLight", packColor(0.5, 0.5, 0.5, 1));
+   * ```
+   */
+  function setRule(rule: "ambientLight", rgbaData: number): void;
+  /** Sets the multiplier for the energy output of solar panels. */
+  function setRule(rule: "solarMultiplier", multiplier: number): void;
+  /**
+   * Sets the build speed multiplier of a team.
+   * The multiplier will always be clamped between `0.001` and `50`.
+   */
+  function setRule(
+    rule: "buildSpeed",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /**
+   * Sets the speed multiplier for unit factories.
+   * The multiplier will always be clamped between `0` and `50`.
+   */
+  function setRule(
+    rule: "unitBuildSpeed",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the damage multiplier for units on a given team. */
+  function setRule(
+    rule: "unitDamage",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the block health multiplier for a given team. */
+  function setRule(
+    rule: "blockHealth",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the block damage multiplier for a given team. */
+  function setRule(
+    rule: "blockDamage",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /**
+   * Sets the Real Time Strategy minimum weight for a team.
+   *
+   * In other words it, sets the minimum "advantage" needed for a squad to attack.
+   * The higher the value, the more cautious the squad is.
+   */
+  function setRule(rule: "rtsMinWeight", team: TeamSymbol, value: number): void;
+  /**
+   * Sets the Real Time Strategy minimum size of attack squads of a team.
+   *
+   * The higher the value, the more units are required before a squad attacks.
+   */
+  function setRule(rule: "rtsMinSquad", team: TeamSymbol, value: number): void;
 }

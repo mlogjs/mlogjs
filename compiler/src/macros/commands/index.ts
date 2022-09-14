@@ -20,3 +20,4 @@ export * from "./UnitRadar";
 export * from "./UnitLocate";
 export * from "./ApplyStatus";
 export * from "./SpawnWave";
+export * from "./SetRule";

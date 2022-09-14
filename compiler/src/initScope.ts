@@ -60,4 +60,5 @@ export function initScope(scope: Scope) {
   scope.hardSet("spawnUnit", new commands.SpawnUnit(scope));
   scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
   scope.hardSet("spawnWave", new commands.SpawnWave(scope));
+  scope.hardSet("setRule", new commands.SetRule(scope));
 }
