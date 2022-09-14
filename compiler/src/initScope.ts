@@ -59,4 +59,5 @@ export function initScope(scope: Scope) {
   scope.hardSet("setBlock", new commands.SetBlock(scope));
   scope.hardSet("spawnUnit", new commands.SpawnUnit(scope));
   scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
+  scope.hardSet("spawnWave", new commands.SpawnWave(scope));
 }

@@ -625,4 +625,10 @@ declare global {
     status: TUnitEffect,
     unit: BasicUnit
   ): void;
+
+  /**
+   * Spawns an enemy wave, can be used even if there is an already active wave.
+   */
+  function spawnWave(natural: true): void;
+  function spawnWave(natural: false, x: number, y: number): void;
 }
