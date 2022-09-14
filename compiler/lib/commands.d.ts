@@ -357,7 +357,11 @@ declare global {
    */
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
-  /** Packs RGBA color information into a single number */
+  /**
+   * Packs RGBA color information into a single number.
+   *
+   * Each paremeter must range from `0` to `1`.
+   */
   function packColor(r: number, g: number, b: number, a: number): number;
 
   /**
