@@ -30,3 +30,19 @@ export type TUnitLocateBuildingGroup =
   | "rally"
   | "battery"
   | "reactor";
+
+export type TUnitEffect =
+  | "burning"
+  | "freezing"
+  | "unmoving"
+  | "wet"
+  | "melting"
+  | "sapped"
+  | "electrified"
+  | "spore-slowed"
+  | "tarred"
+  | "overdrive"
+  | "overclock"
+  | "boss"
+  | "shocked"
+  | "blasted";

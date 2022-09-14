@@ -1,5 +1,10 @@
 import "./kind";
-import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
+import {
+  TRadarFilter,
+  TRadarSort,
+  TUnitEffect,
+  TUnitLocateBuildingGroup,
+} from "./util";
 declare global {
   /**
    * Appends the items to the print buffer, calling this function
@@ -598,4 +603,26 @@ declare global {
     team: TeamSymbol,
     rotation?: number
   ): T;
+
+  /**
+   * Applies or removes a status effect to the given unit.
+   *
+   * The only status effects that don't require a duration are `overdrive` and `boss`.
+   */
+  function applyStatus(
+    kind: "apply",
+    status: Exclude<TUnitEffect, "overdrive" | "boss">,
+    unit: BasicUnit,
+    duration: number
+  ): void;
+  function applyStatus(
+    kind: "apply",
+    status: "overdrive" | "boss",
+    unit: BasicUnit
+  ): void;
+  function applyStatus(
+    kind: "clear",
+    status: TUnitEffect,
+    unit: BasicUnit
+  ): void;
 }
