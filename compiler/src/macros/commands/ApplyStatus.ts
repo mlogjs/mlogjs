@@ -51,7 +51,7 @@ export class ApplyStatus extends MacroFunction<null> {
         [
           new InstructionBase(
             "status",
-            kind.data,
+            String(kind.data !== "apply"),
             effect.data,
             unit,
             duration ?? "10"
