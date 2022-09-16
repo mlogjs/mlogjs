@@ -730,4 +730,20 @@ declare global {
    * The higher the value, the more units are required before a squad attacks.
    */
   function setRule(rule: "rtsMinSquad", team: TeamSymbol, value: number): void;
+
+  /**
+   * Writes the contents of the print buffer in the selected mode
+   * and clears the buffer afterwards.
+   *
+   * ```js
+   * print("Hello");
+   * flushMessage("announce", 4); // lasts 4 seconds
+   * wait(5);
+   * print("World");
+   * flushMessage("toast", 4);
+   * wait(5);
+   * ```
+   */
+  function flushMessage(kind: "notify" | "mission"): void;
+  function flushMessage(kind: "announce" | "toast", duration: number): void;
 }
