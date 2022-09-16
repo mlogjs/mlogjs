@@ -62,4 +62,5 @@ export function initScope(scope: Scope) {
   scope.hardSet("spawnWave", new commands.SpawnWave(scope));
   scope.hardSet("setRule", new commands.SetRule(scope));
   scope.hardSet("flushMessage", new commands.FlushMessage(scope));
+  scope.hardSet("cutscene", new commands.Cutscene(scope));
 }

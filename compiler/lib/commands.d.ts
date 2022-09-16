@@ -746,4 +746,11 @@ declare global {
    */
   function flushMessage(kind: "notify" | "mission"): void;
   function flushMessage(kind: "announce" | "toast", duration: number): void;
+
+  /** Moves the player's camera to the given location. */
+  function cutscene(mode: "pan", x: number, y: number, speed: number): void;
+  /** Zooms the player camera to the desired level */
+  function cutscene(mode: "zoom", level: number): void;
+  /** Gives the camera control back to the player */
+  function cutscene(mode: "stop"): void;
 }
