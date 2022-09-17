@@ -1,76 +1,76 @@
-set dynamicItem:61:4 4
-set n:3:19 dynamicItem:61:4
-set &rmatchItem:3:0 4
+set dynamicItem:59:4 4
+set n:1:19 dynamicItem:59:4
+set &rmatchItem:1:0 4
 jump 19 always
-print &fmatchItem:3:0
-set &t1:matchItem:3:0 @sand
-print &t1:matchItem:3:0
-set item:42:18 @copper
-set &ritemUses:42:0 10
+print &fmatchItem:1:0
+set &t1:matchItem:1:0 @sand
+print &t1:matchItem:1:0
+set item:40:18 @copper
+set &ritemUses:40:0 10
 jump 70 always
-set item:42:18 @coal
-set &ritemUses:42:0 13
+set item:40:18 @coal
+set &ritemUses:40:0 13
 jump 70 always
-set item:42:18 @silicon
-set &ritemUses:42:0 16
+set item:40:18 @silicon
+set &ritemUses:40:0 16
 jump 70 always
 print "always runs!\n"
 printflush message1
 end
-jump 36 strictEqual n:3:19 1
-jump 38 strictEqual n:3:19 2
-jump 40 strictEqual n:3:19 3
-jump 42 strictEqual n:3:19 4
-jump 44 strictEqual n:3:19 5
-jump 46 strictEqual n:3:19 6
-jump 48 strictEqual n:3:19 7
-jump 50 strictEqual n:3:19 8
-jump 52 strictEqual n:3:19 9
-jump 54 strictEqual n:3:19 10
-jump 56 strictEqual n:3:19 11
-jump 58 strictEqual n:3:19 12
-jump 60 strictEqual n:3:19 13
-jump 62 strictEqual n:3:19 14
-jump 64 strictEqual n:3:19 15
-jump 66 strictEqual n:3:19 16
+jump 36 strictEqual n:1:19 1
+jump 38 strictEqual n:1:19 2
+jump 40 strictEqual n:1:19 3
+jump 42 strictEqual n:1:19 4
+jump 44 strictEqual n:1:19 5
+jump 46 strictEqual n:1:19 6
+jump 48 strictEqual n:1:19 7
+jump 50 strictEqual n:1:19 8
+jump 52 strictEqual n:1:19 9
+jump 54 strictEqual n:1:19 10
+jump 56 strictEqual n:1:19 11
+jump 58 strictEqual n:1:19 12
+jump 60 strictEqual n:1:19 13
+jump 62 strictEqual n:1:19 14
+jump 64 strictEqual n:1:19 15
+jump 66 strictEqual n:1:19 16
 jump 68 always
-set &fmatchItem:3:0 @copper
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @lead
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @metaglass
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @graphite
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @sand
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @coal
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @titanium
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @thorium
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @scrap
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @silicon
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @plastanium
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @phase-fabric
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @surge-alloy
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @spore-pod
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @blast-compound
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 @pyratite
-set @counter &rmatchItem:3:0
-set &fmatchItem:3:0 null
-set @counter &rmatchItem:3:0
-jump 74 strictEqual item:42:18 @copper
-jump 78 strictEqual item:42:18 @coal
-jump 82 strictEqual item:42:18 @silicon
+set &fmatchItem:1:0 @copper
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @lead
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @metaglass
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @graphite
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @sand
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @coal
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @titanium
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @thorium
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @scrap
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @silicon
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @plastanium
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @phase-fabric
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @surge-alloy
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @spore-pod
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @blast-compound
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 @pyratite
+set @counter &rmatchItem:1:0
+set &fmatchItem:1:0 null
+set @counter &rmatchItem:1:0
+jump 74 strictEqual item:40:18 @copper
+jump 78 strictEqual item:40:18 @coal
+jump 82 strictEqual item:40:18 @silicon
 jump 83 always
 print "Basic material\n"
 print "Ammo for some units\n"
@@ -82,4 +82,4 @@ print "Energy\n"
 jump 83 always
 print "Silligone\n"
 print "Something at the end\n"
-set @counter &ritemUses:42:0
+set @counter &ritemUses:40:0

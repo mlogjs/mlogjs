@@ -9,6 +9,12 @@ print @this
 print @thisx
 print @thisy
 print @unit
+print @blue
+print @crux
+print @delerict
+print @green
+print @malis
+print @sharded
 print @blast-compound
 print @coal
 print @copper
@@ -104,7 +110,6 @@ print @type
 print @flag
 print @controlled
 print @controller
-print @commanded
 print @name
 print @payloadCount
 print @payloadType
@@ -113,9 +118,6 @@ print @shoot
 print @shootp
 print @config
 print @color
-print @commandAttack
-print @commandIdle
-print @commandRally
 print @air
 print @solid
 print @silicon-smelter
@@ -176,7 +178,7 @@ print @plastanium-conveyor
 print @armored-conveyor
 print @distributor
 print @junction
-print @item-bridge
+print @bridge-conveyor
 print @phase-conveyor
 print @sorter
 print @inverted-sorter
@@ -189,7 +191,7 @@ print @duct-router
 print @duct-bridge
 print @mechanical-pump
 print @rotary-pump
-print @thermal-pump
+print @impulse-pump
 print @conduit
 print @pulse-conduit
 print @plated-conduit
@@ -205,7 +207,7 @@ print @steam-generator
 print @differential-generator
 print @rtg-generator
 print @solar-panel
-print @large-solar-panel
+print @solar-panel-large
 print @thorium-reactor
 print @impact-reactor
 print @battery
@@ -245,7 +247,6 @@ print @meltdown
 print @segment
 print @parallax
 print @tsunami
-print @command-center
 print @ground-factory
 print @air-factory
 print @naval-factory
@@ -264,7 +265,7 @@ print @large-constructor
 print @payload-loader
 print @payload-unloader
 print @message
-print @switch-block
+print @switch
 print @micro-processor
 print @logic-processor
 print @hyper-processor

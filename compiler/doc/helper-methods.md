@@ -51,3 +51,24 @@ const fullName = concat(programName, "-v", programVersion);
 
 // ...
 ```
+
+## asm
+
+Inlines mlog code (can be used with variables and expressions)
+
+```js
+const turret = getBuilding("cyclone1");
+
+let first = 10;
+let second = 0.2;
+
+// raw use of radar
+asm`radar player enemy any distance ${turret} 1 radarResult`;
+
+// temporary values should work too
+asm`op mul foo ${first + second} 2`;
+
+print(getVar("radarResult"));
+print(getVar("foo"));
+printFlush();
+```

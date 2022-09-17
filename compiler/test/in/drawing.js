@@ -1,5 +1,3 @@
-/// <reference types="mlogjs/lib" />
-
 draw("clear", 10, 50, 60);
 
 draw("color", 40, 50, 60);
@@ -7,7 +5,7 @@ draw("color", 40, 50, 60, 12);
 draw("image", 30, 60, Blocks.router, 15, 45);
 draw("line", 10, 15, 60, 75);
 
-draw("linePoly", 50, 45, 9, 90);
+draw("linePoly", 50, 45, 9, 90, 0);
 
 draw("lineRect", 46, 89, 10, 20);
 

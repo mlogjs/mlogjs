@@ -6,7 +6,6 @@ import {
   NamespaceMacro,
   VarsNamespace,
 } from "./macros";
-import { UCommandsNamespace } from "./macros/Namespace";
 import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 import { EMutability } from "./types";
@@ -19,11 +18,11 @@ export function initScope(scope: Scope) {
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro(scope));
   scope.hardSet("Vars", new VarsNamespace(scope));
+  scope.hardSet("Teams", new NamespaceMacro(scope));
   scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("Liquids", new NamespaceMacro(scope));
-  scope.hardSet("Units", new NamespaceMacro(scope));
+  scope.hardSet("Units", new NamespaceMacro(scope, { changeCasing: true }));
   scope.hardSet("LAccess", new NamespaceMacro(scope));
-  scope.hardSet("UnitCommands", new UCommandsNamespace(scope));
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods
@@ -46,9 +45,27 @@ export function initScope(scope: Scope) {
   scope.hardSet("sensor", new commands.Sensor(scope));
   scope.hardSet("wait", new commands.Wait(scope));
   scope.hardSet("lookup", new commands.Lookup(scope));
+  scope.hardSet("packColor", new commands.PackColor(scope));
   scope.hardSet("endScript", new commands.End(scope));
+  scope.hardSet("stopScript", new commands.Stop(scope));
   scope.hardSet("unitBind", new commands.UnitBind(scope));
   scope.hardSet("unitControl", new commands.UnitControl(scope));
   scope.hardSet("unitRadar", new commands.UnitRadar(scope));
   scope.hardSet("unitLocate", new commands.UnitLocate(scope));
+
+  // world processor commands
+
+  scope.hardSet("getBlock", new commands.GetBlock(scope));
+  scope.hardSet("setBlock", new commands.SetBlock(scope));
+  scope.hardSet("spawnUnit", new commands.SpawnUnit(scope));
+  scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
+  scope.hardSet("spawnWave", new commands.SpawnWave(scope));
+  scope.hardSet("setRule", new commands.SetRule(scope));
+  scope.hardSet("flushMessage", new commands.FlushMessage(scope));
+  scope.hardSet("cutscene", new commands.Cutscene(scope));
+  scope.hardSet("explosion", new commands.Explosion(scope));
+  scope.hardSet("setRate", new commands.SetRate(scope));
+  scope.hardSet("fetch", new commands.Fetch(scope));
+  scope.hardSet("getFlag", new commands.GetFlag(scope));
+  scope.hardSet("setFlag", new commands.SetFlag(scope));
 }
