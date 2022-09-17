@@ -16,9 +16,9 @@ function div(a, b) {
 
 function op(type, a, b) {
   if (type === 0) return add(a, b);
-  else if (type === 1) return sub(a, b);
-  else if (type === 2) return mul(a, b);
-  else if (type === 3) return div(a, b);
+  if (type === 1) return sub(a, b);
+  if (type === 2) return mul(a, b);
+  if (type === 3) return div(a, b);
 }
 
 let type = 0;
