@@ -810,7 +810,7 @@ declare global {
     kind: "build",
     team: TeamSymbol,
     index: number,
-    block: BuildingSymbol
+  block: BuildingSymbol
   ): T;
   /** Gets the amount of buildings existing on a given team.*/
   function fetch(
@@ -818,4 +818,7 @@ declare global {
     team: TeamSymbol,
     block: BuildingSymbol
   ): number;
+
+  /** Checks if a global flag is set */
+  function getFlag(flag: string): boolean;
 }
