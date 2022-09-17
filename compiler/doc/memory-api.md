@@ -17,14 +17,13 @@ that allows you to easily iterate over their elements.
 for (let i = 0; i < memory.length; i++) {
   print(memory[i], "\n");
 }
-printFlush(getBuilding("message1"));
+printFlush();
 ```
 
 Bellow is a demonstration using the memory api to "intialize" a processor
 
 ```js
 const bank = getBuilding("bank1");
-const message = getBuilding("message1");
 
 const mem = new Memory(bank, 512); // tell the compiler the size of the memory unit. 64 by default
 
@@ -37,5 +36,5 @@ if (mem[0] == 0) {
   mem[1]++;
 }
 
-printFlush(message);
+printFlush();
 ```
