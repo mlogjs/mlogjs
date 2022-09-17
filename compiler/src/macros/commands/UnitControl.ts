@@ -8,6 +8,7 @@ import {
   StoreValue,
 } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { assertLiteralOneOf } from "../../assertions/literals";
 
 const validModes = [
   "idle",
@@ -28,18 +29,12 @@ const validModes = [
   "build",
   "getBlock",
   "within",
-];
+] as const;
 
 export class UnitControl extends MacroFunction<IValue | null> {
   constructor(scope: IScope) {
     super(scope, (mode, ...args) => {
-      if (!(mode instanceof LiteralValue) || typeof mode.data !== "string")
-        throw new CompilerError(
-          "The unitControl mode must be a string literal"
-        );
-
-      if (!validModes.includes(mode.data))
-        throw new CompilerError("Invalid unitControl mode");
+      assertLiteralOneOf(mode, validModes, "The unitControl mode");
 
       if (
         args.some(

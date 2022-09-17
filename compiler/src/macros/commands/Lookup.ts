@@ -3,16 +3,14 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { assertLiteralOneOf } from "../../assertions/literals";
 
-const validKinds = ["block", "unit", "item", "liquid"];
+const validKinds = ["block", "unit", "item", "liquid"] as const;
+
 export class Lookup extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (kind, index) => {
-      if (!(kind instanceof LiteralValue && typeof kind.data === "string"))
-        throw new CompilerError("The lookup kind must be a string literal");
-
-      if (!validKinds.includes(kind.data))
-        throw new CompilerError("Invalid lookup kind");
+      assertLiteralOneOf(kind, validKinds, "The lookup kind");
 
       if (
         !(index instanceof LiteralValue && typeof index.data === "number") &&

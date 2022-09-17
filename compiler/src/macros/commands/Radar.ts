@@ -3,6 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { assertLiteralOneOf } from "../../assertions/literals";
 
 export const validRadarFilters = [
   "any",
@@ -13,7 +14,7 @@ export const validRadarFilters = [
   "flying",
   "boss",
   "ground",
-];
+] as const;
 
 export const validRadarSorts = [
   "distance",
@@ -21,7 +22,7 @@ export const validRadarSorts = [
   "shield",
   "armor",
   "maxHealth",
-];
+] as const;
 
 export class Radar extends MacroFunction {
   constructor(scope: IScope) {
@@ -29,31 +30,15 @@ export class Radar extends MacroFunction {
       if (!(building instanceof SenseableValue))
         throw new CompilerError("The building must a senseable value");
 
-      if (
-        !(filter1 instanceof LiteralValue) ||
-        typeof filter1.data !== "string" ||
-        !(filter2 instanceof LiteralValue) ||
-        typeof filter2.data !== "string" ||
-        !(filter3 instanceof LiteralValue) ||
-        typeof filter3.data !== "string"
-      )
-        throw new CompilerError("The filters must be string literals");
-
-      if (!validRadarFilters.includes(filter1.data))
-        throw new CompilerError("Invalid value for filter1");
-      if (!validRadarFilters.includes(filter2.data))
-        throw new CompilerError("Invalid value for filter2");
-      if (!validRadarFilters.includes(filter3.data))
-        throw new CompilerError("Invalid value for filter3");
+      assertLiteralOneOf(filter1, validRadarFilters, "The first filter");
+      assertLiteralOneOf(filter2, validRadarFilters, "The second filter");
+      assertLiteralOneOf(filter3, validRadarFilters, "The third filter");
 
       if (!(order instanceof LiteralValue || order instanceof StoreValue))
         throw new CompilerError("The radar order must be a literal or a store");
 
-      if (!(sort instanceof LiteralValue) || typeof sort.data !== "string")
-        throw new CompilerError("The radar sort must be a string literal");
+      assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      if (!validRadarSorts.includes(sort.data))
-        throw new CompilerError("Invalid sort value");
       const outUnit = new SenseableValue(scope);
       return [
         outUnit,

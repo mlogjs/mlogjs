@@ -8,8 +8,9 @@ import {
   StoreValue,
 } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { assertLiteralOneOf } from "../../assertions/literals";
 
-const validFinds = ["ore", "building", "spawn", "damaged"];
+const validFinds = ["ore", "building", "spawn", "damaged"] as const;
 
 const validBuildingGroups = [
   "core",
@@ -21,16 +22,12 @@ const validBuildingGroups = [
   "rally",
   "battery",
   "reactor",
-];
+] as const;
 
 export class UnitLocate extends MacroFunction {
   constructor(scope: IScope) {
     super(scope, (find, ...args) => {
-      if (!(find instanceof LiteralValue && typeof find.data === "string"))
-        throw new CompilerError("The unitLocate find must be a string literal");
-
-      if (!validFinds.includes(find.data))
-        throw new CompilerError("Invalid find value");
+      assertLiteralOneOf(find, validFinds, "The unitLocate find");
 
       if (
         args.some(
@@ -57,15 +54,7 @@ export class UnitLocate extends MacroFunction {
         case "building": {
           const [group, enemy] = args;
 
-          if (
-            !(group instanceof LiteralValue && typeof group.data === "string")
-          ) {
-            throw new CompilerError(
-              "The building group must be a string literal"
-            );
-          }
-          if (!validBuildingGroups.includes(group.data))
-            throw new CompilerError("Invalid building group");
+          assertLiteralOneOf(group, validBuildingGroups, "The building group");
 
           inputArgs = [find.data, group.data, enemy, "@copper"];
           break;
