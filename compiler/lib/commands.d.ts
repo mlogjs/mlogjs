@@ -772,39 +772,107 @@ declare global {
   /**
    * Gets an unit from the given team
    *
-   * @param index The index of the unit, starting at 0.
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("unitCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const unit = fetch("unit", Teams.sharded, i);
+   *    print`x: ${unit.x}, y: ${unit.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
    */
   function fetch<T extends BasicUnit = AnyUnit>(
     kind: "unit",
     team: TeamSymbol,
     index: number
   ): T;
-  /** Gets the amount of units existing on a given team. */
+  /**
+   *  Gets the amount of units existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("unitCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const unit = fetch("unit", Teams.sharded, i);
+   *    print`x: ${unit.x}, y: ${unit.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
   function fetch(kind: "unitCount", team: TeamSymbol): number;
   /**
    * Gets a player from a team.
    *
-   * @param index The index of the player, starting at 0.
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("playerCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const player = fetch("player", Teams.sharded, i);
+   *    print`x: ${player.x}, y: ${player.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
    */
   function fetch<T extends BasicUnit = AnyUnit>(
     kind: "player",
     team: TeamSymbol,
     index: number
   ): T;
-  /** Gets the amount of players existing on a given team. */
+  /**
+   * Gets the amount of players existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("playerCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const player = fetch("player", Teams.sharded, i);
+   *    print`x: ${player.x}, y: ${player.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
   function fetch(kind: "playerCount", team: TeamSymbol): number;
   /**
    * Gets a core from a team.
    *
-   * @param index The index of the core, starting at 0.
+   * The index of the starts at 0.
+   *
+   * ```js
+   *  const count = fetch("coreCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const core = fetch("core", Teams.sharded, i);
+   *    print`x: ${core.x}, y: ${core.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
    */
   function fetch(kind: "core", team: TeamSymbol, index: number): AnyBuilding;
-  /** Gets the amount of cores existing on a given team. */
+  /**
+   * Gets the amount of cores existing on a given team.
+   * ```js
+   *  const count = fetch("coreCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const core = fetch("core", Teams.sharded, i);
+   *    print`x: ${core.x}, y: ${core.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
   function fetch(kind: "coreCount", team: TeamSymbol): number;
   /**
    * Gets a building from a team.
    *
-   * @param index The index of the building, starting at 0.
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("buildCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const router = fetch("build", Teams.sharded, i, Blocks.router);
+   *    print`x: ${router.x}, y: ${router.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
    */
   function fetch<T extends BasicBuilding = AnyBuilding>(
     kind: "build",
@@ -812,7 +880,18 @@ declare global {
     index: number,
     block: BuildingSymbol
   ): T;
-  /** Gets the amount of buildings existing on a given team.*/
+  /**
+   * Gets the amount of buildings existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("buildCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const router = fetch("build", Teams.sharded, i, Blocks.router)
+   *    print`x: ${router.x}, y: ${router.y}\n`
+   *  }
+   *  printFlush()
+   * ```
+   */
   function fetch(
     kind: "buildCount",
     team: TeamSymbol,
