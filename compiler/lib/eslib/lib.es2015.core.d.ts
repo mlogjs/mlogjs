@@ -14,3 +14,6 @@ and limitations under the License.
 ***************************************************************************** */
 
 /// <reference no-default-lib="true"/>
+
+/** Does not exist. It's only here because typescript needs it */
+interface RegExp {}

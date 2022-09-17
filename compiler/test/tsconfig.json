@@ -4,7 +4,8 @@
     "allowJs": true,
     "checkJs": true,
     "noLib": true,
-    "noEmit": true
+    "noEmit": true,
+    "types": []
   },
-  "include": ["./in", "./fail", "../lib"]
+  "include": ["./in", "../lib"]
 }
