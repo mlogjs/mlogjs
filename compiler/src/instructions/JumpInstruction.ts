@@ -14,7 +14,7 @@ export enum EJumpKind {
 
 export class JumpInstruction extends InstructionBase {
   constructor(
-    address: IBindableValue,
+    public address: IBindableValue,
     kind: EJumpKind,
     left: IValue | null = null,
     right: IValue | null = null
