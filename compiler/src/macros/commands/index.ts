@@ -25,3 +25,4 @@ export * from "./FlushMessage";
 export * from "./Cutscene";
 export * from "./Explosion";
 export * from "./SetRate";
+export * from "./Fetch";

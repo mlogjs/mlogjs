@@ -768,4 +768,54 @@ declare global {
 
   /** Sets the speed of this world processor in instructions per tick. */
   function setRate(ipt: number): void;
+
+  /**
+   * Gets an unit from the given team
+   *
+   * @param index The index of the unit, starting at 0.
+   */
+  function fetch<T extends BasicUnit = AnyUnit>(
+    kind: "unit",
+    team: TeamSymbol,
+    index: number
+  ): T;
+  /** Gets the amount of units existing on a given team. */
+  function fetch(kind: "unitCount", team: TeamSymbol): number;
+  /**
+   * Gets a player from a team.
+   *
+   * @param index The index of the player, starting at 0.
+   */
+  function fetch<T extends BasicUnit = AnyUnit>(
+    kind: "player",
+    team: TeamSymbol,
+    index: number
+  ): T;
+  /** Gets the amount of players existing on a given team. */
+  function fetch(kind: "playerCount", team: TeamSymbol): number;
+  /**
+   * Gets a core from a team.
+   *
+   * @param index The index of the core, starting at 0.
+   */
+  function fetch(kind: "core", team: TeamSymbol, index: number): AnyBuilding;
+  /** Gets the amount of cores existing on a given team. */
+  function fetch(kind: "coreCount", team: TeamSymbol): number;
+  /**
+   * Gets a building from a team.
+   *
+   * @param index The index of the building, starting at 0.
+   */
+  function fetch<T extends BasicBuilding = AnyBuilding>(
+    kind: "build",
+    team: TeamSymbol,
+    index: number,
+    block: BuildingSymbol
+  ): T;
+  /** Gets the amount of buildings existing on a given team.*/
+  function fetch(
+    kind: "buildCount",
+    team: TeamSymbol,
+    block: BuildingSymbol
+  ): number;
 }
