@@ -63,4 +63,5 @@ export function initScope(scope: Scope) {
   scope.hardSet("setRule", new commands.SetRule(scope));
   scope.hardSet("flushMessage", new commands.FlushMessage(scope));
   scope.hardSet("cutscene", new commands.Cutscene(scope));
+  scope.hardSet("explosion", new commands.Explosion(scope));
 }

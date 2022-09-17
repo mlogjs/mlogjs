@@ -753,4 +753,16 @@ declare global {
   function cutscene(mode: "zoom", level: number): void;
   /** Gives the camera control back to the player */
   function cutscene(mode: "stop"): void;
+
+  /** Creates an explosion */
+  function explosion(
+    team: TeamSymbol,
+    x: number,
+    y: number,
+    radius: number,
+    damage: number,
+    air: boolean,
+    ground: boolean,
+    pierce: boolean
+  ): void;
 }

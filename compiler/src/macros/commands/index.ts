@@ -23,3 +23,4 @@ export * from "./SpawnWave";
 export * from "./SetRule";
 export * from "./FlushMessage";
 export * from "./Cutscene";
+export * from "./Explosion";
