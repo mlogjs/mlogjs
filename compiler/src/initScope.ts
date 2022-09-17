@@ -67,4 +67,5 @@ export function initScope(scope: Scope) {
   scope.hardSet("setRate", new commands.SetRate(scope));
   scope.hardSet("fetch", new commands.Fetch(scope));
   scope.hardSet("getFlag", new commands.GetFlag(scope));
+  scope.hardSet("setFlag", new commands.SetFlag(scope));
 }

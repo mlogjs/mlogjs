@@ -27,3 +27,4 @@ export * from "./Explosion";
 export * from "./SetRate";
 export * from "./Fetch";
 export * from "./GetFlag";
+export * from "./SetFlag";
