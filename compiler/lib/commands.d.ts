@@ -765,4 +765,7 @@ declare global {
     ground: boolean,
     pierce: boolean
   ): void;
+
+  /** Sets the speed of this world processor in instructions per tick. */
+  function setRate(ipt: number): void;
 }
