@@ -45,7 +45,6 @@ Limitations:
 You can use `if` and `else` statements just like in regular javascript without limitations.
 
 ```js
-const message = getBuilding("message1");
 const building = getLink(0);
 
 if (building.type === Blocks.message) {
@@ -56,7 +55,7 @@ if (building.type === Blocks.message) {
   print("Linked to some block");
 }
 
-printFlush(message);
+printFlush();
 ```
 
 ### Switch statements
@@ -81,7 +80,7 @@ switch (item) {
     print("Nowhere to go");
 }
 
-printFlush(getBuilding("message1"));
+printFlush();
 ```
 
 Behavior:
@@ -140,7 +139,7 @@ You can define the regular style `for` loops:
 for (let i = 0; i < 10; i++) {
   print(i);
 }
-printFlush(getBuilding("message1"));
+printFlush();
 ```
 
 Behavior:
@@ -162,7 +161,7 @@ while (i < 10) {
   print(i);
   i++;
 }
-printFlush(getBuilding("message1"));
+printFlush();
 ```
 
 Behavior:
@@ -179,6 +178,7 @@ do {
   print(i);
   i++;
 } while (i < 10);
+printFlush();
 ```
 
 Behavior:
@@ -262,7 +262,7 @@ const container = getBuilding("container1");
 const item = container.totalItems < 200 ? Items.titanium : Items.lead;
 
 print(item);
-printFlush(getBuilding("message1"));
+printFlush();
 ```
 
 Behavior:

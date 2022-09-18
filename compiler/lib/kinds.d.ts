@@ -10,7 +10,8 @@ interface BasicUnit
     Typed<UnitSymbol>,
     Flagged,
     Controllable,
-    Nameable {}
+    Nameable,
+    WithSpeed {}
 
 interface AnyUnit extends BasicUnit, Boosted {}
 
@@ -24,7 +25,7 @@ interface BasicBuilding
     Rotatable,
     Spaced,
     Ranged,
-    Typed<BlockSymbol>,
+    Typed<BuildingSymbol>,
     WithEnable,
     WithConfig {}
 

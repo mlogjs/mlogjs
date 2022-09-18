@@ -44,6 +44,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private c: Compiler;
   private callSize!: number;
   private inlineTemp!: ValueOwner<SenseableValue>;
+  private inlineEnd?: LiteralValue;
   private bundled = false;
   private initialized = false;
 
@@ -157,8 +158,17 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     arg: IValue | null
   ): TValueInstructions<null> {
     const argInst = arg ? this.inlineTemp.value["="](scope, arg)[1] : [];
-    argInst.forEach(inst => (inst.intent = EInstIntent.return));
-    return [null, argInst];
+
+    if (!this.inlineEnd)
+      throw new CompilerError(
+        "Error during inline attempt: missing inline end adress"
+      );
+
+    const jump = assign(new JumpInstruction(this.inlineEnd, EJumpKind.Always), {
+      intent: EInstIntent.return,
+    });
+
+    return [null, [...argInst, jump]];
   }
 
   private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
@@ -186,15 +196,18 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       );
     });
 
+    this.inlineEnd = new LiteralValue(scope, null as never);
+
     this.tryingInline = true;
     let inst = this.c.handle(fnScope, this.body)[1];
+    this.tryingInline = false;
 
     const returnIndex = inst.findIndex(
       i => i.alwaysRuns && i.intent === EInstIntent.return
     );
     if (returnIndex !== -1) inst = inst.slice(0, returnIndex + 1);
 
-    this.tryingInline = false;
+    inst.push(new AddressResolver(this.inlineEnd));
 
     // return the function value
     return [this.inlineTemp.value, inst];

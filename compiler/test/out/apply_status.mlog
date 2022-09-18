@@ -1,0 +1,4 @@
+radar enemy any any distance foreshadow1 1 unit:3:6
+status false melting unit:3:6 20
+status false tarred unit:3:6 20
+end

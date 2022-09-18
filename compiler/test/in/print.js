@@ -8,3 +8,5 @@ print`variable ${variable}
 using
 tagged
 templates`;
+
+print`${variable} emty start and emtpy end ${variable}`;

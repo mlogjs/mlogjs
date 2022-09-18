@@ -1,6 +1,6 @@
 /// <reference path="./kinds.d.ts" />
 
-type MemoryCapacity = 64 | 512;
+type MemoryCapacity = 64 | 128 | 512;
 /**
  * Allows you to view and modify the data of memory cells and memory banks.
  */

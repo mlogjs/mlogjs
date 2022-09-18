@@ -20,6 +20,7 @@ Allows you to access processor variables.
 - `mapw` - The width of the map.
 - `maph` - The height of the map.
 - `links` - The number of blocks linked to this processor.
+- `ipt` - The amount of instructions run per second
 - `unit` - The unit currently bound to this processor.
 - `itemCount` - Total amount of items existent, can be used to check if an item ID is valid
 - `liquidCount` - Total amount of liquids existent, can be used to check if a liquid ID is valid
@@ -27,6 +28,21 @@ Allows you to access processor variables.
 - `blockCount` - Total amount of blocks existent, can be used to check if a block ID is valid
 - `tick` - The amount of ticks that happened since the map started
 - `time` - The current UNIX timestamp in milliseconds
+- `second` - The amount of seconds that passed since the map started
+- `minute` - The amount of minutes that passed since the map started
+- `waveNumber` - The number of the current wave, starts at 1;
+- `waveTime` - The amount of seconds left before the next wave
+
+## Teams
+
+Contais the base game teams
+
+- `delerict`
+- `sharded`
+- `crux`
+- `malis`
+- `green`
+- `blue`
 
 ## Items
 
@@ -48,6 +64,12 @@ Contains all items available
 - `sporePod`
 - `blastCompound`
 - `pyratite`
+- `beryllium`
+- `tungsten`
+- `oxide`
+- `carbide`
+- `fissileMatter`
+- `dormantCyst`
 
 ## Liquids
 
@@ -57,6 +79,13 @@ Contains all items available
 - `slag`
 - `oil`
 - `cryofluid`
+- `neoplasm`
+- `arkycite`
+- `gallium`
+- `ozone`
+- `hydrogen`
+- `nitrogen`
+- `cyanogen`
 
 ## Units
 
@@ -100,6 +129,29 @@ Contains all units available
 - `alpha`
 - `beta`
 - `gamma`
+- `stell`
+- `locus`
+- `precept`
+- `vanquish`
+- `conquer`
+- `merui`
+- `cleroi`
+- `anthicus`
+- `tecta`
+- `collaris`
+- `elude`
+- `avert`
+- `obviate`
+- `quell`
+- `disrupt`
+- `renale`
+- `latum`
+- `evoke`
+- `incite`
+- `emanate`
+- `block`
+- `manifold`
+- `assemblyDrone`
 
 ## LAccess
 
@@ -137,12 +189,12 @@ This namespace contains all symbols that can be used to access properties of ent
 - `mineX`
 - `mineY`
 - `mining`
+- `speed`
 - `team`
 - `type`
 - `flag`
 - `controlled`
 - `controller`
-- `commanded`
 - `name`
 - `payloadCount`
 - `payloadType`
@@ -152,20 +204,10 @@ This namespace contains all symbols that can be used to access properties of ent
 - `config`
 - `color`
 
-## UnitCommands
-
-Contains the possible config values for a command center.
-
-- `attack`
-- `rally`
-- `idle`
-
 ## Blocks
 
 Contains the available symbols for blocks.
 
-- `air`
-- `solid`
 - `graphitePress`
 - `multiPress`
 - `siliconSmelter`
@@ -173,7 +215,7 @@ Contains the available symbols for blocks.
 - `kiln`
 - `plastaniumCompressor`
 - `phaseWeaver`
-- `alloySmelter`
+- `surgeSmelter`
 - `cryofluidMixer`
 - `pyratiteMixer`
 - `blastMixer`
@@ -184,6 +226,21 @@ Contains the available symbols for blocks.
 - `pulverizer`
 - `coalCentrifuge`
 - `incinerator`
+- `siliconArcFurnace`
+- `electrolyzer`
+- `atmosphericConcentrator`
+- `oxidationChamber`
+- `electricHeater`
+- `slagHeater`
+- `phaseHeater`
+- `heatRedirector`
+- `slagIncinerator`
+- `carbideCrucible`
+- `slagCentrifuge`
+- `surgeCrucible`
+- `cyanogenSynthesizer`
+- `phaseSynthesizer`
+- `heatReactor`
 - `copperWall`
 - `copperWallLarge`
 - `titaniumWall`
@@ -203,12 +260,29 @@ Contains the available symbols for blocks.
 - `scrapWallHuge`
 - `scrapWallGigantic`
 - `thruster`
+- `berylliumWall`
+- `berylliumWallLarge`
+- `tungstenWall`
+- `tungstenWallLarge`
+- `blastDoor`
+- `reinforcedSurgeWall`
+- `reinforcedSurgeWallLarge`
+- `carbideWall`
+- `carbideWallLarge`
+- `shieldedWall`
 - `mender`
 - `mendProjector`
 - `overdriveProjector`
 - `overdriveDome`
 - `forceProjector`
 - `shockMine`
+- `radar`
+- `buildTower`
+- `regenProjector`
+- `barrierProjector`
+- `shockwaveTower`
+- `shieldProjector`
+- `largeShieldProjector`
 - `conveyor`
 - `titaniumConveyor`
 - `plastaniumConveyor`
@@ -224,11 +298,19 @@ Contains the available symbols for blocks.
 - `underflowGate`
 - `massDriver`
 - `duct`
+- `armoredDuct`
 - `ductRouter`
+- `overflowDuct`
+- `underflowDuct`
 - `ductBridge`
+- `ductUnloader`
+- `surgeConveyor`
+- `surgeRouter`
+- `unitCargoLoader`
+- `unitCargoUnloadPoint`
 - `mechanicalPump`
 - `rotaryPump`
-- `thermalPump`
+- `impulsePump`
 - `conduit`
 - `pulseConduit`
 - `platedConduit`
@@ -238,6 +320,13 @@ Contains the available symbols for blocks.
 - `liquidJunction`
 - `bridgeConduit`
 - `phaseConduit`
+- `reinforcedPump`
+- `reinforcedConduit`
+- `reinforcedLiquidJunction`
+- `reinforcedBridgeConduit`
+- `reinforcedLiquidRouter`
+- `reinforcedLiquidContainer`
+- `reinforcedLiquidTank`
 - `powerNode`
 - `powerNodeLarge`
 - `surgeTower`
@@ -253,6 +342,14 @@ Contains the available symbols for blocks.
 - `solarPanelLarge`
 - `thoriumReactor`
 - `impactReactor`
+- `beamNode`
+- `beamTower`
+- `beamLink`
+- `turbineCondenser`
+- `chemicalCombustionChamber`
+- `pyrolysisGenerator`
+- `fluxReactor`
+- `neoplasiaReactor`
 - `mechanicalDrill`
 - `pneumaticDrill`
 - `laserDrill`
@@ -260,12 +357,23 @@ Contains the available symbols for blocks.
 - `waterExtractor`
 - `cultivator`
 - `oilExtractor`
+- `ventCondenser`
+- `cliffCrusher`
+- `plasmaBore`
+- `largePlasmaBore`
+- `impactDrill`
+- `eruptionDrill`
 - `coreShard`
 - `coreFoundation`
 - `coreNucleus`
-- `vault`
+- `coreBastion`
+- `coreCitadel`
+- `coreAcropolis`
 - `container`
+- `vault`
 - `unloader`
+- `reinforcedContainer`
+- `reinforcedVault`
 - `duo`
 - `scatter`
 - `scorch`
@@ -284,7 +392,16 @@ Contains the available symbols for blocks.
 - `foreshadow`
 - `spectre`
 - `meltdown`
-- `commandCenter`
+- `breach`
+- `diffuse`
+- `sublimate`
+- `titan`
+- `disperse`
+- `afflict`
+- `lustre`
+- `scathe`
+- `smite`
+- `malign`
 - `groundFactory`
 - `airFactory`
 - `navalFactory`
@@ -296,7 +413,11 @@ Contains the available symbols for blocks.
 - `repairTurret`
 - `payloadConveyor`
 - `payloadRouter`
+- `reinforcedPayloadConveyor`
+- `reinforcedPayloadRouter`
+- `payloadMassDriver`
 - `payloadPropulsionTower`
+- `smallDeconstructor`
 - `deconstructor`
 - `constructor`
 - `largeConstructor`
@@ -310,6 +431,7 @@ Contains the available symbols for blocks.
 - `liquidVoid`
 - `payloadSource`
 - `payloadVoid`
+- `heatSource`
 - `illuminator`
 - `launchPad`
 - `interplanetaryAccelerator`
@@ -322,3 +444,144 @@ Contains the available symbols for blocks.
 - `memoryBank`
 - `logicDisplay`
 - `largeLogicDisplay`
+- `canvas`
+- `worldProcessor`
+- `worldCell`
+- `solid`
+- `air`
+- `spawn`
+- `cliff`
+- `deepWater`
+- `shallowWater`
+- `taintedWater`
+- `deepTaintedWater`
+- `darksandTaintedWater`
+- `sandWater`
+- `darksandWater`
+- `tar`
+- `pooledCryofluid`
+- `moltenSlag`
+- `space`
+- `empty`
+- `stone`
+- `craterStone`
+- `char`
+- `basalt`
+- `hotrock`
+- `magmarock`
+- `sandFloor`
+- `darksand`
+- `dirt`
+- `mud`
+- `dacite`
+- `rhyolite`
+- `rhyoliteCrater`
+- `roughRhyolite`
+- `regolith`
+- `yellowStone`
+- `carbonStone`
+- `ferricStone`
+- `ferricCraters`
+- `beryllicStone`
+- `crystallineStone`
+- `crystalFloor`
+- `yellowStonePlates`
+- `redStone`
+- `denseRedStone`
+- `redIce`
+- `arkyciteFloor`
+- `arkyicStone`
+- `rhyoliteVent`
+- `carbonVent`
+- `arkyicVent`
+- `yellowStoneVent`
+- `redStoneVent`
+- `redmat`
+- `bluemat`
+- `grass`
+- `salt`
+- `snow`
+- `ice`
+- `iceSnow`
+- `shale`
+- `moss`
+- `coreZone`
+- `sporeMoss`
+- `stoneWall`
+- `sporeWall`
+- `dirtWall`
+- `daciteWall`
+- `iceWall`
+- `snowWall`
+- `duneWall`
+- `regolithWall`
+- `yellowStoneWall`
+- `rhyoliteWall`
+- `carbonWall`
+- `ferricStoneWall`
+- `beryllicStoneWall`
+- `arkyicWall`
+- `crystallineStoneWall`
+- `redIceWall`
+- `redStoneWall`
+- `redDiamondWall`
+- `sandWall`
+- `saltWall`
+- `shrubs`
+- `shaleWall`
+- `sporePine`
+- `snowPine`
+- `pine`
+- `whiteTreeDead`
+- `whiteTree`
+- `sporeCluster`
+- `redweed`
+- `purBush`
+- `yellowcoral`
+- `boulder`
+- `snowBoulder`
+- `shaleBoulder`
+- `sandBoulder`
+- `daciteBoulder`
+- `basaltBoulder`
+- `carbonBoulder`
+- `ferricBoulder`
+- `beryllicBoulder`
+- `yellowStoneBoulder`
+- `arkyicBoulder`
+- `crystalCluster`
+- `vibrantCrystalCluster`
+- `crystalBlocks`
+- `crystalOrbs`
+- `crystallineBoulder`
+- `redIceBoulder`
+- `rhyoliteBoulder`
+- `redStoneBoulder`
+- `metalFloor`
+- `metalFloorDamaged`
+- `metalFloor2`
+- `metalFloor3`
+- `metalFloor4`
+- `metalFloor5`
+- `darkPanel1`
+- `darkPanel2`
+- `darkPanel3`
+- `darkPanel4`
+- `darkPanel5`
+- `darkPanel6`
+- `darkMetal`
+- `pebbles`
+- `tendrils`
+- `oreCopper`
+- `oreLead`
+- `oreScrap`
+- `oreCoal`
+- `oreTitanium`
+- `oreThorium`
+- `oreBeryllium`
+- `oreTungsten`
+- `oreCrystalThorium`
+- `oreWallThorium`
+- `oreWallBeryllium`
+- `graphiticWall`
+- `oreWallTungsten`

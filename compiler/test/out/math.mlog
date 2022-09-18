@@ -1,34 +1,34 @@
-set a:2:4 10
-set b:3:4 20
-op max &_ a:2:4 b:3:4
-op min &_ a:2:4 b:3:4
-op angle &_ a:2:4 b:3:4
-op len &_ a:2:4 b:3:4
-op noise &_ a:2:4 b:3:4
-op abs &_ a:2:4
-op log &_ a:2:4
-op log10 &_ a:2:4
-op sin &_ a:2:4
-op cos &_ a:2:4
-op tan &_ a:2:4
-op floor &_ a:2:4
-op ceil &_ a:2:4
-op sqrt &_ a:2:4
-op rand &_ a:2:4
-set temp:23:4 0
-set temp:23:4 20
-set temp:23:4 10.5
-set temp:23:4 62.300527191945
-set temp:23:4 22.588713996153036
-op noise temp:23:4 10.5 20
-set temp:23:4 10.5
-set temp:23:4 2.3513752571634776
-set temp:23:4 1.021189299069938
-set temp:23:4 -0.87969575997167
-set temp:23:4 -0.47553692799599256
-set temp:23:4 1.8498999934219273
-set temp:23:4 10
-set temp:23:4 11
-set temp:23:4 3.24037034920393
-op rand temp:23:4 10.5
+set a:1:4 10
+set b:2:4 20
+op max &_ a:1:4 b:2:4
+op min &_ a:1:4 b:2:4
+op angle &_ a:1:4 b:2:4
+op len &_ a:1:4 b:2:4
+op noise &_ a:1:4 b:2:4
+op abs &_ a:1:4
+op log &_ a:1:4
+op log10 &_ a:1:4
+op sin &_ a:1:4
+op cos &_ a:1:4
+op tan &_ a:1:4
+op floor &_ a:1:4
+op ceil &_ a:1:4
+op sqrt &_ a:1:4
+op rand &_ a:1:4
+set temp:22:4 0
+set temp:22:4 20
+set temp:22:4 10.5
+set temp:22:4 62.300527191945
+set temp:22:4 22.588713996153036
+op noise temp:22:4 10.5 20
+set temp:22:4 10.5
+set temp:22:4 2.3513752571634776
+set temp:22:4 1.021189299069938
+set temp:22:4 -0.87969575997167
+set temp:22:4 -0.47553692799599256
+set temp:22:4 1.8498999934219273
+set temp:22:4 10
+set temp:22:4 11
+set temp:22:4 3.24037034920393
+op rand temp:22:4 10.5
 end

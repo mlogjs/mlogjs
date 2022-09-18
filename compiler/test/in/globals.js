@@ -17,6 +17,15 @@ print(
 );
 
 print(
+  Teams.blue,
+  Teams.crux,
+  Teams.delerict,
+  Teams.green,
+  Teams.malis,
+  Teams.sharded
+);
+
+print(
   Items.blastCompound,
   Items.coal,
   Items.copper,
@@ -116,7 +125,6 @@ print(
   LAccess.flag,
   LAccess.controlled,
   LAccess.controller,
-  LAccess.commanded,
   LAccess.name,
   LAccess.payloadCount,
   LAccess.payloadType,
@@ -126,8 +134,6 @@ print(
   LAccess.config,
   LAccess.color
 );
-
-print(UnitCommands.attack, UnitCommands.idle, UnitCommands.rally);
 
 print(
   Blocks.air,
@@ -190,7 +196,7 @@ print(
   Blocks.armoredConveyor,
   Blocks.distributor,
   Blocks.junction,
-  Blocks.itemBridge,
+  Blocks.bridgeConveyor,
   Blocks.phaseConveyor,
   Blocks.sorter,
   Blocks.invertedSorter,
@@ -203,7 +209,7 @@ print(
   Blocks.ductBridge,
   Blocks.mechanicalPump,
   Blocks.rotaryPump,
-  Blocks.thermalPump,
+  Blocks.impulsePump,
   Blocks.conduit,
   Blocks.pulseConduit,
   Blocks.platedConduit,
@@ -219,7 +225,7 @@ print(
   Blocks.differentialGenerator,
   Blocks.rtgGenerator,
   Blocks.solarPanel,
-  Blocks.largeSolarPanel,
+  Blocks.solarPanelLarge,
   Blocks.thoriumReactor,
   Blocks.impactReactor,
   Blocks.battery,
@@ -259,7 +265,6 @@ print(
   Blocks.segment,
   Blocks.parallax,
   Blocks.tsunami,
-  Blocks.commandCenter,
   Blocks.groundFactory,
   Blocks.airFactory,
   Blocks.navalFactory,
@@ -278,7 +283,7 @@ print(
   Blocks.payloadLoader,
   Blocks.payloadUnloader,
   Blocks.message,
-  Blocks.switchBlock,
+  Blocks.switch,
   Blocks.microProcessor,
   Blocks.logicProcessor,
   Blocks.hyperProcessor,

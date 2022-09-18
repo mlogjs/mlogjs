@@ -1,5 +1,3 @@
-/// <reference path="../../lib/index.d.ts" />
-
 function matchItem(n) {
   switch (n) {
     case 1:

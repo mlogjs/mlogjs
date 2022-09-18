@@ -32,6 +32,29 @@ interface Vars {
   readonly tick: number;
   /** The current UNIX timestamp in milliseconds */
   readonly time: number;
+  /**
+   * The amount of seconds that passed since the map started.
+   *
+   * This number is NOT an integer, use `Math.floor` to get the number
+   * of whole seconds that already passed.
+   */
+  readonly second: number;
+  /**
+   * The amount of minutes that passed since the map started.
+   *
+   * This number is NOT an integer, use `Math.floor` to get the number
+   * of whole minutes that already passed.
+   */
+  readonly minute: number;
+  /** The number of the current wave. Starts at 1. */
+  readonly waveNumber: number;
+  /**
+   * The amount of seconds left before the next wave.
+   *
+   * This number is NOT an integer, use `Math.floor` to get the number
+   * of whole seconds left.
+   */
+  readonly waveTime: number;
   /** Total amount of items existent, can be used to check if an ID is valid*/
   readonly itemCount: number;
   /** Total amount of liquids existent, can be used to check if an ID is valid*/
@@ -43,6 +66,32 @@ interface Vars {
 }
 
 declare const Vars: Vars;
+
+/** Contains the base game teams. */
+declare namespace Teams {
+  /** The gray team. */
+  const delerict: unique symbol;
+  /** The yellow team. */
+  const sharded: unique symbol;
+  /** The red team. */
+  const crux: unique symbol;
+  /** The purple team. */
+  const malis: unique symbol;
+  /**
+   * The green team.
+   *
+   * Warning: this name might change in the future.
+   */
+  const green: unique symbol;
+  /**
+   * The blue team.
+   *
+   * Warning: this name might change in the future.
+   */
+  const blue: unique symbol;
+}
+
+type TeamSymbol = typeof Teams[keyof typeof Teams];
 
 declare namespace Items {
   const copper: unique symbol;
@@ -61,6 +110,12 @@ declare namespace Items {
   const sporePod: unique symbol;
   const blastCompound: unique symbol;
   const pyratite: unique symbol;
+  const beryllium: unique symbol;
+  const tungsten: unique symbol;
+  const oxide: unique symbol;
+  const carbide: unique symbol;
+  const fissileMatter: unique symbol;
+  const dormantCyst: unique symbol;
 }
 
 type ItemSymbol = typeof Items[keyof typeof Items];
@@ -70,6 +125,13 @@ declare namespace Liquids {
   const slag: unique symbol;
   const oil: unique symbol;
   const cryofluid: unique symbol;
+  const neoplasm: unique symbol;
+  const arkycite: unique symbol;
+  const gallium: unique symbol;
+  const ozone: unique symbol;
+  const hydrogen: unique symbol;
+  const nitrogen: unique symbol;
+  const cyanogen: unique symbol;
 }
 
 type LiquidSymbol = typeof Liquids[keyof typeof Liquids];
@@ -113,6 +175,29 @@ declare namespace Units {
   const alpha: unique symbol;
   const beta: unique symbol;
   const gamma: unique symbol;
+  const stell: unique symbol;
+  const locus: unique symbol;
+  const precept: unique symbol;
+  const vanquish: unique symbol;
+  const conquer: unique symbol;
+  const merui: unique symbol;
+  const cleroi: unique symbol;
+  const anthicus: unique symbol;
+  const tecta: unique symbol;
+  const collaris: unique symbol;
+  const elude: unique symbol;
+  const avert: unique symbol;
+  const obviate: unique symbol;
+  const quell: unique symbol;
+  const disrupt: unique symbol;
+  const renale: unique symbol;
+  const latum: unique symbol;
+  const evoke: unique symbol;
+  const incite: unique symbol;
+  const emanate: unique symbol;
+  const block: unique symbol;
+  const manifold: unique symbol;
+  const assemblyDrone: unique symbol;
 }
 
 type UnitSymbol = typeof Units[keyof typeof Units];
@@ -150,12 +235,12 @@ declare namespace LAccess {
   const mineX: unique symbol;
   const mineY: unique symbol;
   const mining: unique symbol;
+  const speed: unique symbol;
   const team: unique symbol;
   const type: unique symbol;
   const flag: unique symbol;
   const controlled: unique symbol;
   const controller: unique symbol;
-  const commanded: unique symbol;
   const name: unique symbol;
   const payloadCount: unique symbol;
   const payloadType: unique symbol;
@@ -166,19 +251,7 @@ declare namespace LAccess {
   const color: unique symbol;
 }
 
-declare namespace UnitCommands {
-  const attack: unique symbol;
-  const rally: unique symbol;
-  const idle: unique symbol;
-}
-
-type UnitCommandSymbol = typeof UnitCommands[keyof typeof UnitCommands];
-
-interface Blocks {
-  // special "blocks" to reference stuff from the environment
-  readonly air: unique symbol;
-  readonly solid: unique symbol;
-
+interface BuildingSymbolTable {
   readonly graphitePress: unique symbol;
   readonly multiPress: unique symbol;
   readonly siliconSmelter: unique symbol;
@@ -186,7 +259,7 @@ interface Blocks {
   readonly kiln: unique symbol;
   readonly plastaniumCompressor: unique symbol;
   readonly phaseWeaver: unique symbol;
-  readonly alloySmelter: unique symbol;
+  readonly surgeSmelter: unique symbol;
   readonly cryofluidMixer: unique symbol;
   readonly pyratiteMixer: unique symbol;
   readonly blastMixer: unique symbol;
@@ -197,6 +270,21 @@ interface Blocks {
   readonly pulverizer: unique symbol;
   readonly coalCentrifuge: unique symbol;
   readonly incinerator: unique symbol;
+  readonly siliconArcFurnace: unique symbol;
+  readonly electrolyzer: unique symbol;
+  readonly atmosphericConcentrator: unique symbol;
+  readonly oxidationChamber: unique symbol;
+  readonly electricHeater: unique symbol;
+  readonly slagHeater: unique symbol;
+  readonly phaseHeater: unique symbol;
+  readonly heatRedirector: unique symbol;
+  readonly slagIncinerator: unique symbol;
+  readonly carbideCrucible: unique symbol;
+  readonly slagCentrifuge: unique symbol;
+  readonly surgeCrucible: unique symbol;
+  readonly cyanogenSynthesizer: unique symbol;
+  readonly phaseSynthesizer: unique symbol;
+  readonly heatReactor: unique symbol;
   readonly copperWall: unique symbol;
   readonly copperWallLarge: unique symbol;
   readonly titaniumWall: unique symbol;
@@ -216,12 +304,29 @@ interface Blocks {
   readonly scrapWallHuge: unique symbol;
   readonly scrapWallGigantic: unique symbol;
   readonly thruster: unique symbol;
+  readonly berylliumWall: unique symbol;
+  readonly berylliumWallLarge: unique symbol;
+  readonly tungstenWall: unique symbol;
+  readonly tungstenWallLarge: unique symbol;
+  readonly blastDoor: unique symbol;
+  readonly reinforcedSurgeWall: unique symbol;
+  readonly reinforcedSurgeWallLarge: unique symbol;
+  readonly carbideWall: unique symbol;
+  readonly carbideWallLarge: unique symbol;
+  readonly shieldedWall: unique symbol;
   readonly mender: unique symbol;
   readonly mendProjector: unique symbol;
   readonly overdriveProjector: unique symbol;
   readonly overdriveDome: unique symbol;
   readonly forceProjector: unique symbol;
   readonly shockMine: unique symbol;
+  readonly radar: unique symbol;
+  readonly buildTower: unique symbol;
+  readonly regenProjector: unique symbol;
+  readonly barrierProjector: unique symbol;
+  readonly shockwaveTower: unique symbol;
+  readonly shieldProjector: unique symbol;
+  readonly largeShieldProjector: unique symbol;
   readonly conveyor: unique symbol;
   readonly titaniumConveyor: unique symbol;
   readonly plastaniumConveyor: unique symbol;
@@ -237,11 +342,19 @@ interface Blocks {
   readonly underflowGate: unique symbol;
   readonly massDriver: unique symbol;
   readonly duct: unique symbol;
+  readonly armoredDuct: unique symbol;
   readonly ductRouter: unique symbol;
+  readonly overflowDuct: unique symbol;
+  readonly underflowDuct: unique symbol;
   readonly ductBridge: unique symbol;
+  readonly ductUnloader: unique symbol;
+  readonly surgeConveyor: unique symbol;
+  readonly surgeRouter: unique symbol;
+  readonly unitCargoLoader: unique symbol;
+  readonly unitCargoUnloadPoint: unique symbol;
   readonly mechanicalPump: unique symbol;
   readonly rotaryPump: unique symbol;
-  readonly thermalPump: unique symbol;
+  readonly impulsePump: unique symbol;
   readonly conduit: unique symbol;
   readonly pulseConduit: unique symbol;
   readonly platedConduit: unique symbol;
@@ -251,6 +364,13 @@ interface Blocks {
   readonly liquidJunction: unique symbol;
   readonly bridgeConduit: unique symbol;
   readonly phaseConduit: unique symbol;
+  readonly reinforcedPump: unique symbol;
+  readonly reinforcedConduit: unique symbol;
+  readonly reinforcedLiquidJunction: unique symbol;
+  readonly reinforcedBridgeConduit: unique symbol;
+  readonly reinforcedLiquidRouter: unique symbol;
+  readonly reinforcedLiquidContainer: unique symbol;
+  readonly reinforcedLiquidTank: unique symbol;
   readonly powerNode: unique symbol;
   readonly powerNodeLarge: unique symbol;
   readonly surgeTower: unique symbol;
@@ -266,6 +386,14 @@ interface Blocks {
   readonly solarPanelLarge: unique symbol;
   readonly thoriumReactor: unique symbol;
   readonly impactReactor: unique symbol;
+  readonly beamNode: unique symbol;
+  readonly beamTower: unique symbol;
+  readonly beamLink: unique symbol;
+  readonly turbineCondenser: unique symbol;
+  readonly chemicalCombustionChamber: unique symbol;
+  readonly pyrolysisGenerator: unique symbol;
+  readonly fluxReactor: unique symbol;
+  readonly neoplasiaReactor: unique symbol;
   readonly mechanicalDrill: unique symbol;
   readonly pneumaticDrill: unique symbol;
   readonly laserDrill: unique symbol;
@@ -273,12 +401,23 @@ interface Blocks {
   readonly waterExtractor: unique symbol;
   readonly cultivator: unique symbol;
   readonly oilExtractor: unique symbol;
+  readonly ventCondenser: unique symbol;
+  readonly cliffCrusher: unique symbol;
+  readonly plasmaBore: unique symbol;
+  readonly largePlasmaBore: unique symbol;
+  readonly impactDrill: unique symbol;
+  readonly eruptionDrill: unique symbol;
   readonly coreShard: unique symbol;
   readonly coreFoundation: unique symbol;
   readonly coreNucleus: unique symbol;
-  readonly vault: unique symbol;
+  readonly coreBastion: unique symbol;
+  readonly coreCitadel: unique symbol;
+  readonly coreAcropolis: unique symbol;
   readonly container: unique symbol;
+  readonly vault: unique symbol;
   readonly unloader: unique symbol;
+  readonly reinforcedContainer: unique symbol;
+  readonly reinforcedVault: unique symbol;
   readonly duo: unique symbol;
   readonly scatter: unique symbol;
   readonly scorch: unique symbol;
@@ -297,7 +436,16 @@ interface Blocks {
   readonly foreshadow: unique symbol;
   readonly spectre: unique symbol;
   readonly meltdown: unique symbol;
-  readonly commandCenter: unique symbol;
+  readonly breach: unique symbol;
+  readonly diffuse: unique symbol;
+  readonly sublimate: unique symbol;
+  readonly titan: unique symbol;
+  readonly disperse: unique symbol;
+  readonly afflict: unique symbol;
+  readonly lustre: unique symbol;
+  readonly scathe: unique symbol;
+  readonly smite: unique symbol;
+  readonly malign: unique symbol;
   readonly groundFactory: unique symbol;
   readonly airFactory: unique symbol;
   readonly navalFactory: unique symbol;
@@ -309,7 +457,11 @@ interface Blocks {
   readonly repairTurret: unique symbol;
   readonly payloadConveyor: unique symbol;
   readonly payloadRouter: unique symbol;
+  readonly reinforcedPayloadConveyor: unique symbol;
+  readonly reinforcedPayloadRouter: unique symbol;
+  readonly payloadMassDriver: unique symbol;
   readonly payloadPropulsionTower: unique symbol;
+  readonly smallDeconstructor: unique symbol;
   readonly deconstructor: unique symbol;
   readonly constructor: unique symbol;
   readonly largeConstructor: unique symbol;
@@ -323,6 +475,7 @@ interface Blocks {
   readonly liquidVoid: unique symbol;
   readonly payloadSource: unique symbol;
   readonly payloadVoid: unique symbol;
+  readonly heatSource: unique symbol;
   readonly illuminator: unique symbol;
   readonly launchPad: unique symbol;
   readonly interplanetaryAccelerator: unique symbol;
@@ -335,7 +488,166 @@ interface Blocks {
   readonly memoryBank: unique symbol;
   readonly logicDisplay: unique symbol;
   readonly largeLogicDisplay: unique symbol;
+  readonly canvas: unique symbol;
+  readonly worldProcessor: unique symbol;
+  readonly worldCell: unique symbol;
 }
 
+type BuildingSymbol = Blocks[keyof BuildingSymbolTable];
+
+interface EnvBlockSymbolTable {
+  // used by some instructions to represent any env block
+  readonly solid: EnvBlockSymbolTable["stoneWall"];
+  readonly air: unique symbol;
+  readonly spawn: unique symbol;
+  readonly cliff: unique symbol;
+  readonly deepWater: unique symbol;
+  readonly shallowWater: unique symbol;
+  readonly taintedWater: unique symbol;
+  readonly deepTaintedWater: unique symbol;
+  readonly darksandTaintedWater: unique symbol;
+  readonly sandWater: unique symbol;
+  readonly darksandWater: unique symbol;
+  readonly tar: unique symbol;
+  readonly pooledCryofluid: unique symbol;
+  readonly moltenSlag: unique symbol;
+  readonly space: unique symbol;
+  readonly empty: unique symbol;
+  readonly stone: unique symbol;
+  readonly craterStone: unique symbol;
+  readonly char: unique symbol;
+  readonly basalt: unique symbol;
+  readonly hotrock: unique symbol;
+  readonly magmarock: unique symbol;
+  readonly sandFloor: unique symbol;
+  readonly darksand: unique symbol;
+  readonly dirt: unique symbol;
+  readonly mud: unique symbol;
+  readonly dacite: unique symbol;
+  readonly rhyolite: unique symbol;
+  readonly rhyoliteCrater: unique symbol;
+  readonly roughRhyolite: unique symbol;
+  readonly regolith: unique symbol;
+  readonly yellowStone: unique symbol;
+  readonly carbonStone: unique symbol;
+  readonly ferricStone: unique symbol;
+  readonly ferricCraters: unique symbol;
+  readonly beryllicStone: unique symbol;
+  readonly crystallineStone: unique symbol;
+  readonly crystalFloor: unique symbol;
+  readonly yellowStonePlates: unique symbol;
+  readonly redStone: unique symbol;
+  readonly denseRedStone: unique symbol;
+  readonly redIce: unique symbol;
+  readonly arkyciteFloor: unique symbol;
+  readonly arkyicStone: unique symbol;
+  readonly rhyoliteVent: unique symbol;
+  readonly carbonVent: unique symbol;
+  readonly arkyicVent: unique symbol;
+  readonly yellowStoneVent: unique symbol;
+  readonly redStoneVent: unique symbol;
+  readonly redmat: unique symbol;
+  readonly bluemat: unique symbol;
+  readonly grass: unique symbol;
+  readonly salt: unique symbol;
+  readonly snow: unique symbol;
+  readonly ice: unique symbol;
+  readonly iceSnow: unique symbol;
+  readonly shale: unique symbol;
+  readonly moss: unique symbol;
+  readonly coreZone: unique symbol;
+  readonly sporeMoss: unique symbol;
+  readonly stoneWall: unique symbol;
+  readonly sporeWall: unique symbol;
+  readonly dirtWall: unique symbol;
+  readonly daciteWall: unique symbol;
+  readonly iceWall: unique symbol;
+  readonly snowWall: unique symbol;
+  readonly duneWall: unique symbol;
+  readonly regolithWall: unique symbol;
+  readonly yellowStoneWall: unique symbol;
+  readonly rhyoliteWall: unique symbol;
+  readonly carbonWall: unique symbol;
+  readonly ferricStoneWall: unique symbol;
+  readonly beryllicStoneWall: unique symbol;
+  readonly arkyicWall: unique symbol;
+  readonly crystallineStoneWall: unique symbol;
+  readonly redIceWall: unique symbol;
+  readonly redStoneWall: unique symbol;
+  readonly redDiamondWall: unique symbol;
+  readonly sandWall: unique symbol;
+  readonly saltWall: unique symbol;
+  readonly shrubs: unique symbol;
+  readonly shaleWall: unique symbol;
+  readonly sporePine: unique symbol;
+  readonly snowPine: unique symbol;
+  readonly pine: unique symbol;
+  readonly whiteTreeDead: unique symbol;
+  readonly whiteTree: unique symbol;
+  readonly sporeCluster: unique symbol;
+  readonly redweed: unique symbol;
+  readonly purBush: unique symbol;
+  readonly yellowcoral: unique symbol;
+  readonly boulder: unique symbol;
+  readonly snowBoulder: unique symbol;
+  readonly shaleBoulder: unique symbol;
+  readonly sandBoulder: unique symbol;
+  readonly daciteBoulder: unique symbol;
+  readonly basaltBoulder: unique symbol;
+  readonly carbonBoulder: unique symbol;
+  readonly ferricBoulder: unique symbol;
+  readonly beryllicBoulder: unique symbol;
+  readonly yellowStoneBoulder: unique symbol;
+  readonly arkyicBoulder: unique symbol;
+  readonly crystalCluster: unique symbol;
+  readonly vibrantCrystalCluster: unique symbol;
+  readonly crystalBlocks: unique symbol;
+  readonly crystalOrbs: unique symbol;
+  readonly crystallineBoulder: unique symbol;
+  readonly redIceBoulder: unique symbol;
+  readonly rhyoliteBoulder: unique symbol;
+  readonly redStoneBoulder: unique symbol;
+  readonly metalFloor: unique symbol;
+  readonly metalFloorDamaged: unique symbol;
+  readonly metalFloor2: unique symbol;
+  readonly metalFloor3: unique symbol;
+  readonly metalFloor4: unique symbol;
+  readonly metalFloor5: unique symbol;
+  readonly darkPanel1: unique symbol;
+  readonly darkPanel2: unique symbol;
+  readonly darkPanel3: unique symbol;
+  readonly darkPanel4: unique symbol;
+  readonly darkPanel5: unique symbol;
+  readonly darkPanel6: unique symbol;
+  readonly darkMetal: unique symbol;
+  readonly pebbles: unique symbol;
+  readonly tendrils: unique symbol;
+}
+
+type EnvBlockSymbol = Blocks[keyof EnvBlockSymbolTable];
+
+interface OreSymbolTable {
+  readonly oreCopper: unique symbol;
+  readonly oreLead: unique symbol;
+  readonly oreScrap: unique symbol;
+  readonly oreCoal: unique symbol;
+  readonly oreTitanium: unique symbol;
+  readonly oreThorium: unique symbol;
+  readonly oreBeryllium: unique symbol;
+  readonly oreTungsten: unique symbol;
+  readonly oreCrystalThorium: unique symbol;
+  readonly oreWallThorium: unique symbol;
+  readonly oreWallBeryllium: unique symbol;
+  readonly graphiticWall: unique symbol;
+  readonly oreWallTungsten: unique symbol;
+}
+
+type OreSymbol = Blocks[keyof OreSymbolTable];
+
+interface Blocks
+  extends BuildingSymbolTable,
+    EnvBlockSymbolTable,
+    OreSymbolTable {}
+
+type BlockSymbol = Blocks[keyof Blocks];
 declare const Blocks: Blocks;
-type BlockSymbol = typeof Blocks[keyof typeof Blocks];

@@ -1,5 +1,10 @@
 import "./kind";
-import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
+import {
+  TRadarFilter,
+  TRadarSort,
+  TUnitEffect,
+  TUnitLocateBuildingGroup,
+} from "./util";
 declare global {
   /**
    * Appends the items to the print buffer, calling this function
@@ -353,6 +358,13 @@ declare global {
   function lookup(kind: "liquid", index: number): LiquidSymbol | null;
 
   /**
+   * Packs RGBA color information into a single number.
+   *
+   * Each paremeter must range from `0` to `1`.
+   */
+  function packColor(r: number, g: number, b: number, a: number): number;
+
+  /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`
    */
   function unitBind(type: UnitSymbol): void;
@@ -406,7 +418,7 @@ declare global {
   function unitControl(mode: "targetp", unit: BasicUnit, shoot: boolean): void;
   /**
    * Makes the unit bound to this processor drop it's held items onto the given target
-   * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+   * @param target Where to drop the items, if `EnvBlocks.air`, the unit will throw it's items away
    * @param amount How many items should be dropped
    */
   function unitControl(
@@ -459,7 +471,7 @@ declare global {
     mode: "build",
     x: number,
     y: number,
-    block: BlockSymbol,
+    block: BuildingSymbol,
     rotation: number,
     config: unknown
   ): void;
@@ -539,20 +551,356 @@ declare global {
     find: "damaged"
   ): [found: false] | [found: true, x: number, y: number, building: T];
 
-  /** Ends the execution of this script */
+  /**Jumps to the top of the instruction stack*/
   function endScript(): never;
 
+  /** Halts the execution of this processor */
+  function stopScript(): never;
+
+  /** Gets the floor type on the given location */
+  function getBlock(kind: "floor", x: number, y: number): EnvBlockSymbol;
+  /** Gets the ore type on the given location. `Blocks.air` if there is no ore */
+  function getBlock(
+    kind: "ore",
+    x: number,
+    y: number
+  ): OreSymbol | typeof Blocks.air;
+  /** Gets the block type on the give location. `Blocks.air` if there is no block. */
+  function getBlock(kind: "block", x: number, y: number): BlockSymbol;
+  /** Gets the building on the given location. `null` if there is no building. */
+  function getBlock<T extends BasicBuilding = AnyBuilding>(
+    type: "building",
+    x: number,
+    y: number
+  ): T | null;
+
+  // TODO: maybe have a separate floor symbol type?
+  /** Sets the floor of the tile at the given location. */
+  function setBlock(
+    kind: "floor",
+    x: number,
+    y: number,
+    to: EnvBlockSymbol
+  ): void;
+  /** Sets the ore at the given location. Use `Blocks.air` to remove any ore. */
+  function setBlock(
+    kind: "ore",
+    x: number,
+    y: number,
+    to: OreSymbol | typeof Blocks.air
+  ): void;
+  /** Sets the block at a given location, it can be a regular building or an environment block. */
+  function setBlock(
+    kind: "block",
+    x: number,
+    y: number,
+    to: EnvBlockSymbol | BuildingSymbol,
+    team: TeamSymbol,
+    rotation: number
+  ): void;
+
+  /** Spawns an unit at the given location */
+  function spawnUnit<T extends BasicUnit = AnyUnit>(
+    type: UnitSymbol,
+    x: number,
+    y: number,
+    team: TeamSymbol,
+    rotation?: number
+  ): T;
+
   /**
-   * Inlines raw mlog code. Variables and expressions can be placed inside.
+   * Applies or removes a status effect to the given unit.
    *
-   * Although possible, using this function is heavily not recommended since
-   * you lose the benefits of getting type cheking and validation for some
-   * commands.
+   * The only status effects that don't require a duration are `overdrive` and `boss`.
+   */
+  function applyStatus(
+    kind: "apply",
+    status: Exclude<TUnitEffect, "overdrive" | "boss">,
+    unit: BasicUnit,
+    duration: number
+  ): void;
+  function applyStatus(
+    kind: "apply",
+    status: "overdrive" | "boss",
+    unit: BasicUnit
+  ): void;
+  function applyStatus(
+    kind: "clear",
+    status: TUnitEffect,
+    unit: BasicUnit
+  ): void;
+
+  /**
+   * Spawns an enemy wave, can be used even if there is an already active wave.
+   */
+  function spawnWave(natural: true): void;
+  function spawnWave(natural: false, x: number, y: number): void;
+
+  /** Sets the wave countdown in seconds. */
+  function setRule(rule: "currentWaveTime", seconds: number): void;
+  /** Enables/disables the wave timer. */
+  function setRule(rule: "waveTimer", enabled: boolean): void;
+  /** Allows or prevents waves from spawning. */
+  function setRule(rule: "waves", enabled: boolean): void;
+  /** Sets the current wave number. */
+  function setRule(rule: "wave", number: number): void;
+  /** Sets the time between waves in seconds. */
+  function setRule(rule: "waveSpacing", seconds: number): void;
+  /** Sets wether waves can be manually summoned by pressing the play button. */
+  function setRule(rule: "waveSending", enabled: boolean): void;
+  /** Sets wether the gamemode is the attack mode */
+  function setRule(rule: "attackMode", enabled: boolean): void;
+  /** Sets the radius of the no-build zone around enemy cores. */
+  function setRule(rule: "enemyCoreBuildRadius", radius: number): void;
+  /** Sets the radius around enemy wave drop zones. */
+  function setRule(rule: "dropZoneRadius", radius: number): void;
+  /** Sets the base unit cap. */
+  function setRule(rule: "unitCap", cap: number): void;
+  /** Sets the playable map area. Blocks that are out of the new bounds will be removed.  */
+  function setRule(
+    rule: "mapArea",
+    x: number,
+    y: number,
+    width: number,
+    height: number
+  ): void;
+  /** Sets wether ambient lighting is enabled */
+  function setRule(rule: "lighting", enabled: boolean): void;
+  /**
+   * Sets the ambient light color.
+   *
+   * `packColor` can be used to get the rgba data recevied by this function.
+   *
    *
    * ```js
-   *  let x = 10
-   *  asm`ucontrol build ${x} ${x * 2} @router 0 0`
+   * // enables lighting and sets the color to gray
+   * setRule("lighting", true);
+   * setRule("ambientLight", packColor(0.5, 0.5, 0.5, 1));
    * ```
    */
-  function asm(strings: TemplateStringsArray, ...values: unknown[]): void;
+  function setRule(rule: "ambientLight", rgbaData: number): void;
+  /** Sets the multiplier for the energy output of solar panels. */
+  function setRule(rule: "solarMultiplier", multiplier: number): void;
+  /**
+   * Sets the build speed multiplier of a team.
+   * The multiplier will always be clamped between `0.001` and `50`.
+   */
+  function setRule(
+    rule: "buildSpeed",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /**
+   * Sets the speed multiplier for unit factories.
+   * The multiplier will always be clamped between `0` and `50`.
+   */
+  function setRule(
+    rule: "unitBuildSpeed",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the damage multiplier for units on a given team. */
+  function setRule(
+    rule: "unitDamage",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the block health multiplier for a given team. */
+  function setRule(
+    rule: "blockHealth",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /** Sets the block damage multiplier for a given team. */
+  function setRule(
+    rule: "blockDamage",
+    team: TeamSymbol,
+    multiplier: number
+  ): void;
+  /**
+   * Sets the Real Time Strategy minimum weight for a team.
+   *
+   * In other words it, sets the minimum "advantage" needed for a squad to attack.
+   * The higher the value, the more cautious the squad is.
+   */
+  function setRule(rule: "rtsMinWeight", team: TeamSymbol, value: number): void;
+  /**
+   * Sets the Real Time Strategy minimum size of attack squads of a team.
+   *
+   * The higher the value, the more units are required before a squad attacks.
+   */
+  function setRule(rule: "rtsMinSquad", team: TeamSymbol, value: number): void;
+
+  /**
+   * Writes the contents of the print buffer in the selected mode
+   * and clears the buffer afterwards.
+   *
+   * ```js
+   * print("Hello");
+   * flushMessage("announce", 4); // lasts 4 seconds
+   * wait(5);
+   * print("World");
+   * flushMessage("toast", 4);
+   * wait(5);
+   * ```
+   */
+  function flushMessage(kind: "notify" | "mission"): void;
+  function flushMessage(kind: "announce" | "toast", duration: number): void;
+
+  /** Moves the player's camera to the given location. */
+  function cutscene(mode: "pan", x: number, y: number, speed: number): void;
+  /** Zooms the player camera to the desired level */
+  function cutscene(mode: "zoom", level: number): void;
+  /** Gives the camera control back to the player */
+  function cutscene(mode: "stop"): void;
+
+  /** Creates an explosion */
+  function explosion(
+    team: TeamSymbol,
+    x: number,
+    y: number,
+    radius: number,
+    damage: number,
+    air: boolean,
+    ground: boolean,
+    pierce: boolean
+  ): void;
+
+  /** Sets the speed of this world processor in instructions per tick. */
+  function setRate(ipt: number): void;
+
+  /**
+   * Gets an unit from the given team
+   *
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("unitCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const unit = fetch("unit", Teams.sharded, i);
+   *    print`x: ${unit.x}, y: ${unit.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch<T extends BasicUnit = AnyUnit>(
+    kind: "unit",
+    team: TeamSymbol,
+    index: number
+  ): T;
+  /**
+   *  Gets the amount of units existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("unitCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const unit = fetch("unit", Teams.sharded, i);
+   *    print`x: ${unit.x}, y: ${unit.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch(kind: "unitCount", team: TeamSymbol): number;
+  /**
+   * Gets a player from a team.
+   *
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("playerCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const player = fetch("player", Teams.sharded, i);
+   *    print`x: ${player.x}, y: ${player.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch<T extends BasicUnit = AnyUnit>(
+    kind: "player",
+    team: TeamSymbol,
+    index: number
+  ): T;
+  /**
+   * Gets the amount of players existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("playerCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const player = fetch("player", Teams.sharded, i);
+   *    print`x: ${player.x}, y: ${player.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch(kind: "playerCount", team: TeamSymbol): number;
+  /**
+   * Gets a core from a team.
+   *
+   * The index of the starts at 0.
+   *
+   * ```js
+   *  const count = fetch("coreCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const core = fetch("core", Teams.sharded, i);
+   *    print`x: ${core.x}, y: ${core.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch(kind: "core", team: TeamSymbol, index: number): AnyBuilding;
+  /**
+   * Gets the amount of cores existing on a given team.
+   * ```js
+   *  const count = fetch("coreCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const core = fetch("core", Teams.sharded, i);
+   *    print`x: ${core.x}, y: ${core.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch(kind: "coreCount", team: TeamSymbol): number;
+  /**
+   * Gets a building from a team.
+   *
+   * The index starts at 0.
+   *
+   * ```js
+   *  const count = fetch("buildCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const router = fetch("build", Teams.sharded, i, Blocks.router);
+   *    print`x: ${router.x}, y: ${router.y}\n`;
+   *  }
+   *  printFlush();
+   * ```
+   */
+  function fetch<T extends BasicBuilding = AnyBuilding>(
+    kind: "build",
+    team: TeamSymbol,
+    index: number,
+    block: BuildingSymbol
+  ): T;
+  /**
+   * Gets the amount of buildings existing on a given team.
+   *
+   * ```js
+   *  const count = fetch("buildCount");
+   *  for(let i = 0; i < count; i++) {
+   *    const router = fetch("build", Teams.sharded, i, Blocks.router)
+   *    print`x: ${router.x}, y: ${router.y}\n`
+   *  }
+   *  printFlush()
+   * ```
+   */
+  function fetch(
+    kind: "buildCount",
+    team: TeamSymbol,
+    block: BuildingSymbol
+  ): number;
+
+  /** Checks if a global flag is set */
+  function getFlag(flag: string): boolean;
+
+  /** Sets a global flag */
+  function setFlag(flag: string, value: boolean): void;
 }

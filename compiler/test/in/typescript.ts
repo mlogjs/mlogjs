@@ -1,4 +1,3 @@
-/// <reference types="mlogjs/lib" />
 const enum State {
   active = 10,
   awaiting,

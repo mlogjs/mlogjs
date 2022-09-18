@@ -43,6 +43,7 @@ print(building.ammo); // results in a sensor instruction followed by a print ins
 const item = Items.coal;
 
 print(building[item]); // this works too
+printFlush();
 ```
 
 ## Function

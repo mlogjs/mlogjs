@@ -3,7 +3,6 @@ import {
   AssignementOperator,
   BinaryOperator,
   LogicalOperator,
-  UnaryOperator,
   updateOperators,
 } from "../operators";
 import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
@@ -25,6 +24,22 @@ export class BaseValue extends VoidValue implements IValue {
   "u+"(scope: IScope): TValueInstructions {
     // TODO: should it return 0 + this ?
     return this.eval(scope);
+  }
+
+  "!"(scope: IScope): TValueInstructions {
+    const [that, inst] = this.consume(scope);
+    const temp = new StoreValue(scope);
+    const falseLiteral = new LiteralValue(scope, 0);
+    return [
+      temp,
+      [...inst, new OperationInstruction("equal", temp, that, falseLiteral)],
+    ];
+  }
+
+  "~"(scope: IScope): TValueInstructions {
+    const [that, inst] = this.consume(scope);
+    const temp = new StoreValue(scope);
+    return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
   }
   ensureOwned(): asserts this is IOwnedValue {
     this.owner ??= new ValueOwner({ scope: this.scope, value: this });
@@ -78,24 +93,6 @@ for (const key in operatorMap) {
         new OperationInstruction(kind, temp, left, right),
       ],
     ];
-  };
-}
-
-const unaryOperatorMap: Record<Extract<UnaryOperator, "!" | "~">, string> = {
-  "!": "not",
-  "~": "flip",
-} as const;
-
-for (const key in unaryOperatorMap) {
-  type K = keyof typeof unaryOperatorMap;
-  const name = unaryOperatorMap[key as K];
-  BaseValue.prototype[key as K] = function (
-    this: BaseValue,
-    scope: IScope
-  ): TValueInstructions {
-    const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
-    return [temp, [...inst, new OperationInstruction(name, temp, that, null)]];
   };
 }
 

@@ -1,7 +1,7 @@
 set i:1:4 0
 op lessThan &t0 i:1:4 100
 jump 9 equal &t0 0
-op rand &t1
+op rand &t1 1
 op greaterThan &t1 &t1 0.5
 jump 7 equal &t1 0
 jump 9 always
