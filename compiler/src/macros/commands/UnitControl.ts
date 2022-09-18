@@ -8,7 +8,7 @@ import {
   StoreValue,
 } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { assertLiteralOneOf } from "../../assertions/literals";
+import { assertLiteralOneOf } from "../../assertions";
 
 const validModes = [
   "idle",

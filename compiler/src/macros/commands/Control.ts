@@ -3,7 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { SenseableValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { assertLiteralOneOf } from "../../assertions/literals";
+import { assertLiteralOneOf } from "../../assertions";
 
 const validKinds = ["enabled", "shoot", "shootp", "config", "color"] as const;
 export class Control extends MacroFunction<null> {

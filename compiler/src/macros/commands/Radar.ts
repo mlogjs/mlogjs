@@ -3,7 +3,7 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { assertLiteralOneOf } from "../../assertions/literals";
+import { assertLiteralOneOf } from "../../assertions";
 
 export const validRadarFilters = [
   "any",

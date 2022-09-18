@@ -1,6 +1,6 @@
-import { CompilerError } from "../CompilerError";
-import { IValue } from "../types";
-import { LiteralValue } from "../values";
+import { CompilerError } from "./CompilerError";
+import { IValue } from "./types";
+import { LiteralValue, StoreValue } from "./values";
 
 export function assertStringLiteral(
   value: IValue,
@@ -23,4 +23,12 @@ export function assertLiteralOneOf<T extends readonly string[]>(
         .map(member => `"${member}"`)
         .join(", ")} or "${members[members.length - 1]}"`
     );
+}
+
+export function assertIsRuntimeValue(
+  value: IValue,
+  name: string
+): asserts value is LiteralValue | StoreValue {
+  if (!(value instanceof LiteralValue) || !(value instanceof StoreValue))
+    throw new CompilerError(`${name} must be a valid runtime value`);
 }

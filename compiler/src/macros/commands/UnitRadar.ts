@@ -4,7 +4,7 @@ import { IScope } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
 import { CompilerError } from "../../CompilerError";
-import { assertLiteralOneOf } from "../../assertions/literals";
+import { assertLiteralOneOf } from "../../assertions";
 
 export class UnitRadar extends MacroFunction {
   constructor(scope: IScope) {

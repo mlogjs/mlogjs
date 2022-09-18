@@ -1,4 +1,4 @@
-import { assertLiteralOneOf } from "../../assertions/literals";
+import { assertLiteralOneOf } from "../../assertions";
 import { InstructionBase } from "../../instructions";
 import { IScope, IValue } from "../../types";
 import { LiteralValue } from "../../values";
