@@ -29,7 +29,7 @@ export function assertIsRuntimeValue(
   value: IValue | undefined,
   name: string
 ): asserts value is LiteralValue | StoreValue {
-  if (!(value instanceof LiteralValue) || !(value instanceof StoreValue))
+  if (!(value instanceof LiteralValue) && !(value instanceof StoreValue))
     throw new CompilerError(`${name} must be a valid runtime value`);
 }
 
