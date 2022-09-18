@@ -1,10 +1,10 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
-const validKinds = ["notify", "mission", "announce", "toast"];
+const validKinds = ["notify", "mission", "announce", "toast"] as const;
 
 export class FlushMessage extends MacroFunction<null> {
   constructor(scope: IScope) {
@@ -17,19 +17,7 @@ export class FlushMessage extends MacroFunction<null> {
 
       const [kind, duration] = args;
 
-      if (!(kind instanceof LiteralValue) || typeof kind.data !== "string") {
-        throw new CompilerError("The kind must be a string literal");
-      }
-
-      if (!validKinds.includes(kind.data)) {
-        throw new CompilerError(
-          `The kind must be one of ${validKinds
-            .slice(0, -1)
-            .map(value => `"${value}"`)} or ${
-            validKinds[validKinds.length - 1]
-          }`
-        );
-      }
+      assertLiteralOneOf(kind, validKinds, "The flush message kind");
 
       return [null, [new InstructionBase("message", kind.data, duration)]];
     });

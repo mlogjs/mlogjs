@@ -1,10 +1,11 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { LiteralValue, SenseableValue, StoreValue } from "../../values";
+import { SenseableValue, StoreValue } from "../../values";
 import { MacroFunction } from "../Function";
 
-const validKinds = ["floor", "ore", "block", "building"];
+const validKinds = ["floor", "ore", "block", "building"] as const;
 
 export class GetBlock extends MacroFunction {
   constructor(scope: IScope) {
@@ -16,15 +17,7 @@ export class GetBlock extends MacroFunction {
       }
       const [kind, x, y] = args;
 
-      if (
-        !(kind instanceof LiteralValue) ||
-        typeof kind.data !== "string" ||
-        !validKinds.includes(kind.data)
-      ) {
-        throw new CompilerError(
-          `The kind must be one of: "floor", "ore", "block" or "building`
-        );
-      }
+      assertLiteralOneOf(kind, validKinds, "The getBlock kind");
 
       const output =
         kind.data === "building"

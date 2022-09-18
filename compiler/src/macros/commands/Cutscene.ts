@@ -1,7 +1,7 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope, IValue } from "../../types";
-import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 const validLengths = [1, 2, 4];
@@ -17,11 +17,7 @@ export class Cutscene extends MacroFunction<null> {
 
       const [mode] = args;
 
-      if (!(mode instanceof LiteralValue) || typeof mode.data !== "string")
-        throw new CompilerError("The mode must be a string literal");
-
-      if (!validModes.includes(mode.data))
-        throw new CompilerError("Invalid cutscene mode");
+      assertLiteralOneOf(mode, validModes, "The cutscene mode");
 
       const params: (IValue | string)[] = ["zoom", "100", "100", "0.06", "0"];
 

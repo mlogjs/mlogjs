@@ -1,7 +1,7 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope, IValue } from "../../types";
-import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 const validRules = [
@@ -40,9 +40,8 @@ export class SetRule extends MacroFunction<null> {
         );
       }
       const [rule] = args;
-      if (!(rule instanceof LiteralValue) || typeof rule.data !== "string")
-        throw new CompilerError("The rule must be a string literal");
-      if (!isValidRule(rule.data)) throw new CompilerError("Invalid rule");
+
+      assertLiteralOneOf(rule, validRules, "The rule");
 
       const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
       switch (rule.data) {
@@ -73,8 +72,4 @@ export class SetRule extends MacroFunction<null> {
       return [null, [new InstructionBase(instName, rule.data, ...params)]];
     });
   }
-}
-
-function isValidRule(rule: string): rule is typeof validRules[number] {
-  return validRules.includes(rule as never);
 }

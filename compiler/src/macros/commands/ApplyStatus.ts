@@ -1,10 +1,10 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
-const validKinds = ["apply", "clear"];
+const validKinds = ["apply", "clear"] as const;
 
 const validEffects = [
   "burning",
@@ -21,7 +21,7 @@ const validEffects = [
   "boss",
   "shocked",
   "blasted",
-];
+] as const;
 
 export class ApplyStatus extends MacroFunction<null> {
   constructor(scope: IScope) {
@@ -32,19 +32,9 @@ export class ApplyStatus extends MacroFunction<null> {
         );
       const [kind, effect, unit, duration] = args;
 
-      if (
-        !(kind instanceof LiteralValue) ||
-        typeof kind.data !== "string" ||
-        !validKinds.includes(kind.data)
-      )
-        throw new CompilerError('The kind must be either "apply" or "clear"');
+      assertLiteralOneOf(kind, validKinds, "The kind");
 
-      if (
-        !(effect instanceof LiteralValue) ||
-        typeof effect.data !== "string" ||
-        !validEffects.includes(effect.data)
-      )
-        throw new CompilerError("Invalid status effect");
+      assertLiteralOneOf(effect, validEffects, "The status effect");
 
       return [
         null,

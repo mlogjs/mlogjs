@@ -1,7 +1,8 @@
+import { assertLiteralOneOf } from "../../assertions/literals";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { LiteralValue, SenseableValue } from "../../values";
+import { SenseableValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 const validKinds = [
@@ -13,7 +14,7 @@ const validKinds = [
   "coreCount",
   "build",
   "buildCount",
-];
+] as const;
 
 export class Fetch extends MacroFunction {
   constructor(scope: IScope) {
@@ -26,12 +27,8 @@ export class Fetch extends MacroFunction {
       }
 
       const [kind, team] = args;
-      if (!(kind instanceof LiteralValue) || typeof kind.data !== "string") {
-        throw new CompilerError(`The fetch kind must be a string literal`);
-      }
 
-      if (!validKinds.includes(kind.data))
-        throw new CompilerError(`Invalid fetch kind: "${kind.data}"`);
+      assertLiteralOneOf(kind, validKinds, "The fetch kind");
 
       const output = new SenseableValue(scope);
       const params = [kind.data, output, team, "0", "@conveyor"];
