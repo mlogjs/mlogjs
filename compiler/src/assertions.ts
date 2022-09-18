@@ -1,9 +1,9 @@
 import { CompilerError } from "./CompilerError";
 import { IValue } from "./types";
-import { LiteralValue, StoreValue } from "./values";
+import { LiteralValue, ObjectValue, StoreValue } from "./values";
 
 export function assertStringLiteral(
-  value: IValue,
+  value: IValue | undefined,
   name: string
 ): asserts value is LiteralValue & { data: string } {
   if (!(value instanceof LiteralValue) || typeof value.data !== "string")
@@ -11,7 +11,7 @@ export function assertStringLiteral(
 }
 
 export function assertLiteralOneOf<T extends readonly string[]>(
-  value: IValue,
+  value: IValue | undefined,
   members: T,
   name: string
 ): asserts value is LiteralValue & { data: T[number] } {
@@ -26,9 +26,17 @@ export function assertLiteralOneOf<T extends readonly string[]>(
 }
 
 export function assertIsRuntimeValue(
-  value: IValue,
+  value: IValue | undefined,
   name: string
 ): asserts value is LiteralValue | StoreValue {
   if (!(value instanceof LiteralValue) || !(value instanceof StoreValue))
     throw new CompilerError(`${name} must be a valid runtime value`);
+}
+
+export function assertIsObjectMacro(
+  value: IValue | undefined,
+  name: string
+): asserts value is ObjectValue {
+  if (!(value instanceof ObjectValue))
+    throw new CompilerError(`${name} must be an object macro`);
 }
