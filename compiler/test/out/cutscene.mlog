@@ -3,11 +3,11 @@ op equal &t1 &t0 0
 jump 4 equal &t1 0
 end
 control enabled switch1 0
-cutscene pan zoom 10 10 0.02 0
+cutscene pan 10 10 0.02 0
 wait 0.5
-cutscene zoom zoom 4 100 0.06 0
+cutscene zoom 4 100 0.06 0
 print "Camera controls!"
 message announce 4
 wait 5
-cutscene stop zoom 100 100 0.06 0
+cutscene stop 100 100 0.06 0
 end
