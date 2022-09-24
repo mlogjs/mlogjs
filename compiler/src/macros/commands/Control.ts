@@ -20,7 +20,7 @@ export class Control extends ObjectValue {
             args: ["building", "unit", "shoot"],
           },
           config: { args: ["building", "value"] },
-          color: { args: ["r", "g", "b"] },
+          color: { args: ["building", "r", "g", "b"] },
         },
         handler(overload, ...args) {
           return [null, [new InstructionBase("control", overload, ...args)]];
