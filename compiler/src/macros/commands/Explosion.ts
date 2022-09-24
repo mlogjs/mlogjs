@@ -1,17 +1,25 @@
-import { CompilerError } from "../../CompilerError";
+import { assertIsObjectMacro, assertObjectFields } from "../../assertions";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
 import { MacroFunction } from "../Function";
 
 export class Explosion extends MacroFunction<null> {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 8)
-        throw new CompilerError(
-          `Expected 8 arguments, received ${args.length}`
-        );
+    super(scope, options => {
+      assertIsObjectMacro(options, "The options");
 
-      return [null, [new InstructionBase("explosion", ...args)]];
+      const params = assertObjectFields(options, [
+        "team",
+        "x",
+        "y",
+        "radius",
+        "damage",
+        "air",
+        "ground",
+        "pierce",
+      ]);
+
+      return [null, [new InstructionBase("explosion", ...params)]];
     });
   }
 }

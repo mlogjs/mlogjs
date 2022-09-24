@@ -814,16 +814,16 @@ declare global {
   }
 
   /** Creates an explosion */
-  function explosion(
-    team: TeamSymbol,
-    x: number,
-    y: number,
-    radius: number,
-    damage: number,
-    air: boolean,
-    ground: boolean,
-    pierce: boolean
-  ): void;
+  function explosion(options: {
+    team: TeamSymbol;
+    x: number;
+    y: number;
+    radius: number;
+    damage: number;
+    air: boolean;
+    ground: boolean;
+    pierce: boolean;
+  }): void;
 
   /** Sets the speed of this world processor in instructions per tick. */
   function setRate(ipt: number): void;
