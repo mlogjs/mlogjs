@@ -7,10 +7,10 @@ import { CompilerError } from "../CompilerError";
 import { IScope, IValue, TValueInstructions } from "../types";
 import { MacroFunction } from "./Function";
 
-interface IOverloadNamespaceOptions {
+interface IOverloadNamespaceOptions<K extends string> {
   scope: IScope;
   overloads: Record<
-    string,
+    K,
     {
       /**
        * Pass the name of the options argument to tell if this overload uses
@@ -22,17 +22,17 @@ interface IOverloadNamespaceOptions {
   >;
 
   handler(
-    overload: string,
+    overload: K,
     ...args: (IValue | string)[]
   ): TValueInstructions<IValue | null>;
 }
 
 /** Used to create namespaces that contain multiple methods that map into instructions */
-export function createOverloadNamespace({
+export function createOverloadNamespace<K extends string>({
   scope,
   overloads,
   handler,
-}: IOverloadNamespaceOptions) {
+}: IOverloadNamespaceOptions<K>) {
   const result: Record<string, MacroFunction<IValue | null>> = {};
 
   for (const key in overloads) {
