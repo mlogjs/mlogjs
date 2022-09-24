@@ -24,146 +24,157 @@ declare global {
    */
   function print(...items: unknown[]): void;
 
-  /**
-   * Fills the screen with a color.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(mode: "clear", r: number, g: number, b: number): void;
+  /** Contains the multiple variants of the `draw` instruction */
+  namespace draw {
+    /**
+     * Fills the screen with a color.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function clear(r: number, g: number, b: number): void;
+    /**
+     * Sets the color for the next drawing operations.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function color(r: number, g: number, b: number, a?: number): void;
 
-  /**
-   * Sets the color for the next drawing operations.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "color",
-    r: number,
-    g: number,
-    b: number,
-    a?: number
-  ): void;
+    /**
+     * Sets the width of the next lines to be drawn.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function stroke(width: number): void;
 
-  /**
-   * Sets the width of the next lines to be drawn.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(mode: "stroke", width: number): void;
+    /**
+     * Draws a line between two points.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function line(options: {
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+    }): void;
 
-  /**
-   * Draws a line between two points.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "line",
-    x1: number,
-    y1: number,
-    x2: number,
-    y2: number
-  ): void;
+    /**
+     * Draws a filled rectangle.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function rect(options: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }): void;
 
-  /**
-   * Draws a filled rectangle.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "rect",
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): void;
+    /**
+     * Draws a rectangle outline.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function lineRect(options: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }): void;
 
-  /**
-   * Draws a rectangle outline.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "lineRect",
-    x: number,
-    y: number,
-    width: number,
-    height: number
-  ): void;
+    /**
+     * Draws a filled, regular polygon.
+     * @param options.sides The number of sides the polygon should have
+     * @param options.radius The smallest distance between a line and the center of the polygon
+     * @param options.rotation The rotation of the polygon in degrees
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function poly(options: {
+      x: number;
+      y: number;
+      /** The number of sides the polygon should have */
+      sides: number;
+      /** The smallest distance between a line and the center of the polygon */
+      radius: number;
+      /** The rotation of the polygon in degrees */
+      rotation: number;
+    }): void;
 
-  /**
-   * Draws a filled, regular polygon.
-   * @param sides The number of sides the polygon should have
-   * @param radius The smallest distance between a line and the center of the polygon
-   * @param rotation The rotation of the polygon in degrees
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "poly",
-    x: number,
-    y: number,
-    sides: number,
-    radius: number,
-    rotation: number
-  ): void;
+    /**
+     * Draws the outline of a regular polygon.
+     * @param options.sides The number of sides the polygon should have
+     * @param options.radius The smallest distance between a line and the center of the polygon
+     * @param options.rotation The rotation of the polygon in degrees
+     *
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function linePoly(options: {
+      x: number;
+      y: number;
+      /** The number of sides the polygon should have */
+      sides: number;
+      /** The smallest distance between a line and the center of the polygon */
+      radius: number;
+      /** The rotation of the polygon in degrees */
+      rotation: number;
+    }): void;
 
-  /**
-   * Draws the outline of a regular polygon.
-   * @param sides The number of sides the polygon should have
-   * @param radius The smallest distance between a line and the center of the polygon
-   * @param rotation The rotation of the polygon in degrees
-   *
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "linePoly",
-    x: number,
-    y: number,
-    sides: number,
-    radius: number,
-    rotation: number
-  ): void;
+    /**
+     * Draws a filled triangle.
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function triangle(options: {
+      x: number;
+      y: number;
+      x2: number;
+      y2: number;
+      x3: number;
+      y3: number;
+    }): void;
 
-  /**
-   * Draws a filled triangle.
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   */
-  function draw(
-    mode: "triangle",
-    x: number,
-    y: number,
-    x2: number,
-    y2: number,
-    x3: number,
-    y3: number
-  ): void;
-
-  /**
-   * Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
-   *
-   * Warning: nothing is drawn until `drawFlush` is called.
-   * @param image The symbol for the image to be drawn.
-   * @param rotation The rotation of the image in degrees.
-   *
-   * Example:
-   * ```js
-   * // draw a router
-   * draw("image", 30, 30, Blocks.router, 15, 0);
-   *
-   * // draw the unit bound to the processor
-   * draw("image", 60, 60, Vars.unit.type, 15, 0);
-   * ```
-   */
-  function draw(
-    mode: "image",
-    x: number,
-    y: number,
-    image: symbol,
-    size: number,
-    rotation: number
-  ): void;
+    /**
+     * Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     * @param options.image The symbol for the image to be drawn.
+     * @param options.rotation The rotation of the image in degrees.
+     *
+     * Example:
+     * ```js
+     * // draw a router
+     * draw({
+     *  mode: "image",
+     *  x: 30,
+     *  y: 30,
+     *  image: Blocks.router,
+     *  size: 15,
+     *  rotation: 0
+     * });
+     *
+     * // draw the unit bound to the processor
+     * draw({
+     *  mode: "image",
+     *  x: 60,
+     *  y: 60,
+     *  image: Vars.unit.type,
+     *  size: 15,
+     *  rotation: 0
+     * });
+     * ```
+     */
+    function image(options: {
+      x: number;
+      y: number;
+      /** The symbol for the image to be drawn. */
+      image: symbol;
+      size: number;
+      /** The rotation of the image in degrees. */
+      rotation: number;
+    }): void;
+  }
 
   /**
    * Writes the contents of the print buffer into the target message
