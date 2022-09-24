@@ -199,60 +199,57 @@ declare global {
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
-  /**
-   * Sets whether the building is enabled or disabled.
-   */
-  function control(
-    kind: "enabled",
-    building: BasicBuilding,
-    value: boolean
-  ): void;
+  /** Contains the multiple variants of the `control` instruction */
+  namespace control {
+    /**
+     * Sets whether the building is enabled or disabled.
+     */
+    function enabled(building: BasicBuilding, value: boolean): void;
 
-  /**
-   * Makes the building shoot or aim at the given position
-   * @param building The shooting building
-   * @param shoot `true` to shoot, `false` to just aim at the position
-   */
-  function control(
-    kind: "shoot",
-    building: BasicBuilding & Shooting,
-    x: number,
-    y: number,
-    shoot: boolean
-  ): void;
+    /**
+     * Makes the building shoot or aim at the given position
+     * @param options.building The shooting building
+     * @param options.shoot `true` to shoot, `false` to just aim at the position
+     */
+    function shoot(options: {
+      /** The shooting building */
+      building: BasicBuilding & Shooting;
+      x: number;
+      y: number;
+      /** `true` to shoot, `false` to just aim at the position */
+      shoot: boolean;
+    }): void;
 
-  /**
-   * Shoot at an unit with velocity prediction
-   * @param building The shooting building
-   * @param unit The target unit
-   * @param shoot `true` to shoot, `false` to just aim
-   */
-  function control(
-    kind: "shootp",
-    building: BasicBuilding & Shooting,
-    unit: BasicUnit,
-    shoot: boolean
-  ): void;
+    /**
+     * Shoot at an unit with velocity prediction
+     * @param options.building The shooting building
+     * @param options.unit The target unit
+     * @param options.shoot `true` to shoot, `false` to just aim
+     */
+    function shootp(options: {
+      /** The shooting building */
+      building: BasicBuilding & Shooting;
+      /** The target unit */
+      unit: BasicUnit;
+      /** `true` to shoot, `false` to just aim */
+      shoot: boolean;
+    }): void;
 
-  /**
-   * Sets the config of a block (like the item of a sorter)
-   */
-  function control(
-    kind: "config",
-    building: BasicBuilding,
-    value: symbol
-  ): void;
+    /**
+     * Sets the config of a block (like the item of a sorter)
+     */
+    function config(building: BasicBuilding, value: symbol): void;
 
-  /**
-   * Sets the color of an illuminator
-   */
-  function control(
-    kind: "color",
-    building: BasicBuilding,
-    r: number,
-    g: number,
-    b: number
-  ): void;
+    /**
+     * Sets the color of an illuminator
+     */
+    function color(
+      building: BasicBuilding,
+      r: number,
+      g: number,
+      b: number
+    ): void;
+  }
 
   /**
    * Detects an unit nearby this `building`.

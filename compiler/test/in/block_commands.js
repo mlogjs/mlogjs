@@ -15,32 +15,20 @@ drawFlush();
 
 const block = getLink(1);
 
-control({
-  mode: "color",
-  building: illuminator,
-  r: 10,
-  g: 50,
-  b: 9,
-});
-control({
-  mode: "enabled",
-  building: block,
-  value: false,
-});
-control({
-  mode: "config",
-  building: sorter,
-  value: Items.plastanium,
-});
-control({
-  mode: "shoot",
+control.color(illuminator, 10, 50, 9);
+
+control.enabled(block, false);
+
+control.config(sorter, Items.plastanium);
+
+control.shoot({
   building: cyclone,
   x: 20,
   y: 40,
   shoot: true,
 });
-control({
-  mode: "shootp",
+
+control.shootp({
   building: cyclone,
   unit: Vars.unit,
   shoot: true,
