@@ -1,42 +1,31 @@
 import { InstructionBase } from "../../instructions";
-import { MacroFunction } from "..";
 import { IScope } from "../../types";
-import { assertIsObjectMacro, assertObjectFields } from "../../assertions";
 import { ObjectValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
 export class Control extends ObjectValue {
   constructor(scope: IScope) {
-    const genericHandler = new MacroFunction(scope, (...args) => [
-      null,
-      [new InstructionBase("control", ...args)],
-    ]);
-
-    super(scope, {
-      enabled: genericHandler,
-      config: genericHandler,
-      color: genericHandler,
-      shoot: new MacroFunction(scope, options => {
-        assertIsObjectMacro(options, "The shoot options");
-
-        const params = assertObjectFields(options, [
-          "building",
-          "x",
-          "y",
-          "shoot",
-        ]);
-        return [null, [new InstructionBase("control", ...params)]];
-      }),
-
-      shootp: new MacroFunction(scope, options => {
-        assertIsObjectMacro(options, "The shootp options");
-
-        const params = assertObjectFields(options, [
-          "building",
-          "unit",
-          "shoot",
-        ]);
-        return [null, [new InstructionBase("control", ...params)]];
-      }),
-    });
+    super(
+      scope,
+      createOverloadNamespace({
+        scope,
+        overloads: {
+          enabled: { args: ["building", "value"] },
+          shoot: {
+            named: "options",
+            args: ["building", "x", "y", "shoot"],
+          },
+          shootp: {
+            named: "options",
+            args: ["building", "unit", "shoot"],
+          },
+          config: { args: ["building", "value"] },
+          color: { args: ["r", "g", "b"] },
+        },
+        handler(overload, ...args) {
+          return [null, [new InstructionBase("control", overload, ...args)]];
+        },
+      })
+    );
   }
 }
