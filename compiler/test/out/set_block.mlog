@@ -1,9 +1,9 @@
-radar player any any distance foreshadow1 1 &t5
-sensor x:3:6 &t5 @x
-sensor y:3:9 &t5 @y
-sensor shooting:3:12 &t5 @shooting
-op equal &t6 shooting:3:12 0
-jump 7 equal &t6 0
+radar player any any distance foreshadow1 1 &t2
+sensor x:3:6 &t2 @x
+sensor y:3:9 &t2 @y
+sensor shooting:3:12 &t2 @shooting
+op equal &t3 shooting:3:12 0
+jump 7 equal &t3 0
 end
 setblock block @boulder x:3:6 y:3:9 @sharded 0
 end

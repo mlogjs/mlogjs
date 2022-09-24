@@ -37,12 +37,17 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
     const [member, memberInst] = c.handleEval(scope, value);
-    const owner = new ValueOwner({
-      scope,
-      constant: true,
-      value: member,
-    });
-    data[index] = owner.value;
+
+    // TODO: use an approach that can be defined by each type
+    if (!member.owner && !(member instanceof LiteralValue)) {
+      new ValueOwner({
+        scope,
+        constant: true,
+        value: member,
+      });
+    }
+
+    data[index] = member;
     inst.push(...memberInst);
   }
   return [new ObjectValue(scope, data), inst];

@@ -16,11 +16,11 @@ set x:3:6 30
 set y:3:9 40
 set health:3:12 500
 write 50 cell1 0
-read &t9 cell1 0
+read &t3 cell1 0
 print x:3:6
 print y:3:9
 print health:3:12
-print &t9
+print &t3
 ulocate building core 1 @copper &_ &_ &_ &t0:computed:31:6
 sensor x:3:6 &t0:computed:31:6 @x
 sensor y:3:9 &t0:computed:31:6 @y
