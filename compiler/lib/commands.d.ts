@@ -253,29 +253,35 @@ declare global {
 
   /**
    * Detects an unit nearby this `building`.
-   * @param building The building used to detect potential targets
-   * @param filter1 First filter for selecting a target. Setting it to "any" ignores it
-   * @param filter2 Second filter for selecting a target. Setting it to "any" ignores it
-   * @param filter3 Third filter for selecting a target. Setting it to "any" ignores it
-   * @param order The n th unit that fits these requirements based on the sorting method
+   * @param options.building The building used to detect potential targets
+   * @param options.filters The filters for selecting a target. Use "any" for any target.
+   * @param options.order The n th unit that fits these requirements based on the sorting method
    *  (1 => first unit, 2 => second unit and so on)
-   * @param sort The method on which the results should be sorted
+   * @param options.sort The method on which the results should be sorted
    *
    * Example:
    * ```js
    *  const turret = getBuilding("cyclone1")
    *  // returns the second nearest enemy unit
-   *  const result = radar(turret, "enemy", "any", "any", 2, "distance")
+   *  const result = radar({
+   *    building: turret,
+   *    filters: ["enemy", "any", "any"],
+   *    order: 2,
+   *    sort: "distance"
+   *  });
    * ```
    */
-  function radar<T extends BasicUnit = AnyUnit>(
-    building: BasicBuilding,
-    filter1: TRadarFilter,
-    filter2: TRadarFilter,
-    filter3: TRadarFilter,
-    order: number,
-    sort: TRadarSort
-  ): T;
+  function radar<T extends BasicUnit = AnyUnit>(options: {
+    /** The building used to detect potential targets */
+    building: BasicBuilding;
+    /** The filters for selecting a target. Use "any" for any target. */
+    filters: [TRadarFilter, TRadarFilter, TRadarFilter];
+    /** The n th unit that fits these requirements based on the sorting method
+     *  (1 => first unit, 2 => second unit and so on) */
+    order: number;
+    /** The method on which the results should be sorted */
+    sort: TRadarSort;
+  }): T;
 
   /**
    * Alternate way to access special properties on objects.

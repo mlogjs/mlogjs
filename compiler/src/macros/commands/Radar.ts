@@ -3,7 +3,11 @@ import { MacroFunction } from "..";
 import { IScope } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { assertLiteralOneOf } from "../../assertions";
+import {
+  assertIsArrayMacro,
+  assertIsObjectMacro,
+  assertLiteralOneOf,
+} from "../../assertions";
 
 export const validRadarFilters = [
   "any",
@@ -26,9 +30,25 @@ export const validRadarSorts = [
 
 export class Radar extends MacroFunction {
   constructor(scope: IScope) {
-    super(scope, (building, filter1, filter2, filter3, order, sort) => {
+    super(scope, options => {
+      assertIsObjectMacro(options, "The radar options");
+
+      const { building, filters, order, sort } = options.data;
       if (!(building instanceof SenseableValue))
         throw new CompilerError("The building must a senseable value");
+
+      assertIsArrayMacro(filters, "filters");
+
+      const { length } = filters.data;
+
+      if (!(length instanceof LiteralValue) || typeof length.data !== "number")
+        throw new CompilerError("The length of an array macro must be");
+
+      if (length.data !== 3)
+        throw new CompilerError("The filters array must have 3 items");
+
+      // data is not an array
+      const { 0: filter1, 1: filter2, 2: filter3 } = filters.data;
 
       assertLiteralOneOf(filter1, validRadarFilters, "The first filter");
       assertLiteralOneOf(filter2, validRadarFilters, "The second filter");
