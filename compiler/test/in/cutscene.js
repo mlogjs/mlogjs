@@ -2,7 +2,11 @@ const switchBlock = getBuilding("switch1");
 
 if (!switchBlock.enabled) endScript();
 
-control("enabled", switchBlock, false);
+control({
+  mode: "enabled",
+  building: switchBlock,
+  value: false,
+});
 
 cutscene("pan", 10, 10, 0.02);
 wait(0.5);

@@ -11,13 +11,11 @@ let item = Items.copper;
 print("amount of ", item, " : ", Vars.unit[item]);
 printFlush(getBuilding("message1"));
 
-const unitA = radar(
-  getBuilding("cyclone1"),
-  "enemy",
-  "any",
-  "any",
-  1,
-  "distance"
-);
+const unitA = radar({
+  building: getBuilding("cyclone1"),
+  filters: ["enemy", "any", "any"],
+  order: 1,
+  sort: "distance",
+});
 const unitB = unitRadar("enemy", "flying", "any", 1, "distance");
 print(unitA.health, unitB.health);
