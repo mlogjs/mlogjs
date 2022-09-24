@@ -557,40 +557,43 @@ declare global {
     sort: TRadarSort;
   }): T;
 
-  /**
-   * Uses the unit bound to this processor to find an ore vein anywhere on the map
-   * @param ore The kind of item the ore should contain
-   */
-  function unitLocate(
-    find: "ore",
-    ore: ItemSymbol
-  ): [found: false] | [found: true, x: number, y: number];
-  /**
-   * Uses the unit bound to this processor to find a building anywhere on the map
-   * @param group The group that the building belongs to
-   * @param enemy Whether it should be an enemy building or an ally one
-   */
-  function unitLocate<T extends BasicBuilding = AnyBuilding>(
-    find: "building",
-    group: TUnitLocateBuildingGroup,
-    enemy: boolean
-  ): [found: false] | [found: true, x: number, y: number, building: T];
-  /**
-   * Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
-   *
-   * May return a building (a core) or a position
-   * @param find
-   */
-  function unitLocate<T extends BasicBuilding = AnyBuilding>(
-    find: "spawn"
-  ): [found: false] | [found: true, x: number, y: number, building: T];
-  /**
-   * Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
-   * @param find
-   */
-  function unitLocate<T extends BasicBuilding = AnyBuilding>(
-    find: "damaged"
-  ): [found: false] | [found: true, x: number, y: number, building: T];
+  namespace unitLocate {
+    /**
+     * Uses the unit bound to this processor to find an ore vein anywhere on the map
+     * @param ore The kind of item the ore should contain
+     */
+    function ore(
+      ore: ItemSymbol
+    ): [found: false] | [found: true, x: number, y: number];
+
+    /**
+     * Uses the unit bound to this processor to find a building anywhere on the map
+     * @param options.group The group that the building belongs to
+     * @param options.enemy Whether it should be an enemy building or an ally one
+     */
+    function building<T extends BasicBuilding = AnyBuilding>(options: {
+      /** The group that the building belongs to */
+      group: TUnitLocateBuildingGroup;
+      /** Whether it should be an enemy building or an ally one */
+      enemy: boolean;
+    }): [found: false] | [found: true, x: number, y: number, building: T];
+
+    /**
+     * Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
+     *
+     * May return a building (a core) or a position
+     */
+    function spawn<T extends BasicBuilding = AnyBuilding>():
+      | [found: false]
+      | [found: true, x: number, y: number, building: T];
+
+    /**
+     * Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
+     */
+    function damaged<T extends BasicBuilding = AnyBuilding>():
+      | [found: false]
+      | [found: true, x: number, y: number, building: T];
+  }
 
   /**Jumps to the top of the instruction stack*/
   function endScript(): never;
