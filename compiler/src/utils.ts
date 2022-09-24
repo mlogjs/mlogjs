@@ -55,7 +55,8 @@ export const itemNames = [
 /**
  * A more type safe version of `Object.assign`
  */
-export function assign<T extends Record<string, unknown>>(
+// eslint-disable-next-line @typescript-eslint/ban-types
+export function assign<T extends {}>(
   obj: T,
   props: {
     // eslint-disable-next-line @typescript-eslint/ban-types
