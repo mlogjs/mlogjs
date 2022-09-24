@@ -9,6 +9,6 @@ wait(0.5);
 cutscene("zoom", 4);
 
 print("Camera controls!");
-flushMessage("announce", 4);
+flushMessage.announce(4);
 wait(5);
 cutscene("stop");

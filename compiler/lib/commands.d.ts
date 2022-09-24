@@ -778,15 +778,31 @@ declare global {
    *
    * ```js
    * print("Hello");
-   * flushMessage("announce", 4); // lasts 4 seconds
+   * flushMessage.announce(4); // lasts 4 seconds
    * wait(5);
    * print("World");
-   * flushMessage("toast", 4);
+   * flushMessage.toast(4);
    * wait(5);
    * ```
    */
-  function flushMessage(kind: "notify" | "mission"): void;
-  function flushMessage(kind: "announce" | "toast", duration: number): void;
+  namespace flushMessage {
+    /** Shows a nofication at the top of the screen */
+    function notify(): void;
+    /** Puts the content on the top left corner of the screen */
+    function mission(): void;
+    /**
+     * Puts the content on the middle of the screen
+     *
+     * @param duration The duration, in seconds
+     */
+    function announce(duration: number): void;
+    /**
+     * Puts the content on the middle top of the screen
+     *
+     * @param duration The duration, in seconds
+     */
+    function toast(duration: number): void;
+  }
 
   /** Moves the player's camera to the given location. */
   function cutscene(mode: "pan", x: number, y: number, speed: number): void;

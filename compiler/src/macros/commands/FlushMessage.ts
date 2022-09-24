@@ -1,25 +1,22 @@
-import { assertLiteralOneOf } from "../../assertions";
-import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { MacroFunction } from "../Function";
+import { ObjectValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
-const validKinds = ["notify", "mission", "announce", "toast"] as const;
-
-export class FlushMessage extends MacroFunction<null> {
+export class FlushMessage extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 1 && args.length !== 2) {
-        throw new CompilerError(
-          `Expected 1-2 arguments, received ${args.length}`
-        );
-      }
-
-      const [kind, duration] = args;
-
-      assertLiteralOneOf(kind, validKinds, "The flush message kind");
-
-      return [null, [new InstructionBase("message", kind.data, duration)]];
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        notify: { args: [] },
+        mission: { args: [] },
+        announce: { args: ["duration"] },
+        toast: { args: ["duration"] },
+      },
+      handler(overload, duration) {
+        return [null, [new InstructionBase("message", overload, duration)]];
+      },
     });
+    super(scope, data);
   }
 }

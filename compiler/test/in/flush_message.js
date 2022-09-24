@@ -8,5 +8,5 @@ const player = radar({
 });
 
 print`You is a ${player}`;
-flushMessage("announce", 3);
+flushMessage.announce(3);
 wait(10);
