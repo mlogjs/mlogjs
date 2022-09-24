@@ -1,37 +1,37 @@
-import { assertLiteralOneOf } from "../../assertions";
-import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { MacroFunction } from "../Function";
+import { ObjectValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
-const validKinds = ["ore", "floor", "block"] as const;
-
-export class SetBlock extends MacroFunction<null> {
+export class SetBlock extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 4 && args.length !== 6) {
-        throw new CompilerError(
-          `Expected 4 or 6 arguments, received ${args.length}`
-        );
-      }
-      const [kind, x, y, to, team, rotation] = args;
-
-      assertLiteralOneOf(kind, validKinds, "The setBlock kind");
-
-      return [
-        null,
-        [
-          new InstructionBase(
-            "setblock",
-            kind.data,
-            to,
-            x,
-            y,
-            team ?? "@delerict",
-            rotation ?? "0"
-          ),
-        ],
-      ];
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        floor: { args: ["x", "y", "to"] },
+        ore: { args: ["x", "y", "to"] },
+        block: {
+          named: "options",
+          args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
+        },
+      },
+      handler(overload, x, y, to, team, rotation) {
+        return [
+          null,
+          [
+            new InstructionBase(
+              "setblock",
+              overload,
+              to,
+              x,
+              y,
+              team ?? "@delerict",
+              rotation ?? "0"
+            ),
+          ],
+        ];
+      },
     });
+    super(scope, data);
   }
 }

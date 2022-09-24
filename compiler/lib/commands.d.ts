@@ -628,13 +628,13 @@ declare global {
     function ore(x: number, y: number, to: OreSymbol | typeof Blocks.air): void;
 
     /** Sets the block at a given location, it can be a regular building or an environment block. */
-    function block(
-      x: number,
-      y: number,
-      to: EnvBlockSymbol | BuildingSymbol,
-      team: TeamSymbol,
-      rotation: number
-    ): void;
+    function block(options: {
+      x: number;
+      y: number;
+      to: EnvBlockSymbol | BuildingSymbol;
+      team: TeamSymbol;
+      rotation: number;
+    }): void;
   }
 
   /** Spawns an unit at the given location */
@@ -669,11 +669,13 @@ declare global {
 
   /**
    * Spawns an enemy wave, can be used even if there is an already active wave.
+   *
+   * World processor ONLY.
    */
   function spawnWave(natural: true): void;
   function spawnWave(natural: false, x: number, y: number): void;
 
-  /** Contains the multiple variants of the `set rule` instruction */
+  /** Contains the multiple variants of the `set rule` instruction. World processor ONLY. */
   namespace setRule {
     /** Sets the wave countdown in seconds. */
     function currentWaveTime(seconds: number): void;
@@ -774,7 +776,7 @@ declare global {
 
   /**
    * Writes the contents of the print buffer in the selected mode
-   * and clears the buffer afterwards.
+   * and clears the buffer afterwards. World processor ONLY.
    *
    * ```js
    * print("Hello");
@@ -828,6 +830,7 @@ declare global {
   /** Sets the speed of this world processor in instructions per tick. */
   function setRate(ipt: number): void;
 
+  /** Contains the variants of the `fetch` instruction. World processor ONLY. */
   namespace fetch {
     /**
      * Gets an unit from the given team
@@ -952,9 +955,9 @@ declare global {
     function buildCount(team: TeamSymbol, block: BuildingSymbol): number;
   }
 
-  /** Checks if a global flag is set */
+  /** Checks if a global flag is set. World processor ONLY. */
   function getFlag(flag: string): boolean;
 
-  /** Sets a global flag */
+  /** Sets a global flag. World processor ONLY. */
   function setFlag(flag: string, value: boolean): void;
 }

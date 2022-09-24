@@ -9,4 +9,4 @@ let { x, y, shooting } = radar({
 
 if (!shooting) endScript();
 
-setBlock("block", x, y, Blocks.boulder, Teams.sharded, 0);
+setBlock.block({ x, y, to: Blocks.boulder, team: Teams.sharded, rotation: 0 });
