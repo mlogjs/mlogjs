@@ -7,5 +7,5 @@ const unit = radar({
   sort: "distance",
 });
 
-applyStatus("apply", "melting", unit, 20);
-applyStatus("apply", "tarred", unit, 20);
+applyStatus.apply("melting", unit, 20);
+applyStatus.apply("tarred", unit, 20);

@@ -601,47 +601,41 @@ declare global {
   /** Halts the execution of this processor */
   function stopScript(): never;
 
-  /** Gets the floor type on the given location */
-  function getBlock(kind: "floor", x: number, y: number): EnvBlockSymbol;
-  /** Gets the ore type on the given location. `Blocks.air` if there is no ore */
-  function getBlock(
-    kind: "ore",
-    x: number,
-    y: number
-  ): OreSymbol | typeof Blocks.air;
-  /** Gets the block type on the give location. `Blocks.air` if there is no block. */
-  function getBlock(kind: "block", x: number, y: number): BlockSymbol;
-  /** Gets the building on the given location. `null` if there is no building. */
-  function getBlock<T extends BasicBuilding = AnyBuilding>(
-    type: "building",
-    x: number,
-    y: number
-  ): T | null;
+  /** Gets block data from the map. Available ONLY for world processors. */
+  namespace getBlock {
+    /** Gets the floor type on the given location */
+    function floor(x: number, y: number): EnvBlockSymbol;
 
-  // TODO: maybe have a separate floor symbol type?
-  /** Sets the floor of the tile at the given location. */
-  function setBlock(
-    kind: "floor",
-    x: number,
-    y: number,
-    to: EnvBlockSymbol
-  ): void;
-  /** Sets the ore at the given location. Use `Blocks.air` to remove any ore. */
-  function setBlock(
-    kind: "ore",
-    x: number,
-    y: number,
-    to: OreSymbol | typeof Blocks.air
-  ): void;
-  /** Sets the block at a given location, it can be a regular building or an environment block. */
-  function setBlock(
-    kind: "block",
-    x: number,
-    y: number,
-    to: EnvBlockSymbol | BuildingSymbol,
-    team: TeamSymbol,
-    rotation: number
-  ): void;
+    /** Gets the ore type on the given location. `Blocks.air` if there is no ore */
+    function ore(x: number, y: number): OreSymbol | typeof Blocks.air;
+
+    /** Gets the block type on the give location. `Blocks.air` if there is no block. */
+    function block(x: number, y: number): BlockSymbol;
+
+    /** Gets the building on the given location. `null` if there is no building. */
+    function building<T extends BasicBuilding = AnyBuilding>(
+      x: number,
+      y: number
+    ): T | null;
+  }
+
+  namespace setBlock {
+    // TODO: maybe have a separate floor symbol type?
+    /** Sets the floor of the tile at the given location. */
+    function floor(x: number, y: number, to: EnvBlockSymbol): void;
+
+    /** Sets the ore at the given location. Use `Blocks.air` to remove any ore. */
+    function ore(x: number, y: number, to: OreSymbol | typeof Blocks.air): void;
+
+    /** Sets the block at a given location, it can be a regular building or an environment block. */
+    function block(
+      x: number,
+      y: number,
+      to: EnvBlockSymbol | BuildingSymbol,
+      team: TeamSymbol,
+      rotation: number
+    ): void;
+  }
 
   /** Spawns an unit at the given location */
   function spawnUnit<T extends BasicUnit = AnyUnit>(
@@ -652,27 +646,26 @@ declare global {
     rotation?: number
   ): T;
 
-  /**
-   * Applies or removes a status effect to the given unit.
-   *
-   * The only status effects that don't require a duration are `overdrive` and `boss`.
-   */
-  function applyStatus(
-    kind: "apply",
-    status: Exclude<TUnitEffect, "overdrive" | "boss">,
-    unit: BasicUnit,
-    duration: number
-  ): void;
-  function applyStatus(
-    kind: "apply",
-    status: "overdrive" | "boss",
-    unit: BasicUnit
-  ): void;
-  function applyStatus(
-    kind: "clear",
-    status: TUnitEffect,
-    unit: BasicUnit
-  ): void;
+  /** Contains the variants for the `applyStatus` instruction. World processor ONLY. */
+  namespace applyStatus {
+    /**
+     * Applies a status effect to the given unit.
+     *
+     * The only status effects that don't require a duration are `overdrive` and `boss`.
+     */
+    function apply(
+      status: Exclude<TUnitEffect, "overdrive" | "boss">,
+      unit: BasicUnit,
+      duration: number
+    ): void;
+
+    function apply(status: "overdrive" | "boss", unit: BasicUnit): void;
+
+    /**
+     * Removes a status effect to the given unit.
+     */
+    function clear(status: TUnitEffect, unit: BasicUnit): void;
+  }
 
   /**
    * Spawns an enemy wave, can be used even if there is an already active wave.
