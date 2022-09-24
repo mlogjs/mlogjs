@@ -17,5 +17,9 @@ const unitA = radar({
   order: 1,
   sort: "distance",
 });
-const unitB = unitRadar("enemy", "flying", "any", 1, "distance");
+const unitB = unitRadar({
+  filters: ["enemy", "flying", "any"],
+  order: 1,
+  sort: "distance",
+});
 print(unitA.health, unitB.health);
