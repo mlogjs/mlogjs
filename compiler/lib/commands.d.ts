@@ -638,13 +638,13 @@ declare global {
   }
 
   /** Spawns an unit at the given location */
-  function spawnUnit<T extends BasicUnit = AnyUnit>(
-    type: UnitSymbol,
-    x: number,
-    y: number,
-    team: TeamSymbol,
-    rotation?: number
-  ): T;
+  function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
+    type: UnitSymbol;
+    x: number;
+    y: number;
+    team: TeamSymbol;
+    rotation?: number;
+  }): T;
 
   /** Contains the variants for the `applyStatus` instruction. World processor ONLY. */
   namespace applyStatus {

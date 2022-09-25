@@ -1,4 +1,4 @@
-import { CompilerError } from "../../CompilerError";
+import { assertIsObjectMacro, assertIsRuntimeValue } from "../../assertions";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
 import { SenseableValue } from "../../values";
@@ -6,13 +6,15 @@ import { MacroFunction } from "../Function";
 
 export class SpawnUnit extends MacroFunction {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 4 && args.length !== 5)
-        throw new CompilerError(
-          `Expected 4 or 5 arguments, received ${args.length}`
-        );
+    super(scope, options => {
+      assertIsObjectMacro(options, "The options");
 
-      const [type, x, y, team, rotation] = args;
+      const { type, x, y, team, rotation } = options.data;
+
+      assertIsRuntimeValue(type, "type");
+      assertIsRuntimeValue(x, "x");
+      assertIsRuntimeValue(y, "y");
+      assertIsRuntimeValue(team, "team");
 
       const output = new SenseableValue(scope);
 
