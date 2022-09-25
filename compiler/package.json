@@ -55,7 +55,7 @@
     "ts-jest": "^29.0.2",
     "ts-node": "^10.9.1",
     "tslib": "^2.3.1",
-    "typedoc": "^0.22.12",
+    "typedoc": "^0.23.15",
     "typescript": "*"
   },
   "files": [
