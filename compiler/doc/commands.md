@@ -4,6 +4,12 @@ Commands are built in function macros that expand into instructions during compi
 
 Here is a list of them, some have multiple overloads
 
+Overloaded commands have the following syntax:
+
+```js
+command.variant();
+```
+
 ## Input/output
 
 - `print` - Adds data to the print buffer
