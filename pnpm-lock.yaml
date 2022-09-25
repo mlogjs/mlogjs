@@ -9,7 +9,7 @@ importers:
       '@types/react-dom': ^18.0.6
       '@vitejs/plugin-react': ^1.3.2
       mlogjs: workspace:^
-      monaco-editor: ^0.32.1
+      monaco-editor: ^0.34.0
       react: ^18.2.0
       react-dom: ^18.2.0
       react-split-pane: ^0.1.92
@@ -18,11 +18,11 @@ importers:
     dependencies:
       mlogjs: link:../compiler
     devDependencies:
-      '@monaco-editor/react': 4.4.6_lwreu5y3zlxshlvuo3hvfxn3zq
+      '@monaco-editor/react': 4.4.6_7payg3yaajmz2lehtpasnhysrm
       '@types/react': 18.0.21
       '@types/react-dom': 18.0.6
       '@vitejs/plugin-react': 1.3.2
-      monaco-editor: 0.32.1
+      monaco-editor: 0.34.0
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
       react-split-pane: 0.1.92_biqbaboplfbrettd7655fr4n2y
@@ -354,24 +354,24 @@ packages:
       '@jridgewell/sourcemap-codec': 1.4.14
     dev: true
 
-  /@monaco-editor/loader/1.3.2_monaco-editor@0.32.1:
+  /@monaco-editor/loader/1.3.2_monaco-editor@0.34.0:
     resolution: {integrity: sha512-BTDbpHl3e47r3AAtpfVFTlAi7WXv4UQ/xZmz8atKl4q7epQV5e7+JbigFDViWF71VBi4IIBdcWP57Hj+OWuc9g==}
     peerDependencies:
       monaco-editor: '>= 0.21.0 < 1'
     dependencies:
-      monaco-editor: 0.32.1
+      monaco-editor: 0.34.0
       state-local: 1.0.7
     dev: true
 
-  /@monaco-editor/react/4.4.6_lwreu5y3zlxshlvuo3hvfxn3zq:
+  /@monaco-editor/react/4.4.6_7payg3yaajmz2lehtpasnhysrm:
     resolution: {integrity: sha512-Gr3uz3LYf33wlFE3eRnta4RxP5FSNxiIV9ENn2D2/rN8KgGAD8ecvcITRtsbbyuOuNkwbuHYxfeaz2Vr+CtyFA==}
     peerDependencies:
       monaco-editor: '>= 0.25.0 < 1'
       react: ^16.8.0 || ^17.0.0 || ^18.0.0
       react-dom: ^16.8.0 || ^17.0.0 || ^18.0.0
     dependencies:
-      '@monaco-editor/loader': 1.3.2_monaco-editor@0.32.1
-      monaco-editor: 0.32.1
+      '@monaco-editor/loader': 1.3.2_monaco-editor@0.34.0
+      monaco-editor: 0.34.0
       prop-types: 15.8.1
       react: 18.2.0
       react-dom: 18.2.0_react@18.2.0
@@ -777,8 +777,8 @@ packages:
       js-tokens: 4.0.0
     dev: true
 
-  /monaco-editor/0.32.1:
-    resolution: {integrity: sha512-LUt2wsUvQmEi2tfTOK+tjAPvt7eQ+K5C4rZPr6SeuyzjAuAHrIvlUloTcOiGjZW3fn3a/jFQCONrEJbNOaCqbA==}
+  /monaco-editor/0.34.0:
+    resolution: {integrity: sha512-VF+S5zG8wxfinLKLrWcl4WUizMx+LeJrG4PM/M78OhcwocpV0jiyhX/pG6Q9jIOhrb/ckYi6nHnaR5OojlOZCQ==}
     dev: true
 
   /ms/2.1.2:
