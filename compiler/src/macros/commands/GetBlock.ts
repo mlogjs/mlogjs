@@ -1,33 +1,30 @@
-import { assertLiteralOneOf } from "../../assertions";
-import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { SenseableValue, StoreValue } from "../../values";
-import { MacroFunction } from "../Function";
+import { ObjectValue, SenseableValue, StoreValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
-const validKinds = ["floor", "ore", "block", "building"] as const;
-
-export class GetBlock extends MacroFunction {
+export class GetBlock extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 3) {
-        throw new CompilerError(
-          `Expected 3 arguments, received ${args.length}`
-        );
-      }
-      const [kind, x, y] = args;
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        floor: { args: ["x", "y"] },
+        ore: { args: ["x", "y"] },
+        block: { args: ["x", "y"] },
+        building: { args: ["x", "y"] },
+      },
+      handler(overload, x, y) {
+        const output =
+          overload === "building"
+            ? new SenseableValue(scope)
+            : new StoreValue(scope);
 
-      assertLiteralOneOf(kind, validKinds, "The getBlock kind");
-
-      const output =
-        kind.data === "building"
-          ? new SenseableValue(scope)
-          : new StoreValue(scope);
-
-      return [
-        output,
-        [new InstructionBase("getblock", kind.data, output, x, y)],
-      ];
+        return [
+          output,
+          [new InstructionBase("getblock", overload, output, x, y)],
+        ];
+      },
     });
+    super(scope, data);
   }
 }
