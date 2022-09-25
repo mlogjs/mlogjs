@@ -6,8 +6,8 @@ op equal &t0 shooting:3:24 0
 jump 7 equal &t0 0
 end
 spawn @eclipse shootX:3:8 shootY:3:16 0 @malis unit:7:6
-sensor &t1 unit:7:6 @health
+sensor &t2 unit:7:6 @health
 print "available health: "
-print &t1
+print &t2
 printflush message1
 end
