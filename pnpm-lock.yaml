@@ -21,7 +21,7 @@ importers:
       '@rollup/plugin-typescript': ^8.5.0
       '@types/jest': ^29.0.3
       '@types/node': ^15.3.0
-      '@types/yargs': ^16.0.1
+      '@types/yargs': ^17.0.13
       '@typescript-eslint/eslint-plugin': ^5.38.0
       '@typescript-eslint/parser': ^5.38.0
       chalk: ^4.1.2
@@ -48,7 +48,7 @@ importers:
       '@rollup/plugin-typescript': 8.5.0_jm3lfwhp2n3nxb4wwf6zz565he
       '@types/jest': 29.0.3
       '@types/node': 15.14.9
-      '@types/yargs': 16.0.4
+      '@types/yargs': 17.0.13
       '@typescript-eslint/eslint-plugin': 5.38.0_4gkcvl6qsi23tqqawfqgcwtp54
       '@typescript-eslint/parser': 5.38.0_7ilbxdl5iguzcjriqqcg2m5cku
       eslint: 8.24.0
@@ -913,12 +913,6 @@ packages:
 
   /@types/yargs-parser/21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
-    dev: true
-
-  /@types/yargs/16.0.4:
-    resolution: {integrity: sha512-T8Yc9wt/5LbJyCaLiHPReJa0kApcIgJ7Bn735GjItUfh08Z1pJvu8QZqb9s+mMvKV6WUQRV7K2R46YbjMXTTJw==}
-    dependencies:
-      '@types/yargs-parser': 21.0.0
     dev: true
 
   /@types/yargs/17.0.13:
