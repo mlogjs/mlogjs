@@ -9,7 +9,7 @@ let vy = 0;
 const display = getBuilding("display1");
 const switch1 = getBuilding("switch1");
 
-draw("color", 255, 255, 255);
+draw.color(255, 255, 255);
 
 while (switch1.enabled) {
   x += vx;
@@ -20,7 +20,7 @@ while (switch1.enabled) {
   if (x < 0 || x + bsize > dsize) vx /= -1.1;
   if (y < 0 || y + bsize > dsize) vy /= -1.1;
 
-  draw("clear");
-  draw("rect", x, y, bsize, bsize);
+  draw.clear(0, 0, 0);
+  draw.rect({ x, y, width: bsize, height: bsize });
   drawFlush(display);
 }

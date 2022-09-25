@@ -1,27 +1,27 @@
-set 4:4 88
-set 5:4 88
-set 6:4 2
-set 7:4 0
+set x:4:4 88
+set y:5:4 88
+set vx:6:4 2
+set vy:7:4 0
 draw color 255 255 255
-sensor t0 switch1 @enabled
-jump 26 equal t0 0
-op add 4:4 4:4 6:4
-op add 5:4 5:4 7:4
-op add 7:4 7:4 -1
-op lessThan t4 4:4 0
-op add t5 4:4 5
-op greaterThan t6 t5 176
-op or t7 t4 t6
-jump 16 equal t7 0
-op div 6:4 6:4 -1.1
-op lessThan t9 5:4 0
-op add t10 5:4 5
-op greaterThan t11 t10 176
-op or t12 t9 t11
-jump 22 equal t12 0
-op div 7:4 7:4 -1.1
-draw clear
-draw rect 4:4 5:4 5 5
+sensor &t0 switch1 @enabled
+jump 26 equal &t0 0
+op add x:4:4 x:4:4 vx:6:4
+op add y:5:4 y:5:4 vy:7:4
+op add vy:7:4 vy:7:4 -1
+op lessThan &t1 x:4:4 0
+op add &t2 x:4:4 5
+op greaterThan &t3 &t2 176
+op or &t4 &t1 &t3
+jump 16 equal &t4 0
+op div vx:6:4 vx:6:4 -1.1
+op lessThan &t5 y:5:4 0
+op add &t6 y:5:4 5
+op greaterThan &t7 &t6 176
+op or &t8 &t5 &t7
+jump 22 equal &t8 0
+op div vy:7:4 vy:7:4 -1.1
+draw clear 0 0 0
+draw rect x:4:4 y:5:4 5 5
 drawflush display1
 jump 5 always
 end
