@@ -10,7 +10,7 @@ let vy = 2;
 
 const display1 = getBuilding("display1");
 
-draw("color", 255, 255, 255);
+draw.color(255, 255, 255);
 
 while (1) {
   if (x < 0 || x + ballSize > displaySize) vx *= -1;
@@ -19,7 +19,7 @@ while (1) {
   y += vy;
   vy += g;
 
-  draw("clear");
-  draw("rect", x, y, ballSize, ballSize);
+  draw.clear(0, 0, 0);
+  draw.rect({ x, y, width: ballSize, height: ballSize });
   drawFlush(display1);
 }
