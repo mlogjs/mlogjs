@@ -9,7 +9,6 @@ importers:
       '@rollup/plugin-alias': ^3.1.9
       '@rollup/plugin-replace': ^4.0.0
       '@rollup/plugin-typescript': ^8.3.1
-      '@types/estree': ^0.0.51
       '@types/jest': ^29.0.3
       '@types/node': ^15.3.0
       '@types/yargs': ^16.0.1
@@ -37,7 +36,6 @@ importers:
       '@rollup/plugin-alias': 3.1.9_rollup@2.74.0
       '@rollup/plugin-replace': 4.0.0_rollup@2.74.0
       '@rollup/plugin-typescript': 8.3.2_dwhto3eknlchw7qifl3asmnahy
-      '@types/estree': 0.0.51
       '@types/jest': 29.0.3
       '@types/node': 15.14.9
       '@types/yargs': 16.0.4
@@ -833,10 +831,6 @@ packages:
 
   /@types/estree/0.0.39:
     resolution: {integrity: sha512-EYNwp3bU+98cpU4lAWYYL7Zz+2gryWH1qbdDTidVd6hkiR6weksdbMadyXKXNPEkQFhXM+hVO9ZygomHXp+AIw==}
-    dev: true
-
-  /@types/estree/0.0.51:
-    resolution: {integrity: sha512-CuPgU6f3eT/XgKKPqKd/gLZV1Xmvf1a2R5POBOGQa6uv82xpls89HU5zKeVoyR8XzHd1RGNOlQlvUe3CFkjWNQ==}
     dev: true
 
   /@types/graceful-fs/4.1.5:
