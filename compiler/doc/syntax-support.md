@@ -281,9 +281,14 @@ const builds = {
   turret: getBuilding("cyclone1"),
 };
 
-const target = radar(builds.turret, "player", "enemy", "any", 1, "distance");
+const target = radar({
+  building: builds.turret,
+  filters: ["player", "enemy", "any"],
+  order: 1,
+  sort: "distance",
+});
 
-control("shootp", builds.turret, target, true);
+control.shootp(builds.turret, target, true);
 
 print("Shooting ", target);
 printFlush(builds.message);
@@ -322,7 +327,10 @@ Behavior:
 - Destructuring expressions CAN be nested.
 
 ```js
-const [found, x, y, { totalItems }] = unitLocate("building", "core", false);
+const [found, x, y, { totalItems }] = unitLocate.building({
+  group: "core",
+  enemy: false,
+});
 ```
 
 Limitations:
