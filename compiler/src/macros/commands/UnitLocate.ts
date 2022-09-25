@@ -1,5 +1,4 @@
 import { InstructionBase } from "../../instructions";
-import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import {
   LiteralValue,
@@ -7,9 +6,9 @@ import {
   SenseableValue,
   StoreValue,
 } from "../../values";
+import { assertLiteralOneOf } from "../../assertions";
+import { createOverloadNamespace } from "../util";
 import { CompilerError } from "../../CompilerError";
-
-const validFinds = ["ore", "building", "spawn", "damaged"];
 
 const validBuildingGroups = [
   "core",
@@ -21,70 +20,71 @@ const validBuildingGroups = [
   "rally",
   "battery",
   "reactor",
-];
+] as const;
 
-export class UnitLocate extends MacroFunction {
+export class UnitLocate extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (find, ...args) => {
-      if (!(find instanceof LiteralValue && typeof find.data === "string"))
-        throw new CompilerError("The unitLocate find must be a string literal");
-
-      if (!validFinds.includes(find.data))
-        throw new CompilerError("Invalid find value");
-
-      if (
-        args.some(
-          value =>
-            !(value instanceof StoreValue || value instanceof LiteralValue)
-        )
-      )
-        throw new CompilerError(
-          "The others arguments of unitLocate must be literals or stores"
-        );
-
-      const outFound = new StoreValue(scope);
-      const outX = new StoreValue(scope);
-      const outY = new StoreValue(scope);
-      const outBuilding = new SenseableValue(scope);
-      const outArgs = [outX, outY, outFound, outBuilding];
-      let inputArgs: (IValue | string)[] = [];
-      switch (find.data) {
-        case "ore": {
-          const [ore] = args;
-          inputArgs = [find.data, "core", "true", ore];
-          break;
-        }
-        case "building": {
-          const [group, enemy] = args;
-
-          if (
-            !(group instanceof LiteralValue && typeof group.data === "string")
-          ) {
-            throw new CompilerError(
-              "The building group must be a string literal"
-            );
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        ore: {
+          args: ["ore"],
+        },
+        building: { named: "options", args: ["group", "enemy"] },
+        spawn: {
+          args: [],
+        },
+        damaged: {
+          args: [],
+        },
+      },
+      handler(overload, ...args) {
+        const outFound = new StoreValue(scope);
+        const outX = new StoreValue(scope);
+        const outY = new StoreValue(scope);
+        const outBuilding = new SenseableValue(scope);
+        const outArgs = [outX, outY, outFound, outBuilding];
+        let inputArgs: (IValue | string)[] = [];
+        switch (overload) {
+          case "ore": {
+            const [ore] = args;
+            inputArgs = [overload, "core", "true", ore];
+            break;
           }
-          if (!validBuildingGroups.includes(group.data))
-            throw new CompilerError("Invalid building group");
+          case "building": {
+            const [group, enemy] = args;
 
-          inputArgs = [find.data, group.data, enemy, "@copper"];
-          break;
+            if (!(group instanceof LiteralValue))
+              throw new CompilerError(
+                "The building group must be a string literal"
+              );
+
+            assertLiteralOneOf(
+              group,
+              validBuildingGroups,
+              "The building group"
+            );
+
+            inputArgs = [overload, group.data, enemy, "@copper"];
+            break;
+          }
+          case "spawn":
+          case "damaged": {
+            inputArgs = [overload, "core", "true", "@copper"];
+            break;
+          }
         }
-        case "spawn":
-        case "damaged": {
-          inputArgs = [find.data, "core", "true", "@copper"];
-          break;
-        }
-      }
-      return [
-        ObjectValue.fromArray(scope, [
-          outFound,
-          outX,
-          outY,
-          ...(find.data !== "ore" ? [outBuilding] : []),
-        ]),
-        [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
-      ];
+        return [
+          ObjectValue.fromArray(scope, [
+            outFound,
+            outX,
+            outY,
+            ...(overload !== "ore" ? [outBuilding] : []),
+          ]),
+          [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
+        ];
+      },
     });
+    super(scope, data);
   }
 }

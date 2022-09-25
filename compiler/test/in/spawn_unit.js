@@ -4,7 +4,12 @@ const { shootX, shootY, shooting } = Vars.unit;
 
 if (!shooting) endScript();
 
-const unit = spawnUnit(Units.eclipse, shootX, shootY, Teams.malis);
+const unit = spawnUnit({
+  type: Units.eclipse,
+  x: shootX,
+  y: shootY,
+  team: Teams.malis,
+});
 
 print`available health: ${unit.health}`;
 printFlush();

@@ -1,43 +1,54 @@
-import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
-import { IScope, IValue } from "../../types";
-import { LiteralValue } from "../../values";
-import { MacroFunction } from "../Function";
+import { IScope } from "../../types";
+import { ObjectValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
-export class Draw extends MacroFunction<null> {
+export class Draw extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (kind: IValue, ...args: IValue[]) => {
-      if (!(kind instanceof LiteralValue && typeof kind.data === "string"))
-        throw new CompilerError("Draw kind must be a string literal.");
-      if (
-        [
-          "clear",
-          "color",
-          "stroke",
-          "line",
-          "rect",
-          "lineRect",
-          "poly",
-          "linePoly",
-          "triangle",
-          "image",
-        ].indexOf(kind.data) === -1
-      )
-        throw new CompilerError("Invalid draw kind");
-      return [
-        null,
-        [
-          new InstructionBase(
-            "draw",
-            kind.data,
-            ...args.map(v => {
-              if (v instanceof LiteralValue && typeof v.data === "string")
-                return v.data;
-              return v;
-            })
-          ),
-        ],
-      ];
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        clear: {
+          args: ["r", "g", "b"],
+        },
+        color: {
+          args: ["r", "g", "b", { key: "a", default: "" }],
+        },
+        stroke: {
+          args: ["width"],
+        },
+        line: {
+          named: "options",
+          args: ["x", "y", "x2", "y2"],
+        },
+        rect: {
+          named: "options",
+          args: ["x", "y", "width", "height"],
+        },
+        lineRect: { named: "options", args: ["x", "y", "width", "height"] },
+        linePoly: {
+          named: "options",
+          args: ["x", "y", "sides", "radius", "rotation"],
+        },
+        poly: {
+          named: "options",
+          args: ["x", "y", "sides", "radius", "rotation"],
+        },
+        triangle: {
+          named: "options",
+          args: ["x", "y", "x2", "y2", "x3", "y3"],
+        },
+        image: {
+          named: "options",
+          args: ["x", "y", "image", "size", "rotation"],
+        },
+      },
+
+      handler(overload, ...args) {
+        return [null, [new InstructionBase("draw", overload, ...args)]];
+      },
     });
+
+    super(scope, data);
   }
 }

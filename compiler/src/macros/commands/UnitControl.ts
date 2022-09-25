@@ -1,5 +1,4 @@
 import { InstructionBase } from "../../instructions";
-import { MacroFunction } from "..";
 import { IScope, IValue } from "../../types";
 import {
   LiteralValue,
@@ -7,73 +6,65 @@ import {
   SenseableValue,
   StoreValue,
 } from "../../values";
-import { CompilerError } from "../../CompilerError";
+import { createOverloadNamespace } from "../util";
 
-const validModes = [
-  "idle",
-  "stop",
-  "move",
-  "approach",
-  "boost",
-  "pathfind",
-  "target",
-  "targetp",
-  "itemDrop",
-  "itemTake",
-  "payDrop",
-  "payTake",
-  "payEnter",
-  "mine",
-  "flag",
-  "build",
-  "getBlock",
-  "within",
-];
-
-export class UnitControl extends MacroFunction<IValue | null> {
+export class UnitControl extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (mode, ...args) => {
-      if (!(mode instanceof LiteralValue) || typeof mode.data !== "string")
-        throw new CompilerError(
-          "The unitControl mode must be a string literal"
-        );
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        idle: { args: [] },
+        stop: { args: [] },
+        move: { args: ["x", "y"] },
+        approach: { named: "options", args: ["x", "y", "radius"] },
+        boost: { args: ["enable"] },
+        pathfind: { args: [] },
+        target: { named: "options", args: ["x", "y", "shoot"] },
+        targetp: { named: "options", args: ["unit", "shoot"] },
+        itemDrop: { args: ["target", "amount"] },
+        itemTake: { args: ["target", "item", "amount"] },
+        payDrop: { args: [] },
+        payTake: { named: "options", args: ["takeUnits"] },
+        payEnter: { args: [] },
+        mine: { args: ["x", "y"] },
+        flag: { args: ["value"] },
+        build: {
+          named: "options",
+          args: ["x", "y", "block", "rotation", { key: "config", default: "" }],
+        },
+        getBlock: {
+          args: ["x", "y"],
+        },
+        within: {
+          named: "options",
+          args: ["x", "y", "radius"],
+        },
+      },
+      handler(overload, ...args) {
+        let result: ObjectValue | StoreValue | null = null;
+        let extraArgs: IValue[] = [];
+        switch (overload) {
+          case "getBlock": {
+            const outType = new StoreValue(scope);
+            const outBuilding = new SenseableValue(scope);
 
-      if (!validModes.includes(mode.data))
-        throw new CompilerError("Invalid unitControl mode");
-
-      if (
-        args.some(
-          value =>
-            !(value instanceof StoreValue || value instanceof LiteralValue)
-        )
-      )
-        throw new CompilerError(
-          "The others arguments of unitControl must be literals or stores"
-        );
-
-      let result: ObjectValue | StoreValue | null = null;
-      let extraArgs: IValue[] = [];
-      switch (mode.data) {
-        case "getBlock": {
-          const outType = new StoreValue(scope);
-          const outBuilding = new SenseableValue(scope);
-
-          result = ObjectValue.fromArray(scope, [outType, outBuilding]);
-          extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
-          break;
+            result = ObjectValue.fromArray(scope, [outType, outBuilding]);
+            extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
+            break;
+          }
+          case "within": {
+            const temp = new StoreValue(scope);
+            result = temp;
+            extraArgs = [temp, new LiteralValue(scope, 0)];
+            break;
+          }
         }
-        case "within": {
-          const temp = new StoreValue(scope);
-          result = temp;
-          extraArgs = [temp, new LiteralValue(scope, 0)];
-          break;
-        }
-      }
-
-      return [
-        result,
-        [new InstructionBase("ucontrol", mode.data, ...args, ...extraArgs)],
-      ];
+        return [
+          result,
+          [new InstructionBase("ucontrol", overload, ...args, ...extraArgs)],
+        ];
+      },
     });
+    super(scope, data);
   }
 }

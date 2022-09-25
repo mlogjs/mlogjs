@@ -13,7 +13,7 @@ ucontrol getBlock 10 20 type:15:7 building:15:13 0
 print type:15:7
 print building:15:13
 ulocate building core 0 @copper coreX:19:16 coreY:19:23 coreFound:19:5 core:19:30
-ulocate ore core true @lead oreX:20:15 oreY:20:21 oreFound:20:5 &_
-ulocate damaged core true @copper dX:21:13 dY:21:17 dFound:21:5 dBuilding:21:21
-ulocate spawn core true @copper sX:22:13 sY:22:17 sFound:22:5 sBuilding:22:21
+ulocate ore core true @lead oreX:23:15 oreY:23:21 oreFound:23:5 &_
+ulocate damaged core true @copper dX:24:13 dY:24:17 dFound:24:5 dBuilding:24:21
+ulocate spawn core true @copper sX:25:13 sY:25:17 sFound:25:5 sBuilding:25:21
 end

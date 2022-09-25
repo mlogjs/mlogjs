@@ -4,4 +4,13 @@ const { shootX, shootY, shooting } = Vars.unit;
 
 if (!shooting) endScript();
 
-explosion(Teams.sharded, shootX, shootY, 5, 10, true, true, true);
+explosion({
+  team: Teams.sharded,
+  x: shootX,
+  y: shootY,
+  radius: 5,
+  damage: 10,
+  air: true,
+  ground: true,
+  pierce: true,
+});

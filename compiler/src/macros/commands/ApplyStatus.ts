@@ -1,10 +1,9 @@
+import { assertLiteralOneOf } from "../../assertions";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
 import { IScope } from "../../types";
-import { LiteralValue } from "../../values";
-import { MacroFunction } from "../Function";
-
-const validKinds = ["apply", "clear"];
+import { LiteralValue, ObjectValue } from "../../values";
+import { createOverloadNamespace } from "../util";
 
 const validEffects = [
   "burning",
@@ -21,43 +20,37 @@ const validEffects = [
   "boss",
   "shocked",
   "blasted",
-];
+] as const;
 
-export class ApplyStatus extends MacroFunction<null> {
+export class ApplyStatus extends ObjectValue {
   constructor(scope: IScope) {
-    super(scope, (...args) => {
-      if (args.length !== 3 && args.length !== 4)
-        throw new CompilerError(
-          `Expected 3 or 4 arguments, received ${args.length}`
-        );
-      const [kind, effect, unit, duration] = args;
+    const data = createOverloadNamespace({
+      scope,
+      overloads: {
+        apply: {
+          args: ["status", "unit", { key: "duration", default: "10" }],
+        },
+        clear: { args: ["status", "unit"] },
+      },
+      handler(overload, effect, unit, duration) {
+        if (!(effect instanceof LiteralValue))
+          throw new CompilerError("The status effect must be a string literal");
+        assertLiteralOneOf(effect, validEffects, "The status effect");
 
-      if (
-        !(kind instanceof LiteralValue) ||
-        typeof kind.data !== "string" ||
-        !validKinds.includes(kind.data)
-      )
-        throw new CompilerError('The kind must be either "apply" or "clear"');
-
-      if (
-        !(effect instanceof LiteralValue) ||
-        typeof effect.data !== "string" ||
-        !validEffects.includes(effect.data)
-      )
-        throw new CompilerError("Invalid status effect");
-
-      return [
-        null,
-        [
-          new InstructionBase(
-            "status",
-            String(kind.data !== "apply"),
-            effect.data,
-            unit,
-            duration ?? "10"
-          ),
-        ],
-      ];
+        return [
+          null,
+          [
+            new InstructionBase(
+              "status",
+              String(overload !== "apply"),
+              effect.data,
+              unit,
+              duration
+            ),
+          ],
+        ];
+      },
     });
+    super(scope, data);
   }
 }

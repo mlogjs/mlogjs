@@ -17,9 +17,9 @@ print " : "
 print &t3
 printflush message1
 radar enemy any any distance cyclone1 1 unitA:14:6
-uradar enemy flying any distance 0 1 unitB:22:6
-sensor &t4 unitA:14:6 @health
-sensor &t5 unitB:22:6 @health
-print &t4
-print &t5
+uradar enemy flying any distance 0 1 unitB:20:6
+sensor &t8 unitA:14:6 @health
+sensor &t9 unitB:20:6 @health
+print &t8
+print &t9
 end

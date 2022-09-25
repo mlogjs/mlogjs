@@ -15,12 +15,30 @@ drawFlush();
 
 const block = getLink(1);
 
-control("color", illuminator, 10, 50, 9);
-control("enabled", block, false);
-control("config", sorter, Items.plastanium);
-control("shoot", cyclone, 20, 40, true);
-control("shootp", cyclone, Vars.unit, true);
+control.color(illuminator, 10, 50, 9);
 
-radar(cyclone, "enemy", "boss", "flying", 1, "maxHealth");
+control.enabled(block, false);
+
+control.config(sorter, Items.plastanium);
+
+control.shoot({
+  building: cyclone,
+  x: 20,
+  y: 40,
+  shoot: true,
+});
+
+control.shootp({
+  building: cyclone,
+  unit: Vars.unit,
+  shoot: true,
+});
+
+radar({
+  building: cyclone,
+  filters: ["enemy", "boss", "flying"],
+  order: 1,
+  sort: "maxHealth",
+});
 
 sensor(LAccess.health, cyclone);
