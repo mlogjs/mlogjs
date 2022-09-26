@@ -1,269 +1,269 @@
-set a11:81:4 1
-set a12:82:2 0
-set a13:83:2 0
-set a21:84:4 0
-set a22:85:2 1
-set a23:86:2 0
-set a31:87:4 0
-set a32:88:2 0
-set a33:89:2 1
+set a11:19:4 1
+set a12:20:2 0
+set a13:21:2 0
+set a21:22:4 0
+set a22:23:2 1
+set a23:24:2 0
+set a31:25:4 0
+set a32:26:2 0
+set a33:27:2 1
 draw color 255 255 255
 draw clear 0 0 0
-set p1x:93:18 -1
-set p1y:93:23 -1
-set p1z:93:28 -1
-set p2x:93:33 -1
-set p2y:93:38 1
-set p2z:93:43 -1
-set &rdrawLine:93:0 19
+set p1x:31:18 -1
+set p1y:31:23 -1
+set p1z:31:28 -1
+set p2x:31:33 -1
+set p2y:31:38 1
+set p2z:31:43 -1
+set &rdrawLine:31:0 19
 jump 115 always
-set p1x:93:18 1
-set p1y:93:23 -1
-set p1z:93:28 -1
-set p2x:93:33 1
-set p2y:93:38 1
-set p2z:93:43 -1
-set &rdrawLine:93:0 27
+set p1x:31:18 1
+set p1y:31:23 -1
+set p1z:31:28 -1
+set p2x:31:33 1
+set p2y:31:38 1
+set p2z:31:43 -1
+set &rdrawLine:31:0 27
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 -1
-set p1z:93:28 1
-set p2x:93:33 -1
-set p2y:93:38 1
-set p2z:93:43 1
-set &rdrawLine:93:0 35
+set p1x:31:18 -1
+set p1y:31:23 -1
+set p1z:31:28 1
+set p2x:31:33 -1
+set p2y:31:38 1
+set p2z:31:43 1
+set &rdrawLine:31:0 35
 jump 115 always
-set p1x:93:18 1
-set p1y:93:23 -1
-set p1z:93:28 1
-set p2x:93:33 1
-set p2y:93:38 1
-set p2z:93:43 1
-set &rdrawLine:93:0 43
+set p1x:31:18 1
+set p1y:31:23 -1
+set p1z:31:28 1
+set p2x:31:33 1
+set p2y:31:38 1
+set p2z:31:43 1
+set &rdrawLine:31:0 43
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 -1
-set p1z:93:28 -1
-set p2x:93:33 -1
-set p2y:93:38 -1
-set p2z:93:43 1
-set &rdrawLine:93:0 51
+set p1x:31:18 -1
+set p1y:31:23 -1
+set p1z:31:28 -1
+set p2x:31:33 -1
+set p2y:31:38 -1
+set p2z:31:43 1
+set &rdrawLine:31:0 51
 jump 115 always
-set p1x:93:18 1
-set p1y:93:23 -1
-set p1z:93:28 -1
-set p2x:93:33 1
-set p2y:93:38 -1
-set p2z:93:43 1
-set &rdrawLine:93:0 59
+set p1x:31:18 1
+set p1y:31:23 -1
+set p1z:31:28 -1
+set p2x:31:33 1
+set p2y:31:38 -1
+set p2z:31:43 1
+set &rdrawLine:31:0 59
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 1
-set p1z:93:28 -1
-set p2x:93:33 -1
-set p2y:93:38 1
-set p2z:93:43 1
-set &rdrawLine:93:0 67
+set p1x:31:18 -1
+set p1y:31:23 1
+set p1z:31:28 -1
+set p2x:31:33 -1
+set p2y:31:38 1
+set p2z:31:43 1
+set &rdrawLine:31:0 67
 jump 115 always
-set p1x:93:18 1
-set p1y:93:23 1
-set p1z:93:28 -1
-set p2x:93:33 1
-set p2y:93:38 1
-set p2z:93:43 1
-set &rdrawLine:93:0 75
+set p1x:31:18 1
+set p1y:31:23 1
+set p1z:31:28 -1
+set p2x:31:33 1
+set p2y:31:38 1
+set p2z:31:43 1
+set &rdrawLine:31:0 75
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 -1
-set p1z:93:28 -1
-set p2x:93:33 1
-set p2y:93:38 -1
-set p2z:93:43 -1
-set &rdrawLine:93:0 83
+set p1x:31:18 -1
+set p1y:31:23 -1
+set p1z:31:28 -1
+set p2x:31:33 1
+set p2y:31:38 -1
+set p2z:31:43 -1
+set &rdrawLine:31:0 83
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 1
-set p1z:93:28 -1
-set p2x:93:33 1
-set p2y:93:38 1
-set p2z:93:43 -1
-set &rdrawLine:93:0 91
+set p1x:31:18 -1
+set p1y:31:23 1
+set p1z:31:28 -1
+set p2x:31:33 1
+set p2y:31:38 1
+set p2z:31:43 -1
+set &rdrawLine:31:0 91
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 -1
-set p1z:93:28 1
-set p2x:93:33 1
-set p2y:93:38 -1
-set p2z:93:43 1
-set &rdrawLine:93:0 99
+set p1x:31:18 -1
+set p1y:31:23 -1
+set p1z:31:28 1
+set p2x:31:33 1
+set p2y:31:38 -1
+set p2z:31:43 1
+set &rdrawLine:31:0 99
 jump 115 always
-set p1x:93:18 -1
-set p1y:93:23 1
-set p1z:93:28 1
-set p2x:93:33 1
-set p2y:93:38 1
-set p2z:93:43 1
-set &rdrawLine:93:0 107
+set p1x:31:18 -1
+set p1y:31:23 1
+set p1z:31:28 1
+set p2x:31:33 1
+set p2y:31:38 1
+set p2z:31:43 1
+set &rdrawLine:31:0 107
 jump 115 always
 drawflush display1
-op rand z:127:22 2
-set x:127:16 2
-set y:127:19 5
-set &rrotate:127:0 113
+op rand z:65:22 2
+set x:65:16 2
+set y:65:19 5
+set &rrotate:65:0 113
 jump 214 always
 jump 10 always
 end
-op mul &t0:drawLine:93:0 a31:87:4 p1x:93:18
-op mul &t1:drawLine:93:0 a32:88:2 p1y:93:23
-op add &t2:drawLine:93:0 &t0:drawLine:93:0 &t1:drawLine:93:0
-op mul &t3:drawLine:93:0 a33:89:2 p1z:93:28
-op add z1:94:8 &t2:drawLine:93:0 &t3:drawLine:93:0
-op mul &t4:drawLine:93:0 a31:87:4 p2x:93:33
-op mul &t5:drawLine:93:0 a32:88:2 p2y:93:38
-op add &t6:drawLine:93:0 &t4:drawLine:93:0 &t5:drawLine:93:0
-op mul &t7:drawLine:93:0 a33:89:2 p2z:93:43
-op add z2:95:8 &t6:drawLine:93:0 &t7:drawLine:93:0
-op add &t8:drawLine:93:0 z1:94:8 3
-op div persp1:96:8 38.5 &t8:drawLine:93:0
-op add &t9:drawLine:93:0 z2:95:8 3
-op div persp2:97:8 38.5 &t9:drawLine:93:0
-op mul &t10:drawLine:93:0 a11:81:4 p1x:93:18
-op mul &t11:drawLine:93:0 a12:82:2 p1y:93:23
-op add &t12:drawLine:93:0 &t10:drawLine:93:0 &t11:drawLine:93:0
-op mul &t13:drawLine:93:0 a13:83:2 p1z:93:28
-op add &t14:drawLine:93:0 &t12:drawLine:93:0 &t13:drawLine:93:0
-op mul &t15:drawLine:93:0 &t14:drawLine:93:0 persp1:96:8
-op add &t16:drawLine:93:0 &t15:drawLine:93:0 38.5
-op mul &t17:drawLine:93:0 a21:84:4 p1x:93:18
-op mul &t18:drawLine:93:0 a22:85:2 p1y:93:23
-op add &t19:drawLine:93:0 &t17:drawLine:93:0 &t18:drawLine:93:0
-op mul &t20:drawLine:93:0 a23:86:2 p1z:93:28
-op add &t21:drawLine:93:0 &t19:drawLine:93:0 &t20:drawLine:93:0
-op mul &t22:drawLine:93:0 &t21:drawLine:93:0 persp1:96:8
-op add &t23:drawLine:93:0 &t22:drawLine:93:0 38.5
-op mul &t24:drawLine:93:0 a11:81:4 p2x:93:33
-op mul &t25:drawLine:93:0 a12:82:2 p2y:93:38
-op add &t26:drawLine:93:0 &t24:drawLine:93:0 &t25:drawLine:93:0
-op mul &t27:drawLine:93:0 a13:83:2 p2z:93:43
-op add &t28:drawLine:93:0 &t26:drawLine:93:0 &t27:drawLine:93:0
-op mul &t29:drawLine:93:0 &t28:drawLine:93:0 persp2:97:8
-op add &t30:drawLine:93:0 &t29:drawLine:93:0 38.5
-op mul &t31:drawLine:93:0 a21:84:4 p2x:93:33
-op mul &t32:drawLine:93:0 a22:85:2 p2y:93:38
-op add &t33:drawLine:93:0 &t31:drawLine:93:0 &t32:drawLine:93:0
-op mul &t34:drawLine:93:0 a23:86:2 p2z:93:43
-op add &t35:drawLine:93:0 &t33:drawLine:93:0 &t34:drawLine:93:0
-op mul &t36:drawLine:93:0 &t35:drawLine:93:0 persp2:97:8
-op add &t37:drawLine:93:0 &t36:drawLine:93:0 38.5
-draw line &t16:drawLine:93:0 &t23:drawLine:93:0 &t30:drawLine:93:0 &t37:drawLine:93:0
-set @counter &rdrawLine:93:0
-set _a11:107:8 a11:81:4
-set _a12:108:4 a12:82:2
-set _a13:109:4 a13:83:2
-set _a21:110:8 a21:84:4
-set _a22:111:4 a22:85:2
-set _a23:112:4 a23:86:2
-set _a31:113:8 a31:87:4
-set _a32:114:4 a32:88:2
-set _a33:115:4 a33:89:2
-op mul &t0:multiplyMatrices:106:0 _a11:107:8 b11:106:26
-op mul &t1:multiplyMatrices:106:0 _a12:108:4 b21:106:41
-op add &t2:multiplyMatrices:106:0 &t0:multiplyMatrices:106:0 &t1:multiplyMatrices:106:0
-op mul &t3:multiplyMatrices:106:0 _a13:109:4 b31:106:56
-op add a11:81:4 &t2:multiplyMatrices:106:0 &t3:multiplyMatrices:106:0
-op mul &t4:multiplyMatrices:106:0 _a11:107:8 b12:106:31
-op mul &t5:multiplyMatrices:106:0 _a12:108:4 b22:106:46
-op add &t6:multiplyMatrices:106:0 &t4:multiplyMatrices:106:0 &t5:multiplyMatrices:106:0
-op mul &t7:multiplyMatrices:106:0 _a13:109:4 b32:106:61
-op add a12:82:2 &t6:multiplyMatrices:106:0 &t7:multiplyMatrices:106:0
-op mul &t8:multiplyMatrices:106:0 _a11:107:8 b13:106:36
-op mul &t9:multiplyMatrices:106:0 _a12:108:4 b23:106:51
-op add &t10:multiplyMatrices:106:0 &t8:multiplyMatrices:106:0 &t9:multiplyMatrices:106:0
-op mul &t11:multiplyMatrices:106:0 _a13:109:4 b33:106:66
-op add a13:83:2 &t10:multiplyMatrices:106:0 &t11:multiplyMatrices:106:0
-op mul &t12:multiplyMatrices:106:0 _a21:110:8 b11:106:26
-op mul &t13:multiplyMatrices:106:0 _a22:111:4 b21:106:41
-op add &t14:multiplyMatrices:106:0 &t12:multiplyMatrices:106:0 &t13:multiplyMatrices:106:0
-op mul &t15:multiplyMatrices:106:0 _a23:112:4 b31:106:56
-op add a21:84:4 &t14:multiplyMatrices:106:0 &t15:multiplyMatrices:106:0
-op mul &t16:multiplyMatrices:106:0 _a21:110:8 b12:106:31
-op mul &t17:multiplyMatrices:106:0 _a22:111:4 b22:106:46
-op add &t18:multiplyMatrices:106:0 &t16:multiplyMatrices:106:0 &t17:multiplyMatrices:106:0
-op mul &t19:multiplyMatrices:106:0 _a23:112:4 b32:106:61
-op add a22:85:2 &t18:multiplyMatrices:106:0 &t19:multiplyMatrices:106:0
-op mul &t20:multiplyMatrices:106:0 _a21:110:8 b13:106:36
-op mul &t21:multiplyMatrices:106:0 _a22:111:4 b23:106:51
-op add &t22:multiplyMatrices:106:0 &t20:multiplyMatrices:106:0 &t21:multiplyMatrices:106:0
-op mul &t23:multiplyMatrices:106:0 _a23:112:4 b33:106:66
-op add a23:86:2 &t22:multiplyMatrices:106:0 &t23:multiplyMatrices:106:0
-op mul &t24:multiplyMatrices:106:0 _a31:113:8 b11:106:26
-op mul &t25:multiplyMatrices:106:0 _a32:114:4 b21:106:41
-op add &t26:multiplyMatrices:106:0 &t24:multiplyMatrices:106:0 &t25:multiplyMatrices:106:0
-op mul &t27:multiplyMatrices:106:0 _a33:115:4 b31:106:56
-op add a31:87:4 &t26:multiplyMatrices:106:0 &t27:multiplyMatrices:106:0
-op mul &t28:multiplyMatrices:106:0 _a31:113:8 b12:106:31
-op mul &t29:multiplyMatrices:106:0 _a32:114:4 b22:106:46
-op add &t30:multiplyMatrices:106:0 &t28:multiplyMatrices:106:0 &t29:multiplyMatrices:106:0
-op mul &t31:multiplyMatrices:106:0 _a33:115:4 b32:106:61
-op add a32:88:2 &t30:multiplyMatrices:106:0 &t31:multiplyMatrices:106:0
-op mul &t32:multiplyMatrices:106:0 _a31:113:8 b13:106:36
-op mul &t33:multiplyMatrices:106:0 _a32:114:4 b23:106:51
-op add &t34:multiplyMatrices:106:0 &t32:multiplyMatrices:106:0 &t33:multiplyMatrices:106:0
-op mul &t35:multiplyMatrices:106:0 _a33:115:4 b33:106:66
-op add a33:89:2 &t34:multiplyMatrices:106:0 &t35:multiplyMatrices:106:0
-set @counter &rmultiplyMatrices:106:0
-op cos &t1 z:127:22
-op cos &t2 y:127:19
-op mul b11:106:26 &t1 &t2
-op sin &t3 z:127:22
-op sub &t1:rotate:127:0 0 &t3
-op cos &t4 x:127:16
-op mul &t2:rotate:127:0 &t1:rotate:127:0 &t4
-op cos &t5 z:127:22
-op sin &t6 y:127:19
-op mul &t3:rotate:127:0 &t5 &t6
-op sin &t7 x:127:16
-op mul &t4:rotate:127:0 &t3:rotate:127:0 &t7
-op add b12:106:31 &t2:rotate:127:0 &t4:rotate:127:0
-op sin &t8 z:127:22
-op sin &t9 x:127:16
-op mul &t6:rotate:127:0 &t8 &t9
-op cos &t10 z:127:22
-op cos &t11 x:127:16
-op mul &t7:rotate:127:0 &t10 &t11
-op sin &t12 y:127:19
-op mul &t8:rotate:127:0 &t7:rotate:127:0 &t12
-op add b13:106:36 &t6:rotate:127:0 &t8:rotate:127:0
-op sin &t13 z:127:22
-op cos &t14 y:127:19
-op mul b21:106:41 &t13 &t14
-op cos &t15 z:127:22
-op cos &t16 x:127:16
-op mul &t11:rotate:127:0 &t15 &t16
-op sin &t17 z:127:22
-op sin &t18 y:127:19
-op mul &t12:rotate:127:0 &t17 &t18
-op sin &t19 x:127:16
-op mul &t13:rotate:127:0 &t12:rotate:127:0 &t19
-op add b22:106:46 &t11:rotate:127:0 &t13:rotate:127:0
-op cos &t20 z:127:22
-op sub &t15:rotate:127:0 0 &t20
-op sin &t21 x:127:16
-op mul &t16:rotate:127:0 &t15:rotate:127:0 &t21
-op sin &t22 z:127:22
-op cos &t23 x:127:16
-op mul &t17:rotate:127:0 &t22 &t23
-op sin &t24 y:127:19
-op mul &t18:rotate:127:0 &t17:rotate:127:0 &t24
-op add b23:106:51 &t16:rotate:127:0 &t18:rotate:127:0
-op sin &t25 y:127:19
-op sub b31:106:56 0 &t25
-op cos &t26 y:127:19
-op sin &t27 x:127:16
-op mul b32:106:61 &t26 &t27
-op cos &t28 y:127:19
-op cos &t29 x:127:16
-op mul b33:106:66 &t28 &t29
-set &rmultiplyMatrices:106:0 268
+op mul &t0:drawLine:31:0 a31:25:4 p1x:31:18
+op mul &t1:drawLine:31:0 a32:26:2 p1y:31:23
+op add &t2:drawLine:31:0 &t0:drawLine:31:0 &t1:drawLine:31:0
+op mul &t3:drawLine:31:0 a33:27:2 p1z:31:28
+op add z1:32:8 &t2:drawLine:31:0 &t3:drawLine:31:0
+op mul &t4:drawLine:31:0 a31:25:4 p2x:31:33
+op mul &t5:drawLine:31:0 a32:26:2 p2y:31:38
+op add &t6:drawLine:31:0 &t4:drawLine:31:0 &t5:drawLine:31:0
+op mul &t7:drawLine:31:0 a33:27:2 p2z:31:43
+op add z2:33:8 &t6:drawLine:31:0 &t7:drawLine:31:0
+op add &t8:drawLine:31:0 z1:32:8 3
+op div persp1:34:8 38.5 &t8:drawLine:31:0
+op add &t9:drawLine:31:0 z2:33:8 3
+op div persp2:35:8 38.5 &t9:drawLine:31:0
+op mul &t10:drawLine:31:0 a11:19:4 p1x:31:18
+op mul &t11:drawLine:31:0 a12:20:2 p1y:31:23
+op add &t12:drawLine:31:0 &t10:drawLine:31:0 &t11:drawLine:31:0
+op mul &t13:drawLine:31:0 a13:21:2 p1z:31:28
+op add &t14:drawLine:31:0 &t12:drawLine:31:0 &t13:drawLine:31:0
+op mul &t15:drawLine:31:0 &t14:drawLine:31:0 persp1:34:8
+op add &t16:drawLine:31:0 &t15:drawLine:31:0 38.5
+op mul &t17:drawLine:31:0 a21:22:4 p1x:31:18
+op mul &t18:drawLine:31:0 a22:23:2 p1y:31:23
+op add &t19:drawLine:31:0 &t17:drawLine:31:0 &t18:drawLine:31:0
+op mul &t20:drawLine:31:0 a23:24:2 p1z:31:28
+op add &t21:drawLine:31:0 &t19:drawLine:31:0 &t20:drawLine:31:0
+op mul &t22:drawLine:31:0 &t21:drawLine:31:0 persp1:34:8
+op add &t23:drawLine:31:0 &t22:drawLine:31:0 38.5
+op mul &t24:drawLine:31:0 a11:19:4 p2x:31:33
+op mul &t25:drawLine:31:0 a12:20:2 p2y:31:38
+op add &t26:drawLine:31:0 &t24:drawLine:31:0 &t25:drawLine:31:0
+op mul &t27:drawLine:31:0 a13:21:2 p2z:31:43
+op add &t28:drawLine:31:0 &t26:drawLine:31:0 &t27:drawLine:31:0
+op mul &t29:drawLine:31:0 &t28:drawLine:31:0 persp2:35:8
+op add &t30:drawLine:31:0 &t29:drawLine:31:0 38.5
+op mul &t31:drawLine:31:0 a21:22:4 p2x:31:33
+op mul &t32:drawLine:31:0 a22:23:2 p2y:31:38
+op add &t33:drawLine:31:0 &t31:drawLine:31:0 &t32:drawLine:31:0
+op mul &t34:drawLine:31:0 a23:24:2 p2z:31:43
+op add &t35:drawLine:31:0 &t33:drawLine:31:0 &t34:drawLine:31:0
+op mul &t36:drawLine:31:0 &t35:drawLine:31:0 persp2:35:8
+op add &t37:drawLine:31:0 &t36:drawLine:31:0 38.5
+draw line &t16:drawLine:31:0 &t23:drawLine:31:0 &t30:drawLine:31:0 &t37:drawLine:31:0
+set @counter &rdrawLine:31:0
+set _a11:45:8 a11:19:4
+set _a12:46:4 a12:20:2
+set _a13:47:4 a13:21:2
+set _a21:48:8 a21:22:4
+set _a22:49:4 a22:23:2
+set _a23:50:4 a23:24:2
+set _a31:51:8 a31:25:4
+set _a32:52:4 a32:26:2
+set _a33:53:4 a33:27:2
+op mul &t0:multiplyMatrices:44:0 _a11:45:8 b11:44:26
+op mul &t1:multiplyMatrices:44:0 _a12:46:4 b21:44:41
+op add &t2:multiplyMatrices:44:0 &t0:multiplyMatrices:44:0 &t1:multiplyMatrices:44:0
+op mul &t3:multiplyMatrices:44:0 _a13:47:4 b31:44:56
+op add a11:19:4 &t2:multiplyMatrices:44:0 &t3:multiplyMatrices:44:0
+op mul &t4:multiplyMatrices:44:0 _a11:45:8 b12:44:31
+op mul &t5:multiplyMatrices:44:0 _a12:46:4 b22:44:46
+op add &t6:multiplyMatrices:44:0 &t4:multiplyMatrices:44:0 &t5:multiplyMatrices:44:0
+op mul &t7:multiplyMatrices:44:0 _a13:47:4 b32:44:61
+op add a12:20:2 &t6:multiplyMatrices:44:0 &t7:multiplyMatrices:44:0
+op mul &t8:multiplyMatrices:44:0 _a11:45:8 b13:44:36
+op mul &t9:multiplyMatrices:44:0 _a12:46:4 b23:44:51
+op add &t10:multiplyMatrices:44:0 &t8:multiplyMatrices:44:0 &t9:multiplyMatrices:44:0
+op mul &t11:multiplyMatrices:44:0 _a13:47:4 b33:44:66
+op add a13:21:2 &t10:multiplyMatrices:44:0 &t11:multiplyMatrices:44:0
+op mul &t12:multiplyMatrices:44:0 _a21:48:8 b11:44:26
+op mul &t13:multiplyMatrices:44:0 _a22:49:4 b21:44:41
+op add &t14:multiplyMatrices:44:0 &t12:multiplyMatrices:44:0 &t13:multiplyMatrices:44:0
+op mul &t15:multiplyMatrices:44:0 _a23:50:4 b31:44:56
+op add a21:22:4 &t14:multiplyMatrices:44:0 &t15:multiplyMatrices:44:0
+op mul &t16:multiplyMatrices:44:0 _a21:48:8 b12:44:31
+op mul &t17:multiplyMatrices:44:0 _a22:49:4 b22:44:46
+op add &t18:multiplyMatrices:44:0 &t16:multiplyMatrices:44:0 &t17:multiplyMatrices:44:0
+op mul &t19:multiplyMatrices:44:0 _a23:50:4 b32:44:61
+op add a22:23:2 &t18:multiplyMatrices:44:0 &t19:multiplyMatrices:44:0
+op mul &t20:multiplyMatrices:44:0 _a21:48:8 b13:44:36
+op mul &t21:multiplyMatrices:44:0 _a22:49:4 b23:44:51
+op add &t22:multiplyMatrices:44:0 &t20:multiplyMatrices:44:0 &t21:multiplyMatrices:44:0
+op mul &t23:multiplyMatrices:44:0 _a23:50:4 b33:44:66
+op add a23:24:2 &t22:multiplyMatrices:44:0 &t23:multiplyMatrices:44:0
+op mul &t24:multiplyMatrices:44:0 _a31:51:8 b11:44:26
+op mul &t25:multiplyMatrices:44:0 _a32:52:4 b21:44:41
+op add &t26:multiplyMatrices:44:0 &t24:multiplyMatrices:44:0 &t25:multiplyMatrices:44:0
+op mul &t27:multiplyMatrices:44:0 _a33:53:4 b31:44:56
+op add a31:25:4 &t26:multiplyMatrices:44:0 &t27:multiplyMatrices:44:0
+op mul &t28:multiplyMatrices:44:0 _a31:51:8 b12:44:31
+op mul &t29:multiplyMatrices:44:0 _a32:52:4 b22:44:46
+op add &t30:multiplyMatrices:44:0 &t28:multiplyMatrices:44:0 &t29:multiplyMatrices:44:0
+op mul &t31:multiplyMatrices:44:0 _a33:53:4 b32:44:61
+op add a32:26:2 &t30:multiplyMatrices:44:0 &t31:multiplyMatrices:44:0
+op mul &t32:multiplyMatrices:44:0 _a31:51:8 b13:44:36
+op mul &t33:multiplyMatrices:44:0 _a32:52:4 b23:44:51
+op add &t34:multiplyMatrices:44:0 &t32:multiplyMatrices:44:0 &t33:multiplyMatrices:44:0
+op mul &t35:multiplyMatrices:44:0 _a33:53:4 b33:44:66
+op add a33:27:2 &t34:multiplyMatrices:44:0 &t35:multiplyMatrices:44:0
+set @counter &rmultiplyMatrices:44:0
+op cos &t13 z:65:22
+op cos &t14 y:65:19
+op mul b11:44:26 &t13 &t14
+op sin &t15 z:65:22
+op sub &t1:rotate:65:0 0 &t15
+op cos &t16 x:65:16
+op mul &t2:rotate:65:0 &t1:rotate:65:0 &t16
+op cos &t17 z:65:22
+op sin &t18 y:65:19
+op mul &t3:rotate:65:0 &t17 &t18
+op sin &t19 x:65:16
+op mul &t4:rotate:65:0 &t3:rotate:65:0 &t19
+op add b12:44:31 &t2:rotate:65:0 &t4:rotate:65:0
+op sin &t20 z:65:22
+op sin &t21 x:65:16
+op mul &t6:rotate:65:0 &t20 &t21
+op cos &t22 z:65:22
+op cos &t23 x:65:16
+op mul &t7:rotate:65:0 &t22 &t23
+op sin &t24 y:65:19
+op mul &t8:rotate:65:0 &t7:rotate:65:0 &t24
+op add b13:44:36 &t6:rotate:65:0 &t8:rotate:65:0
+op sin &t25 z:65:22
+op cos &t26 y:65:19
+op mul b21:44:41 &t25 &t26
+op cos &t27 z:65:22
+op cos &t28 x:65:16
+op mul &t11:rotate:65:0 &t27 &t28
+op sin &t29 z:65:22
+op sin &t30 y:65:19
+op mul &t12:rotate:65:0 &t29 &t30
+op sin &t31 x:65:16
+op mul &t13:rotate:65:0 &t12:rotate:65:0 &t31
+op add b22:44:46 &t11:rotate:65:0 &t13:rotate:65:0
+op cos &t32 z:65:22
+op sub &t15:rotate:65:0 0 &t32
+op sin &t33 x:65:16
+op mul &t16:rotate:65:0 &t15:rotate:65:0 &t33
+op sin &t34 z:65:22
+op cos &t35 x:65:16
+op mul &t17:rotate:65:0 &t34 &t35
+op sin &t36 y:65:19
+op mul &t18:rotate:65:0 &t17:rotate:65:0 &t36
+op add b23:44:51 &t16:rotate:65:0 &t18:rotate:65:0
+op sin &t37 y:65:19
+op sub b31:44:56 0 &t37
+op cos &t38 y:65:19
+op sin &t39 x:65:16
+op mul b32:44:61 &t38 &t39
+op cos &t40 y:65:19
+op cos &t41 x:65:16
+op mul b33:44:66 &t40 &t41
+set &rmultiplyMatrices:44:0 268
 jump 159 always
-set @counter &rrotate:127:0
+set @counter &rrotate:65:0

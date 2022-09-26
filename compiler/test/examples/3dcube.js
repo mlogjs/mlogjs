@@ -2,80 +2,18 @@
 const display = getBuilding("display1");
 
 const points = [
-  -1,
-  -1,
-  -1,
-  -1,
-  1,
-  -1, // 0
-  1,
-  -1,
-  -1,
-  1,
-  1,
-  -1, // 1
-  -1,
-  -1,
-  1,
-  -1,
-  1,
-  1, // 2
-  1,
-  -1,
-  1,
-  1,
-  1,
-  1, // 3
-
-  -1,
-  -1,
-  -1,
-  -1,
-  -1,
-  1, // 4
-  1,
-  -1,
-  -1,
-  1,
-  -1,
-  1, // 5
-  -1,
-  1,
-  -1,
-  -1,
-  1,
-  1, // 6
-  1,
-  1,
-  -1,
-  1,
-  1,
-  1, // 7
-
-  -1,
-  -1,
-  -1,
-  1,
-  -1,
-  -1, // 8
-  -1,
-  1,
-  -1,
-  1,
-  1,
-  -1, // 9
-  -1,
-  -1,
-  1,
-  1,
-  -1,
-  1, // 10
-  -1,
-  1,
-  1,
-  1,
-  1,
-  1, // 11
+  [-1, -1, -1, -1, 1, -1], // 0
+  [1, -1, -1, 1, 1, -1], // 1
+  [-1, -1, 1, -1, 1, 1], // 2
+  [1, -1, 1, 1, 1, 1], // 3
+  [-1, -1, -1, -1, -1, 1], // 4
+  [1, -1, -1, 1, -1, 1], // 5
+  [-1, 1, -1, -1, 1, 1], // 6
+  [1, 1, -1, 1, 1, 1], // 7
+  [-1, -1, -1, 1, -1, -1], // 8
+  [-1, 1, -1, 1, 1, -1], // 9
+  [-1, -1, 1, 1, -1, 1], // 10
+  [-1, 1, 1, 1, 1, 1], // 11
 ];
 
 let a11 = 1,
@@ -145,100 +83,100 @@ while (true) {
   draw.clear(0, 0, 0);
 
   drawLine(
-    points[0 * 6 + 0],
-    points[0 * 6 + 1],
-    points[0 * 6 + 2], // 0
-    points[0 * 6 + 3],
-    points[0 * 6 + 4],
-    points[0 * 6 + 5]
+    points[0][0],
+    points[0][1],
+    points[0][2], // 0
+    points[0][3],
+    points[0][4],
+    points[0][5]
   );
   drawLine(
-    points[1 * 6 + 0],
-    points[1 * 6 + 1],
-    points[1 * 6 + 2], // 1
-    points[1 * 6 + 3],
-    points[1 * 6 + 4],
-    points[1 * 6 + 5]
+    points[1][0],
+    points[1][1],
+    points[1][2], // 1
+    points[1][3],
+    points[1][4],
+    points[1][5]
   );
   drawLine(
-    points[2 * 6 + 0],
-    points[2 * 6 + 1],
-    points[2 * 6 + 2], // 2
-    points[2 * 6 + 3],
-    points[2 * 6 + 4],
-    points[2 * 6 + 5]
+    points[2][0],
+    points[2][1],
+    points[2][2], // 2
+    points[2][3],
+    points[2][4],
+    points[2][5]
   );
   drawLine(
-    points[3 * 6 + 0],
-    points[3 * 6 + 1],
-    points[3 * 6 + 2], // 3
-    points[3 * 6 + 3],
-    points[3 * 6 + 4],
-    points[3 * 6 + 5]
+    points[3][0],
+    points[3][1],
+    points[3][2], // 3
+    points[3][3],
+    points[3][4],
+    points[3][5]
   );
   drawLine(
-    points[4 * 6 + 0],
-    points[4 * 6 + 1],
-    points[4 * 6 + 2], // 4
-    points[4 * 6 + 3],
-    points[4 * 6 + 4],
-    points[4 * 6 + 5]
+    points[4][0],
+    points[4][1],
+    points[4][2], // 4
+    points[4][3],
+    points[4][4],
+    points[4][5]
   );
   drawLine(
-    points[5 * 6 + 0],
-    points[5 * 6 + 1],
-    points[5 * 6 + 2], // 5
-    points[5 * 6 + 3],
-    points[5 * 6 + 4],
-    points[5 * 6 + 5]
+    points[5][0],
+    points[5][1],
+    points[5][2], // 5
+    points[5][3],
+    points[5][4],
+    points[5][5]
   );
   drawLine(
-    points[6 * 6 + 0],
-    points[6 * 6 + 1],
-    points[6 * 6 + 2], // 6
-    points[6 * 6 + 3],
-    points[6 * 6 + 4],
-    points[6 * 6 + 5]
+    points[6][0],
+    points[6][1],
+    points[6][2], // 6
+    points[6][3],
+    points[6][4],
+    points[6][5]
   );
   drawLine(
-    points[7 * 6 + 0],
-    points[7 * 6 + 1],
-    points[7 * 6 + 2], // 7
-    points[7 * 6 + 3],
-    points[7 * 6 + 4],
-    points[7 * 6 + 5]
+    points[7][0],
+    points[7][1],
+    points[7][2], // 7
+    points[7][3],
+    points[7][4],
+    points[7][5]
   );
   drawLine(
-    points[8 * 6 + 0],
-    points[8 * 6 + 1],
-    points[8 * 6 + 2], // 8
-    points[8 * 6 + 3],
-    points[8 * 6 + 4],
-    points[8 * 6 + 5]
+    points[8][0],
+    points[8][1],
+    points[8][2], // 8
+    points[8][3],
+    points[8][4],
+    points[8][5]
   );
   drawLine(
-    points[9 * 6 + 0],
-    points[9 * 6 + 1],
-    points[9 * 6 + 2], // 9
-    points[9 * 6 + 3],
-    points[9 * 6 + 4],
-    points[9 * 6 + 5]
+    points[9][0],
+    points[9][1],
+    points[9][2], // 9
+    points[9][3],
+    points[9][4],
+    points[9][5]
   );
   drawLine(
-    points[10 * 6 + 0],
-    points[10 * 6 + 1],
-    points[10 * 6 + 2], // 10
-    points[10 * 6 + 3],
-    points[10 * 6 + 4],
-    points[10 * 6 + 5]
+    points[10][0],
+    points[10][1],
+    points[10][2], // 10
+    points[10][3],
+    points[10][4],
+    points[10][5]
   );
   drawLine(
-    points[11 * 6 + 0],
-    points[11 * 6 + 1],
-    points[11 * 6 + 2], // 11
-    points[11 * 6 + 3],
-    points[11 * 6 + 4],
-    points[11 * 6 + 5]
+    points[11][0],
+    points[11][1],
+    points[11][2], // 11
+    points[11][3],
+    points[11][4],
+    points[11][5]
   );
 
   drawFlush(display);
