@@ -9,5 +9,12 @@ asm`radar player enemy any distance ${turret} 1 radarResult`;
 // temporary values should work too
 asm`op mul foo ${first + second} 2`;
 
+asm`
+multine should be properly
+        formatted
+        ${first}    
+    d ${second} a
+`;
+
 print(getVar("radarResult"));
 print(getVar("foo"));
