@@ -1,11 +1,9 @@
 radar ground any any distance foreshadow1 1 unit:3:6
-status false boss unit:3:6 10
+status false overdrive unit:3:6 10
 status false melting unit:3:6 20
+status false burning unit:3:6 20
 status false tarred unit:3:6 20
 wait 2
-status true melting unit:3:6
-wait 2
-status true tarred unit:3:6
-status true boss unit:3:6
-wait 2
+status true overdrive unit:3:6
+wait 3
 end
