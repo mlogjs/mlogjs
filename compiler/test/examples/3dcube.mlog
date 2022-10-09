@@ -212,58 +212,58 @@ op add &t34:multiplyMatrices:44:0 &t32:multiplyMatrices:44:0 &t33:multiplyMatric
 op mul &t35:multiplyMatrices:44:0 _a33:53:4 b33:44:66
 op add a33:27:2 &t34:multiplyMatrices:44:0 &t35:multiplyMatrices:44:0
 set @counter &rmultiplyMatrices:44:0
-op cos &t13 z:65:22
-op cos &t14 y:65:19
-op mul b11:44:26 &t13 &t14
-op sin &t15 z:65:22
-op sub &t1:rotate:65:0 0 &t15
-op cos &t16 x:65:16
-op mul &t2:rotate:65:0 &t1:rotate:65:0 &t16
-op cos &t17 z:65:22
-op sin &t18 y:65:19
-op mul &t3:rotate:65:0 &t17 &t18
-op sin &t19 x:65:16
-op mul &t4:rotate:65:0 &t3:rotate:65:0 &t19
-op add b12:44:31 &t2:rotate:65:0 &t4:rotate:65:0
-op sin &t20 z:65:22
-op sin &t21 x:65:16
-op mul &t6:rotate:65:0 &t20 &t21
-op cos &t22 z:65:22
-op cos &t23 x:65:16
-op mul &t7:rotate:65:0 &t22 &t23
-op sin &t24 y:65:19
-op mul &t8:rotate:65:0 &t7:rotate:65:0 &t24
-op add b13:44:36 &t6:rotate:65:0 &t8:rotate:65:0
-op sin &t25 z:65:22
-op cos &t26 y:65:19
-op mul b21:44:41 &t25 &t26
-op cos &t27 z:65:22
-op cos &t28 x:65:16
-op mul &t11:rotate:65:0 &t27 &t28
-op sin &t29 z:65:22
-op sin &t30 y:65:19
-op mul &t12:rotate:65:0 &t29 &t30
-op sin &t31 x:65:16
-op mul &t13:rotate:65:0 &t12:rotate:65:0 &t31
-op add b22:44:46 &t11:rotate:65:0 &t13:rotate:65:0
-op cos &t32 z:65:22
-op sub &t15:rotate:65:0 0 &t32
-op sin &t33 x:65:16
-op mul &t16:rotate:65:0 &t15:rotate:65:0 &t33
-op sin &t34 z:65:22
-op cos &t35 x:65:16
-op mul &t17:rotate:65:0 &t34 &t35
-op sin &t36 y:65:19
-op mul &t18:rotate:65:0 &t17:rotate:65:0 &t36
-op add b23:44:51 &t16:rotate:65:0 &t18:rotate:65:0
-op sin &t37 y:65:19
-op sub b31:44:56 0 &t37
-op cos &t38 y:65:19
-op sin &t39 x:65:16
-op mul b32:44:61 &t38 &t39
-op cos &t40 y:65:19
-op cos &t41 x:65:16
-op mul b33:44:66 &t40 &t41
+op cos &t0:rotate:65:0 z:65:22
+op cos &t1:rotate:65:0 y:65:19
+op mul b11:44:26 &t0:rotate:65:0 &t1:rotate:65:0
+op sin &t3:rotate:65:0 z:65:22
+op sub &t4:rotate:65:0 0 &t3:rotate:65:0
+op cos &t5:rotate:65:0 x:65:16
+op mul &t6:rotate:65:0 &t4:rotate:65:0 &t5:rotate:65:0
+op cos &t7:rotate:65:0 z:65:22
+op sin &t8:rotate:65:0 y:65:19
+op mul &t9:rotate:65:0 &t7:rotate:65:0 &t8:rotate:65:0
+op sin &t10:rotate:65:0 x:65:16
+op mul &t11:rotate:65:0 &t9:rotate:65:0 &t10:rotate:65:0
+op add b12:44:31 &t6:rotate:65:0 &t11:rotate:65:0
+op sin &t13:rotate:65:0 z:65:22
+op sin &t14:rotate:65:0 x:65:16
+op mul &t15:rotate:65:0 &t13:rotate:65:0 &t14:rotate:65:0
+op cos &t16:rotate:65:0 z:65:22
+op cos &t17:rotate:65:0 x:65:16
+op mul &t18:rotate:65:0 &t16:rotate:65:0 &t17:rotate:65:0
+op sin &t19:rotate:65:0 y:65:19
+op mul &t20:rotate:65:0 &t18:rotate:65:0 &t19:rotate:65:0
+op add b13:44:36 &t15:rotate:65:0 &t20:rotate:65:0
+op sin &t22:rotate:65:0 z:65:22
+op cos &t23:rotate:65:0 y:65:19
+op mul b21:44:41 &t22:rotate:65:0 &t23:rotate:65:0
+op cos &t25:rotate:65:0 z:65:22
+op cos &t26:rotate:65:0 x:65:16
+op mul &t27:rotate:65:0 &t25:rotate:65:0 &t26:rotate:65:0
+op sin &t28:rotate:65:0 z:65:22
+op sin &t29:rotate:65:0 y:65:19
+op mul &t30:rotate:65:0 &t28:rotate:65:0 &t29:rotate:65:0
+op sin &t31:rotate:65:0 x:65:16
+op mul &t32:rotate:65:0 &t30:rotate:65:0 &t31:rotate:65:0
+op add b22:44:46 &t27:rotate:65:0 &t32:rotate:65:0
+op cos &t34:rotate:65:0 z:65:22
+op sub &t35:rotate:65:0 0 &t34:rotate:65:0
+op sin &t36:rotate:65:0 x:65:16
+op mul &t37:rotate:65:0 &t35:rotate:65:0 &t36:rotate:65:0
+op sin &t38:rotate:65:0 z:65:22
+op cos &t39:rotate:65:0 x:65:16
+op mul &t40:rotate:65:0 &t38:rotate:65:0 &t39:rotate:65:0
+op sin &t41:rotate:65:0 y:65:19
+op mul &t42:rotate:65:0 &t40:rotate:65:0 &t41:rotate:65:0
+op add b23:44:51 &t37:rotate:65:0 &t42:rotate:65:0
+op sin &t44:rotate:65:0 y:65:19
+op sub b31:44:56 0 &t44:rotate:65:0
+op cos &t46:rotate:65:0 y:65:19
+op sin &t47:rotate:65:0 x:65:16
+op mul b32:44:61 &t46:rotate:65:0 &t47:rotate:65:0
+op cos &t49:rotate:65:0 y:65:19
+op cos &t50:rotate:65:0 x:65:16
+op mul b33:44:66 &t49:rotate:65:0 &t50:rotate:65:0
 set &rmultiplyMatrices:44:0 268
 jump 159 always
 set @counter &rrotate:65:0
