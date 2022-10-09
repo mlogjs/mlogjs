@@ -14,7 +14,7 @@ for (const path of paths) {
     const expected = await readFile(`test/out/${name}.mlog`, "utf8");
     const [actual, error] = compiler.compile(input);
     if (error) {
-      console.error(error);
+      throw error;
     }
     expect(actual).toBe(expected);
   });
