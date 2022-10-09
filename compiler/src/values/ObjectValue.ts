@@ -10,7 +10,6 @@ import {
   TValueInstructions,
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
-import { ValueOwner } from "./ValueOwner";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData extends TOperatorMacroMap {
@@ -24,28 +23,27 @@ export class ObjectValue extends VoidValue {
   macro = true;
   data: IObjectValueData;
 
-  constructor(public scope: IScope, data: IObjectValueData = {}) {
+  constructor(data: IObjectValueData = {}) {
     super();
     this.data = data;
   }
 
   static fromArray(
-    scope: IScope,
     items: IObjectValueData[keyof IObjectValueData][],
     intialData?: IObjectValueData
   ): ObjectValue {
     const data: IObjectValueData = {
       ...intialData,
-      length: new LiteralValue(scope, items.length),
+      length: new LiteralValue(items.length),
     };
     items.forEach((item, i) => {
       if (item) data[i] = item;
     });
-    return new ObjectValue(scope, data);
+    return new ObjectValue(data);
   }
 
-  typeof(scope: IScope): TValueInstructions {
-    return [new LiteralValue(scope, "object"), []];
+  typeof(): TValueInstructions {
+    return [new LiteralValue("object"), []];
   }
 
   get(scope: IScope, key: LiteralValue): TValueInstructions {
@@ -81,9 +79,7 @@ export class ObjectValue extends VoidValue {
     return $call.call(scope, args);
   }
 
-  ensureOwned(): asserts this is IOwnedValue {
-    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
-  }
+  ensureOwned(): asserts this is IOwnedValue {}
 }
 
 for (const op of operators) {
@@ -96,5 +92,5 @@ for (const op of operators) {
     if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
     const [scope, ...fnArgs] = args;
     return $.call(scope, fnArgs);
-  };
+  } as never;
 }

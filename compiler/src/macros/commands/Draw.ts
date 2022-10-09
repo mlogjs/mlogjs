@@ -1,10 +1,9 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Draw extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         clear: {
@@ -48,6 +47,6 @@ export class Draw extends ObjectValue {
       },
     });
 
-    super(scope, data);
+    super(data);
   }
 }

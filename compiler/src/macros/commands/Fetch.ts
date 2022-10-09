@@ -1,10 +1,10 @@
 import { InstructionBase } from "../../instructions";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import { ObjectValue, SenseableValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Fetch extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         unit: { args: ["team", "index"] },
@@ -33,6 +33,6 @@ export class Fetch extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

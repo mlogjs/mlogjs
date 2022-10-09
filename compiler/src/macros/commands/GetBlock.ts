@@ -1,10 +1,9 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue, SenseableValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class GetBlock extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         floor: { args: ["x", "y"] },
@@ -24,6 +23,6 @@ export class GetBlock extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

@@ -1,10 +1,9 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Cutscene extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         pan: { named: "options", args: ["x", "y", "speed"] },
@@ -16,6 +15,6 @@ export class Cutscene extends ObjectValue {
         return [null, [new InstructionBase("cutscene", overload, ...params)]];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

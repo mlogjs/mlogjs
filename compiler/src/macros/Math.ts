@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { IScope, IValue } from "../types";
+import { IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
@@ -40,7 +40,7 @@ function createMacroMathOperations() {
             throw new CompilerError(
               "Cannot do math operation with non-numerical literals."
             );
-          return [new LiteralValue(scope, fn(a.num, b.num)), []];
+          return [new LiteralValue(fn(a.num, b.num)), []];
         }
         const temp = new StoreValue(scope);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
@@ -51,7 +51,7 @@ function createMacroMathOperations() {
             "Cannot do math operation with non-numerical literal."
           );
 
-        return [new LiteralValue(scope, fn(a.num)), []];
+        return [new LiteralValue(fn(a.num)), []];
       }
       const temp = new StoreValue(scope);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
@@ -61,8 +61,8 @@ function createMacroMathOperations() {
 }
 
 export class MlogMath extends ObjectValue {
-  constructor(scope: IScope) {
-    super(scope, createMacroMathOperations());
+  constructor() {
+    super(createMacroMathOperations());
   }
 }
 

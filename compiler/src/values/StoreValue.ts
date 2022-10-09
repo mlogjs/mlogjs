@@ -1,8 +1,15 @@
 import { BaseValue, LiteralValue } from ".";
 import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
-import { EMutability, IScope, IValue, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IOwnedValue,
+  IScope,
+  IValue,
+  TValueInstructions,
+} from "../types";
 import { discardedName } from "../utils";
+import { ValueOwner } from "./ValueOwner";
 
 /**
  * `StoreValue` represents values unknown at compile time,
@@ -10,12 +17,12 @@ import { discardedName } from "../utils";
  */
 export class StoreValue extends BaseValue implements IValue {
   mutability = EMutability.mutable;
-  constructor(scope: IScope) {
-    super(scope);
+  constructor(public scope: IScope) {
+    super();
   }
 
-  typeof(scope: IScope): TValueInstructions {
-    return [new LiteralValue(scope, "store"), []];
+  typeof(): TValueInstructions {
+    return [new LiteralValue("store"), []];
   }
 
   "="(scope: IScope, value: IValue): TValueInstructions {
@@ -39,6 +46,10 @@ export class StoreValue extends BaseValue implements IValue {
   consume(_scope: IScope): TValueInstructions {
     this.ensureOwned();
     return [this, []];
+  }
+
+  ensureOwned(): asserts this is IOwnedValue {
+    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 
   toString() {

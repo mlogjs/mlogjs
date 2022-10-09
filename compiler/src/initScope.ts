@@ -31,41 +31,41 @@ export function initScope(scope: Scope) {
   scope.hardSet("concat", new Concat());
   scope.hardSet("asm", new Asm());
 
-  scope.hardSet("Math", new MlogMath(scope));
-  scope.hardSet("Memory", new MemoryBuilder(scope));
+  scope.hardSet("Math", new MlogMath());
+  scope.hardSet("Memory", new MemoryBuilder());
 
   // commands
-  scope.hardSet("draw", new commands.Draw(scope));
+  scope.hardSet("draw", new commands.Draw());
   scope.hardSet("print", new commands.Print());
   scope.hardSet("printFlush", new commands.PrintFlush());
   scope.hardSet("drawFlush", new commands.DrawFlush());
   scope.hardSet("getLink", new commands.GetLink());
-  scope.hardSet("control", new commands.Control(scope));
+  scope.hardSet("control", new commands.Control());
   scope.hardSet("radar", new commands.Radar());
   scope.hardSet("sensor", new commands.Sensor());
   scope.hardSet("wait", new commands.Wait());
-  scope.hardSet("lookup", new commands.Lookup(scope));
+  scope.hardSet("lookup", new commands.Lookup());
   scope.hardSet("packColor", new commands.PackColor());
   scope.hardSet("endScript", new commands.End());
   scope.hardSet("stopScript", new commands.Stop());
   scope.hardSet("unitBind", new commands.UnitBind());
-  scope.hardSet("unitControl", new commands.UnitControl(scope));
+  scope.hardSet("unitControl", new commands.UnitControl());
   scope.hardSet("unitRadar", new commands.UnitRadar());
-  scope.hardSet("unitLocate", new commands.UnitLocate(scope));
+  scope.hardSet("unitLocate", new commands.UnitLocate());
 
   // world processor commands
 
-  scope.hardSet("getBlock", new commands.GetBlock(scope));
-  scope.hardSet("setBlock", new commands.SetBlock(scope));
+  scope.hardSet("getBlock", new commands.GetBlock());
+  scope.hardSet("setBlock", new commands.SetBlock());
   scope.hardSet("spawnUnit", new commands.SpawnUnit());
-  scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
+  scope.hardSet("applyStatus", new commands.ApplyStatus());
   scope.hardSet("spawnWave", new commands.SpawnWave());
-  scope.hardSet("setRule", new commands.SetRule(scope));
-  scope.hardSet("flushMessage", new commands.FlushMessage(scope));
-  scope.hardSet("cutscene", new commands.Cutscene(scope));
+  scope.hardSet("setRule", new commands.SetRule());
+  scope.hardSet("flushMessage", new commands.FlushMessage());
+  scope.hardSet("cutscene", new commands.Cutscene());
   scope.hardSet("explosion", new commands.Explosion());
   scope.hardSet("setRate", new commands.SetRate());
-  scope.hardSet("fetch", new commands.Fetch(scope));
+  scope.hardSet("fetch", new commands.Fetch());
   scope.hardSet("getFlag", new commands.GetFlag());
   scope.hardSet("setFlag", new commands.SetFlag());
 }

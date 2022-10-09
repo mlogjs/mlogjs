@@ -13,10 +13,10 @@ export const ForStatement: THandler<null> = (
   const initInst = node.init ? c.handle(scope, node.init)[1] : [];
   const [test, testLines] = node.test
     ? c.handleConsume(scope, node.test)
-    : [new LiteralValue(scope, 1), []];
+    : [new LiteralValue(1), []];
   const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
-  const startLoopAddr = new LiteralValue(scope, null as never);
-  const endLoopAddr = new LiteralValue(scope, null as never);
+  const startLoopAddr = new LiteralValue(null as never);
+  const endLoopAddr = new LiteralValue(null as never);
 
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
@@ -31,7 +31,7 @@ export const ForStatement: THandler<null> = (
         endLoopAddr,
         EJumpKind.Equal,
         test,
-        new LiteralValue(scope, 0)
+        new LiteralValue(0)
       ),
       ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
       ...updateLines,

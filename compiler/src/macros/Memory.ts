@@ -15,7 +15,7 @@ class MemoryEntry extends ObjectValue {
   private store: StoreValue | null = null;
 
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
-    super(scope, {
+    super({
       $eval: new MacroFunction(scope => {
         if (this.store) return [this.store, []];
         const temp = new StoreValue(scope);
@@ -59,7 +59,7 @@ class MemoryMacro extends ObjectValue {
     return this.name;
   }
   constructor(scope: IScope, public cell: SenseableValue, size: LiteralValue) {
-    super(scope, {
+    super({
       $get: new MacroFunction((scope, prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
           throw new CompilerError(
@@ -77,10 +77,10 @@ class MemoryMacro extends ObjectValue {
 }
 
 export class MemoryBuilder extends ObjectValue {
-  constructor(scope: IScope) {
-    super(scope, {
+  constructor() {
+    super({
       $call: new MacroFunction(
-        (scope, cell: IValue, size: IValue = new LiteralValue(scope, 64)) => {
+        (scope, cell: IValue, size: IValue = new LiteralValue(64)) => {
           if (!(cell instanceof SenseableValue))
             throw new CompilerError("Memory cell must be a senseable value.");
 

@@ -14,20 +14,20 @@ const literalMethods: Record<
   string,
   (this: LiteralValue, scope: IScope) => LiteralValue
 > = {
-  length: function (this: LiteralValue, scope: IScope) {
+  length: function (this: LiteralValue) {
     if (typeof this.data !== "string")
       throw new CompilerError(
         "Length method only works on string literal values."
       );
-    return new LiteralValue(scope, this.data.length);
+    return new LiteralValue(this.data.length);
   },
 };
 
 export class LiteralValue extends BaseValue implements IBindableValue {
   data: TLiteral;
   mutability = EMutability.constant;
-  constructor(scope: IScope, data: TLiteral) {
-    super(scope);
+  constructor(data: TLiteral) {
+    super();
     this.data = data;
   }
   eval(_scope: IScope): TValueInstructions {
@@ -55,9 +55,11 @@ export class LiteralValue extends BaseValue implements IBindableValue {
     return this.data;
   }
 
-  typeof(scope: IScope): TValueInstructions {
-    return [new LiteralValue(scope, "literal"), []];
+  typeof(): TValueInstructions {
+    return [new LiteralValue("literal"), []];
   }
+
+  ensureOwned(): void {}
 }
 
 type TOperationFn = (a: number, b?: number) => number;
@@ -103,10 +105,7 @@ for (const key in operatorMap) {
     if (!(value instanceof LiteralValue)) {
       return BaseValue.prototype[key as K].apply(this, [scope, value]);
     }
-    return [
-      new LiteralValue(scope, fn(this.data as never, value.data as never)),
-      [],
-    ];
+    return [new LiteralValue(fn(this.data as never, value.data as never)), []];
   };
 }
 
@@ -122,10 +121,9 @@ const unaryOperatorMap: {
 for (const key in unaryOperatorMap) {
   type K = keyof typeof unaryOperatorMap;
   LiteralValue.prototype[key as K] = function (
-    this: LiteralValue,
-    scope: IScope
+    this: LiteralValue
   ): TValueInstructions {
     const fn = unaryOperatorMap[key as K];
-    return [new LiteralValue(scope, fn(this.data as never)), []];
+    return [new LiteralValue(fn(this.data as never)), []];
   };
 }

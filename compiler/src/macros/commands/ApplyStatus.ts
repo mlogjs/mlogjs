@@ -1,7 +1,6 @@
 import { assertLiteralOneOf } from "../../assertions";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -23,7 +22,7 @@ const validEffects = [
 ] as const;
 
 export class ApplyStatus extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         apply: {
@@ -50,6 +49,6 @@ export class ApplyStatus extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

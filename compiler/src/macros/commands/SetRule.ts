@@ -1,10 +1,10 @@
 import { InstructionBase } from "../../instructions";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class SetRule extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         currentWaveTime: { args: ["seconds"] },
@@ -59,6 +59,6 @@ export class SetRule extends ObjectValue {
         return [null, [new InstructionBase("setrule", overload, ...params)]];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

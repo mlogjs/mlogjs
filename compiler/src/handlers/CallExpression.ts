@@ -37,14 +37,10 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   const template = node.quasi;
 
   const stringsObject = ObjectValue.fromArray(
-    scope,
-    template.quasis.map(
-      quasi => new LiteralValue(scope, quasi.value.cooked ?? "")
-    ),
+    template.quasis.map(quasi => new LiteralValue(quasi.value.cooked ?? "")),
     {
       raw: ObjectValue.fromArray(
-        scope,
-        template.quasis.map(quasi => new LiteralValue(scope, quasi.value.raw))
+        template.quasis.map(quasi => new LiteralValue(quasi.value.raw))
       ),
     }
   );

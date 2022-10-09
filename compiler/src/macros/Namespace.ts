@@ -22,7 +22,7 @@ export class NamespaceMacro extends ObjectValue {
     scope: IScope,
     { changeCasing = false }: NamespaceMacroOptions = {}
   ) {
-    super(scope, {
+    super({
       $get: new MacroFunction((scope, prop) => {
         if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
           throw new CompilerError(

@@ -1,12 +1,10 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Control extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     super(
-      scope,
       createOverloadNamespace({
         overloads: {
           enabled: { args: ["building", "value"] },

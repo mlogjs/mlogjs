@@ -1,5 +1,5 @@
 import { InstructionBase } from "../../instructions";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import {
   LiteralValue,
   ObjectValue,
@@ -9,7 +9,7 @@ import {
 import { createOverloadNamespace } from "../util";
 
 export class UnitControl extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         idle: { args: [] },
@@ -47,14 +47,14 @@ export class UnitControl extends ObjectValue {
             const outType = new StoreValue(scope);
             const outBuilding = new SenseableValue(scope);
 
-            result = ObjectValue.fromArray(scope, [outType, outBuilding]);
-            extraArgs = [outType, outBuilding, new LiteralValue(scope, 0)];
+            result = ObjectValue.fromArray([outType, outBuilding]);
+            extraArgs = [outType, outBuilding, new LiteralValue(0)];
             break;
           }
           case "within": {
             const temp = new StoreValue(scope);
             result = temp;
-            extraArgs = [temp, new LiteralValue(scope, 0)];
+            extraArgs = [temp, new LiteralValue(0)];
             break;
           }
         }
@@ -64,6 +64,6 @@ export class UnitControl extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

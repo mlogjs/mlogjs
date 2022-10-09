@@ -12,10 +12,7 @@ export class Concat extends MacroFunction {
             "Concat arguments must all be literal values."
           );
       return [
-        new LiteralValue(
-          scope,
-          values.map(v => (v as LiteralValue).data).join("")
-        ),
+        new LiteralValue(values.map(v => (v as LiteralValue).data).join("")),
         [],
       ];
     });

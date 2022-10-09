@@ -1,10 +1,9 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Lookup extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
       overloads: {
         block: { args: ["index"] },
@@ -20,6 +19,6 @@ export class Lookup extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }
