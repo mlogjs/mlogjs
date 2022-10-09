@@ -16,14 +16,14 @@ import { Asm } from "./macros/Asm";
  */
 export function initScope(scope: Scope) {
   // namespaces
-  scope.hardSet("ControlKind", new NamespaceMacro(scope));
+  scope.hardSet("ControlKind", new NamespaceMacro());
   scope.hardSet("Vars", new VarsNamespace(scope));
-  scope.hardSet("Teams", new NamespaceMacro(scope));
-  scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
-  scope.hardSet("Liquids", new NamespaceMacro(scope));
-  scope.hardSet("Units", new NamespaceMacro(scope, { changeCasing: true }));
-  scope.hardSet("LAccess", new NamespaceMacro(scope));
-  scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
+  scope.hardSet("Teams", new NamespaceMacro());
+  scope.hardSet("Items", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("Liquids", new NamespaceMacro());
+  scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("LAccess", new NamespaceMacro());
+  scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
