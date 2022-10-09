@@ -1,6 +1,5 @@
-const bricks = getBuilding("bank1");
+const bricks = new Memory(getBuilding("bank1"), 512);
 const display = getBuilding("display1");
-const message = getBuilding("message1");
 
 const size = 176;
 
@@ -24,9 +23,9 @@ const ballMaxStartSpeed = 5;
 const ballSize = 5;
 const ballSizeMinus1 = ballSize - 1;
 
-draw("color", 255, 255, 255);
+draw.color(255, 255, 255);
 
-while (1) {
+while (true) {
   // paddle
   let paddleWidth = 40;
   let paddleX = size / 2 - paddleWidth / 2;
@@ -43,13 +42,18 @@ while (1) {
 
   // game loops
   while (1) {
-    draw("clear", 0, 0, 0);
+    draw.clear(0, 0, 0);
 
     // render paddle
-    draw("rect", paddleX, paddleY, paddleWidth, paddleHeight);
+    draw.rect({
+      x: paddleX,
+      y: paddleY,
+      width: paddleWidth,
+      height: paddleHeight,
+    });
 
     // render ball
-    draw("rect", ballX, ballY, ballSize, ballSize);
+    draw.rect({ x: ballX, y: ballY, width: ballSize, height: ballSize });
 
     // update paddle and handle paddle-wall collision
     if (paddleController.enabled) {
@@ -88,7 +92,7 @@ while (1) {
         // check if brick exists
         if (bricks[brickPtr] == 1) {
           // render the brick
-          draw("rect", x, y, brickWidth - 1, brickHeight - 1);
+          draw.rect({ x, y, width: brickWidth - 1, height: brickHeight - 1 });
           // detect collision
           if (
             ballXEnd > x &&

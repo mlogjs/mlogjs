@@ -1,0 +1,25 @@
+set x:5:4 88
+set y:6:4 88
+set vx:8:4 0
+set vy:9:4 2
+draw color 255 255 255
+op lessThan &t0 x:5:4 0
+op add &t1 x:5:4 5
+op greaterThan &t2 &t1 176
+op or &t3 &t0 &t2
+jump 11 equal &t3 0
+op mul vx:8:4 vx:8:4 -1
+op lessThan &t4 y:6:4 0
+op add &t5 y:6:4 5
+op greaterThan &t6 &t5 176
+op or &t7 &t4 &t6
+jump 17 equal &t7 0
+op mul vy:9:4 vy:9:4 -1
+op add x:5:4 x:5:4 vx:8:4
+op add y:6:4 y:6:4 vy:9:4
+op add vy:9:4 vy:9:4 -1
+draw clear 0 0 0
+draw rect x:5:4 y:6:4 5 5
+drawflush display1
+jump 5 always
+end

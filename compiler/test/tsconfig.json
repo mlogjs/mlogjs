@@ -7,5 +7,5 @@
     "noEmit": true,
     "types": []
   },
-  "include": ["./in", "../lib"]
+  "include": ["./in", "../lib", "./examples"]
 }

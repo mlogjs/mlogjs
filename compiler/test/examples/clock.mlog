@@ -1,0 +1,48 @@
+draw clear 0 0 0
+set i:4:9 0
+op lessThanEq &t0 i:4:9 330
+jump 18 equal &t0 0
+op sin &t0 i:4:9
+op mul x:5:6 &t0 40
+op cos &t1 i:4:9
+op mul y:6:6 &t1 40
+draw color 75 75 75 255
+op mul &t1 x:5:6 0.8
+op add &t2 &t1 40
+op mul &t3 y:6:6 0.8
+op add &t4 &t3 40
+op add &t5 x:5:6 40
+op add &t6 y:6:6 40
+draw line &t2 &t4 &t5 &t6
+op add i:4:9 i:4:9 30
+jump 2 always
+op mul h:17:4 @time 0.006
+draw color 128 128 128 255
+draw stroke 2
+op sin &t2 h:17:4
+op mul &t3 &t2 35
+op add &t4 &t3 40
+op cos &t5 h:17:4
+op mul &t6 &t5 35
+op add &t7 &t6 40
+draw line 40 40 &t4 &t7
+op div h:17:4 h:17:4 60
+draw color 255 255 255 255
+op sin &t9 h:17:4
+op mul &t10 &t9 25
+op add &t11 &t10 40
+op cos &t12 h:17:4
+op mul &t13 &t12 25
+op add &t14 &t13 40
+draw line 40 40 &t11 &t14
+op div h:17:4 h:17:4 282
+draw color 255 64 64 255
+op sin &t16 h:17:4
+op mul &t17 &t16 15
+op add &t18 &t17 40
+op cos &t19 h:17:4
+op mul &t20 &t19 15
+op add &t21 &t20 40
+draw line 40 40 &t18 &t21
+drawflush display1
+end
