@@ -1,6 +1,6 @@
 import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
-import { IScope, IValue } from "../types";
+import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
 import {
   BaseValue,
   LiteralValue,
@@ -10,35 +10,53 @@ import {
 } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
+import { ValueOwner } from "../values/ValueOwner";
 
-class MemoryEntry extends ObjectValue {
+class MemoryEntry extends BaseValue {
+  macro = true;
   private store: StoreValue | null = null;
 
-  constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
-    super({
-      $eval: new MacroFunction(scope => {
-        if (this.store) return [this.store, []];
-        const temp = new StoreValue(scope);
-        return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
-      }),
-      $consume: new MacroFunction(scope => {
-        if (this.store) return [this.store, []];
-        this.ensureOwned();
-        this.store = new StoreValue(scope);
-        this.owner.own(this.store);
-        return [
-          this.store,
-          [new InstructionBase("read", this.store, mem.cell, prop)],
-        ];
-      }),
-      "$=": new MacroFunction((scope, value) => {
-        const [data, dataInst] = value.consume(scope);
-        return [
-          data,
-          [...dataInst, new InstructionBase("write", data, mem.cell, prop)],
-        ];
-      }),
-    });
+  constructor(
+    public scope: IScope,
+    private mem: MemoryMacro,
+    private prop: IValue
+  ) {
+    super();
+  }
+
+  eval(scope: IScope): TValueInstructions {
+    if (this.store) return [this.store, []];
+    const temp = new StoreValue(scope);
+    return [
+      temp,
+      [new InstructionBase("read", temp, this.mem.cell, this.prop)],
+    ];
+  }
+
+  consume(scope: IScope): TValueInstructions {
+    if (this.store) return [this.store, []];
+    this.ensureOwned();
+    this.store = new StoreValue(scope);
+    this.owner.own(this.store);
+    return [
+      this.store,
+      [new InstructionBase("read", this.store, this.mem.cell, this.prop)],
+    ];
+  }
+
+  "="(scope: IScope, value: IValue): TValueInstructions {
+    const [data, dataInst] = value.consume(scope);
+    return [
+      data,
+      [
+        ...dataInst,
+        new InstructionBase("write", data, this.mem.cell, this.prop),
+      ],
+    ];
+  }
+
+  ensureOwned(): asserts this is IOwnedValue {
+    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }
 
@@ -54,11 +72,7 @@ for (const operator of operators) {
 }
 
 class MemoryMacro extends ObjectValue {
-  name: string;
-  toString() {
-    return this.name;
-  }
-  constructor(scope: IScope, public cell: SenseableValue, size: LiteralValue) {
+  constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
       $get: new MacroFunction((scope, prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
@@ -71,8 +85,10 @@ class MemoryMacro extends ObjectValue {
       length: size,
       size,
     });
+  }
 
-    this.name = cell.toString();
+  toString() {
+    return this.cell.toString();
   }
 }
 
@@ -89,7 +105,7 @@ export class MemoryBuilder extends ObjectValue {
               "The memory size must be a number literal."
             );
 
-          return [new MemoryMacro(scope, cell, size), []];
+          return [new MemoryMacro(cell, size), []];
         }
       ),
     });
