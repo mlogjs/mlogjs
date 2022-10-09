@@ -8,7 +8,6 @@ import { IScope, IValue, TValueInstructions } from "../types";
 import { MacroFunction } from "./Function";
 
 interface IOverloadNamespaceOptions<K extends string> {
-  scope: IScope;
   overloads: Record<
     K,
     {
@@ -22,6 +21,7 @@ interface IOverloadNamespaceOptions<K extends string> {
   >;
 
   handler(
+    scope: IScope,
     overload: K,
     ...args: (IValue | string)[]
   ): TValueInstructions<IValue | null>;
@@ -29,7 +29,6 @@ interface IOverloadNamespaceOptions<K extends string> {
 
 /** Used to create namespaces that contain multiple methods that map into instructions */
 export function createOverloadNamespace<K extends string>({
-  scope,
   overloads,
   handler,
 }: IOverloadNamespaceOptions<K>) {
@@ -38,15 +37,15 @@ export function createOverloadNamespace<K extends string>({
   for (const key in overloads) {
     const { named, args } = overloads[key];
     if (named) {
-      result[key] = new MacroFunction(scope, options => {
+      result[key] = new MacroFunction((scope, options) => {
         assertIsObjectMacro(options, named);
 
-        return handler(key, ...assertObjectFields(options, args));
+        return handler(scope, key, ...assertObjectFields(options, args));
       });
       continue;
     }
 
-    result[key] = new MacroFunction(scope, (...params) => {
+    result[key] = new MacroFunction((scope, ...params) => {
       const handlerParams: (IValue | string)[] = [];
       // validate the paramters
       for (let i = 0; i < args.length; i++) {
@@ -66,7 +65,7 @@ export function createOverloadNamespace<K extends string>({
         handlerParams.push(param);
       }
 
-      return handler(key, ...handlerParams);
+      return handler(scope, key, ...handlerParams);
     });
   }
 

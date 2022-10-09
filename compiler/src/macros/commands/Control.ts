@@ -8,7 +8,6 @@ export class Control extends ObjectValue {
     super(
       scope,
       createOverloadNamespace({
-        scope,
         overloads: {
           enabled: { args: ["building", "value"] },
           shoot: {
@@ -22,7 +21,7 @@ export class Control extends ObjectValue {
           config: { args: ["building", "value"] },
           color: { args: ["building", "r", "g", "b"] },
         },
-        handler(overload, ...args) {
+        handler(scope, overload, ...args) {
           return [null, [new InstructionBase("control", overload, ...args)]];
         },
       })

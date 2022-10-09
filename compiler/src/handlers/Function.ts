@@ -21,7 +21,6 @@ function handleFunctionNode(
 
   return [
     new FunctionValue({
-      node,
       scope,
       params: params as es.Identifier[],
       body,

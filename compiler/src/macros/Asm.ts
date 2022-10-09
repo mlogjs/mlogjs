@@ -1,13 +1,13 @@
 import { CompilerError } from "../CompilerError";
 import { ZeroSpaceInstruction } from "../instructions";
-import { IInstruction, IScope, IValue } from "../types";
+import { IInstruction, IValue } from "../types";
 import { isTemplateObjectArray } from "../utils";
 import { LiteralValue } from "../values";
 import { MacroFunction } from "./Function";
 
 export class Asm extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, (stringsArray, ...values) => {
+  constructor() {
+    super((scope, stringsArray, ...values) => {
       if (!isTemplateObjectArray(stringsArray))
         throw new CompilerError("Expected to receive a template strings array");
 

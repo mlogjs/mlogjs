@@ -24,8 +24,8 @@ export class ObjectValue extends VoidValue {
   macro = true;
   data: IObjectValueData;
 
-  constructor(scope: IScope, data: IObjectValueData = {}) {
-    super(scope);
+  constructor(public scope: IScope, data: IObjectValueData = {}) {
+    super();
     this.data = data;
   }
 

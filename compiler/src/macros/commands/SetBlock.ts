@@ -6,7 +6,6 @@ import { createOverloadNamespace } from "../util";
 export class SetBlock extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         floor: { args: ["x", "y", "to"] },
         ore: { args: ["x", "y", "to"] },
@@ -15,7 +14,7 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(overload, x, y, to, team, rotation) {
+      handler(scope, overload, x, y, to, team, rotation) {
         return [
           null,
           [

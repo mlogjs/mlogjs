@@ -102,7 +102,7 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
     inst.push(...valueInst[1]);
     members.set(new LiteralValue(scope, i), valueInst[0]);
   }
-  return [new DestructuringValue(scope, members), inst];
+  return [new DestructuringValue(members), inst];
 };
 
 export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
@@ -133,5 +133,5 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 
     members.set(keyInst[0], valueInst[0]);
   }
-  return [new DestructuringValue(scope, members), inst];
+  return [new DestructuringValue(members), inst];
 };

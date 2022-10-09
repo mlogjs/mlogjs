@@ -1,12 +1,12 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IInstruction, IScope, IValue, TValueInstructions } from "../../types";
+import { IInstruction, IValue, TValueInstructions } from "../../types";
 import { LiteralValue } from "../../values";
 import { isTemplateObjectArray } from "../../utils";
 
 export class Print extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, (...values: IValue[]) => {
+  constructor() {
+    super((scope, ...values: IValue[]) => {
       const [first] = values;
       const inst: IInstruction[] = [];
 

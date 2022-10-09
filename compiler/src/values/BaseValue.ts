@@ -10,6 +10,10 @@ import { LiteralValue, VoidValue, StoreValue } from ".";
 import { ValueOwner } from "./ValueOwner";
 
 export class BaseValue extends VoidValue implements IValue {
+  constructor(public scope: IScope) {
+    super();
+  }
+
   "u-"(scope: IScope): TValueInstructions {
     const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);

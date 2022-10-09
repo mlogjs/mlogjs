@@ -25,14 +25,13 @@ const validEffects = [
 export class ApplyStatus extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         apply: {
           args: ["status", "unit", { key: "duration", default: "10" }],
         },
         clear: { args: ["status", "unit"] },
       },
-      handler(overload, effect, unit, duration) {
+      handler(scope, overload, effect, unit, duration) {
         if (!(effect instanceof LiteralValue))
           throw new CompilerError("The status effect must be a string literal");
         assertLiteralOneOf(effect, validEffects, "The status effect");

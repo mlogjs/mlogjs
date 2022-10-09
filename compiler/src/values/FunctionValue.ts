@@ -30,10 +30,11 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
 export class FunctionValue extends VoidValue implements IFunctionValue {
   mutability = EMutability.constant;
   macro = true;
-  private node: es.Function;
+
+  scope: IScope;
   private childScope!: IScope;
   private params: es.Identifier[];
-  private paramOwners: ValueOwner<StoreValue>[] = [];
+  private paramOwners: ValueOwner<IValue>[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
   private temp!: ValueOwner<SenseableValue>;
@@ -53,18 +54,16 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     params,
     body,
     c,
-    node,
   }: {
     scope: IScope;
     body: es.BlockStatement;
     c: Compiler;
-    node: es.Function;
     params: es.Identifier[];
   }) {
-    super(scope);
+    super();
+    this.scope = scope;
     this.body = body;
     this.c = c;
-    this.node = node;
     this.params = params;
   }
 

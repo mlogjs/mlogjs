@@ -220,7 +220,6 @@ export enum EMutability {
 export interface IValue extends IValueOperators {
   // main properties
   owner: IValueOwner | null;
-  scope: IScope;
   mutability: EMutability;
   macro: boolean;
   /**

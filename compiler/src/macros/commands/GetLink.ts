@@ -1,12 +1,12 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 export class GetLink extends MacroFunction {
-  constructor(scope: IScope) {
-    super(scope, (index: IValue) => {
+  constructor() {
+    super((scope, index: IValue) => {
       if (
         !(index instanceof StoreValue) &&
         (!(index instanceof LiteralValue) || typeof index.data !== "number")

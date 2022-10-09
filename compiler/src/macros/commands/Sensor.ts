@@ -1,13 +1,13 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { EMutability, IScope } from "../../types";
+import { EMutability } from "../../types";
 import { SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 import { assign } from "../../utils";
 
 export class Sensor extends MacroFunction {
-  constructor(scope: IScope) {
-    super(scope, (property, target) => {
+  constructor() {
+    super((scope, property, target) => {
       if (!(property instanceof StoreValue))
         throw new CompilerError("The sensor property must be a store");
 

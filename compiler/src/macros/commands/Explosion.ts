@@ -1,11 +1,10 @@
 import { assertIsObjectMacro, assertObjectFields } from "../../assertions";
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { MacroFunction } from "../Function";
 
 export class Explosion extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, options => {
+  constructor() {
+    super((scope, options) => {
       assertIsObjectMacro(options, "The options");
 
       const params = assertObjectFields(options, [

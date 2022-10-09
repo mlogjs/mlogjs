@@ -6,14 +6,13 @@ import { createOverloadNamespace } from "../util";
 export class GetBlock extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         floor: { args: ["x", "y"] },
         ore: { args: ["x", "y"] },
         block: { args: ["x", "y"] },
         building: { args: ["x", "y"] },
       },
-      handler(overload, x, y) {
+      handler(scope, overload, x, y) {
         const output =
           overload === "building"
             ? new SenseableValue(scope)

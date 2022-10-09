@@ -11,12 +11,9 @@ import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
   owner: IValueOwner | null = null;
-  scope: IScope;
   mutability = EMutability.mutable;
   macro = false;
-  constructor(scope: IScope) {
-    this.scope = scope;
-  }
+
   eval(_scope: IScope): TValueInstructions {
     throw new CompilerError(`${this} cannot eval.`);
   }

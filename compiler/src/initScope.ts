@@ -26,46 +26,46 @@ export function initScope(scope: Scope) {
   scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
 
   // helper methods
-  scope.hardSet("getBuilding", new GetGlobal(scope, EMutability.constant));
-  scope.hardSet("getVar", new GetGlobal(scope, EMutability.mutable));
-  scope.hardSet("concat", new Concat(scope));
-  scope.hardSet("asm", new Asm(scope));
+  scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
+  scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
+  scope.hardSet("concat", new Concat());
+  scope.hardSet("asm", new Asm());
 
   scope.hardSet("Math", new MlogMath(scope));
   scope.hardSet("Memory", new MemoryBuilder(scope));
 
   // commands
   scope.hardSet("draw", new commands.Draw(scope));
-  scope.hardSet("print", new commands.Print(scope));
-  scope.hardSet("printFlush", new commands.PrintFlush(scope));
-  scope.hardSet("drawFlush", new commands.DrawFlush(scope));
-  scope.hardSet("getLink", new commands.GetLink(scope));
+  scope.hardSet("print", new commands.Print());
+  scope.hardSet("printFlush", new commands.PrintFlush());
+  scope.hardSet("drawFlush", new commands.DrawFlush());
+  scope.hardSet("getLink", new commands.GetLink());
   scope.hardSet("control", new commands.Control(scope));
-  scope.hardSet("radar", new commands.Radar(scope));
-  scope.hardSet("sensor", new commands.Sensor(scope));
-  scope.hardSet("wait", new commands.Wait(scope));
+  scope.hardSet("radar", new commands.Radar());
+  scope.hardSet("sensor", new commands.Sensor());
+  scope.hardSet("wait", new commands.Wait());
   scope.hardSet("lookup", new commands.Lookup(scope));
-  scope.hardSet("packColor", new commands.PackColor(scope));
-  scope.hardSet("endScript", new commands.End(scope));
-  scope.hardSet("stopScript", new commands.Stop(scope));
-  scope.hardSet("unitBind", new commands.UnitBind(scope));
+  scope.hardSet("packColor", new commands.PackColor());
+  scope.hardSet("endScript", new commands.End());
+  scope.hardSet("stopScript", new commands.Stop());
+  scope.hardSet("unitBind", new commands.UnitBind());
   scope.hardSet("unitControl", new commands.UnitControl(scope));
-  scope.hardSet("unitRadar", new commands.UnitRadar(scope));
+  scope.hardSet("unitRadar", new commands.UnitRadar());
   scope.hardSet("unitLocate", new commands.UnitLocate(scope));
 
   // world processor commands
 
   scope.hardSet("getBlock", new commands.GetBlock(scope));
   scope.hardSet("setBlock", new commands.SetBlock(scope));
-  scope.hardSet("spawnUnit", new commands.SpawnUnit(scope));
+  scope.hardSet("spawnUnit", new commands.SpawnUnit());
   scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
-  scope.hardSet("spawnWave", new commands.SpawnWave(scope));
+  scope.hardSet("spawnWave", new commands.SpawnWave());
   scope.hardSet("setRule", new commands.SetRule(scope));
   scope.hardSet("flushMessage", new commands.FlushMessage(scope));
   scope.hardSet("cutscene", new commands.Cutscene(scope));
-  scope.hardSet("explosion", new commands.Explosion(scope));
-  scope.hardSet("setRate", new commands.SetRate(scope));
+  scope.hardSet("explosion", new commands.Explosion());
+  scope.hardSet("setRate", new commands.SetRate());
   scope.hardSet("fetch", new commands.Fetch(scope));
-  scope.hardSet("getFlag", new commands.GetFlag(scope));
-  scope.hardSet("setFlag", new commands.SetFlag(scope));
+  scope.hardSet("getFlag", new commands.GetFlag());
+  scope.hardSet("setFlag", new commands.SetFlag());
 }

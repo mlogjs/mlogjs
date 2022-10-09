@@ -6,7 +6,6 @@ import { createOverloadNamespace } from "../util";
 export class Fetch extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         unit: { args: ["team", "index"] },
         unitCount: { args: ["team"] },
@@ -17,7 +16,7 @@ export class Fetch extends ObjectValue {
         build: { args: ["team", "index", "block"] },
         buildCount: { args: ["team", "block"] },
       },
-      handler(overload, team, ...rest) {
+      handler(scope, overload, team, ...rest) {
         const output = new SenseableValue(scope);
 
         const params: (IValue | string)[] = ["0", "@conveyor"];

@@ -25,7 +25,6 @@ const validBuildingGroups = [
 export class UnitLocate extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         ore: {
           args: ["ore"],
@@ -38,7 +37,7 @@ export class UnitLocate extends ObjectValue {
           args: [],
         },
       },
-      handler(overload, ...args) {
+      handler(scope, overload, ...args) {
         const outFound = new StoreValue(scope);
         const outX = new StoreValue(scope);
         const outY = new StoreValue(scope);

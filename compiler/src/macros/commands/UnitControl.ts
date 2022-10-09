@@ -11,7 +11,6 @@ import { createOverloadNamespace } from "../util";
 export class UnitControl extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         idle: { args: [] },
         stop: { args: [] },
@@ -40,7 +39,7 @@ export class UnitControl extends ObjectValue {
           args: ["x", "y", "radius"],
         },
       },
-      handler(overload, ...args) {
+      handler(scope, overload, ...args) {
         let result: ObjectValue | StoreValue | null = null;
         let extraArgs: IValue[] = [];
         switch (overload) {

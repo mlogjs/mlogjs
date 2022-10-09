@@ -16,12 +16,12 @@ class MemoryEntry extends ObjectValue {
 
   constructor(scope: IScope, mem: MemoryMacro, prop: IValue) {
     super(scope, {
-      $eval: new MacroFunction(scope, () => {
+      $eval: new MacroFunction(scope => {
         if (this.store) return [this.store, []];
         const temp = new StoreValue(scope);
         return [temp, [new InstructionBase("read", temp, mem.cell, prop)]];
       }),
-      $consume: new MacroFunction(scope, () => {
+      $consume: new MacroFunction(scope => {
         if (this.store) return [this.store, []];
         this.ensureOwned();
         this.store = new StoreValue(scope);
@@ -31,7 +31,7 @@ class MemoryEntry extends ObjectValue {
           [new InstructionBase("read", this.store, mem.cell, prop)],
         ];
       }),
-      "$=": new MacroFunction(scope, value => {
+      "$=": new MacroFunction((scope, value) => {
         const [data, dataInst] = value.consume(scope);
         return [
           data,
@@ -60,7 +60,7 @@ class MemoryMacro extends ObjectValue {
   }
   constructor(scope: IScope, public cell: SenseableValue, size: LiteralValue) {
     super(scope, {
-      $get: new MacroFunction(scope, (prop: IValue) => {
+      $get: new MacroFunction((scope, prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
           throw new CompilerError(
             `Invalid memory object property: "${prop.data}"`
@@ -80,8 +80,7 @@ export class MemoryBuilder extends ObjectValue {
   constructor(scope: IScope) {
     super(scope, {
       $call: new MacroFunction(
-        scope,
-        (cell: IValue, size: IValue = new LiteralValue(scope, 64)) => {
+        (scope, cell: IValue, size: IValue = new LiteralValue(scope, 64)) => {
           if (!(cell instanceof SenseableValue))
             throw new CompilerError("Memory cell must be a senseable value.");
 

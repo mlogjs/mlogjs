@@ -1,12 +1,11 @@
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 export class SpawnWave extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, (natural, x, y) => {
+  constructor() {
+    super((scope, natural, x, y) => {
       if (
         !(natural instanceof LiteralValue) ||
         (natural.data !== 1 && natural.data !== 0)

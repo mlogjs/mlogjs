@@ -6,7 +6,6 @@ import { createOverloadNamespace } from "../util";
 export class SetRule extends ObjectValue {
   constructor(scope: IScope) {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         currentWaveTime: { args: ["seconds"] },
         waveTimer: { args: ["enabled"] },
@@ -30,7 +29,7 @@ export class SetRule extends ObjectValue {
         rtsMinWeight: { args: ["team", "value"] },
         rtsMinSquad: { args: ["team", "value"] },
       },
-      handler(overload, ...args) {
+      handler(scope, overload, ...args) {
         const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
         switch (overload) {
           case "mapArea": {

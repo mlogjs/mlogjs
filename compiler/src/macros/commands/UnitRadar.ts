@@ -1,6 +1,5 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope } from "../../types";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
 import { CompilerError } from "../../CompilerError";
@@ -11,8 +10,8 @@ import {
 } from "../../assertions";
 
 export class UnitRadar extends MacroFunction {
-  constructor(scope: IScope) {
-    super(scope, options => {
+  constructor() {
+    super((scope, options) => {
       assertIsObjectMacro(options, "The radar options");
 
       const { filters, order, sort } = options.data;
