@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { IScope, IValue } from "../types";
+import { IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
@@ -29,18 +29,18 @@ const mathOperations: Record<
   rand: null,
 };
 
-function createMacroMathOperations(scope: IScope) {
+function createMacroMathOperations() {
   const macroMathOperations: Record<string, MacroFunction> = {};
   for (const key in mathOperations) {
     const fn = mathOperations[key];
-    macroMathOperations[key] = new MacroFunction<IValue>(scope, (a, b) => {
+    macroMathOperations[key] = new MacroFunction<IValue>((scope, a, b) => {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (typeof a.data !== "number" || typeof b.data !== "number")
             throw new CompilerError(
               "Cannot do math operation with non-numerical literals."
             );
-          return [new LiteralValue(scope, fn(a.num, b.num)), []];
+          return [new LiteralValue(fn(a.num, b.num)), []];
         }
         const temp = new StoreValue(scope);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
@@ -51,7 +51,7 @@ function createMacroMathOperations(scope: IScope) {
             "Cannot do math operation with non-numerical literal."
           );
 
-        return [new LiteralValue(scope, fn(a.num)), []];
+        return [new LiteralValue(fn(a.num)), []];
       }
       const temp = new StoreValue(scope);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
@@ -61,8 +61,8 @@ function createMacroMathOperations(scope: IScope) {
 }
 
 export class MlogMath extends ObjectValue {
-  constructor(scope: IScope) {
-    super(scope, createMacroMathOperations(scope));
+  constructor() {
+    super(createMacroMathOperations());
   }
 }
 

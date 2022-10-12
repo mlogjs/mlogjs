@@ -11,8 +11,8 @@ import { VoidValue } from "./VoidValue";
 export class DestructuringValue extends VoidValue {
   macro = true;
 
-  constructor(scope: IScope, public members: Map<IValue, IValue>) {
-    super(scope);
+  constructor(public members: Map<IValue, IValue>) {
+    super();
   }
 
   "="(scope: IScope, right: IValue): TValueInstructions {

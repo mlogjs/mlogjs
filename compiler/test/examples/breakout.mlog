@@ -4,14 +4,14 @@ op div &t0 paddleWidth:30:6 2
 op sub paddleX:31:6 88 &t0
 set ballX:34:6 88
 set ballY:35:6 88
-op rand &t0 10
-op sub ballVX:36:6 &t0 5
 op rand &t1 10
-op sub ballVY:37:6 &t1 5
+op sub ballVX:36:6 &t1 5
+op rand &t2 10
+op sub ballVY:37:6 &t2 5
 set brickCount:40:6 6
 set i:41:11 0
-op lessThan &t1 i:41:11 6
-jump 17 equal &t1 0
+op lessThan &t3 i:41:11 6
+jump 17 equal &t3 0
 write 1 bank1 i:41:11
 op add i:41:11 i:41:11 1
 jump 12 always
@@ -64,9 +64,9 @@ jump 96 equal &t17 0
 set x:91:15 1
 op lessThan &t18 x:91:15 176
 jump 94 equal &t18 0
-read &t2 bank1 brickPtr:89:8
-op equal &t19 &t2 1
-jump 91 equal &t19 0
+read &t19 bank1 brickPtr:89:8
+op equal &t20 &t19 1
+jump 91 equal &t20 0
 draw rect x:91:15 y:90:13 57.666666666666664 9
 op greaterThan &t21 ballXEnd:69:8 x:91:15
 op add &t22 x:91:15 58.666666666666664

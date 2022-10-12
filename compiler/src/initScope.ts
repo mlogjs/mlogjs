@@ -16,56 +16,56 @@ import { Asm } from "./macros/Asm";
  */
 export function initScope(scope: Scope) {
   // namespaces
-  scope.hardSet("ControlKind", new NamespaceMacro(scope));
+  scope.hardSet("ControlKind", new NamespaceMacro());
   scope.hardSet("Vars", new VarsNamespace(scope));
-  scope.hardSet("Teams", new NamespaceMacro(scope));
-  scope.hardSet("Items", new NamespaceMacro(scope, { changeCasing: true }));
-  scope.hardSet("Liquids", new NamespaceMacro(scope));
-  scope.hardSet("Units", new NamespaceMacro(scope, { changeCasing: true }));
-  scope.hardSet("LAccess", new NamespaceMacro(scope));
-  scope.hardSet("Blocks", new NamespaceMacro(scope, { changeCasing: true }));
+  scope.hardSet("Teams", new NamespaceMacro());
+  scope.hardSet("Items", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("Liquids", new NamespaceMacro());
+  scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("LAccess", new NamespaceMacro());
+  scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
 
   // helper methods
-  scope.hardSet("getBuilding", new GetGlobal(scope, EMutability.constant));
-  scope.hardSet("getVar", new GetGlobal(scope, EMutability.mutable));
-  scope.hardSet("concat", new Concat(scope));
-  scope.hardSet("asm", new Asm(scope));
+  scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
+  scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
+  scope.hardSet("concat", new Concat());
+  scope.hardSet("asm", new Asm());
 
-  scope.hardSet("Math", new MlogMath(scope));
-  scope.hardSet("Memory", new MemoryBuilder(scope));
+  scope.hardSet("Math", new MlogMath());
+  scope.hardSet("Memory", new MemoryBuilder());
 
   // commands
-  scope.hardSet("draw", new commands.Draw(scope));
-  scope.hardSet("print", new commands.Print(scope));
-  scope.hardSet("printFlush", new commands.PrintFlush(scope));
-  scope.hardSet("drawFlush", new commands.DrawFlush(scope));
-  scope.hardSet("getLink", new commands.GetLink(scope));
-  scope.hardSet("control", new commands.Control(scope));
-  scope.hardSet("radar", new commands.Radar(scope));
-  scope.hardSet("sensor", new commands.Sensor(scope));
-  scope.hardSet("wait", new commands.Wait(scope));
-  scope.hardSet("lookup", new commands.Lookup(scope));
-  scope.hardSet("packColor", new commands.PackColor(scope));
-  scope.hardSet("endScript", new commands.End(scope));
-  scope.hardSet("stopScript", new commands.Stop(scope));
-  scope.hardSet("unitBind", new commands.UnitBind(scope));
-  scope.hardSet("unitControl", new commands.UnitControl(scope));
-  scope.hardSet("unitRadar", new commands.UnitRadar(scope));
-  scope.hardSet("unitLocate", new commands.UnitLocate(scope));
+  scope.hardSet("draw", new commands.Draw());
+  scope.hardSet("print", new commands.Print());
+  scope.hardSet("printFlush", new commands.PrintFlush());
+  scope.hardSet("drawFlush", new commands.DrawFlush());
+  scope.hardSet("getLink", new commands.GetLink());
+  scope.hardSet("control", new commands.Control());
+  scope.hardSet("radar", new commands.Radar());
+  scope.hardSet("sensor", new commands.Sensor());
+  scope.hardSet("wait", new commands.Wait());
+  scope.hardSet("lookup", new commands.Lookup());
+  scope.hardSet("packColor", new commands.PackColor());
+  scope.hardSet("endScript", new commands.End());
+  scope.hardSet("stopScript", new commands.Stop());
+  scope.hardSet("unitBind", new commands.UnitBind());
+  scope.hardSet("unitControl", new commands.UnitControl());
+  scope.hardSet("unitRadar", new commands.UnitRadar());
+  scope.hardSet("unitLocate", new commands.UnitLocate());
 
   // world processor commands
 
-  scope.hardSet("getBlock", new commands.GetBlock(scope));
-  scope.hardSet("setBlock", new commands.SetBlock(scope));
-  scope.hardSet("spawnUnit", new commands.SpawnUnit(scope));
-  scope.hardSet("applyStatus", new commands.ApplyStatus(scope));
-  scope.hardSet("spawnWave", new commands.SpawnWave(scope));
-  scope.hardSet("setRule", new commands.SetRule(scope));
-  scope.hardSet("flushMessage", new commands.FlushMessage(scope));
-  scope.hardSet("cutscene", new commands.Cutscene(scope));
-  scope.hardSet("explosion", new commands.Explosion(scope));
-  scope.hardSet("setRate", new commands.SetRate(scope));
-  scope.hardSet("fetch", new commands.Fetch(scope));
-  scope.hardSet("getFlag", new commands.GetFlag(scope));
-  scope.hardSet("setFlag", new commands.SetFlag(scope));
+  scope.hardSet("getBlock", new commands.GetBlock());
+  scope.hardSet("setBlock", new commands.SetBlock());
+  scope.hardSet("spawnUnit", new commands.SpawnUnit());
+  scope.hardSet("applyStatus", new commands.ApplyStatus());
+  scope.hardSet("spawnWave", new commands.SpawnWave());
+  scope.hardSet("setRule", new commands.SetRule());
+  scope.hardSet("flushMessage", new commands.FlushMessage());
+  scope.hardSet("cutscene", new commands.Cutscene());
+  scope.hardSet("explosion", new commands.Explosion());
+  scope.hardSet("setRate", new commands.SetRate());
+  scope.hardSet("fetch", new commands.Fetch());
+  scope.hardSet("getFlag", new commands.GetFlag());
+  scope.hardSet("setFlag", new commands.SetFlag());
 }

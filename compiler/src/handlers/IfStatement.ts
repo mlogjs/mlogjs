@@ -14,21 +14,16 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
     return [null, inst];
   }
 
-  const endIfAddr = new LiteralValue(scope, null as never);
+  const endIfAddr = new LiteralValue(null as never);
 
   inst.push(
     ...testInst,
-    new JumpInstruction(
-      endIfAddr,
-      EJumpKind.Equal,
-      test,
-      new LiteralValue(scope, 0)
-    ),
+    new JumpInstruction(endIfAddr, EJumpKind.Equal, test, new LiteralValue(0)),
     ...withAlwaysRuns(c.handle(scope, node.consequent), false)[1],
     new AddressResolver(endIfAddr)
   );
 
-  const endElseAddr = new LiteralValue(scope, null as never);
+  const endElseAddr = new LiteralValue(null as never);
   if (node.alternate) {
     inst.push(
       new JumpInstruction(endElseAddr, EJumpKind.Always),

@@ -1,19 +1,17 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue, SenseableValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class GetBlock extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         floor: { args: ["x", "y"] },
         ore: { args: ["x", "y"] },
         block: { args: ["x", "y"] },
         building: { args: ["x", "y"] },
       },
-      handler(overload, x, y) {
+      handler(scope, overload, x, y) {
         const output =
           overload === "building"
             ? new SenseableValue(scope)
@@ -25,6 +23,6 @@ export class GetBlock extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

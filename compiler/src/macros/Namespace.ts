@@ -18,12 +18,9 @@ interface NamespaceMacroOptions {
 }
 export class NamespaceMacro extends ObjectValue {
   changeCasing: boolean;
-  constructor(
-    scope: IScope,
-    { changeCasing = false }: NamespaceMacroOptions = {}
-  ) {
-    super(scope, {
-      $get: new MacroFunction(scope, prop => {
+  constructor({ changeCasing = false }: NamespaceMacroOptions = {}) {
+    super({
+      $get: new MacroFunction((scope, prop) => {
         if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
           throw new CompilerError(
             "Cannot use dynamic properties on namespace macros"
@@ -52,7 +49,7 @@ export class NamespaceMacro extends ObjectValue {
 
 export class VarsNamespace extends NamespaceMacro {
   constructor(scope: IScope) {
-    super(scope);
+    super();
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
       unit: new ValueOwner({
         scope,

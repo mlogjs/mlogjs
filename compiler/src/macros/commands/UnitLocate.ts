@@ -1,5 +1,5 @@
 import { InstructionBase } from "../../instructions";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import {
   LiteralValue,
   ObjectValue,
@@ -23,9 +23,8 @@ const validBuildingGroups = [
 ] as const;
 
 export class UnitLocate extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         ore: {
           args: ["ore"],
@@ -38,7 +37,7 @@ export class UnitLocate extends ObjectValue {
           args: [],
         },
       },
-      handler(overload, ...args) {
+      handler(scope, overload, ...args) {
         const outFound = new StoreValue(scope);
         const outX = new StoreValue(scope);
         const outY = new StoreValue(scope);
@@ -75,7 +74,7 @@ export class UnitLocate extends ObjectValue {
           }
         }
         return [
-          ObjectValue.fromArray(scope, [
+          ObjectValue.fromArray([
             outFound,
             outX,
             outY,
@@ -85,6 +84,6 @@ export class UnitLocate extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

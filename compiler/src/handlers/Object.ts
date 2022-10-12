@@ -50,7 +50,7 @@ export const ObjectExpression: THandler = (
     data[index] = member;
     inst.push(...memberInst);
   }
-  return [new ObjectValue(scope, data), inst];
+  return [new ObjectValue(data), inst];
 };
 
 export const ArrayExpression: THandler = (
@@ -67,7 +67,7 @@ export const ArrayExpression: THandler = (
     items.push(value);
     inst.push(...valueInst);
   });
-  return [ObjectValue.fromArray(scope, items), inst];
+  return [ObjectValue.fromArray(items), inst];
 };
 
 export const MemberExpression: THandler = (
@@ -79,7 +79,7 @@ export const MemberExpression: THandler = (
 
   const [prop, propInst] = node.computed
     ? c.handleConsume(scope, node.property)
-    : [new LiteralValue(scope, (node.property as es.Identifier).name), []];
+    : [new LiteralValue((node.property as es.Identifier).name), []];
 
   const [got, gotInst] = obj.get(scope, prop);
   return [got, [...objInst, ...propInst, ...gotInst]];
@@ -100,9 +100,9 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
       );
 
     inst.push(...valueInst[1]);
-    members.set(new LiteralValue(scope, i), valueInst[0]);
+    members.set(new LiteralValue(i), valueInst[0]);
   }
-  return [new DestructuringValue(scope, members), inst];
+  return [new DestructuringValue(members), inst];
 };
 
 export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
@@ -117,7 +117,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const { key } = prop;
     const keyInst: TValueInstructions =
       !prop.computed && key.type === "Identifier"
-        ? [new LiteralValue(scope, key.name), []]
+        ? [new LiteralValue(key.name), []]
         : c.handleConsume(scope, prop.key);
     inst.push(...keyInst[1]);
 
@@ -133,5 +133,5 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 
     members.set(keyInst[0], valueInst[0]);
   }
-  return [new DestructuringValue(scope, members), inst];
+  return [new DestructuringValue(members), inst];
 };

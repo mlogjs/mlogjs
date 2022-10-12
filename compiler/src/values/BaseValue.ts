@@ -5,9 +5,8 @@ import {
   LogicalOperator,
   updateOperators,
 } from "../operators";
-import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
+import { IScope, IValue, TValueInstructions } from "../types";
 import { LiteralValue, VoidValue, StoreValue } from ".";
-import { ValueOwner } from "./ValueOwner";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope): TValueInstructions {
@@ -17,7 +16,7 @@ export class BaseValue extends VoidValue implements IValue {
       temp,
       [
         ...inst,
-        new OperationInstruction("sub", temp, new LiteralValue(scope, 0), that),
+        new OperationInstruction("sub", temp, new LiteralValue(0), that),
       ],
     ];
   }
@@ -29,7 +28,7 @@ export class BaseValue extends VoidValue implements IValue {
   "!"(scope: IScope): TValueInstructions {
     const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
-    const falseLiteral = new LiteralValue(scope, 0);
+    const falseLiteral = new LiteralValue(0);
     return [
       temp,
       [...inst, new OperationInstruction("equal", temp, that, falseLiteral)],
@@ -40,9 +39,6 @@ export class BaseValue extends VoidValue implements IValue {
     const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
     return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
-  }
-  ensureOwned(): asserts this is IOwnedValue {
-    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
   }
 }
 
@@ -144,9 +140,6 @@ for (const key of updateOperators) {
       inst.push(...tempInst);
     }
     const kind = key === "++" ? "+=" : "-=";
-    return [
-      ret,
-      [...inst, ...this[kind](scope, new LiteralValue(scope, 1))[1]],
-    ];
+    return [ret, [...inst, ...this[kind](scope, new LiteralValue(1))[1]]];
   };
 }

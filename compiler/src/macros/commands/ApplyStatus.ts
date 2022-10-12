@@ -1,7 +1,6 @@
 import { assertLiteralOneOf } from "../../assertions";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -23,16 +22,15 @@ const validEffects = [
 ] as const;
 
 export class ApplyStatus extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         apply: {
           args: ["status", "unit", { key: "duration", default: "10" }],
         },
         clear: { args: ["status", "unit"] },
       },
-      handler(overload, effect, unit, duration) {
+      handler(scope, overload, effect, unit, duration) {
         if (!(effect instanceof LiteralValue))
           throw new CompilerError("The status effect must be a string literal");
         assertLiteralOneOf(effect, validEffects, "The status effect");
@@ -51,6 +49,6 @@ export class ApplyStatus extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

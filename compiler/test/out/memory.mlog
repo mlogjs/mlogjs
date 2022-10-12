@@ -12,7 +12,7 @@ print "This code has run "
 print runs:11:6
 print " time(s)"
 read &t2 bank1 1
-op add &t2 &t2 1
-write &t2 bank1 1
+op add &t3 &t2 1
+write &t3 bank1 1
 printflush message1
 end

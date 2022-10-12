@@ -1,12 +1,10 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class SetBlock extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         floor: { args: ["x", "y", "to"] },
         ore: { args: ["x", "y", "to"] },
@@ -15,7 +13,7 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(overload, x, y, to, team, rotation) {
+      handler(scope, overload, x, y, to, team, rotation) {
         return [
           null,
           [
@@ -32,6 +30,6 @@ export class SetBlock extends ObjectValue {
         ];
       },
     });
-    super(scope, data);
+    super(data);
   }
 }

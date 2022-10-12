@@ -11,8 +11,8 @@ export const WhileStatement: THandler<null> = (
   const lines: IInstruction[] = [];
   const [test, testLines] = c.handleConsume(scope, node.test);
 
-  const startLoopAddr = new LiteralValue(scope, null as never);
-  const endLoopAddr = new LiteralValue(scope, null as never);
+  const startLoopAddr = new LiteralValue(null as never);
+  const endLoopAddr = new LiteralValue(null as never);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
 
@@ -35,7 +35,7 @@ export const WhileStatement: THandler<null> = (
       endLoopAddr,
       EJumpKind.Equal,
       test,
-      new LiteralValue(scope, 0)
+      new LiteralValue(0)
     ),
     ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
     new JumpInstruction(startLoopAddr, EJumpKind.Always),
@@ -52,7 +52,7 @@ export const DoWhileStatement: THandler<null> = (
   const lines: IInstruction[] = [];
   const [test, testLines] = c.handleConsume(scope, node.test);
 
-  const startLoopAddr = new LiteralValue(scope, null as never);
+  const startLoopAddr = new LiteralValue(null as never);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
   const [, bodyLines] = c.handle(scope, node.body);
 
@@ -77,7 +77,7 @@ export const DoWhileStatement: THandler<null> = (
       startLoopAddr,
       EJumpKind.Equal,
       test,
-      new LiteralValue(scope, 1)
+      new LiteralValue(1)
     )
   );
   return [null, lines];

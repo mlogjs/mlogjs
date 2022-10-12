@@ -30,10 +30,11 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
 export class FunctionValue extends VoidValue implements IFunctionValue {
   mutability = EMutability.constant;
   macro = true;
-  private node: es.Function;
+
+  scope: IScope;
   private childScope!: IScope;
   private params: es.Identifier[];
-  private paramOwners: ValueOwner<StoreValue>[] = [];
+  private paramOwners: ValueOwner<IValue>[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue;
   private temp!: ValueOwner<SenseableValue>;
@@ -53,23 +54,21 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     params,
     body,
     c,
-    node,
   }: {
     scope: IScope;
     body: es.BlockStatement;
     c: Compiler;
-    node: es.Function;
     params: es.Identifier[];
   }) {
-    super(scope);
+    super();
+    this.scope = scope;
     this.body = body;
     this.c = c;
-    this.node = node;
     this.params = params;
   }
 
-  typeof(scope: IScope): TValueInstructions {
-    return [new LiteralValue(scope, "function"), []];
+  typeof(): TValueInstructions {
+    return [new LiteralValue("function"), []];
   }
 
   private initScope(name: string) {
@@ -100,7 +99,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     const { name } = this.owner;
     this.initScope(name);
 
-    this.addr = new LiteralValue(this.childScope, null as never);
+    this.addr = new LiteralValue(null as never);
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
@@ -141,7 +140,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
-    const callAddressLiteral = new LiteralValue(scope, null as never);
+    const callAddressLiteral = new LiteralValue(null as never);
     const inst: IInstruction[] = this.paramOwners
       .map(({ value: param }, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
@@ -196,7 +195,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       );
     });
 
-    this.inlineEnd = new LiteralValue(scope, null as never);
+    this.inlineEnd = new LiteralValue(null as never);
 
     this.tryingInline = true;
     let inst = this.c.handle(fnScope, this.body)[1];

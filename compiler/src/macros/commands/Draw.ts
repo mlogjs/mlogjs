@@ -1,12 +1,10 @@
 import { InstructionBase } from "../../instructions";
-import { IScope } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Draw extends ObjectValue {
-  constructor(scope: IScope) {
+  constructor() {
     const data = createOverloadNamespace({
-      scope,
       overloads: {
         clear: {
           args: ["r", "g", "b"],
@@ -44,11 +42,11 @@ export class Draw extends ObjectValue {
         },
       },
 
-      handler(overload, ...args) {
+      handler(scope, overload, ...args) {
         return [null, [new InstructionBase("draw", overload, ...args)]];
       },
     });
 
-    super(scope, data);
+    super(data);
   }
 }

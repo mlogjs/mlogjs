@@ -1,12 +1,12 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IInstruction, IScope, IValue, TValueInstructions } from "../../types";
+import { IInstruction, IValue, TValueInstructions } from "../../types";
 import { LiteralValue } from "../../values";
 import { isTemplateObjectArray } from "../../utils";
 
 export class Print extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, (...values: IValue[]) => {
+  constructor() {
+    super((scope, ...values: IValue[]) => {
       const [first] = values;
       const inst: IInstruction[] = [];
 
@@ -25,7 +25,7 @@ export class Print extends MacroFunction<null> {
       for (let i = 1; i < values.length; i++) {
         const [string] = first.get(
           scope,
-          new LiteralValue(scope, i - 1)
+          new LiteralValue(i - 1)
         ) as TValueInstructions<LiteralValue>;
 
         if (string.data) inst.push(new InstructionBase("print", string));
@@ -34,7 +34,7 @@ export class Print extends MacroFunction<null> {
 
       const [tail] = first.get(
         scope,
-        new LiteralValue(scope, length.data - 1)
+        new LiteralValue(length.data - 1)
       ) as TValueInstructions<LiteralValue>;
       if (tail.data) inst.push(new InstructionBase("print", tail));
       return [null, inst];

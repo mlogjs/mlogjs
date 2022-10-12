@@ -31,8 +31,8 @@ export const LogicalExpression: THandler = (
 ) => {
   if (node.operator !== "??") return LRExpression(c, scope, node, null);
 
-  const nullLiteral = new LiteralValue(scope, null as never);
-  const endAdress = new LiteralValue(scope, null as never);
+  const nullLiteral = new LiteralValue(null as never);
+  const endAdress = new LiteralValue(null as never);
 
   const [left, leftInst] = c.handleEval(scope, node.left);
 
@@ -119,8 +119,8 @@ export const ConditionalExpression: THandler = (
   result.ensureOwned();
   const consequent = c.handleEval(scope, node.consequent);
   const alternate = c.handleEval(scope, node.alternate);
-  const alternateStartAdress = new LiteralValue(scope, null as never);
-  const endExpressionAdress = new LiteralValue(scope, null as never);
+  const alternateStartAdress = new LiteralValue(null as never);
+  const endExpressionAdress = new LiteralValue(null as never);
 
   return [
     result,
@@ -130,7 +130,7 @@ export const ConditionalExpression: THandler = (
         alternateStartAdress,
         EJumpKind.Equal,
         test,
-        new LiteralValue(scope, 0)
+        new LiteralValue(0)
       ),
       ...consequent[1],
       ...result["="](scope, consequent[0])[1],

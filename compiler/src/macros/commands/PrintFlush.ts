@@ -1,13 +1,13 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IScope, IValue } from "../../types";
+import { IValue } from "../../types";
 import { SenseableValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 const defaultTargetName = "message1";
 export class PrintFlush extends MacroFunction<null> {
-  constructor(scope: IScope) {
-    super(scope, (target?: IValue) => {
+  constructor() {
+    super((scope, target?: IValue) => {
       if (!target)
         return [null, [new InstructionBase("printflush", defaultTargetName)]];
 

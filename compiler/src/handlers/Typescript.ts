@@ -42,7 +42,7 @@ export const TSEnumDeclaration: THandler<null> = (
 
     const [value] = member.initializer
       ? c.handleEval(scope, member.initializer)
-      : [new LiteralValue(scope, counter)];
+      : [new LiteralValue(counter)];
 
     if (!(value instanceof LiteralValue))
       throw new CompilerError(
@@ -65,7 +65,7 @@ export const TSEnumDeclaration: THandler<null> = (
   scope.set(
     new ValueOwner({
       scope,
-      value: new ObjectValue(scope, data),
+      value: new ObjectValue(data),
       constant: true,
       identifier: node.id.name,
       name: nodeName(node, !c.compactNames && node.id.name),
