@@ -3,7 +3,7 @@ const turret = getBuilding("foreshadow1");
 const unit = radar({
   building: turret,
   filters: ["ground", "any", "any"],
-  order: 1,
+  order: true,
   sort: "distance",
 });
 

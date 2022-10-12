@@ -37,7 +37,7 @@ control.shootp({
 radar({
   building: cyclone,
   filters: ["enemy", "boss", "flying"],
-  order: 1,
+  order: true,
   sort: "maxHealth",
 });
 

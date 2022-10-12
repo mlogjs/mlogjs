@@ -14,12 +14,12 @@ printFlush(getBuilding("message1"));
 const unitA = radar({
   building: getBuilding("cyclone1"),
   filters: ["enemy", "any", "any"],
-  order: 1,
+  order: true,
   sort: "distance",
 });
 const unitB = unitRadar({
   filters: ["enemy", "flying", "any"],
-  order: 1,
+  order: true,
   sort: "distance",
 });
 print(unitA.health, unitB.health);
