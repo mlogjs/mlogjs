@@ -266,8 +266,7 @@ declare global {
    * Detects an unit nearby this `building`.
    * @param options.building The building used to detect potential targets
    * @param options.filters The filters for selecting a target. Use "any" for any target.
-   * @param options.order The n th unit that fits these requirements based on the sorting method
-   *  (1 => first unit, 2 => second unit and so on)
+   * @param options.order `true` to get the first result, `false` to get the last result.
    * @param options.sort The method on which the results should be sorted
    *
    * Example:
@@ -287,9 +286,8 @@ declare global {
     building: BasicBuilding;
     /** The filters for selecting a target. Use "any" for any target. */
     filters: [TRadarFilter, TRadarFilter, TRadarFilter];
-    /** The n th unit that fits these requirements based on the sorting method
-     *  (1 => first unit, 2 => second unit and so on) */
-    order: number;
+    /** `true` to get the first result, `false` to get the last result. */
+    order: boolean;
     /** The method on which the results should be sorted */
     sort: TRadarSort;
   }): T;
@@ -533,8 +531,7 @@ declare global {
   /**
    * Finds an unit near the unit bound to this processor
    * @param options.filters The filters for selecting a target. Use "any" for any target.
-   * @param options.order The n th unit that fits these requirements based on the sorting method
-   *  (1 => first unit, 2 => second unit and so on)
+   * @param options.order `true` to get the first result, `false` to get the last result.
    * @param options.sort The method on which the results should be sorted
    *
    * Example:
@@ -550,9 +547,8 @@ declare global {
   function unitRadar<T extends BasicUnit = AnyUnit>(options: {
     /** The filters for selecting a target. Use "any" for any target. */
     filters: [TRadarFilter, TRadarFilter, TRadarFilter];
-    /** The n th unit that fits these requirements based on the sorting method
-     *  (1 => first unit, 2 => second unit and so on) */
-    order: number;
+    /** `true` to get the first result, `false` to get the last result. */
+    order: boolean;
     /** The method on which the results should be sorted */
     sort: TRadarSort;
   }): T;
