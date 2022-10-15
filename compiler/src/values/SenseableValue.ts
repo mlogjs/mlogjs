@@ -29,10 +29,6 @@ const senseableProps = ["controller"];
 export class SenseableValue extends StoreValue {
   mutability = EMutability.constant;
 
-  constructor(scope: IScope) {
-    super(scope);
-  }
-
   get(scope: IScope, prop: IValue): TValueInstructions<IValue> {
     if (prop instanceof LiteralValue && typeof prop.data === "string") {
       const name = itemNames.includes(prop.data)
