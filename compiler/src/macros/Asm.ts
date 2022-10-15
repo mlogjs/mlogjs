@@ -39,26 +39,31 @@ export class Asm extends MacroFunction<null> {
 /** Splits multiline asm calls and formats each line. */
 function formatInstructions(args: (string | IValue)[]) {
   const instructions: IInstruction[] = [];
-  let last = 0;
 
-  let previous: string[] = [];
+  let buffer: (string | IValue)[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
 
     if (typeof arg !== "string" || !arg.includes("\n")) {
+      buffer.push(arg);
       continue;
     }
 
     const segments = arg.split("\n");
 
-    const params = [...previous, ...args.slice(last, i), segments[0]];
+    const params = [...buffer, segments[0]];
 
     if (validateInstructionArgs(params)) {
       instructions.push(new ZeroSpaceInstruction(...params));
-      previous = [];
+      buffer = [];
     }
 
+    // iterates over all segments except the first and last
+    // the first segment was already processed above
+    // the last segment will be added to the buffer because there might
+    // be an interpolation after it
+    // and putting it in the buffer makes sure it has a proper output format
     for (let i = 1; i < segments.length - 1; i++) {
       const trimmed = segments[i].trim();
       if (trimmed.length == 0) continue;
@@ -66,16 +71,12 @@ function formatInstructions(args: (string | IValue)[]) {
     }
 
     if (segments.length > 1) {
-      previous.push(segments[segments.length - 1]);
+      buffer.push(segments[segments.length - 1]);
     }
-
-    last = i + 1;
   }
 
-  if (last < args.length) {
-    const params = args.slice(last);
-    validateInstructionArgs(params);
-    instructions.push(new ZeroSpaceInstruction(...params));
+  if (buffer.length > 0 && validateInstructionArgs(buffer)) {
+    instructions.push(new ZeroSpaceInstruction(...buffer));
   }
 
   return instructions;

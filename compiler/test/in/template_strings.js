@@ -14,7 +14,8 @@ multine should be properly
         formatted
         ${first}    
     d ${second} a
-`;
+
+    \nstuff`;
 
 print(getVar("radarResult"));
 print(getVar("foo"));
