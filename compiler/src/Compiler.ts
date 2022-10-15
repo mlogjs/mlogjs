@@ -165,7 +165,7 @@ export class Compiler {
     handler?: (node: T) => TValueInstructions<IValue | null>
   ): TValueInstructions<null> {
     const lines = [];
-    for (const node of nodes) {
+    for (const node of hoistedFunctionNodes(nodes)) {
       const [, nodeLines] = this.handle(
         scope,
         node,
@@ -202,6 +202,22 @@ function hideRedundantJumps(inst: IInstruction[]) {
       }
       searchIndex++;
       current = inst[searchIndex];
+    }
+  }
+}
+
+function* hoistedFunctionNodes<T extends es.Node>(nodes: T[]) {
+  // sorting is O(n long n) while this is just O(n)
+  // besides, it's better not to modify the node array
+  for (const node of nodes) {
+    if (node.type === "FunctionDeclaration") {
+      yield node;
+    }
+  }
+
+  for (const node of nodes) {
+    if (node.type !== "FunctionDeclaration") {
+      yield node;
     }
   }
 }

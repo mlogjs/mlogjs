@@ -1,30 +1,30 @@
-set type:24:4 0
-set a:25:4 1
-set b:26:4 1
-set type:17:12 type:24:4
-set a:17:18 a:25:4
-set b:17:21 b:26:4
-set &rop:17:0 8
+set type:5:4 0
+set a:6:4 1
+set b:7:4 1
+set type:26:12 type:5:4
+set a:26:18 a:6:4
+set b:26:21 b:7:4
+set &rop:26:0 8
 jump 14 always
-set result:28:4 &fop:17:0
-print "Thre result is: "
-print result:28:4
+set result:9:4 &fop:26:0
+print "The result is: "
+print result:9:4
 print "."
 printflush message1
 end
-op strictEqual &t0:op:17:0 type:17:12 0
-jump 18 equal &t0:op:17:0 0
-op add &fop:17:0 a:17:18 b:17:21
-set @counter &rop:17:0
-op strictEqual &t1:op:17:0 type:17:12 1
-jump 22 equal &t1:op:17:0 0
-op sub &fop:17:0 a:17:18 b:17:21
-set @counter &rop:17:0
-op strictEqual &t2:op:17:0 type:17:12 2
-jump 26 equal &t2:op:17:0 0
-op mul &fop:17:0 a:17:18 b:17:21
-set @counter &rop:17:0
-op strictEqual &t3:op:17:0 type:17:12 3
-jump 30 equal &t3:op:17:0 0
-op div &fop:17:0 a:17:18 b:17:21
-set @counter &rop:17:0
+op strictEqual &t0:op:26:0 type:26:12 0
+jump 18 equal &t0:op:26:0 0
+op add &fop:26:0 a:26:18 b:26:21
+set @counter &rop:26:0
+op strictEqual &t1:op:26:0 type:26:12 1
+jump 22 equal &t1:op:26:0 0
+op sub &fop:26:0 a:26:18 b:26:21
+set @counter &rop:26:0
+op strictEqual &t2:op:26:0 type:26:12 2
+jump 26 equal &t2:op:26:0 0
+op mul &fop:26:0 a:26:18 b:26:21
+set @counter &rop:26:0
+op strictEqual &t3:op:26:0 type:26:12 3
+jump 30 equal &t3:op:26:0 0
+op div &fop:26:0 a:26:18 b:26:21
+set @counter &rop:26:0

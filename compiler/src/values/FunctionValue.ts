@@ -174,7 +174,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // create return value
     this.inlineTemp = new ValueOwner({
       scope: this.childScope,
-      value: assign(new SenseableValue(scope), {
+      value: assign(new SenseableValue(this.childScope), {
         mutability: EMutability.mutable,
       }),
     });
