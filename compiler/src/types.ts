@@ -12,9 +12,6 @@ export enum EInstIntent {
   return,
 }
 
-// Just to make other type declarations more readable
-export type TValueId = number;
-
 export interface IInstruction {
   intent: EInstIntent;
   hidden: boolean;
