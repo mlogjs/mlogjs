@@ -1,3 +1,20 @@
+let dynamicItem = 4;
+const constantItem = 5;
+
+print(matchItem(dynamicItem));
+print(matchItem(constantItem));
+
+itemUses(Items.copper);
+itemUses(Items.coal);
+itemUses(Items.silicon);
+
+switch (dynamicItem) {
+  default:
+    print("always runs!\n");
+}
+
+printFlush(getBuilding("message1"));
+
 function matchItem(n) {
   switch (n) {
     case 1:
@@ -55,20 +72,3 @@ function itemUses(item) {
 
   print("Something at the end\n");
 }
-
-let dynamicItem = 4;
-const constantItem = 5;
-
-print(matchItem(dynamicItem));
-print(matchItem(constantItem));
-
-itemUses(Items.copper);
-itemUses(Items.coal);
-itemUses(Items.silicon);
-
-switch (dynamicItem) {
-  default:
-    print("always runs!\n");
-}
-
-printFlush(getBuilding("message1"));
