@@ -1,0 +1,38 @@
+print "1\n1 1\n"
+set lastSize:12:4 2
+write 1 cell2 0
+write 1 cell2 1
+set i:17:9 3
+op lessThanEq &t0 i:17:9 10
+jump 36 equal &t0 0
+write 1 cell1 0
+set j:19:11 1
+op lessThan &t1 j:19:11 lastSize:12:4
+jump 18 equal &t1 0
+op sub &t2 j:19:11 1
+read &t3 cell2 &t2
+read &t4 cell2 j:19:11
+op add &t5 &t3 &t4
+write &t5 cell1 j:19:11
+op add j:19:11 j:19:11 1
+jump 9 always
+write 1 cell1 lastSize:12:4
+op add lastSize:12:4 lastSize:12:4 1
+set c:25:11 0
+op lessThan &t1 c:25:11 lastSize:12:4
+jump 33 equal &t1 0
+read &t2 cell1 c:25:11
+print &t2
+read &t3 cell1 c:25:11
+write &t3 cell2 c:25:11
+op sub &t4 lastSize:12:4 1
+op lessThan &t5 c:25:11 &t4
+jump 31 equal &t5 0
+print " "
+op add c:25:11 c:25:11 1
+jump 21 always
+print "\n"
+op add i:17:9 i:17:9 1
+jump 5 always
+printflush message1
+end
