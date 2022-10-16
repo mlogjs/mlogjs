@@ -117,13 +117,24 @@ asm`this is inlined into the final code`;
 > This is only possible because the arguments are known at compile time,
 > making it possible for the compiler to know how to deal with each case.
 
+- Functions declarations are hoisted to the top of their declaration scope.
+
+```js
+// works
+doSomething();
+
+function doSomething() {
+  print("something");
+  printFlush();
+}
+```
+
 Limitations:
 
 - Functions can only be bound to constants
 - No `this` context for any kind of function
 - Functions cannot act as constructors
 - No recursion support
-- Functions declarations are not hoisted
 - No proper support for closures
 - No support for generators
 - No support for `async`/`await`
