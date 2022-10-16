@@ -1,3 +1,4 @@
 packages:
   - editor
   - compiler
+  - website
