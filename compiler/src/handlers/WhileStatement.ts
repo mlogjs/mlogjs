@@ -19,6 +19,10 @@ export const WhileStatement: THandler<null> = (
   );
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
+  if (scope.label) {
+    startLoopLine.bindContinue(scope);
+  }
+
   if (test instanceof LiteralValue) {
     if (test.data) {
       lines.push(
@@ -60,6 +64,11 @@ export const DoWhileStatement: THandler<null> = (
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
+
+  if (scope.label) {
+    startLoopLine.bindContinue(scope);
+  }
+
   const [, bodyLines] = c.handle(childScope, node.body);
 
   if (test instanceof LiteralValue) {
