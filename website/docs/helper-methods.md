@@ -9,9 +9,11 @@ const turret = getBuilding("cyclone1");
 // ...
 ```
 
-> Values returned from `getBuilding` are always assumed to be constant,
-> this allows the compiler to optimize the code by treating constants created
-> that way as aliases.
+::: info
+Values returned from `getBuilding` are always assumed to be constant,
+this allows the compiler to optimize the code by treating constants created
+that way as aliases.
+:::
 
 ## getVar
 
@@ -26,19 +28,22 @@ let value = sensor(customSymbol, building);
 // do somthing after
 ```
 
-> Values returned by `getVar` will always be treated as mutable, which means
-> that a constant bound to it won't be aliased:
->
-> ```js
-> const foo = getVar("@foo");
-> ```
->
-> always produces:
->
-> ```
-> set foo:1:6 @foo
-> end
-> ```
+::: warning
+Values returned by `getVar` will always be treated as mutable, which means
+that a constant bound to it won't be aliased:
+
+```js
+const foo = getVar("@foo");
+```
+
+always produces:
+
+```
+set foo:1:6 @foo
+end
+```
+
+:::
 
 ## concat
 

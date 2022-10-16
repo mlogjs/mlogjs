@@ -2,7 +2,7 @@
 
 Because the mlog environment is different from the regular javascript environments, code is structured in a different way.
 
-There are a total of four different data types:
+There are a total of five different data types:
 
 - Literal
 - Store
@@ -61,8 +61,6 @@ typeof add === "function"; // true
 
 Object values are constants and support operator overriding.
 
-Note that operator overriding cannot be checked by typescript, so its use is not recommended.
-
 ```js
 const obj = {
   a: 1,
@@ -74,3 +72,7 @@ obj.b(1, 2); // 3
 obj(2, 2); // 4
 typeof obj === "object"; // true
 ```
+
+::: warning
+Note that operator overriding cannot be checked by typescript, so its use is not recommended.
+:::

@@ -15,24 +15,24 @@ Behavior:
 
 - `const` variables holding values that are also constant will inline that value on the output code.
 
-```js
-const a = "string";
-const b = Vars.this;
-const c = getBuilding("message1");
-print(a, " is a string", "\n");
-print(b, "\n");
-printFlush(c);
-```
+  ```js
+  const a = "string";
+  const b = Vars.this;
+  const c = getBuilding("message1");
+  print(a, " is a string", "\n");
+  print(b, "\n");
+  printFlush(c);
+  ```
 
-```
-print "string"
-print " is a string"
-print "\n"
-print @this
-print "\n"
-printflush message1
-end
-```
+  ```
+  print "string"
+  print " is a string"
+  print "\n"
+  print @this
+  print "\n"
+  printflush message1
+  end
+  ```
 
 - `var` behaves the same as `let` (see limitations)
 
@@ -104,18 +104,20 @@ Behavior:
 - Functions will be automatically inlined when the size of the body is smaller than the size of the call
 - Some built-in functions such as [asm](/commands) or [print](/commands) can be called with tagged template strings.
 
-```js
-let a = 1;
-let b = 2;
-let c = 3;
+  ```js
+  let a = 1;
+  let b = 2;
+  let c = 3;
 
-print("regular style with ", a, " and ", b, " and ", c);
-print`new style with ${a} and ${b} and ${c}`;
-asm`this is inlined into the final code`;
-```
+  print("regular style with ", a, " and ", b, " and ", c);
+  print`new style with ${a} and ${b} and ${c}`;
+  asm`this is inlined into the final code`;
+  ```
 
-> This is only possible because the arguments are known at compile time,
-> making it possible for the compiler to know how to deal with each case.
+  ::: info
+  This is only possible because the arguments are known at compile time,
+  making it possible for the compiler to know how to deal with each case.
+  :::
 
 Limitations:
 
@@ -214,17 +216,21 @@ Check out the [online editor](https://mlogjs.github.io/mlogjs/editor/) to see ho
 
 The logical operators `&&` (and) and `||` (or) are supported, although they DO NOT short-circuit. See [What is short-circuiting?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation)
 
-> Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
->
-> ```js
-> // WARNING: does not work
-> // first: both expressions are evaluated because there is no
-> // short circuiting
-> //
-> // second: the final value will be a boolean, not
-> // whathever object getSomething returns
-> let foo = isEnabled && getSomething();
-> ```
+::: warning
+
+Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
+
+```js
+// WARNING: does not work
+// first: both expressions are evaluated because there is no
+// short circuiting
+//
+// second: the final value will be a boolean, not
+// whathever object getSomething returns
+let foo = isEnabled && getSomething();
+```
+
+:::
 
 Behavior:
 
@@ -336,24 +342,34 @@ const [found, x, y, { totalItems }] = unitLocate.building({
 Limitations:
 
 - Because this is just syntactic sugar to make multiple assignments, you can't do variable swaps.
+  ::: warning
 
-```js
-// WARNING: does not work
-[a, b] = [b, a];
-```
+  This doesn't work
+
+  ```js
+  [a, b] = [b, a];
+  ```
+
+  :::
 
 - There is no support for default values inside destructuring assignments/declarations.
 
-```js
-// WARNING: does not work
-const { firstItem = Items.copper } = building;
-```
+  ::: warning
 
-> This happens because this feature _should_ only assign the default value if the object
-> does not have the wanted key, but this can't be safely done on the compiler side because it
-> doesn't know whether the object has such property, and cheking for `null`
-> is not a viable option because returning `null` does not necessarily mean
-> that the property doesn't exist.
+  This doesn't work
+
+  ```js
+  const { firstItem = Items.copper } = building;
+  ```
+
+  :::
+  ::: info
+  This happens because this feature _should_ only assign the default value if the object
+  does not have the wanted key, but this can't be safely done on the compiler side because it
+  doesn't know whether the object has such property, and cheking for `null`
+  is not a viable option because returning `null` does not necessarily mean
+  that the property doesn't exist.
+  :::
 
 ## Typescript
 
