@@ -39,7 +39,7 @@ export const ContinueStatement: THandler<null> = (
   const label = node.label?.name;
 
   const target = label ? findScopeLabel(scope, label) : scope;
-  target.break.bind(addr);
+  target.continue.bind(addr);
 
   return [null, [new ContinueInstruction(addr)]];
 };
