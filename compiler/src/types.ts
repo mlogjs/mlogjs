@@ -49,6 +49,8 @@ export interface IScope {
    * the instructions that make the body of a function
    */
   inst: IInstruction[];
+  /** The label applied to this scope */
+  label?: string;
   /** Where to jump to on a break statement */
   break: AddressResolver;
   /** Where to jump to on a continue statement */

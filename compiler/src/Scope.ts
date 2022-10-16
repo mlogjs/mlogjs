@@ -18,6 +18,7 @@ export class Scope implements IScope {
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
+  label?: string;
   constructor(
     values: Record<string, IValueOwner | null>,
     public parent: IScope | null = null,

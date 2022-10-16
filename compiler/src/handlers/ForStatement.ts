@@ -5,10 +5,10 @@ import { LiteralValue } from "../values";
 
 export const ForStatement: THandler<null> = (
   c,
-  scope,
+  parentScope,
   node: es.ForStatement
 ) => {
-  scope = scope.createScope();
+  const scope = parentScope.createScope();
 
   const initInst = node.init ? c.handle(scope, node.init)[1] : [];
   const [test, testLines] = node.test
@@ -20,6 +20,10 @@ export const ForStatement: THandler<null> = (
 
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
+
+  if (parentScope.label) {
+    startLoopLine.bindContinue(parentScope);
+  }
 
   return [
     null,

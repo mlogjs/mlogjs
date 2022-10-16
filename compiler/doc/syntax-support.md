@@ -185,6 +185,26 @@ Behavior:
 
 - Supports `break` and `continue` statements
 
+### Labels
+
+You can use labels to have a finer control over your script's control flow.
+
+```js
+block: {
+  if (Math.rand(1) > 0.5) break block;
+  // do something
+}
+
+loop: for (let i = 0; i < 10; i++) {
+  for (let j = 0; j < 10; j++) {
+    if (i === j) continue loop;
+    print`(${i}, ${j})\n`;
+  }
+}
+
+printFlush();
+```
+
 ### Math and related operators
 
 All the mathematical operators for numbers are supported and will be transpiled into mlog code.

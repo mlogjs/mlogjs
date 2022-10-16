@@ -11,16 +11,23 @@ export const WhileStatement: THandler<null> = (
   const lines: IInstruction[] = [];
   const [test, testLines] = c.handleConsume(scope, node.test);
 
+  const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null as never);
   const endLoopAddr = new LiteralValue(null as never);
-  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
-  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
+  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
+    childScope
+  );
+  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
+
+  if (scope.label) {
+    startLoopLine.bindContinue(scope);
+  }
 
   if (test instanceof LiteralValue) {
     if (test.data) {
       lines.push(
         startLoopLine,
-        ...c.handle(scope, node.body)[1],
+        ...c.handle(childScope, node.body)[1],
         new JumpInstruction(startLoopAddr, EJumpKind.Always),
         endLoopLine
       );
@@ -37,7 +44,7 @@ export const WhileStatement: THandler<null> = (
       test,
       new LiteralValue(0)
     ),
-    ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
+    ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
     new JumpInstruction(startLoopAddr, EJumpKind.Always),
     endLoopLine
   );
@@ -52,9 +59,17 @@ export const DoWhileStatement: THandler<null> = (
   const lines: IInstruction[] = [];
   const [test, testLines] = c.handleConsume(scope, node.test);
 
+  const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null as never);
-  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
-  const [, bodyLines] = c.handle(scope, node.body);
+  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
+    childScope
+  );
+
+  if (scope.label) {
+    startLoopLine.bindContinue(scope);
+  }
+
+  const [, bodyLines] = c.handle(childScope, node.body);
 
   if (test instanceof LiteralValue) {
     if (!test.data) return [null, [...lines, ...bodyLines]];
