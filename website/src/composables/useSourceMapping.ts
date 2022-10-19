@@ -24,15 +24,15 @@ export function useSourceMapping({
     const sourcemaps = sourcemapsRef.value;
     if (!(editor && outEditor)) return;
 
-    let inputDecorations: string[] = [];
-    let outputDecorations: string[] = [];
+    const inputCollection = editor.createDecorationsCollection();
+    const outputCollection = outEditor.createDecorationsCollection();
 
     const inputListener = outEditor.onDidChangeCursorSelection(e => {
-      outputDecorations = outEditor.deltaDecorations(outputDecorations, []);
+      outputCollection.clear();
       if (!sourcemaps) return;
 
       const [firstSelection, decorations] = getInputDecorations(e, sourcemaps);
-      inputDecorations = editor.deltaDecorations(inputDecorations, decorations);
+      inputCollection.set(decorations);
 
       if (
         firstSelection &&
@@ -43,15 +43,12 @@ export function useSourceMapping({
     });
 
     const outputListener = editor.onDidChangeCursorSelection(e => {
-      inputDecorations = editor.deltaDecorations(inputDecorations, []);
+      inputCollection.clear();
       if (!sourcemaps) return;
 
       const [revealedLine, decorations] = getOutputDecorations(e, sourcemaps);
 
-      outputDecorations = outEditor.deltaDecorations(
-        outputDecorations,
-        decorations
-      );
+      outputCollection.set(decorations);
       if (
         revealedLine &&
         e.reason === monaco.editor.CursorChangeReason.Explicit
@@ -62,8 +59,8 @@ export function useSourceMapping({
     onCleanup(() => {
       inputListener.dispose();
       outputListener.dispose();
-      editor.deltaDecorations(inputDecorations, []);
-      outEditor.deltaDecorations(outputDecorations, []);
+      inputCollection.clear();
+      outputCollection.clear();
     });
   });
 }
