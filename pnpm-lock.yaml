@@ -6,11 +6,13 @@ importers:
     specifiers:
       '@guolao/vue-monaco-editor': ^0.0.5
       monaco-editor: ^0.34.0
+      splitpanes: ^3.1.1
       vitepress: 1.0.0-alpha.21
       vue: ^3.2.41
     dependencies:
       '@guolao/vue-monaco-editor': 0.0.5_prqmueegshze5c2f6nx3e5nbta
       monaco-editor: 0.34.1
+      splitpanes: 3.1.1
     devDependencies:
       vitepress: 1.0.0-alpha.21
       vue: 3.2.41
@@ -702,6 +704,10 @@ packages:
   /sourcemap-codec/1.4.8:
     resolution: {integrity: sha512-9NykojV5Uih4lgo5So5dtw+f0JgJX30KCNI8gwhz2J9A15wD0Ml6tjHKwf6fTSa6fAdVBdZeNOs9eJ71qCk8vA==}
     dev: true
+
+  /splitpanes/3.1.1:
+    resolution: {integrity: sha512-VUkxDJfIGSvTM/fm/+OSrx8ha9URwE/9B8FPvfzoBuAxVELIHBWpsfnJXIXv77zVwuex//QQL4kTU9SDBPeHjA==}
+    dev: false
 
   /state-local/1.0.7:
     resolution: {integrity: sha512-HTEHMNieakEnoe33shBYcZ7NX83ACUjCu8c40iOGEZsngj9zRnkqS9j1pqQPXwobB0ZcVTk27REb7COQ0UR59w==}

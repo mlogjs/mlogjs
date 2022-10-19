@@ -1,30 +1,33 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import Editor from "@guolao/vue-monaco-editor";
-import { useRoute } from "vitepress";
+import { Splitpanes, Pane } from "splitpanes";
+import "splitpanes/dist/splitpanes.css";
 const value = ref("stuff");
-console.log("mlog editor runs");
-const route = useRoute();
-console.log(route.path);
-console.log(/editor(.html)?$/.test(route.path));
 </script>
 
 <template>
   <div class="editor-wrapper">
-    <Editor
-      language="javascript"
-      v-model:value="value"
-      height="var(--editor-height)"
-      theme="vs-dark"
-      class="monaco-editor"
-    ></Editor>
-    <Editor
-      language="mlog"
-      class="output"
-      theme="vs-dark"
-      height="var(--editor-height)"
-    >
-    </Editor>
+    <Splitpanes class="default-theme">
+      <Pane size="70">
+        <Editor
+          language="javascript"
+          v-model:value="value"
+          height="var(--editor-height)"
+          theme="vs-dark"
+          class="monaco-editor"
+        ></Editor>
+      </Pane>
+      <Pane size="30">
+        <Editor
+          language="mlog"
+          class="output"
+          theme="vs-dark"
+          height="var(--editor-height)"
+        >
+        </Editor>
+      </Pane>
+    </Splitpanes>
   </div>
 </template>
 
@@ -33,13 +36,15 @@ console.log(/editor(.html)?$/.test(route.path));
   --editor-height: calc(100vh - var(--vp-nav-height-desktop));
   height: var(--editor-height);
   display: grid;
-  grid-template-areas: "editor output";
-  grid-template-columns: 3fr 1fr;
 }
 .editor-wrapper :deep(.monaco-editor) {
   grid-area: editor;
 }
 .editor-wrapper :deep(.output) {
   grid-area: output;
+}
+.editor-wrapper :deep(.splitpanes__splitter) {
+  background-color: gray;
+  border-color: gray;
 }
 </style>
