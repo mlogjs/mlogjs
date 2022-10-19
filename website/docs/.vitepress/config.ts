@@ -8,26 +8,32 @@ const config: UserConfig = {
   themeConfig: {
     logo: "/logo.png",
     outline: [2, 3],
-    sidebar: [
-      {
-        text: "Introduction",
-        items: [
-          { text: "Getting Started", link: "/getting-started" },
-          { text: "Typescript support", link: "/typescript" },
-        ],
-      },
-      {
-        text: "User API",
-        items: [
-          { text: "Data Types", link: "/data-types" },
-          { text: "Namespaces", link: "/namespaces" },
-          { text: "Helper methods", link: "/helper-methods" },
-          { text: "Commands", link: "/commands" },
-          { text: "Memory API", link: "/memory-api" },
-          { text: "Supported Syntax", link: "/syntax-support" },
-        ],
-      },
+    nav: [
+      { text: "Docs", link: "/guide/" },
+      { text: "Editor", link: "/editor" },
     ],
+    sidebar: {
+      "/guide/": [
+        {
+          text: "Introduction",
+          items: [
+            { text: "Getting Started", link: "/guide/getting-started" },
+            { text: "Typescript support", link: "/guide/typescript" },
+          ],
+        },
+        {
+          text: "User API",
+          items: [
+            { text: "Data Types", link: "/guide/data-types" },
+            { text: "Namespaces", link: "/guide/namespaces" },
+            { text: "Helper methods", link: "/guide/helper-methods" },
+            { text: "Commands", link: "/guide/commands" },
+            { text: "Memory API", link: "/guide/memory-api" },
+            { text: "Supported Syntax", link: "/guide/syntax-support" },
+          ],
+        },
+      ],
+    },
 
     socialLinks: [{ icon: "github", link: "https://github.com/mlogjs/mlogjs" }],
   },
@@ -38,7 +44,7 @@ const config: UserConfig = {
   vite: {
     server: {
       fs: {
-        allow: ["../../node_modules", "../"],
+        allow: ["../../node_modules"],
       },
     },
   },
