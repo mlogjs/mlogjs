@@ -1,4 +1,5 @@
-import { UserConfig } from "vitepress";
+import type { UserConfig } from "vitepress";
+import { rawResolver } from "./raw_resolver";
 
 const config: UserConfig = {
   title: "MlogJS",
@@ -42,11 +43,15 @@ const config: UserConfig = {
   },
   lastUpdated: true,
   vite: {
+    define: {
+      "process.env": {},
+    },
     server: {
       fs: {
-        allow: ["../../node_modules"],
+        allow: ["../../node_modules", "../../compiler"],
       },
     },
+    plugins: [rawResolver()],
   },
 };
 

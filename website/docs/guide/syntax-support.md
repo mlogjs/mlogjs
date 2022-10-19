@@ -210,7 +210,7 @@ available on the mlog runtime. They are listed bellow:
 - `sqrt` - Square root of a number
 - `tan` - Tangent of an angle in degrees
 
-Check out the [online editor](https://mlogjs.github.io/mlogjs/editor/) to see how each one works!
+Check out the [online editor](/editor) to see how each one works!
 
 ### Logical operators
 
