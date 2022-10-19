@@ -1,15 +1,21 @@
 <script setup lang="ts">
 import { ref, shallowRef } from "vue";
-import Editor, { useMonaco } from "@guolao/vue-monaco-editor";
+import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
-import type * as monaco from "monaco-editor";
+import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
 import type { Monaco } from "../util";
 import { registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
+
+loader.config({
+  paths: {
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs",
+  },
+});
 
 const outEditorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
   readOnly: true,
