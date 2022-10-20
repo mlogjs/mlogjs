@@ -10,7 +10,7 @@ const config: UserConfig = {
     logo: "/logo.png",
     outline: [2, 3],
     nav: [
-      { text: "Docs", link: "/guide/" },
+      { text: "Guide", link: "/guide/" },
       { text: "Editor", link: "/editor" },
     ],
     sidebar: {
