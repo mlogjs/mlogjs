@@ -9,6 +9,9 @@ const config: UserConfig = {
   themeConfig: {
     logo: "/logo.png",
     outline: [2, 3],
+    editLink: {
+      pattern: "https://github.com/mlogjs/mlogjs/website/docs/:path",
+    },
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "Editor", link: "/editor" },
