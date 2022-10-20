@@ -17,7 +17,12 @@ loader.config({
   },
 });
 
-const outEditorOptions: monaco.editor.IStandaloneEditorConstructionOptions = {
+type EditorOptions = monaco.editor.IStandaloneEditorConstructionOptions;
+
+const editorOptions: EditorOptions = {
+  fixedOverflowWidgets: true,
+};
+const outEditorOptions: EditorOptions = {
   readOnly: true,
   lineNumbers: n => `${n - 1}`,
 };
@@ -71,6 +76,7 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
           language="typescript"
           v-model:value="code"
           theme="vs-dark"
+          :options="editorOptions"
           @before-mount="beforeMount"
           @mount="onMount"
           height="var(--editor-height)"
@@ -111,5 +117,9 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
 }
 .editor-wrapper :deep(.selection-highlighted) {
   background-color: hsla(203, 100%, 60%, 0.3);
+}
+
+.editor-wrapper :deep(.editor-widget) {
+  position: fixed;
 }
 </style>
