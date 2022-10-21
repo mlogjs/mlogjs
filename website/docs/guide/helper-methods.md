@@ -17,7 +17,7 @@ that way as aliases.
 
 ## getVar
 
-Allows you to access symbols or variables that are not available through the [namespaces](/namespaces).
+Allows you to access symbols or variables that are not available through the [namespaces](/guide/namespaces).
 
 ```js
 const building = getBuilding("container1");
