@@ -415,6 +415,7 @@ declare global {
    */
   function wait(seconds: number): void;
 
+  /** Looks up content symbols by their index. */
   namespace lookup {
     /**
      * Looks up a block symbol by it's index on the content registry.
@@ -477,6 +478,14 @@ declare global {
    * Packs RGBA color information into a single number.
    *
    * Each paremeter must range from `0` to `1`.
+   *
+   *
+   *  ```js
+   *  const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+   *
+   *  // world processor only
+   *  setRule.ambientLight(colorData);
+   *  ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
 

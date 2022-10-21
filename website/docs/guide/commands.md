@@ -346,8 +346,70 @@ let result = sensor(myCustomSymbol, myBuilding);
 
 ## Operations
 
-- `lookup` - Finds a symbol for a kind of content based on its index
-- `packColor` - Packs RGBA color information into a single number
+### `lookup`
+
+Looks up content symbols by their index.
+
+- #### `lookup.block`
+
+  Looks up a block symbol by it's index on the content registry.
+
+  Use `Vars.blockCount` to check the maximum index allowed.
+
+  ```js
+  if (index < Vars.blockCount) {
+    let blockKind = lookup.block(index);
+  }
+  ```
+
+- #### `lookup.unit`
+
+  Looks up an unit symbol by it's index on the content registry.
+
+  Use `Vars.unitCount` to check the maximum index allowed.
+
+  ```js
+  if (index < Vars.unitCount) {
+    let unitKind = lookup.unit(index);
+  }
+  ```
+
+- #### `lookup.item`
+
+  Looks up an item symbol by it's index on the content registry.
+
+  Use `Vars.itemCount` to check the maximum index allowed.
+
+  ```js
+  if (index < Vars.itemCount) {
+    let itemKind = lookup.item(index);
+  }
+  ```
+
+- #### `lookup.liquid`
+
+  Looks up a liquid symbol by it's index on the content registry.
+
+  Use `Vars.liquidCount` to check the maximum index allowed.
+
+  ```js
+  if (index < Vars.liquidCount) {
+    let liquidKind = lookup.liquid(index);
+  }
+  ```
+
+### `packColor`
+
+Packs RGBA color information into a single number.
+
+Each paremeter must range from `0` to `1`.
+
+```js
+const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+
+// world processor only
+setRule.ambientLight(colorData);
+```
 
 ## Flow control
 
