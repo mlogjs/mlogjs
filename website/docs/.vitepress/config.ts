@@ -45,6 +45,7 @@ const config: UserConfig = {
     theme: "dark-plus",
   },
   lastUpdated: true,
+  head: [["link", { rel: "icon", type: "image/png", href: "/logo.png" }]],
   vite: {
     define: {
       "process.env": {},
