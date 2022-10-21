@@ -10,7 +10,7 @@ declare global {
    * Appends the items to the print buffer, calling this function
    * on its own will not print any contents to a message block.
    *
-   * To print the contents of the print buffer and empty it call `printFlush`.
+   * To print the contents of the print buffer and empty it call, `printFlush`.
    *
    * @param items The items to be added to the print buffer.
    *
@@ -35,6 +35,12 @@ declare global {
     /**
      * Sets the color for the next drawing operations.
      *
+     *  Each parameter must be within range: [0, 255].
+     *
+     *  ```js
+     *  draw.color(255, 255, 255, 128);
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function color(r: number, g: number, b: number, a?: number): void;
@@ -42,12 +48,20 @@ declare global {
     /**
      * Sets the width of the next lines to be drawn.
      *
+     *  ```js
+     *  draw.stroke(15);
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function stroke(width: number): void;
 
     /**
      * Draws a line between two points.
+     *
+     *  ```js
+     *  draw.line({ x: 5, y: 5, x2: 50, y2: 50 });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -60,6 +74,14 @@ declare global {
 
     /**
      * Draws a filled rectangle.
+     *  ```js
+     *  draw.rect({
+     *    x: 10,
+     *    y: 15,
+     *    height: 60,
+     *    width: 40,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -88,6 +110,16 @@ declare global {
      * @param options.radius The smallest distance between a line and the center of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
+     *  ```js
+     *  draw.poly({
+     *    radius: 10,
+     *    rotation: 0,
+     *    sides: 10,
+     *    x: 25,
+     *    y: 25,
+     *  });
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function poly(options: {
@@ -107,6 +139,15 @@ declare global {
      * @param options.radius The smallest distance between a line and the center of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
+     *  ```js
+     *  draw.linePoly({
+     *    radius: 10,
+     *    rotation: 0,
+     *    sides: 10,
+     *    x: 25,
+     *    y: 25,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -123,6 +164,17 @@ declare global {
 
     /**
      * Draws a filled triangle.
+     *
+     *  ```js
+     *  draw.triangle({
+     *    x: 10,
+     *    y: 10,
+     *    x2: 20,
+     *    y2: 20,
+     *    x3: 30,
+     *    y3: 10,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
