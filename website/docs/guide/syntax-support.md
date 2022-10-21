@@ -102,7 +102,7 @@ const other = function () {};
 Behavior:
 
 - Functions will be automatically inlined when the size of the body is smaller than the size of the call
-- Some built-in functions such as [asm](/guide/commands) or [print](/guide/commands) can be called with tagged template strings.
+- Some built-in functions such as [asm](/guide/helper-methods#asm) or [print](/guide/commands#print) can be called with tagged template strings.
 
   ```js
   let a = 1;
