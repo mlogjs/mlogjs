@@ -1,3 +1,7 @@
+---
+outline: [2, 4]
+---
+
 # Commands
 
 Commands are built in function macros that expand into instructions during compilation.
@@ -177,12 +181,168 @@ Nothing is drawn until `drawFlush` is called.
 
 ## Block Control
 
-- `printFlush` - Empties the buffer and prints its contents on the target message block
-- `drawFlush` - Empties the draw buffer and draws its contents on the target display block
-- `getLink` - Gets a block linked to the processor via its index
-- `control` - Controls a given block
-- `radar` - Uses a block (usually a turret) to detect units nearby
-- `sensor` - Detect properties of values (only use if you know what you are doing)
+### `printFlush`
+
+Writes the contents of the print buffer into the target message
+and clears the buffer afterwards.
+
+- `target` The message building to write to. Writes to `message1` by default.
+
+  Note that the default value only applies if you don't pass any parameter to this function.
+
+```js
+const message = getBuilding("message2");
+printFlush(message);
+
+printFlush(); // defaults to message1
+```
+
+### `drawFlush`
+
+Writes the contents of the draw buffer into the target display
+and clears the buffer afterwards.
+
+- `target` The display building to write to. Writes to `display1` by default.
+
+  Note that the default value only applies if you don't pass any parameter to this function.
+
+```js
+const display = getBuilding("display2");
+drawFlush(display);
+
+drawFlush(); // defaults to display1
+```
+
+### `getLink`
+
+Gets a block link by its index.
+
+To make safe queries it is recommended to check an index
+before trying to get a link. This can be done by using `Vars.links`.
+
+```js
+if (index < Vars.links) {
+  let myBlock = getLink(index);
+  // ...
+}
+```
+
+### `control`
+
+Contains the multiple variants of the `control` instruction
+
+- #### `control.enabled`
+
+  Sets whether the building is enabled or disabled.
+
+  ```js
+  const conveyor = getBuilding("conveyor1");
+  control.enabled(conveyor, false);
+  ```
+
+- #### `control.shoot`
+
+  Makes the building shoot or aim at the given position
+
+  - `building` - The shooting building
+  - `shoot` - `true` to shoot, `false` to just aim at the position
+
+  ```js
+  control.shoot({
+    building: getBuilding("cyclone1"),
+    shoot: true,
+    x: Vars.thisx,
+    y: Vars.thisy,
+  });
+  ```
+
+- #### `control.shootp`
+
+  Shoot at an unit with velocity prediction
+
+  - `building` - The shooting building
+  - `unit` - The target unit
+  - `shoot` - `true` to shoot, `false` to just aim
+
+  ```js
+  const turret = getBuilding("cyclone1");
+
+  const player = radar({
+    building: turret,
+    filters: ["player", "any", "any"],
+    order: true,
+    sort: "distance",
+  });
+
+  control.shootp({
+    building: turret,
+    unit: player,
+    shoot: true,
+  });
+  ```
+
+- #### `control.config`
+
+  Sets the config of a block (like the item of a sorter)
+
+  ```js
+  const sorter = getBuilding("sorter1");
+
+  control.config(sorter, Items.copper);
+  ```
+
+- #### `control.color`
+
+  Sets the color of an illuminator.
+
+  The RGB values must be within the range: [0, 255].
+
+  ```js
+  const illuminator = getBuilding("illuminator1");
+
+  control.color(illuminator, 10, 150, 210);
+  ```
+
+### `radar`
+
+Detects an unit nearby this `building`.
+
+- `building` - The building used to detect potential targets
+- `filters` - The filters for selecting a target. Use "any" for any target.
+- `order` - `true` to get the first result, `false` to get the last result.
+- `sort` - The method on which the results should be sorted
+
+Example:
+
+```js
+const turret = getBuilding("cyclone1");
+// returns the second nearest enemy unit
+const result = radar({
+  building: turret,
+  filters: ["enemy", "any", "any"],
+  order: 2,
+  sort: "distance",
+});
+```
+
+### `sensor`
+
+Alternate way to access special properties on objects.
+
+This method allows you to use customly created symbols
+and sensor them on buildings.
+
+- `property` - The property to be sensed on the building
+- `target` - The object that will be "sensed"
+
+```ts
+let myBuilding = getBuilding("container1");
+
+// typescript annotation, you can use jsdoc comments on
+// regular javascript
+let myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
+let result = sensor(myCustomSymbol, myBuilding);
+```
 
 ## Operations
 

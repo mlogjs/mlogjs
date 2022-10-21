@@ -256,7 +256,8 @@ declare global {
    * Example:
    * ```js
    * if(index < Vars.links) {
-   *   myBlock = getLink(index)
+   *   let myBlock = getLink(index)
+   *   // ...
    * }
    * ```
    */
@@ -266,6 +267,11 @@ declare global {
   namespace control {
     /**
      * Sets whether the building is enabled or disabled.
+     *
+     *  ```js
+     *  const conveyor = getBuilding("conveyor1");
+     *  control.enabled(conveyor, false);
+     *  ```
      */
     function enabled(building: BasicBuilding, value: boolean): void;
 
@@ -273,6 +279,15 @@ declare global {
      * Makes the building shoot or aim at the given position
      * @param options.building The shooting building
      * @param options.shoot `true` to shoot, `false` to just aim at the position
+     *
+     *  ```js
+     *  control.shoot({
+     *    building: getBuilding("cyclone1"),
+     *    shoot: true,
+     *    x: Vars.thisx,
+     *    y: Vars.thisy,
+     *  });
+     *  ```
      */
     function shoot(options: {
       /** The shooting building */
@@ -288,6 +303,23 @@ declare global {
      * @param options.building The shooting building
      * @param options.unit The target unit
      * @param options.shoot `true` to shoot, `false` to just aim
+     *
+     *  ```js
+     *  const turret = getBuilding("cyclone1");
+     *
+     *  const player = radar({
+     *    building: turret,
+     *    filters: ["player", "any", "any"],
+     *    order: true,
+     *    sort: "distance",
+     *  });
+     *
+     *  control.shootp({
+     *    building: turret,
+     *    unit: player,
+     *    shoot: true,
+     *  });
+     *  ```
      */
     function shootp(options: {
       /** The shooting building */
@@ -300,11 +332,25 @@ declare global {
 
     /**
      * Sets the config of a block (like the item of a sorter)
+     *
+     *  ```js
+     *  const sorter = getBuilding("sorter1");
+     *
+     *  control.config(sorter, Items.copper);
+     *  ```
      */
     function config(building: BasicBuilding, value: symbol): void;
 
     /**
-     * Sets the color of an illuminator
+     * Sets the color of an illuminator.
+     *
+     * The RGB values must be within the range: [0, 255].
+     *
+     *  ```js
+     *  const illuminator = getBuilding("illuminator1");
+     *
+     *  control.color(illuminator, 10, 150, 210);
+     *  ```
      */
     function color(
       building: BasicBuilding,
@@ -350,16 +396,17 @@ declare global {
    * This method allows you to use customly created symbols
    * and sensor them on buildings.
    * @param property The property to be sensed on the building
-   * @param target
+   * @param target The object that will be "sensed"
    *
    * Example:
-   * ```js
-   *  let myBuilding = getBuilding("container1")
-   *  // jsdoc doesn't allow me to type this
-   * // variable, but you should type it as a symbol in this case
-   *  let myCustomSymbol = getVar("@custom-symbol") // problably defined by a mod
-   *  let result = sensor(myCustomSymbol, myBuilding)
-   * ```
+   *  ```ts
+   *  let myBuilding = getBuilding("container1");
+   *
+   *  // typescript annotation, you can use jsdoc comments on
+   *  // regular javascript
+   *  let myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
+   *  let result = sensor(myCustomSymbol, myBuilding);
+   *  ```
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
