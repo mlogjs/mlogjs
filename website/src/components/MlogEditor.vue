@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, shallowRef } from "vue";
+import { computed, ref, shallowRef } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
@@ -10,6 +10,11 @@ import { useSourceMapping } from "../composables/useSourceMapping";
 import type { Monaco } from "../util";
 import { registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
+import { useData } from "vitepress";
+
+const { isDark } = useData();
+
+const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
 
 loader.config({
   paths: {
@@ -76,7 +81,7 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
         <Editor
           language="typescript"
           v-model:value="code"
-          theme="vs-dark"
+          :theme="theme"
           :options="editorOptions"
           @before-mount="beforeMount"
           @mount="onMount"
@@ -87,7 +92,7 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
       <Pane size="30">
         <Editor
           language="mlog"
-          theme="vs-dark"
+          :theme="theme"
           :value="compiledRef"
           :options="outEditorOptions"
           @mount="onOutMount"
