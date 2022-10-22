@@ -6,4 +6,6 @@ layout: page
     import MlogEditor from '../src/components/MlogEditor.vue'
 </script>
 
-<MlogEditor></MlogEditor>
+<ClientOnly>
+    <MlogEditor></MlogEditor>
+</ClientOnly>
