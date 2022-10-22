@@ -1,6 +1,6 @@
 # Helper methods
 
-## getBuilding
+## `getBuilding`
 
 Allows you to get a reference to a building linked to the processor by its name.
 
@@ -15,7 +15,7 @@ this allows the compiler to optimize the code by treating constants created
 that way as aliases.
 :::
 
-## getVar
+## `getVar`
 
 Allows you to access symbols or variables that are not available through the [namespaces](/guide/namespaces).
 
@@ -45,7 +45,7 @@ end
 
 :::
 
-## concat
+## `concat`
 
 Allows you to concatenate a series of constant strings.
 
@@ -57,7 +57,7 @@ const fullName = concat(programName, "-v", programVersion);
 // ...
 ```
 
-## asm
+## `asm`
 
 Inlines mlog code (can be used with variables and expressions)
 
