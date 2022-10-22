@@ -114,9 +114,6 @@ print @name
 print @payloadCount
 print @payloadType
 print @enabled
-print @shoot
-print @shootp
-print @config
 print @color
 print @air
 print @solid
