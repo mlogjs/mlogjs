@@ -411,7 +411,14 @@ declare global {
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
   /**
-   * Stops the execution for the given amount of seconds
+   * Stops the execution for the given amount of
+   *  ```js
+   *  print("before");
+   *  printFlush();
+   *  wait(3.5);
+   *  print("after");
+   *  printFlush();
+   *  ```
    */
   function wait(seconds: number): void;
 
@@ -699,10 +706,27 @@ declare global {
       | [found: true, x: number, y: number, building: T];
   }
 
-  /**Jumps to the top of the instruction stack*/
+  /**
+   * Jumps to the top of the instruction stack.
+   *2
+   *  ```js
+   *  const { enabled } = getBuilding("switch1");
+   *
+   *  if (!enabled) endScript();
+   *  // do something when the switch is enabled
+   *  ```
+   */
   function endScript(): never;
 
-  /** Halts the execution of this processor */
+  /**
+   * Halts the execution of this processor. Can be used to debug
+   * code and analyze the processor registers.
+   *
+   *  ```js
+   *  // stop the processor to debug variables
+   *  stopScript();
+   *  ```
+   */
   function stopScript(): never;
 
   /** Gets block data from the map. Available ONLY for world processors. */

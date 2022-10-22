@@ -413,9 +413,37 @@ setRule.ambientLight(colorData);
 
 ## Flow control
 
-- `wait` - Pauses execution for the given amount of seconds
-- `endScript` - Jumps to the top of the instruction stack (compiles into an `end` instruction)
-- `stopScript` - Halts the execution of the current processor
+### `wait`
+
+Stops the execution for the given amount of seconds
+
+```js
+print("before");
+printFlush();
+wait(3.5);
+print("after");
+printFlush();
+```
+
+### `endScript`
+
+Jumps to the top of the instruction stack
+
+```js
+const { enabled } = getBuilding("switch1");
+
+if (!enabled) endScript();
+// do something when the switch is enabled
+```
+
+### `stopScript`
+
+Halts the execution of this processor. Can be used to debug code and analyze the processor registers.
+
+```js
+// stop the processor to debug variables
+stopScript();
+```
 
 ## Unit control
 
