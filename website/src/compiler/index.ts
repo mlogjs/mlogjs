@@ -1,10 +1,7 @@
 import type { CompilerOptions } from "mlogjs";
 import type { CompilerResult, InputMessage, OutputMessage } from "./types";
 
-const worker = new Worker(new URL("./worker.ts", import.meta.url), {
-  name: "mlogjs-compiler",
-  type: "module",
-});
+let worker: Worker;
 
 /**
  * Invokes a web worker to compile the code. It will throttle any calls that
@@ -15,6 +12,12 @@ export async function compile(
   code: string,
   options: CompilerOptions
 ): Promise<CompilerResult> {
+  // cuz vite insists on doing ssr
+  worker ??= new Worker(new URL("./worker.ts", import.meta.url), {
+    name: "mlogjs-compiler",
+    type: "module",
+  });
+
   const inputMessage: InputMessage = {
     id: generateId(),
     input: code,
