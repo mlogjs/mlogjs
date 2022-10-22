@@ -119,13 +119,24 @@ Behavior:
   making it possible for the compiler to know how to deal with each case.
   :::
 
+- Functions declarations are hoisted to the top of their declaration scope.
+
+```js
+// works
+doSomething();
+
+function doSomething() {
+  print("something");
+  printFlush();
+}
+```
+
 Limitations:
 
 - Functions can only be bound to constants
 - No `this` context for any kind of function
 - Functions cannot act as constructors
 - No recursion support
-- Functions declarations are not hoisted
 - No proper support for closures
 - No support for generators
 - No support for `async`/`await`
@@ -186,6 +197,26 @@ printFlush();
 Behavior:
 
 - Supports `break` and `continue` statements
+
+### Labels
+
+You can use labels to have a finer control over your script's control flow.
+
+```js
+block: {
+  if (Math.rand(1) > 0.5) break block;
+  // do something
+}
+
+loop: for (let i = 0; i < 10; i++) {
+  for (let j = 0; j < 10; j++) {
+    if (i === j) continue loop;
+    print`(${i}, ${j})\n`;
+  }
+}
+
+printFlush();
+```
 
 ### Math and related operators
 
