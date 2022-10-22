@@ -46,6 +46,7 @@ useSourceMapping({
   editorRef,
   outEditorRef,
   sourcemapsRef,
+  monacoRef,
 });
 
 function beforeMount(monaco: Monaco) {

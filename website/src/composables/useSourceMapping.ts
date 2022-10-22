@@ -1,7 +1,7 @@
-import * as monaco from "monaco-editor";
 import type { editor } from "monaco-editor";
 import type { SourceLocation } from "../compiler/types";
 import { watchEffect, type ShallowRef } from "vue";
+import type { Monaco } from "../util";
 
 type Sourcemaps = SourceLocation[];
 
@@ -9,6 +9,7 @@ interface Params {
   editorRef: ShallowRef<editor.IStandaloneCodeEditor | undefined>;
   outEditorRef: ShallowRef<editor.IStandaloneCodeEditor | undefined>;
   sourcemapsRef: ShallowRef<Sourcemaps | undefined>;
+  monacoRef: ShallowRef<Monaco | null>;
 }
 
 const inlineClassName = "selection-highlighted";
@@ -17,12 +18,14 @@ export function useSourceMapping({
   editorRef,
   outEditorRef,
   sourcemapsRef,
+  monacoRef,
 }: Params) {
   watchEffect(onCleanup => {
+    const monaco = monacoRef.value;
     const editor = editorRef.value;
     const outEditor = outEditorRef.value;
     const sourcemaps = sourcemapsRef.value;
-    if (!(editor && outEditor)) return;
+    if (!editor || !outEditor || !monaco) return;
 
     const inputCollection = editor.createDecorationsCollection();
     const outputCollection = outEditor.createDecorationsCollection();
@@ -31,7 +34,11 @@ export function useSourceMapping({
       outputCollection.clear();
       if (!sourcemaps) return;
 
-      const [firstSelection, decorations] = getInputDecorations(e, sourcemaps);
+      const [firstSelection, decorations] = getInputDecorations(
+        monaco,
+        e,
+        sourcemaps
+      );
       inputCollection.set(decorations);
 
       if (
@@ -46,7 +53,11 @@ export function useSourceMapping({
       inputCollection.clear();
       if (!sourcemaps) return;
 
-      const [revealedLine, decorations] = getOutputDecorations(e, sourcemaps);
+      const [revealedLine, decorations] = getOutputDecorations(
+        monaco,
+        e,
+        sourcemaps
+      );
 
       outputCollection.set(decorations);
       if (
@@ -66,6 +77,7 @@ export function useSourceMapping({
 }
 
 function getInputDecorations(
+  monaco: Monaco,
   e: editor.ICursorSelectionChangedEvent,
   sourcemaps: Sourcemaps
 ): [SourceLocation | undefined, editor.IModelDeltaDecoration[]] {
@@ -93,6 +105,7 @@ function getInputDecorations(
 }
 
 function getOutputDecorations(
+  monaco: Monaco,
   e: editor.ICursorSelectionChangedEvent,
   sourcemaps: Sourcemaps
 ): [number | undefined, editor.IModelDeltaDecoration[]] {
