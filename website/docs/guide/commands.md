@@ -447,10 +447,353 @@ stopScript();
 
 ## Unit control
 
-- `unitBind` - Binds an unit of a given type to the processor
-- `unitControl` - Controls the unit bound to the processor
-- `unitRadar` - Uses the unit bound to the processor to find nearby units
-- `unitLocate` - Uses the unit bound to the processor to find blocks
+### `unitBind`
+
+Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
+
+```js
+unitBind(Units.flare);
+
+const { x, y } = Vars.unit;
+
+print`x: ${x} y: ${y}`;
+printFlush();
+```
+
+### `unitControl`
+
+Controls the unit bound to the processor
+
+- #### `unitControl.idle`
+
+  Makes the unit bound to this processor stop moving but
+  allows it to keep doing it's action (like mining or building).
+
+  ```js
+  unitControl.idle();
+  ```
+
+- #### `unitControl.stop`
+
+  Makes the unit bound to this processor stop mining, building and moving
+
+  ```js
+  unitControl.stop();
+  ```
+
+- #### `unitControl.move`
+
+  Makes the unit bound to this processor move to the given position
+
+  ```js
+  unitControl.move(10, 20);
+  ```
+
+- #### `unitControl.approach`
+
+  Makes the unit bound to this processor approach the given position at the given radius
+
+  - `radius` - How distant to the position the unit can be
+
+  ```js
+  unitControl.approach({
+    x: 15,
+    y: 30,
+    radius: 5,
+  });
+  ```
+
+- #### `unitControl.boost`
+
+  Whether the unit bound to this processor should be boosted (floating).
+
+  ```js
+  unitControl.boost(true);
+  ```
+
+- #### `unitControl.pathfind`
+
+  Makes the unit bound to this processor move to the enemy spawn
+
+  ```js
+  unitControl.pathfind();
+  ```
+
+- #### `unitControl.target`
+
+  Makes the unit bound to this processor shoot/aim at the given position
+
+  - `shoot` - `true` to shoot, `false` to just aim
+
+  ```js
+  unitControl.target({
+    shoot: true,
+    x: 15,
+    y: 30,
+  });
+  ```
+
+- #### `unitControl.targetp`
+
+  Makes the unit bound to this processor target an unit with velocity prediction
+
+  - `unit` - The shoot target
+  - `shoot` - `true` to shoot, `false` to just aim
+
+  ```js
+  const player = unitRadar({
+    filters: ["player", "any", "any"],
+    order: true,
+    sort: "distance",
+  });
+
+  unitControl.targetp({
+    shoot: true,
+    unit: player,
+  });
+  ```
+
+- #### `unitControl.itemDrop`
+
+  Makes the unit bound to this processor drop it's held items onto the given target
+
+  - `target` - Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+  - `amount` - How many items should be dropped
+
+  ```js
+  const container = getBuilding("container1");
+
+  // ...
+
+  // drop 40 items on the container
+  unitControl.itemDrop(container, 40);
+
+  // ...
+
+  // discard 10 items from the current unit
+  unitControl.itemDrop(Blocks.air, 10);
+  ```
+
+- #### `unitControl.itemTake`
+
+  Makes the unit bound to this processor take items from a building
+
+  - `target` - The building that will have it's items taken
+  - `item` - The kind of item to take
+  - `amount` - How many items should be taken
+
+  ```js
+  const vault = getBuilding("vault1");
+
+  // bind unit and move to the valult...
+
+  unitControl.itemTake(vault, Items.graphite, 50);
+
+  // do something with the graphite...
+  ```
+
+- #### `unitControl.payDrop`
+
+  Makes the unit bound to this processor drop one entity from it's payload
+
+  ```js
+  unitControl.payDrop();
+  ```
+
+- #### `unitControl.payTake`
+
+  Makes the unit bound to this processor take an entity into it's payload
+
+  - `takeUnits` - Whether to take units or buildings
+
+  ```js
+  unitControl.payTake({
+    takeUnits: true,
+  });
+  ```
+
+- #### `unitControl.payEnter`
+
+  Makes the unit bound to this processor enter/land on the
+  payload block the unit is on
+
+  ```js
+  unitControl.payEnter();
+  ```
+
+- #### `unitControl.mine`
+
+  Makes the unit bound to this processor mine at the given position
+
+  ```js
+  unitControl.mine(10, 20);
+  ```
+
+- #### `unitControl.flag`
+
+  Sets the numeric flag of the unit bound to this processor
+
+  ```js
+  const localFlag = 123;
+
+  unitControl.flag(localFlag);
+  ```
+
+- #### `unitControl.build`
+
+  Makes the unit bound to this processor build a building with the
+  given properties
+
+  - `block` - The kind of building to build
+  - `rotation` - The rotation of the building, ranges from 0 to 3
+  - `config` - The config of the building
+
+  ```js
+  unitControl.build({
+    x: 10,
+    y: 20,
+    block: Blocks.sorter,
+    rotation: 1,
+    config: Items.silicon,
+  });
+  ```
+
+- #### `unitControl.getBlock`
+
+  Makes the unit bound to this processor get data about a block at the given position
+
+  ```js
+  const [type, building] = unitControl.getBlock(10, 20);
+
+  // do something with the results
+  ```
+
+- #### `unitControl.within`
+
+  Checks if the unit bound to this processor is within a radius of a given position.
+
+  ```js
+  unitControl.within({
+    x: 10,
+    y: 20,
+    radius: 5,
+  });
+  ```
+
+### `unitRadar`
+
+Finds an unit near the unit bound to this processor
+
+- `filters` - The filters for selecting a target. Use "any" for any target.
+- `order` - `true` to get the first result, `false` to get the last result.
+- `sort` - The method on which the results should be sorted
+
+Example:
+
+```js
+// returns the second nearest enemy unit
+const result = unitRadar({
+  filters: ["enemy", "any", "any"],
+  order: 2,
+  sort: "distance",
+});
+```
+
+### `unitLocate`
+
+Uses the unit bound to this processor to find specific types of blocks
+
+- #### `unitLocate.ore`
+
+  Uses the unit bound to this processor to find an ore vein anywhere on the map
+
+  - `ore` - The kind of item the ore should contain
+
+  ```js
+  const [found, x, y] = unitLocate.ore(Items.copper);
+
+  if (found) {
+    unitControl.approach({ x, y, radius: 5 });
+  }
+  ```
+
+- #### `unitLocate.building`
+
+  Uses the unit bound to this processor to find a building anywhere on the map
+
+  - `group` - The group that the building belongs to
+  - `enemy` - Whether it should be an enemy building or an ally one
+
+  ```js
+  const vault = getBuilding("vault1");
+  const takeAmount = 100;
+
+  unitBind(Units.mega);
+
+  // we don't use the `found` variable
+  // because we always have our own core
+  const [, x, y, core] = unitLocate.building({
+    group: "core",
+    enemy: false,
+  });
+
+  const location = {
+    x,
+    y,
+    radius: 5,
+  };
+
+  if (!unitControl.within(location) && Vars.unit.totalItems == 0) {
+    // if the unit has no items and it is not near
+    // the core, move it to the core
+    // and take 100 copper
+    unitControl.approach(location);
+    unitControl.itemTake(core, Items.copper, takeAmount);
+  } else {
+    // else, approach the vault and drop the items on it
+    unitControl.approach({
+      x: vault.x,
+      y: vault.y,
+      radius: 5,
+    });
+    unitControl.itemDrop(vault, takeAmount);
+  }
+  ```
+
+- #### `unitLocate.spawn`
+
+  Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
+
+  Returns the enemy spawn point or its core, if it exists.
+
+  ```js
+  const [found, x, y, core] = unitLocate.spawn();
+
+  if (!found) {
+    print("No enemy core found");
+  } else if (core) {
+    print`core location at (${x}, ${y})`;
+  } else {
+    print`enemy spawn at (${x}, ${y})`;
+  }
+
+  printFlush();
+  ```
+
+- #### `unitLocate.damaged`
+
+  Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
+
+  ```js
+  const [found, x, y, building] = unitLocate.damaged();
+
+  if (found) {
+    print`go fix a ${building} at (${x}, ${y})`;
+  } else {
+    print("No damaged building found");
+  }
+  printFlush();
+  ```
 
 ## World
 
