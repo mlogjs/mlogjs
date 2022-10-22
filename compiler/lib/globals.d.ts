@@ -278,6 +278,7 @@ interface BuildingSymbolTable {
   readonly slagHeater: unique symbol;
   readonly phaseHeater: unique symbol;
   readonly heatRedirector: unique symbol;
+  readonly heatRouter: unique symbol;
   readonly slagIncinerator: unique symbol;
   readonly carbideCrucible: unique symbol;
   readonly slagCentrifuge: unique symbol;
@@ -546,6 +547,7 @@ interface EnvBlockSymbolTable {
   readonly arkyicVent: unique symbol;
   readonly yellowStoneVent: unique symbol;
   readonly redStoneVent: unique symbol;
+  readonly crystallineVent: unique symbol;
   readonly redmat: unique symbol;
   readonly bluemat: unique symbol;
   readonly grass: unique symbol;

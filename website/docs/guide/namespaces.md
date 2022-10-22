@@ -234,6 +234,7 @@ Contains the available symbols for blocks.
 - `slagHeater`
 - `phaseHeater`
 - `heatRedirector`
+- `heatRouter`
 - `slagIncinerator`
 - `carbideCrucible`
 - `slagCentrifuge`
@@ -496,6 +497,7 @@ Contains the available symbols for blocks.
 - `arkyicVent`
 - `yellowStoneVent`
 - `redStoneVent`
+- `crystallineVent`
 - `redmat`
 - `bluemat`
 - `grass`
