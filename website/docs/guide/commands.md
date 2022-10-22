@@ -1,5 +1,5 @@
 ---
-outline: [2, 4]
+outline: [2, 3]
 ---
 
 # Commands
@@ -800,16 +800,572 @@ Uses the unit bound to this processor to find specific types of blocks
 These commands are exclusive to world processors and will not work
 on regular processor
 
-- `getBlock` - Gets block data on a given location
-- `setBlock` - Sets block data on a given location
-- `spawnUnit` - Spawns an unit at a give location
-- `applyStatus` - Applies a status effect to an unit
-- `spawnWave` - Spawns a wave
-- `setRule` - Sets a game rule
-- `flushMessage` - Consumes content of the print buffer and displays it on the gui
-- `cutscene` - Controls the player camera
-- `explosion` - Creates an explosion
-- `setRate` - Sets the speed of this processor
-- `fetch` - Looks up players/buildings/units by index
-- `getFlag` - Checks if a global flag is set
-- `setFlag` - Sets a global flag
+### `getBlock`
+
+Gets block data from the map. Available ONLY for world processors.
+
+- #### `getBlock.floor`
+
+  Gets the floor type on the given location
+
+  ```js
+  const floorType = getBlock.floor(10, 20);
+  ```
+
+- #### `getBlock.ore`
+
+  Gets the ore type on the given location. `Blocks.air` if there is no ore
+
+  ```js
+  const oreType = getBlock.ore(10, 20);
+
+  if (oreType != Blocks.air) {
+    print("found ", oreType);
+  } else {
+    print("no ore found");
+  }
+  printFlush();
+  ```
+
+- #### `getBlock.block`
+
+  Gets the block type on the give location. `Blocks.air` if there is no block.
+
+  ```js
+  const blockType = getBlock.block(10, 20);
+
+  if (blockType != Blocks.air) {
+    print("found ", blockType);
+  } else {
+    print("no block found");
+  }
+  printFlush();
+  ```
+
+- #### `getBlock.building`
+
+  Gets the building on the given location. `null` if there is no building.
+
+  ```js
+  const building = getBlock.building(10, 20);
+
+  if (building != null) {
+    print("found ", building, "");
+  } else {
+    print("no building found");
+  }
+  printFlush();
+  ```
+
+### `setBlock`
+
+- #### `setBlock.floor`
+
+  Sets the floor of the tile at the given location.
+
+  ```js
+  setBlock.floor(10, 20, Blocks.metalFloor5);
+  ```
+
+- #### `setBlock.ore`
+
+  Sets the ore at the given location. Use `Blocks.air` to remove any ore.
+
+  ```js
+  setBlock.ore(10, 20, Blocks.oreCopper);
+  ```
+
+- #### `setBlock.block`
+
+  Sets the block at a given location, it can be a regular building or an environment block.
+
+  ```js
+  setBlock.block({
+    x: 10,
+    y: 20,
+    to: Blocks.router,
+    rotation: 0,
+    team: Teams.sharded,
+  });
+  ```
+
+### `spawnUnit`
+
+Spawns an unit at the given location.
+
+- `rotation` - The initial rotation of the unit in degrees.
+
+```js
+spawnUnit({
+  team: Teams.sharded,
+  type: Units.flare,
+  x: 10,
+  y: 20,
+  rotation: 90,
+});
+```
+
+### `applyStatus`
+
+Contains the variants for the `applyStatus` instruction.
+
+- #### `applyStatus.apply`
+
+  Applies a status effect to the given unit.
+
+  The only status effects that don't require a duration are `overdrive` and `boss`.
+
+  ```js
+  applyStatus.apply("burning", Vars.unit, 10);
+  applyStatus.apply("boss", Vars.unit);
+  ```
+
+- #### `applyStatus.clear`
+
+  Removes a status effect to the given unit.
+
+  ```js
+  applyStatus.clear("burning", Vars.unit);
+  applyStatus.clear("boss", Vars.unit);
+  ```
+
+### `spawnWave`
+
+Spawns an enemy wave, can be used even if there is an already active wave.
+
+```js
+// natural wave, units appear on the enemy spawn
+spawnWave(true);
+
+// syntethic wave, units appear on the given coordinates
+spawnWave(false, 10, 20);
+```
+
+### `setRule`
+
+Contains the multiple variants of the `setrule` instruction.
+
+- #### `setRule.currentWaveTime`
+
+  Sets the wave countdown in seconds.
+
+  ```js
+  setRule.currentWaveTime(10);
+  ```
+
+- #### `setRule.waveTimer`
+
+  Enables/disables the wave timer.
+
+  ```js
+  setRule.waveTimer(true);
+  ```
+
+- #### `setRule.waves`
+
+  Allows or prevents waves from spawning.
+
+  ```js
+  setRule.waves(true);
+  ```
+
+- #### `setRule.wave`
+
+  Sets the current wave number.
+
+  ```js
+  setRule.wave(10);
+  ```
+
+- #### `setRule.waveSpacing`
+
+  Sets the time between waves in seconds.
+
+  ```js
+  setRule.waveSpacing(180);
+  ```
+
+- #### `setRule.waveSending`
+
+  Sets wether waves can be manually summoned by pressing the play button.
+
+  ```js
+  setRule.waveSending(true);
+  ```
+
+- #### `setRule.attackMode`
+
+  Sets wether the gamemode is the attack mode
+
+  ```js
+  setRule.attackMode(true);
+  ```
+
+- #### `setRule.enemyCoreBuildRadius`
+
+  Sets the radius of the no-build zone around enemy cores.
+
+  ```js
+  setRule.enemyCoreBuildRadius(150);
+  ```
+
+- #### `setRule.dropZoneRadius`
+
+  Sets the radius around enemy wave drop zones.
+
+  ```js
+  setRule.dropZoneRadius(20);
+  ```
+
+- #### `setRule.unitCap`
+
+  Sets the base unit cap.
+
+  ```js
+  setRule.unitCap(40);
+  ```
+
+- #### `setRule.mapArea`
+
+  Sets the playable map area. Blocks that are out of the new bounds will be removed.
+
+  ```js
+  setRule.mapArea({
+    x: 0,
+    y: 0,
+    width: 500,
+    height: 500,
+  });
+  ```
+
+- #### `setRule.lighting`
+
+  Sets wether ambient lighting is enabled
+
+  ```js
+  setRule.lighting(true);
+  ```
+
+- #### `setRule.ambientLight`
+
+  Sets the ambient light color.
+  `packColor` can be used to get the RGBA data recevied by this function.
+
+  ```js
+  // enables lighting and sets the color to gray
+  setRule.lighting(true);
+  setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
+  ```
+
+- #### `setRule.solarMultiplier`
+
+  Sets the multiplier for the energy output of solar panels.
+
+  ```js
+  setRule.solarMultiplier(10);
+  ```
+
+- #### `setRule.buildSpeed`
+
+  Sets the build speed multiplier of a team.
+
+  The multiplier will always be clamped between `0.001` and `50`.
+
+  ```js
+  setRule.buildSpeed(Teams.sharded, 1.5);
+  ```
+
+- #### `setRule.unitBuildSpeed`
+
+  Sets the speed multiplier for unit factories.
+
+  The multiplier will always be clamped between `0` and `50`.
+
+  ```js
+  setRule.unitBuildSpeed(Teams.sharded, 3);
+  ```
+
+- #### `setRule.unitDamage`
+
+  Sets the damage multiplier for units on a given team.
+
+  ```js
+  setRule.unitDamage(Teams.sharded, 1.25);
+  ```
+
+- #### `setRule.blockHealth`
+
+  Sets the block health multiplier for a given team.
+
+  ```js
+  setRule.blockHealth(Teams.crux, 0.75);
+  ```
+
+- #### `setRule.blockDamage`
+
+  Sets the block damage multiplier for a given team.
+
+  ```js
+  setRule.blockDamage(Teams.crux, 2);
+  ```
+
+- #### `setRule.rtsMinWeight`
+
+  Sets the Real Time Strategy minimum weight for a team.
+
+  In other words it, sets the minimum "advantage" needed for a squad to attack.
+  The higher the value, the more cautious the squad is.
+
+  ```js
+  setRule.rtsMinWeight(Teams.sharded, 3);
+  ```
+
+- #### `setRule.rtsMinSquad`
+
+  Sets the Real Time Strategy minimum size of attack squads of a team.
+
+  The higher the value, the more units are required before a squad attacks.
+
+  ```js
+  setRule.rtsMinSquad(Teams.sharded, 5);
+  ```
+
+### `flushMessage`
+
+Writes the contents of the print buffer in the selected mode
+and clears the buffer afterwards. World processor ONLY.
+
+```js
+print("Hello");
+flushMessage.announce(4); // lasts 4 seconds
+wait(5);
+print("World");
+flushMessage.toast(4);
+wait(5);
+```
+
+- #### `flushMessage.notify`
+
+  Shows a nofication at the top of the screen
+
+  ```js
+  print("something");
+  flushMessage.notify();
+  ```
+
+- #### `flushMessage.mission`
+
+  Puts the content on the top left corner of the screen
+
+  ```js
+  print("something");
+  flushMessage.mission();
+  ```
+
+- #### `flushMessage.announce`
+
+  Puts the content on the middle of the screen
+
+  - `duration` - The duration, in seconds
+
+  ```js
+  print("something");
+  flushMessage.announce(3);
+  ```
+
+- #### `flushMessage.toast`
+
+  Puts the content on the middle top of the screen
+
+  - `duration`- The duration, in seconds
+
+  ```js
+  print("something");
+  flushMessage.toast(5);
+  ```
+
+### `cutscene`
+
+- #### `cutscene.pan`
+
+  Moves the player's camera to the given location.
+
+  ```js
+  cutscene.pan({
+    x: 10,
+    y: 20,
+    speed: 15,
+  });
+  ```
+
+- #### `cutscene.zoom`
+
+  Zooms the player camera to the desired level
+
+  ```js
+  cutscene.zoom(3);
+  ```
+
+- #### `cutscene.stop`]
+
+  Gives the camera control back to the player
+
+  ```js
+  cutscene.stop();
+  ```
+
+### `explosion`
+
+Creates an explosion
+
+```js
+explosion({
+  team: Teams.crux,
+  x: 5,
+  y: 15,
+  radius: 20,
+  damage: 100,
+  air: true,
+  ground: true,
+  pierce: true,
+});
+```
+
+### `setRate`
+
+Sets the speed of this world processor in instructions per tick.
+
+```js
+setRate(20);
+```
+
+### `fetch`
+
+Contains the variants of the `fetch` instruction.
+
+- #### `fetch.unit`
+
+  Gets an unit from the given team
+  The index starts at 0.
+
+  ```js
+  const count = fetch.unitCount();
+  for (let i = 0; i < count; i++) {
+    const unit = fetch.unit(Teams.sharded, i);
+    print`x: ${unit.x}, y: ${unit.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.unitCount`
+
+  Gets the amount of units existing on a given team.
+
+  ```js
+  const count = fetch.unitCount();
+  for (let i = 0; i < count; i++) {
+    const unit = fetch.unit(Teams.sharded, i);
+    print`x: ${unit.x}, y: ${unit.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.player`
+
+  Gets a player from a team.
+
+  The index starts at 0.
+
+  ```js
+  const count = fetch.playerCount();
+  for (let i = 0; i < count; i++) {
+    const player = fetch.player(Teams.sharded, i);
+    print`x: ${player.x}, y: ${player.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.playerCount`
+
+  Gets the amount of players existing on a given team.
+
+  ```js
+  const count = fetch.playerCount();
+  for (let i = 0; i < count; i++) {
+    const player = fetch.player(Teams.sharded, i);
+    print`x: ${player.x}, y: ${player.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.core`
+
+  Gets a core from a team.
+
+  The index of the starts at 0.
+
+  ```js
+  const count = fetch.coreCount();
+  for (let i = 0; i < count; i++) {
+    const core = fetch.core(Teams.sharded, i);
+    print`x: ${core.x}, y: ${core.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.coreCount`
+
+  Gets the amount of cores existing on a given team.
+
+  ```js
+  const count = fetch.coreCount();
+  for (let i = 0; i < count; i++) {
+    const core = fetch.core(Teams.sharded, i);
+    print`x: ${core.x}, y: ${core.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.build`
+
+  Gets a building from a team.
+
+  The index starts at 0.
+
+  ```js
+  const count = fetch.buildCount();
+  for (let i = 0; i < count; i++) {
+    const router = fetch.build(Teams.sharded, i, Blocks.router);
+    print`x: ${router.x}, y: ${router.y}\n`;
+  }
+  printFlush();
+  ```
+
+- #### `fetch.buildCount`
+
+  Gets the amount of buildings existing on a given team.
+
+  ```js
+  const count = fetch.buildCount();
+  for (let i = 0; i < count; i++) {
+    const router = fetch.build(Teams.sharded, i, Blocks.router);
+    print`x: ${router.x}, y: ${router.y}\n`;
+  }
+  printFlush();
+  ```
+
+### `getFlag`
+
+Checks if a global flag is set.
+
+```js
+const flagEnabled = getFlag("foo");
+```
+
+### `setFlag`
+
+Sets a global flag.
+
+```js
+setFlag("foo", true);
+```

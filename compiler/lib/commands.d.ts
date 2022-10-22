@@ -876,6 +876,7 @@ declare global {
     ): T | null;
   }
 
+  /**  Sets block data on a given location. World processor ONLY.  */
   namespace setBlock {
     // TODO: maybe have a separate floor symbol type?
     /** Sets the floor of the tile at the given location. */
@@ -894,12 +895,17 @@ declare global {
     }): void;
   }
 
-  /** Spawns an unit at the given location */
+  /**
+   * Spawns an unit at the given location. World processor ONLY.
+   *
+   * @param options.rotation The initial rotation of the unit in degrees.
+   */
   function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
     type: UnitSymbol;
     x: number;
     y: number;
     team: TeamSymbol;
+    /** The initial rotation of the unit in degrees. */
     rotation?: number;
   }): T;
 
@@ -983,8 +989,8 @@ declare global {
      *
      * ```js
      * // enables lighting and sets the color to gray
-     * setRule("lighting", true);
-     * setRule("ambientLight", packColor(0.5, 0.5, 0.5, 1));
+     * setRule.lighting(true);
+     * setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
      * ```
      */
     function ambientLight(rgbaData: number): void;
@@ -1005,10 +1011,9 @@ declare global {
     function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
 
     /** Sets the damage multiplier for units on a given team. */
-
     function unitDamage(team: TeamSymbol, multiplier: number): void;
-    /** Sets the block health multiplier for a given team. */
 
+    /** Sets the block health multiplier for a given team. */
     function blockHealth(team: TeamSymbol, multiplier: number): void;
 
     /** Sets the block damage multiplier for a given team. */
@@ -1063,6 +1068,7 @@ declare global {
     function toast(duration: number): void;
   }
 
+  /** Controls the player camera. World processor ONLY. */
   namespace cutscene {
     /** Moves the player's camera to the given location. */
     function pan(options: { x: number; y: number; speed: number }): void;
@@ -1072,7 +1078,7 @@ declare global {
     function stop(): void;
   }
 
-  /** Creates an explosion */
+  /** Creates an explosion. World processor ONLY. */
   function explosion(options: {
     team: TeamSymbol;
     x: number;
@@ -1084,7 +1090,7 @@ declare global {
     pierce: boolean;
   }): void;
 
-  /** Sets the speed of this world processor in instructions per tick. */
+  /** Sets the speed of this world processor in instructions per tick. World processor ONLY. */
   function setRate(ipt: number): void;
 
   /** Contains the variants of the `fetch` instruction. World processor ONLY. */
