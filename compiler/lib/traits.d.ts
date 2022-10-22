@@ -138,4 +138,14 @@ declare global {
     extends WithSymbols<{
       speed: number;
     }> {}
+
+  interface WithColor
+    extends WithSymbols<{
+      color: number;
+    }> {}
+
+  interface WithTeam
+    extends WithSymbols<{
+      team: number;
+    }> {}
 }
