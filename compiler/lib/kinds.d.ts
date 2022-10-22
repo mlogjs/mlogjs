@@ -26,8 +26,7 @@ interface BasicBuilding
     Spaced,
     Ranged,
     Typed<BuildingSymbol>,
-    WithEnable,
-    WithConfig {}
+    WithEnable {}
 
 interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 

@@ -245,9 +245,6 @@ declare namespace LAccess {
   const payloadCount: unique symbol;
   const payloadType: unique symbol;
   const enabled: unique symbol;
-  const shoot: unique symbol;
-  const shootp: unique symbol;
-  const config: unique symbol;
   const color: unique symbol;
 }
 
