@@ -1206,7 +1206,7 @@ wait(5);
   cutscene.zoom(3);
   ```
 
-- #### `cutscene.stop`]
+- #### `cutscene.stop`
 
   Gives the camera control back to the player
 
