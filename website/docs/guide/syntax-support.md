@@ -194,6 +194,10 @@ All the mathematical operators for numbers are supported and will be transpiled 
 But the `Math` object has been modified to match the other math functions
 available on the mlog runtime. They are listed bellow:
 
+- `PI` - Pi. This is the ratio of the circumference of a circle to its diameter.
+- `E` - The mathematical constant e. This is Euler's number, the base of natural logarithms.
+- `degToRad` - The convertion ratio for degress to radians.
+- `radToDeg` - The convertion ratio for radians to degrees.
 - `abs` - Absolute value of a number
 - `angle` - Angle of a vector in degrees
 - `ceil` - Rounds the number to the closest bigger integer

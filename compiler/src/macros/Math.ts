@@ -1,8 +1,15 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { IValue } from "../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../values";
+import { EMutability, IScope, IValue } from "../types";
+import { assign } from "../utils";
+import {
+  IObjectValueData,
+  LiteralValue,
+  ObjectValue,
+  StoreValue,
+} from "../values";
+import { ValueOwner } from "../values/ValueOwner";
 import { MacroFunction } from "./Function";
 
 const mathOperations: Record<
@@ -29,8 +36,24 @@ const mathOperations: Record<
   rand: null,
 };
 
-function createMacroMathOperations() {
-  const macroMathOperations: Record<string, MacroFunction> = {};
+function mathConstant(scope: IScope, name: string) {
+  return new ValueOwner({
+    scope,
+    constant: true,
+    name,
+    value: assign(new StoreValue(scope), {
+      mutability: EMutability.constant,
+    }),
+  }).value;
+}
+
+function createMacroMathOperations(scope: IScope) {
+  const macroMathOperations: IObjectValueData = {
+    PI: mathConstant(scope, "@pi"),
+    E: mathConstant(scope, "@e"),
+    degToRad: mathConstant(scope, "@degToRad"),
+    radToDeg: mathConstant(scope, "@radToDeg"),
+  };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
     macroMathOperations[key] = new MacroFunction<IValue>((scope, a, b) => {
@@ -61,8 +84,8 @@ function createMacroMathOperations() {
 }
 
 export class MlogMath extends ObjectValue {
-  constructor() {
-    super(createMacroMathOperations());
+  constructor(scope: IScope) {
+    super(createMacroMathOperations(scope));
   }
 }
 

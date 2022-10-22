@@ -31,4 +31,13 @@ set temp:22:4 10
 set temp:22:4 11
 set temp:22:4 3.24037034920393
 op rand temp:22:4 10.5
+print "\n"
+print @pi
+print "\n"
+print @e
+print "\n"
+print @radToDeg
+print "\n"
+print @degToRad
+print "\n"
 end

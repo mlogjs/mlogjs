@@ -31,7 +31,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("concat", new Concat());
   scope.hardSet("asm", new Asm());
 
-  scope.hardSet("Math", new MlogMath());
+  scope.hardSet("Math", new MlogMath(scope));
   scope.hardSet("Memory", new MemoryBuilder());
 
   // commands
