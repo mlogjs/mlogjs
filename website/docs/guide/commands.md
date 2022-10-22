@@ -1085,6 +1085,14 @@ Contains the multiple variants of the `setrule` instruction.
   setRule.unitBuildSpeed(Teams.sharded, 3);
   ```
 
+- #### `setRule.unitCost`
+
+  Sets the build cost multiplier for constructing units.
+
+  ```js
+  setRule.unitCost(Teams.sharded, 1.75);
+  ```
+
 - #### `setRule.unitDamage`
 
   Sets the damage multiplier for units on a given team.

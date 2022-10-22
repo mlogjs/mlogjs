@@ -1010,6 +1010,9 @@ declare global {
      */
     function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
 
+    /** Sets the build cost multiplier for constructing units.  */
+    function unitCost(team: TeamSymbol, multiplier: number): void;
+
     /** Sets the damage multiplier for units on a given team. */
     function unitDamage(team: TeamSymbol, multiplier: number): void;
 
