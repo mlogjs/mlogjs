@@ -199,9 +199,6 @@ This namespace contains all symbols that can be used to access properties of ent
 - `payloadCount`
 - `payloadType`
 - `enabled`
-- `shoot`
-- `shootp`
-- `config`
 - `color`
 
 ## Blocks
