@@ -15,6 +15,16 @@ const config: UserConfig = {
     nav: [
       { text: "Guide", link: "/guide/" },
       { text: "Editor", link: "/editor" },
+      {
+        text: "Resources",
+        items: [
+          {
+            text: "Examples",
+            link: "https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples",
+          },
+          { text: "Discord", link: "https://discord.gg/xjJFpERd" },
+        ],
+      },
     ],
     sidebar: {
       "/guide/": [
