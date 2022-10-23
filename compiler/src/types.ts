@@ -195,6 +195,7 @@ export interface IValueOperators {
   "/="(scope: IScope, value: IValue): TValueInstructions;
   "&&="(scope: IScope, value: IValue): TValueInstructions;
   "||="(scope: IScope, value: IValue): TValueInstructions;
+  "??="(scope: IScope, value: IValue): TValueInstructions;
   "<<="(scope: IScope, value: IValue): TValueInstructions;
   ">>="(scope: IScope, value: IValue): TValueInstructions;
   ">>>="(scope: IScope, value: IValue): TValueInstructions;

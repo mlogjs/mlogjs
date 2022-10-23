@@ -45,7 +45,7 @@ export const arithmeticAssignmentOperators = [
   "-=",
   "/=",
 ] as const;
-export const logicalAssignmentOperators = ["&&=", "||="] as const;
+export const logicalAssignmentOperators = ["&&=", "||=", "??="] as const;
 export const bitwiseAssignmentOperators = [
   "<<=",
   ">>=",
