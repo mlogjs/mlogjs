@@ -121,15 +121,15 @@ Behavior:
 
 - Functions declarations are hoisted to the top of their declaration scope.
 
-```js
-// works
-doSomething();
+  ```js
+  // works
+  doSomething();
 
-function doSomething() {
-  print("something");
-  printFlush();
-}
-```
+  function doSomething() {
+    print("something");
+    printFlush();
+  }
+  ```
 
 Limitations:
 
@@ -217,6 +217,8 @@ loop: for (let i = 0; i < 10; i++) {
 
 printFlush();
 ```
+
+]
 
 ### Math and related operators
 
