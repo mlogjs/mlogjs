@@ -218,8 +218,6 @@ loop: for (let i = 0; i < 10; i++) {
 printFlush();
 ```
 
-]
-
 ### Math and related operators
 
 All the mathematical operators for numbers are supported and will be transpiled into mlog code.
