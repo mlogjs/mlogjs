@@ -316,11 +316,11 @@ Example:
 
 ```js
 const turret = getBuilding("cyclone1");
-// returns the second nearest enemy unit
+// returns the furthest enemy unit
 const result = radar({
   building: turret,
   filters: ["enemy", "any", "any"],
-  order: 2,
+  order: false,
   sort: "distance",
 });
 ```
@@ -691,10 +691,10 @@ Finds an unit near the unit bound to this processor
 Example:
 
 ```js
-// returns the second nearest enemy unit
+// returns the furthest enemy unit
 const result = unitRadar({
   filters: ["enemy", "any", "any"],
-  order: 2,
+  order: false,
   sort: "distance",
 });
 ```

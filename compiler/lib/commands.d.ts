@@ -370,11 +370,11 @@ declare global {
    * Example:
    * ```js
    *  const turret = getBuilding("cyclone1")
-   *  // returns the second nearest enemy unit
+   *  // returns the furthest enemy unit
    *  const result = radar({
    *    building: turret,
    *    filters: ["enemy", "any", "any"],
-   *    order: 2,
+   *    order: false,
    *    sort: "distance"
    *  });
    * ```
@@ -710,10 +710,10 @@ declare global {
    *
    * Example:
    * ```js
-   *  // returns the second nearest enemy unit
+   *  // returns the furthest enemy unit
    *  const result = unitRadar({
    *    filters: ["enemy", "any", "any"],
-   *    order: 2,
+   *    order: false,
    *    sort: "distance",
    *  });
    * ```
