@@ -18,3 +18,7 @@ print(
   offset ?? "offset is null?",
   "preserved" ?? "should not appear"
 );
+
+let item = Math.rand(1) > 0.5 ? null : Items.beryllium;
+
+item ??= Items.copper;

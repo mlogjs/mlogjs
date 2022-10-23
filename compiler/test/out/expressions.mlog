@@ -25,4 +25,12 @@ set &t7 "offset is null?"
 print "null is null"
 print &t7
 print "preserved"
+op rand &t8 1
+op greaterThan &t9 &t8 0.5
+jump 32 equal &t9 0
+set item:22:4 null
+jump 33 always
+set item:22:4 @beryllium
+jump 35 notEqual item:22:4 null
+set item:22:4 @copper
 end

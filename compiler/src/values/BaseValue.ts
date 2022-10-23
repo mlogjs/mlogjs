@@ -1,4 +1,9 @@
-import { OperationInstruction } from "../instructions";
+import {
+  AddressResolver,
+  EJumpKind,
+  JumpInstruction,
+  OperationInstruction,
+} from "../instructions";
 import {
   AssignementOperator,
   BinaryOperator,
@@ -39,6 +44,39 @@ export class BaseValue extends VoidValue implements IValue {
     const [that, inst] = this.consume(scope);
     const temp = new StoreValue(scope);
     return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
+  }
+
+  // requires special handling
+  // the handler should give an object value to allow the lazy evaluation
+  "??"(scope: IScope, other: IValue): TValueInstructions {
+    const [left, leftInst] = this.eval(scope);
+
+    const nullLiteral = new LiteralValue(null as never);
+    const endAdress = new LiteralValue(null as never);
+
+    const [nullTest] = left["=="](scope, nullLiteral);
+
+    if (nullTest instanceof LiteralValue) {
+      if (nullTest.data) return other.eval(scope);
+      else return [left, leftInst];
+    }
+
+    const [right, rightInst] = other.eval(scope);
+
+    const result: StoreValue = new StoreValue(scope);
+    result.ensureOwned();
+
+    return [
+      result,
+      [
+        ...leftInst,
+        ...result["="](scope, left)[1],
+        new JumpInstruction(endAdress, EJumpKind.NotEqual, result, nullLiteral),
+        ...rightInst,
+        ...result["="](scope, right)[1],
+        new AddressResolver(endAdress),
+      ],
+    ];
   }
 }
 
@@ -110,6 +148,7 @@ const assignmentToBinary: Record<
   "<<=": "<<",
   "&&=": "&&",
   "||=": "||",
+  "??=": "??",
 } as const;
 
 for (const op in assignmentToBinary) {

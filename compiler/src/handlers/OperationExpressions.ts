@@ -5,8 +5,8 @@ import {
   BinaryOperator,
   LogicalOperator,
 } from "../operators";
-import { THandler, es } from "../types";
-import { LiteralValue, StoreValue } from "../values";
+import { THandler, es, IValue } from "../types";
+import { LiteralValue, StoreValue, VoidValue } from "../values";
 
 export const LRExpression: THandler = (
   c,
@@ -31,48 +31,35 @@ export const LogicalExpression: THandler = (
 ) => {
   if (node.operator !== "??") return LRExpression(c, scope, node, null);
 
-  const nullLiteral = new LiteralValue(null as never);
-  const endAdress = new LiteralValue(null as never);
+  const other = lazyValue({
+    eval: scope => c.handleEval(scope, node.right),
+    consume: scope => c.handleConsume(scope, node.right),
+  });
 
   const [left, leftInst] = c.handleEval(scope, node.left);
-
-  const [nullTest] = left["=="](scope, nullLiteral);
-
-  if (nullTest instanceof LiteralValue) {
-    if (nullTest.data) return c.handleEval(scope, node.right);
-    else return [left, leftInst];
-  }
-
-  const [right, rightInst] = c.handleEval(scope, node.right);
-
-  const result: StoreValue = new StoreValue(scope);
-  result.ensureOwned();
-
-  return [
-    result,
-    [
-      ...leftInst,
-      ...result["="](scope, left)[1],
-      new JumpInstruction(endAdress, EJumpKind.NotEqual, result, nullLiteral),
-      ...rightInst,
-      ...result["="](scope, right)[1],
-      new AddressResolver(endAdress),
-    ],
-  ];
+  const [result, resultInst] = left["??"](scope, other);
+  return [result, [...leftInst, ...resultInst]];
 };
 
 export const AssignmentExpression: THandler = (
   c,
   scope,
-  node: {
-    left: es.Node;
-    right: es.Node;
-    operator: AssignementOperator | BinaryOperator | LogicalOperator;
+  node: es.AssignmentExpression & {
+    operator: AssignementOperator;
   }
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
   // doesn't need to consume because the operators already do that
-  const [right, rightInst] = c.handleEval(scope, node.right);
+  const [right, rightInst] =
+    node.operator !== "??="
+      ? c.handleEval(scope, node.right)
+      : [
+          lazyValue({
+            eval: scope => c.handleEval(scope, node.right),
+            consume: scope => c.handleConsume(scope, node.right),
+          }),
+          [],
+        ];
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = left![node.operator](scope, right);
   return [op, [...leftInst, ...rightInst, ...opInst]];
@@ -142,3 +129,13 @@ export const ConditionalExpression: THandler = (
     ],
   ];
 };
+
+function lazyValue(options: {
+  eval: IValue["eval"];
+  consume: IValue["consume"];
+}): IValue {
+  const value = new VoidValue();
+  value.eval = options.eval;
+  value.consume = options.consume;
+  return value;
+}
