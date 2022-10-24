@@ -1,0 +1,41 @@
+# .github/workflows/preview.yml
+name: Deploy PR previews
+
+on:
+  pull_request:
+    paths:
+      - "compiler/package.json"
+      - "compiler/lib/**/*"
+      - "compiler/src/**/*"
+      - "website/docs/**/*"
+      - "website/src/**/*"
+      - "website/package.json"
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+
+concurrency: ci-${{ github.ref }}
+
+jobs:
+  deploy-preview:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Install and Build
+        run: |
+          pnpm install
+          pnpm -C compiler build
+          pnpm -C website build
+        env:
+          pr: ${{ github.event.number }}
+
+      - name: Deploy preview
+        uses: rossjrw/pr-preview-action@v1
+        with:
+          source-dir: ./website/docs/.vitepress/dist
+          preview-branch: ci
+          umbrella-dir: docs/pr-preview

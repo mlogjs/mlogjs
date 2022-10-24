@@ -2,10 +2,13 @@ import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
 import { resolve } from "path";
 
+const { pr } = process.env;
+const base = "/mlogjs/";
+
 const config: UserConfig = {
   title: "MlogJS",
   description: "Compile javascript into mlog",
-  base: "/mlogjs/",
+  base: pr ? `${base}pr-preview/pr-${pr}/` : base,
 
   themeConfig: {
     logo: "/logo.png",
