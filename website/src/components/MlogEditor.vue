@@ -11,6 +11,7 @@ import type { Monaco } from "../util";
 import { registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
+import { useMediaQuery } from "../composables/useMediaQuery";
 
 const { isDark } = useData();
 
@@ -53,6 +54,7 @@ useSourceMapping({
   sourcemapsRef,
   monacoRef,
 });
+const horizontal = useMediaQuery("(max-width: 800px)");
 
 function beforeMount(monaco: Monaco) {
   const defaults = monaco.languages.typescript.typescriptDefaults;
@@ -76,7 +78,11 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
 
 <template>
   <div class="editor-wrapper">
-    <Splitpanes class="default-theme">
+    <Splitpanes
+      class="default-theme"
+      :horizontal="horizontal"
+      style="height: var(--wrapper-height); width: 100vw"
+    >
       <Pane size="70">
         <Editor
           language="typescript"
@@ -85,8 +91,6 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
           :options="editorOptions"
           @before-mount="beforeMount"
           @mount="onMount"
-          height="var(--editor-height)"
-          class="monaco-editor"
         ></Editor>
       </Pane>
       <Pane size="30">
@@ -96,8 +100,6 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
           :value="compiledRef"
           :options="outEditorOptions"
           @mount="onOutMount"
-          class="output"
-          height="var(--editor-height)"
         >
         </Editor>
       </Pane>
@@ -107,15 +109,9 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
 
 <style scoped>
 .editor-wrapper {
-  --editor-height: calc(100vh - var(--vp-nav-height-desktop));
-  height: var(--editor-height);
-  display: grid;
-}
-.editor-wrapper :deep(.monaco-editor) {
-  grid-area: editor;
-}
-.editor-wrapper :deep(.output) {
-  grid-area: output;
+  --wrapper-height: calc(100vh - var(--vp-nav-height));
+  height: var(--wrapper-height);
+  width: 100vw;
 }
 .editor-wrapper :deep(.splitpanes__splitter) {
   background-color: gray;
