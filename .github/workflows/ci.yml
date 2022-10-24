@@ -21,8 +21,7 @@ jobs:
       - run: pnpm -C compiler/test exec tsc #typecheck tests
       - run: pnpm -C compiler coverage
       - run: pnpm -C compiler build
-      - run: pnpm -C compiler docs
-      - run: pnpm -C editor build
+      - run: pnpm -C website build
       - if: contains(github.ref, 'main')
         env:
           MESSAGE: ${{ github.event.head_commit.message }}
