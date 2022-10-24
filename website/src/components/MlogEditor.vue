@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { computed, ref, shallowRef } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
-import { Splitpanes, Pane } from "splitpanes";
+// resolved by vite, check the config.ts file
+import { Splitpanes, Pane } from "splitpanes/pkg";
 import type { CompilerOptions } from "mlogjs";
 import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";

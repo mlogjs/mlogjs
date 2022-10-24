@@ -1,5 +1,6 @@
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
+import { resolve } from "path";
 
 const config: UserConfig = {
   title: "MlogJS",
@@ -65,6 +66,15 @@ const config: UserConfig = {
   vite: {
     define: {
       "process.env": {},
+    },
+    resolve: {
+      alias: {
+        // works around https://github.com/antoniandre/splitpanes/issues/176
+        "splitpanes/pkg": resolve(
+          __dirname,
+          "../../node_modules/splitpanes/dist/splitpanes.es.js"
+        ),
+      },
     },
     server: {
       fs: {
