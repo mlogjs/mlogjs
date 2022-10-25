@@ -31,7 +31,7 @@ jobs:
         with:
           node-version: 16.x
           cache: pnpm
-      - run: pnpm install
+      - run: pnpm install --frozen-lockfile
       - run: pnpm -C compiler build
       - run: pnpm -C website build
         env:
@@ -40,6 +40,6 @@ jobs:
       - name: Deploy preview
         uses: rossjrw/pr-preview-action@v1
         with:
-          source-dir: ./website/docs/.vitepress/dist
+          source-dir: ./website/docs/.vitepress/dist/
           preview-branch: ci
           umbrella-dir: docs/pr-preview
