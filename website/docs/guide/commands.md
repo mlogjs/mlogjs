@@ -159,8 +159,7 @@ Nothing is drawn until `drawFlush` is called.
 
   ```js
   // draw a router
-  draw({
-    mode: "image",
+  draw.image({
     x: 30,
     y: 30,
     image: Blocks.router,
@@ -169,8 +168,7 @@ Nothing is drawn until `drawFlush` is called.
   });
 
   // draw the unit bound to the processor
-  draw({
-    mode: "image",
+  draw.image({
     x: 60,
     y: 60,
     image: Vars.unit.type,
