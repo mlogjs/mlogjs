@@ -5,7 +5,7 @@
  *
  * Using this method is discouraged because most values are
  * already accessible under the namespaces `Units`, `Blocks`,
- * `Items`, `Liquids`, `ControlKind`, `Vars` and `UnitCommands`.
+ * `Items`, `Liquids`, `ControlKind` and `Vars`.
  *
  * @param name The identifier of the value
  */
@@ -20,6 +20,7 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
   name: string
 ): T;
 
+/** Concatenates a list of constant strings */
 declare function concat(...strings: string[]): string;
 
 /**

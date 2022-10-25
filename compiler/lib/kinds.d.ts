@@ -11,7 +11,9 @@ interface BasicUnit
     Flagged,
     Controllable,
     Nameable,
-    WithSpeed {}
+    WithSpeed,
+    WithColor,
+    WithTeam {}
 
 interface AnyUnit extends BasicUnit, Boosted {}
 
@@ -27,7 +29,8 @@ interface BasicBuilding
     Ranged,
     Typed<BuildingSymbol>,
     WithEnable,
-    WithConfig {}
+    WithColor,
+    WithTeam {}
 
 interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 

@@ -1,4 +1,4 @@
-import { IScope, IValue, TValueInstructions } from "../types";
+import { EMutability, IScope, IValue, TValueInstructions } from "../types";
 import { VoidValue } from "../values";
 
 type TFunction<T extends IValue | null> = (
@@ -10,7 +10,7 @@ export class MacroFunction<
   RT extends IValue | null = IValue
 > extends VoidValue {
   macro = true;
-  constant = true;
+  mutability = EMutability.constant;
   fn: TFunction<RT>;
   constructor(fn: TFunction<RT>) {
     super();

@@ -56,6 +56,29 @@ interface TemplateStringsArray extends ReadonlyArray<string> {
 interface ImportMeta {}
 
 interface Math {
+  /** Pi. This is the ratio of the circumference of a circle to its diameter. */
+  readonly PI: number;
+
+  /** The mathematical constant e. This is Euler's number, the base of natural logarithms. */
+  readonly E: number;
+  /**
+   * Use this value to convert degrees to radians.
+   *
+   *  ```js
+   *  let radians = degrees * Math.degToRad;
+   *  ```
+   */
+  readonly degToRad: number;
+
+  /**
+   * Use this value to convert radians to degrees.
+   *
+   *  ```js
+   *  let degrees = radians * Math.radToDeg;
+   *  ```
+   */
+  readonly radToDeg: number;
+
   /**
    * Returns the larger of two of supplied numeric expressions.
    * @param a

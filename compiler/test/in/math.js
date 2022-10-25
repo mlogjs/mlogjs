@@ -35,3 +35,10 @@ temp = Math.floor(10.5);
 temp = Math.ceil(10.5);
 temp = Math.sqrt(10.5);
 temp = Math.rand(10.5);
+
+print`
+${Math.PI}
+${Math.E}
+${Math.radToDeg}
+${Math.degToRad}
+`;

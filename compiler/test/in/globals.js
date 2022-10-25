@@ -129,9 +129,6 @@ print(
   LAccess.payloadCount,
   LAccess.payloadType,
   LAccess.enabled,
-  LAccess.shoot,
-  LAccess.shootp,
-  LAccess.config,
   LAccess.color
 );
 

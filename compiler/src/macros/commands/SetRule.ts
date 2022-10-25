@@ -23,6 +23,7 @@ export class SetRule extends ObjectValue {
         solarMultiplier: { args: ["multiplier"] },
         buildSpeed: { args: ["team", "multiplier"] },
         unitBuildSpeed: { args: ["team", "multiplier"] },
+        unitCost: { args: ["team", "multiplier"] },
         unitDamage: { args: ["team", "multiplier"] },
         blockHealth: { args: ["team", "multiplier"] },
         blockDamage: { args: ["team", "multiplier"] },
@@ -42,6 +43,7 @@ export class SetRule extends ObjectValue {
           }
           case "buildSpeed":
           case "unitBuildSpeed":
+          case "unitCost":
           case "unitDamage":
           case "blockHealth":
           case "blockDamage":
@@ -49,7 +51,7 @@ export class SetRule extends ObjectValue {
           case "rtsMinSquad": {
             const [team, value] = args;
             params[1] = team;
-            params[2] = value;
+            params[0] = value;
             break;
           }
           default:

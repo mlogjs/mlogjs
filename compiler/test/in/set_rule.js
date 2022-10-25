@@ -13,6 +13,7 @@ setRule.rtsMinWeight(Teams.crux, 20);
 setRule.solarMultiplier(100);
 setRule.unitBuildSpeed(Teams.sharded, 2);
 setRule.unitCap(20);
+setRule.unitCost(Teams.sharded, 2);
 setRule.unitDamage(Teams.crux, 0.8);
 setRule.wave(1);
 setRule.waveSending(true);

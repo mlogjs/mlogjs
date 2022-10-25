@@ -10,7 +10,7 @@ declare global {
    * Appends the items to the print buffer, calling this function
    * on its own will not print any contents to a message block.
    *
-   * To print the contents of the print buffer and empty it call `printFlush`.
+   * To print the contents of the print buffer and empty it call, `printFlush`.
    *
    * @param items The items to be added to the print buffer.
    *
@@ -35,6 +35,12 @@ declare global {
     /**
      * Sets the color for the next drawing operations.
      *
+     *  Each parameter must be within range: [0, 255].
+     *
+     *  ```js
+     *  draw.color(255, 255, 255, 128);
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function color(r: number, g: number, b: number, a?: number): void;
@@ -42,12 +48,20 @@ declare global {
     /**
      * Sets the width of the next lines to be drawn.
      *
+     *  ```js
+     *  draw.stroke(15);
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function stroke(width: number): void;
 
     /**
      * Draws a line between two points.
+     *
+     *  ```js
+     *  draw.line({ x: 5, y: 5, x2: 50, y2: 50 });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -60,6 +74,14 @@ declare global {
 
     /**
      * Draws a filled rectangle.
+     *  ```js
+     *  draw.rect({
+     *    x: 10,
+     *    y: 15,
+     *    height: 60,
+     *    width: 40,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -88,6 +110,16 @@ declare global {
      * @param options.radius The smallest distance between a line and the center of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
+     *  ```js
+     *  draw.poly({
+     *    radius: 10,
+     *    rotation: 0,
+     *    sides: 10,
+     *    x: 25,
+     *    y: 25,
+     *  });
+     *  ```
+     *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
     function poly(options: {
@@ -107,6 +139,15 @@ declare global {
      * @param options.radius The smallest distance between a line and the center of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
+     *  ```js
+     *  draw.linePoly({
+     *    radius: 10,
+     *    rotation: 0,
+     *    sides: 10,
+     *    x: 25,
+     *    y: 25,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -123,6 +164,17 @@ declare global {
 
     /**
      * Draws a filled triangle.
+     *
+     *  ```js
+     *  draw.triangle({
+     *    x: 10,
+     *    y: 10,
+     *    x2: 20,
+     *    y2: 20,
+     *    x3: 30,
+     *    y3: 10,
+     *  });
+     *  ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -204,7 +256,8 @@ declare global {
    * Example:
    * ```js
    * if(index < Vars.links) {
-   *   myBlock = getLink(index)
+   *   let myBlock = getLink(index)
+   *   // ...
    * }
    * ```
    */
@@ -214,6 +267,11 @@ declare global {
   namespace control {
     /**
      * Sets whether the building is enabled or disabled.
+     *
+     *  ```js
+     *  const conveyor = getBuilding("conveyor1");
+     *  control.enabled(conveyor, false);
+     *  ```
      */
     function enabled(building: BasicBuilding, value: boolean): void;
 
@@ -221,6 +279,15 @@ declare global {
      * Makes the building shoot or aim at the given position
      * @param options.building The shooting building
      * @param options.shoot `true` to shoot, `false` to just aim at the position
+     *
+     *  ```js
+     *  control.shoot({
+     *    building: getBuilding("cyclone1"),
+     *    shoot: true,
+     *    x: Vars.thisx,
+     *    y: Vars.thisy,
+     *  });
+     *  ```
      */
     function shoot(options: {
       /** The shooting building */
@@ -236,6 +303,23 @@ declare global {
      * @param options.building The shooting building
      * @param options.unit The target unit
      * @param options.shoot `true` to shoot, `false` to just aim
+     *
+     *  ```js
+     *  const turret = getBuilding("cyclone1");
+     *
+     *  const player = radar({
+     *    building: turret,
+     *    filters: ["player", "any", "any"],
+     *    order: true,
+     *    sort: "distance",
+     *  });
+     *
+     *  control.shootp({
+     *    building: turret,
+     *    unit: player,
+     *    shoot: true,
+     *  });
+     *  ```
      */
     function shootp(options: {
       /** The shooting building */
@@ -248,11 +332,25 @@ declare global {
 
     /**
      * Sets the config of a block (like the item of a sorter)
+     *
+     *  ```js
+     *  const sorter = getBuilding("sorter1");
+     *
+     *  control.config(sorter, Items.copper);
+     *  ```
      */
     function config(building: BasicBuilding, value: symbol): void;
 
     /**
-     * Sets the color of an illuminator
+     * Sets the color of an illuminator.
+     *
+     * The RGB values must be within the range: [0, 255].
+     *
+     *  ```js
+     *  const illuminator = getBuilding("illuminator1");
+     *
+     *  control.color(illuminator, 10, 150, 210);
+     *  ```
      */
     function color(
       building: BasicBuilding,
@@ -272,11 +370,11 @@ declare global {
    * Example:
    * ```js
    *  const turret = getBuilding("cyclone1")
-   *  // returns the second nearest enemy unit
+   *  // returns the furthest enemy unit
    *  const result = radar({
    *    building: turret,
    *    filters: ["enemy", "any", "any"],
-   *    order: 2,
+   *    order: false,
    *    sort: "distance"
    *  });
    * ```
@@ -298,24 +396,33 @@ declare global {
    * This method allows you to use customly created symbols
    * and sensor them on buildings.
    * @param property The property to be sensed on the building
-   * @param target
+   * @param target The object that will be "sensed"
    *
    * Example:
-   * ```js
-   *  let myBuilding = getBuilding("container1")
-   *  // jsdoc doesn't allow me to type this
-   * // variable, but you should type it as a symbol in this case
-   *  let myCustomSymbol = getVar("@custom-symbol") // problably defined by a mod
-   *  let result = sensor(myCustomSymbol, myBuilding)
-   * ```
+   *  ```ts
+   *  let myBuilding = getBuilding("container1");
+   *
+   *  // typescript annotation, you can use jsdoc comments on
+   *  // regular javascript
+   *  let myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
+   *  let result = sensor(myCustomSymbol, myBuilding);
+   *  ```
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
   /**
-   * Stops the execution for the given amount of seconds
+   * Stops the execution for the given amount of
+   *  ```js
+   *  print("before");
+   *  printFlush();
+   *  wait(3.5);
+   *  print("after");
+   *  printFlush();
+   *  ```
    */
   function wait(seconds: number): void;
 
+  /** Looks up content symbols by their index. */
   namespace lookup {
     /**
      * Looks up a block symbol by it's index on the content registry.
@@ -378,11 +485,28 @@ declare global {
    * Packs RGBA color information into a single number.
    *
    * Each paremeter must range from `0` to `1`.
+   *
+   *
+   *  ```js
+   *  const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+   *
+   *  // world processor only
+   *  setRule.ambientLight(colorData);
+   *  ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
 
   /**
-   * Binds an unit to the this processor. The unit is accessible at `Vars.unit`
+   * Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
+   *
+   *  ```js
+   *  unitBind(Units.flare);
+   *
+   *  const { x, y } = Vars.unit;
+   *
+   *  print`x: ${x} y: ${y}`;
+   *  printFlush();
+   *  ```
    */
   function unitBind(type: UnitSymbol): void;
 
@@ -439,6 +563,19 @@ declare global {
      * Makes the unit bound to this processor target an unit with velocity prediction
      * @param options.unit The shoot target
      * @param options.shoot `true` to shoot, `false` to just aim
+     *
+     *  ```js
+     *  const player = unitRadar({
+     *    filters: ["player", "any", "any"],
+     *    order: true,
+     *    sort: "distance",
+     *  });
+     *
+     *  unitControl.targetp({
+     *    shoot: true,
+     *    unit: player,
+     *  });
+     *  ```
      */
     function targetp(options: {
       /** The shoot target */
@@ -449,8 +586,22 @@ declare global {
 
     /**
      * Makes the unit bound to this processor drop it's held items onto the given target
-     * @param target Where to drop the items, if `EnvBlocks.air`, the unit will throw it's items away
+     * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
      * @param amount How many items should be dropped
+     *
+     *  ```js
+     *  const container = getBuilding("container1");
+     *
+     *  // ...
+     *
+     *  // drop 40 items on the container
+     *  unitControl.itemDrop(container, 40);
+     *
+     *  // ...
+     *
+     *  // discard 10 items from the current unit
+     *  unitControl.itemDrop(Blocks.air, 10);
+     *  ```
      */
     function itemDrop(
       target: BasicBuilding | typeof Blocks.air,
@@ -462,6 +613,16 @@ declare global {
      * @param target The building that will have it's items taken
      * @param item The kind of item to take
      * @param amount How many items should be taken
+     *
+     *  ```js
+     *  const vault = getBuilding("vault1");
+     *
+     *  // bind unit and move to the valult...
+     *
+     *  unitControl.itemTake(vault, Items.graphite, 50);
+     *
+     *  // do something with the graphite...
+     *  ```
      */
     function itemTake(
       target: BasicBuilding,
@@ -505,17 +666,30 @@ declare global {
      * @param options.block The kind of building to build
      * @param options.rotation The rotation of the building, ranges from 0 to 3
      * @param options.config The config of the building
+     *
+     *  ```js
+     *  unitControl.build({
+     *    x: 10,
+     *    y: 20,
+     *    block: Blocks.sorter,
+     *    rotation: 1,
+     *    config: Items.silicon,
+     *  });
+     *  ```
      */
     function build(options: {
       x: number;
       y: number;
+      /** The kind of building to build */
       block: BuildingSymbol;
+      /** The rotation of the building, ranges from 0 to 3 */
       rotation: number;
+      /** The config of the building */
       config?: unknown;
     }): void;
 
     /**
-     * Makes the unit bound to this processor data about a block at the given position
+     * Makes the unit bound to this processor get data about a block at the given position
      */
     function getBlock<T extends BasicBuilding = AnyBuilding>(
       x: number,
@@ -536,10 +710,10 @@ declare global {
    *
    * Example:
    * ```js
-   *  // returns the second nearest enemy unit
+   *  // returns the furthest enemy unit
    *  const result = unitRadar({
    *    filters: ["enemy", "any", "any"],
-   *    order: 2,
+   *    order: false,
    *    sort: "distance",
    *  });
    * ```
@@ -553,10 +727,19 @@ declare global {
     sort: TRadarSort;
   }): T;
 
+  /** Uses the unit bound to this processor to find specific types of blocks */
   namespace unitLocate {
     /**
      * Uses the unit bound to this processor to find an ore vein anywhere on the map
      * @param ore The kind of item the ore should contain
+     *
+     *  ```js
+     *  const [found, x, y] = unitLocate.ore(Items.copper);
+     *
+     *  if (found) {
+     *    unitControl.approach({ x, y, radius: 5 });
+     *  }
+     *  ```
      */
     function ore(
       ore: ItemSymbol
@@ -566,6 +749,42 @@ declare global {
      * Uses the unit bound to this processor to find a building anywhere on the map
      * @param options.group The group that the building belongs to
      * @param options.enemy Whether it should be an enemy building or an ally one
+     *
+     *  ```js
+     *  const vault = getBuilding("vault1");
+     *  const takeAmount = 100;
+     *
+     *  unitBind(Units.mega);
+     *
+     *  // we don't use the `found` variable
+     *  // because we always have our own core
+     *  const [, x, y, core] = unitLocate.building({
+     *    group: "core",
+     *    enemy: false,
+     *  });
+     *
+     *  const location = {
+     *    x,
+     *    y,
+     *    radius: 5,
+     *  };
+     *
+     *  if (!unitControl.within(location) && Vars.unit.totalItems == 0) {
+     *    // if the unit has no items and it is not near
+     *    // the core, move it to the core
+     *    // and take 100 copper
+     *    unitControl.approach(location);
+     *    unitControl.itemTake(core, Items.copper, takeAmount);
+     *  } else {
+     *    // else, approach the vault and drop the items on it
+     *    unitControl.approach({
+     *      x: vault.x,
+     *      y: vault.y,
+     *      radius: 5,
+     *    });
+     *    unitControl.itemDrop(vault, takeAmount);
+     *  }
+     *  ```
      */
     function building<T extends BasicBuilding = AnyBuilding>(options: {
       /** The group that the building belongs to */
@@ -577,24 +796,66 @@ declare global {
     /**
      * Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
      *
-     * May return a building (a core) or a position
+     * Returns the enemy spawn point or its core, if it exists.
+     *
+     *  ```js
+     *  const [found, x, y, core] = unitLocate.spawn();
+     *
+     *  if (!found) {
+     *    print("No enemy core found");
+     *  } else if (core) {
+     *    print`core location at (${x}, ${y})`;
+     *  } else {
+     *    print`enemy spawn at (${x}, ${y})`;
+     *  }
+     *
+     *  printFlush();
+     *  ```
      */
     function spawn<T extends BasicBuilding = AnyBuilding>():
       | [found: false]
       | [found: true, x: number, y: number, building: T];
 
     /**
-     * Uses the unit bound to this processor to find a damaged ally buildings anywhere on the map
+     * Uses the unit bound to this processor to find a damaged ally building anywhere on the map
+     *
+     *  ```js
+     *  const [found, x, y, building] = unitLocate.damaged();
+     *
+     *  if (found) {
+     *    print`go fix a ${building} at (${x}, ${y})`;
+     *  } else {
+     *    print("No damaged building found");
+     *  }
+     *  printFlush();
+     *  ```
      */
     function damaged<T extends BasicBuilding = AnyBuilding>():
       | [found: false]
       | [found: true, x: number, y: number, building: T];
   }
 
-  /**Jumps to the top of the instruction stack*/
+  /**
+   * Jumps to the top of the instruction stack.
+   *
+   *  ```js
+   *  const { enabled } = getBuilding("switch1");
+   *
+   *  if (!enabled) endScript();
+   *  // do something when the switch is enabled
+   *  ```
+   */
   function endScript(): never;
 
-  /** Halts the execution of this processor */
+  /**
+   * Halts the execution of this processor. Can be used to debug
+   * code and analyze the processor registers.
+   *
+   *  ```js
+   *  // stop the processor to debug variables
+   *  stopScript();
+   *  ```
+   */
   function stopScript(): never;
 
   /** Gets block data from the map. Available ONLY for world processors. */
@@ -615,6 +876,7 @@ declare global {
     ): T | null;
   }
 
+  /**  Sets block data on a given location. World processor ONLY.  */
   namespace setBlock {
     // TODO: maybe have a separate floor symbol type?
     /** Sets the floor of the tile at the given location. */
@@ -633,12 +895,17 @@ declare global {
     }): void;
   }
 
-  /** Spawns an unit at the given location */
+  /**
+   * Spawns an unit at the given location. World processor ONLY.
+   *
+   * @param options.rotation The initial rotation of the unit in degrees.
+   */
   function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
     type: UnitSymbol;
     x: number;
     y: number;
     team: TeamSymbol;
+    /** The initial rotation of the unit in degrees. */
     rotation?: number;
   }): T;
 
@@ -722,8 +989,8 @@ declare global {
      *
      * ```js
      * // enables lighting and sets the color to gray
-     * setRule("lighting", true);
-     * setRule("ambientLight", packColor(0.5, 0.5, 0.5, 1));
+     * setRule.lighting(true);
+     * setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
      * ```
      */
     function ambientLight(rgbaData: number): void;
@@ -743,11 +1010,13 @@ declare global {
      */
     function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
 
+    /** Sets the build cost multiplier for constructing units.  */
+    function unitCost(team: TeamSymbol, multiplier: number): void;
+
     /** Sets the damage multiplier for units on a given team. */
-
     function unitDamage(team: TeamSymbol, multiplier: number): void;
-    /** Sets the block health multiplier for a given team. */
 
+    /** Sets the block health multiplier for a given team. */
     function blockHealth(team: TeamSymbol, multiplier: number): void;
 
     /** Sets the block damage multiplier for a given team. */
@@ -802,6 +1071,7 @@ declare global {
     function toast(duration: number): void;
   }
 
+  /** Controls the player camera. World processor ONLY. */
   namespace cutscene {
     /** Moves the player's camera to the given location. */
     function pan(options: { x: number; y: number; speed: number }): void;
@@ -811,7 +1081,7 @@ declare global {
     function stop(): void;
   }
 
-  /** Creates an explosion */
+  /** Creates an explosion. World processor ONLY. */
   function explosion(options: {
     team: TeamSymbol;
     x: number;
@@ -823,7 +1093,7 @@ declare global {
     pierce: boolean;
   }): void;
 
-  /** Sets the speed of this world processor in instructions per tick. */
+  /** Sets the speed of this world processor in instructions per tick. World processor ONLY. */
   function setRate(ipt: number): void;
 
   /** Contains the variants of the `fetch` instruction. World processor ONLY. */
