@@ -12,11 +12,12 @@
 
 ## Features
 
-- Optimzing compiler
+- Optimizing compiler
 - Easy to use
 - Fully Typed API
 - Macros
 - All Instructions and Variables
+- An [online editor]
 
 ## Installation
 
@@ -31,15 +32,14 @@ npm i -g mlogjs
 #### Creating `hello.js`
 
 ```js
-const message1 = getBuilding("message1")
-print("Hello world")
-printFlush(message1)
+print("Hello world");
+printFlush();
 ```
 
 #### Compile
 
 ```sh
-mlogjs hello.js hello.mlog
+mlogjs hello.js
 ```
 
 ## Resources
@@ -49,11 +49,10 @@ mlogjs hello.js hello.mlog
 - [NPM package][npm]
 - [GitHub Action CI][ci]
 
-## Maintainers
-
-Massive thanks to [@JeanJPNM](https://github.com/JeanJPNM) for adding new features!
-
 ## Contribute
+
+Having trouble? [Ask for help on discord](https://discord.gg/DxXkqsWx)
+or [open an issue](https://github.com/mlogjs/mlogjs/issues/new)
 
 Help and suggestions are welcomed!
 
@@ -64,5 +63,6 @@ MIT
 <!-- url -->
 
 [npm]: https://www.npmjs.com/package/mlogjs
-[ci]: https://github.com/weisrc/mlogjs/actions/workflows/ci.yml
+[ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
 [docs]: https://mlogjs.github.io/mlogjs
+[online editor]: https://mlogjs.github.io/mlogjs/editor.html

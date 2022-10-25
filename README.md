@@ -17,6 +17,7 @@
 - Fully Typed API
 - Macros
 - All Instructions and Variables
+- An [online editor]
 
 ## Installation
 
@@ -64,3 +65,4 @@ MIT
 [npm]: https://www.npmjs.com/package/mlogjs
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
 [docs]: https://mlogjs.github.io/mlogjs
+[online editor]: https://mlogjs.github.io/mlogjs/editor.html
