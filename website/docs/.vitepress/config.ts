@@ -8,7 +8,7 @@ const base = "/mlogjs/";
 const config: UserConfig = {
   title: "MlogJS",
   description: "Compile javascript into mlog",
-  base: pr ? `${base}pr-preview/pr-${pr}/` : base,
+  base,
 
   themeConfig: {
     logo: "/logo.png",
@@ -60,7 +60,7 @@ const config: UserConfig = {
   },
   lastUpdated: true,
   head: [
-    ["link", { rel: "icon", type: "image/png", href: "/logo.png" }],
+    ["link", { rel: "icon", type: "image/png", href: `${base}logo.png` }],
     [
       "meta",
       { name: "viewport", content: "width=device-width, initial-scale=1" },
