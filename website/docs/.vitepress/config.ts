@@ -7,7 +7,7 @@ const base = "/mlogjs/";
 
 const config: UserConfig = {
   title: "MlogJS",
-  description: "Compile javascript into mlog",
+  description: "Compile javascript into mindustry logic code",
   base,
 
   themeConfig: {
