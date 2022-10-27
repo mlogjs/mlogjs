@@ -15,3 +15,18 @@ declare class Memory<S extends MemoryCapacity = 64> {
    */
   readonly length: S;
 }
+
+/**
+ * Creates a mutable, dynamic access array, the length is constant.
+ *
+ * The instructions for dynamic accesses
+ */
+declare class DynamicArray<T extends readonly []> {
+  constructor(init: T);
+
+  constructor(length: number);
+
+  [index: number]: T[number];
+
+  readonly length: number;
+}
