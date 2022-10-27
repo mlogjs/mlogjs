@@ -99,7 +99,7 @@ export function registerMlogLang(monaco: Monaco) {
         ],
         [/\@[a-zA-Z-_]+/, "variable"],
         [/(\w+:)?\d+:\d+/, "key.parameter"],
-        [/&[a-z0-9:]+/, "variable.predefined"],
+        [/&[a-zA-Z0-9:]+/, "variable.predefined"],
         [/[\-+]?\d+\.\d+/, "number.float"],
         [/[\-+]?\d+\b/, "number"],
         [/".+"/, "string"],
