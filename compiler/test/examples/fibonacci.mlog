@@ -1,0 +1,23 @@
+set n:4:19 10
+set &rfibonacci:4:0 3
+jump 6 always
+print &ffibonacci:4:0
+printflush message1
+end
+op lessThanEq &t0:fibonacci:4:0 n:4:19 2
+jump 10 equal &t0:fibonacci:4:0 0
+set &ffibonacci:4:0 1
+set @counter &rfibonacci:4:0
+set a:7:6 1
+set b:8:6 1
+set c:9:6 2
+set i:11:11 3
+op lessThanEq &t1:fibonacci:4:0 i:11:11 n:4:19
+jump 21 equal &t1:fibonacci:4:0 0
+op add c:9:6 a:7:6 b:8:6
+set a:7:6 b:8:6
+set b:8:6 c:9:6
+op add i:11:11 i:11:11 1
+jump 14 always
+set &ffibonacci:4:0 c:9:6
+set @counter &rfibonacci:4:0
