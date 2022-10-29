@@ -50,6 +50,12 @@ export const itemNames = [
   "sporePod",
   "blastCompound",
   "pyratite",
+  "beryllium",
+  "tungsten",
+  "oxide",
+  "carbide",
+  "fissileMatter",
+  "dormantCyst",
 ];
 
 /**
