@@ -8,7 +8,7 @@ op equal &t2 i:1:16 1
 op equal &t3 j:2:11 1
 op land &t4 &t2 &t3
 jump 11 equal &t4 0
-jump 1 always
+jump 18 always
 print "i = "
 print i:1:16
 print ", j = "
