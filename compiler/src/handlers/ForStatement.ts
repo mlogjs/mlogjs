@@ -16,13 +16,16 @@ export const ForStatement: THandler<null> = (
     : [new LiteralValue(1), []];
   const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
   const startLoopAddr = new LiteralValue(null as never);
+  // continue statements jump here to run the loop update lines
+  const beforeEndAddr = new LiteralValue(null as never);
   const endLoopAddr = new LiteralValue(null as never);
 
-  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(scope);
+  const startLoopLine = new AddressResolver(startLoopAddr);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);
+  const beforeEndLine = new AddressResolver(beforeEndAddr).bindContinue(scope);
 
   if (parentScope.label) {
-    startLoopLine.bindContinue(parentScope);
+    beforeEndLine.bindContinue(parentScope);
   }
 
   return [
@@ -38,6 +41,7 @@ export const ForStatement: THandler<null> = (
         new LiteralValue(0)
       ),
       ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
+      beforeEndLine,
       ...updateLines,
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
       endLoopLine,
