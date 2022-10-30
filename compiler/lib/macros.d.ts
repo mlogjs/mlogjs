@@ -21,12 +21,22 @@ declare class Memory<S extends MemoryCapacity = 64> {
  *
  * The instructions for dynamic accesses
  */
-declare class DynamicArray<T extends readonly []> {
-  constructor(init: T);
+declare class DynamicArray<T> {
+  constructor(init: readonly T[]);
 
-  constructor(length: number);
+  constructor(length: number, fillValue: T);
 
-  [index: number]: T[number];
+  /** Checked index access. */
+  [index: number]: T;
+
+  /** Unchecked index acess, only do this if  */
+  get(index: number): T;
+
+  /** Sets the value at the given index */
+  set(index: number, value: T): T;
+
+  /** Fills the array with a given value */
+  fill(value: T): void;
 
   readonly length: number;
 }
