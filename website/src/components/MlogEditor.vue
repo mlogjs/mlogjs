@@ -2,7 +2,7 @@
 import { computed, ref, shallowRef } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 // resolved by vite, check the config.ts file
-import { Splitpanes, Pane } from "splitpanes/pkg";
+import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
 import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";
