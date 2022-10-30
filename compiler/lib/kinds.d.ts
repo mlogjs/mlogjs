@@ -29,6 +29,7 @@ interface BasicBuilding
     Ranged,
     Typed<BuildingSymbol>,
     WithEnable,
+    WithConfig,
     WithColor,
     WithTeam {}
 
