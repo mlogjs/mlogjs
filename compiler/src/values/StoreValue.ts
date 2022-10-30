@@ -6,6 +6,7 @@ import {
   IOwnedValue,
   IScope,
   IValue,
+  TEOutput,
   TValueInstructions,
 } from "../types";
 import { discardedName } from "../utils";
@@ -33,6 +34,11 @@ export class StoreValue extends BaseValue implements IValue {
     });
 
     return value;
+  }
+
+  static out(scope: IScope, out: TEOutput | undefined) {
+    if (!out || typeof out === "string") return this.named(scope, out);
+    return out;
   }
 
   typeof(): TValueInstructions {

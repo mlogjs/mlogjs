@@ -1,6 +1,12 @@
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { EMutability, IScope, IValue, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import { assign, camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
@@ -50,6 +56,12 @@ export class SenseableValue extends StoreValue {
     });
 
     return value;
+  }
+
+  static out(scope: IScope, out: TEOutput | undefined) {
+    if (!out || typeof out === "string")
+      return this.named(scope, out, EMutability.mutable);
+    return out;
   }
 
   get(scope: IScope, prop: IValue): TValueInstructions<IValue> {
