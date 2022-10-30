@@ -114,7 +114,7 @@ export class Compiler {
   ): TValueInstructions<IValue | null> {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      const result = handler(this, scope, node, null);
+      const result = handler(this, scope, node, undefined, null);
       if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {

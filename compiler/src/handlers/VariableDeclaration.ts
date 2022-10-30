@@ -19,7 +19,7 @@ export const VariableDeclaration: THandler<null> = (
   node: es.VariableDeclaration
 ) => {
   return c.handleMany(scope, node.declarations, child =>
-    VariableDeclarator(c, scope, child, node.kind)
+    VariableDeclarator(c, scope, child, undefined, node.kind)
   );
 };
 
@@ -27,6 +27,7 @@ export const VariableDeclarator: THandler<null> = (
   c,
   scope,
   node: es.VariableDeclarator,
+  out,
   kind: "let" | "var" | "const" = "let"
 ) => {
   const [init, inst]: TValueInstructions<IValue | null> = node.init

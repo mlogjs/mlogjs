@@ -29,7 +29,8 @@ export const LogicalExpression: THandler = (
   scope,
   node: es.LogicalExpression
 ) => {
-  if (node.operator !== "??") return LRExpression(c, scope, node, null);
+  if (node.operator !== "??")
+    return LRExpression(c, scope, node, undefined, null);
 
   const other = lazyValue({
     eval: scope => c.handleEval(scope, node.right),

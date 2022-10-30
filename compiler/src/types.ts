@@ -24,11 +24,15 @@ export interface IInstruction {
   alwaysRuns: boolean;
 }
 
+/** The expression output, either a value or a value name */
+export type TEOutput = IValue | string;
+
 export type THandler<T extends IValue | null = IValue> = (
   compiler: Compiler,
   scope: IScope,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any,
+  out: TEOutput | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   arg: any
 ) => TValueInstructions<T>;
@@ -148,60 +152,60 @@ export interface IValueOwner<T extends IValue = IValue> {
 // and if we don't do this we'll get an error [ts(2425)]
 export interface IValueOperators {
   // unary operators
-  "!"(scope: IScope): TValueInstructions;
-  "u+"(scope: IScope): TValueInstructions;
-  "u-"(scope: IScope): TValueInstructions;
-  "delete"(scope: IScope): TValueInstructions;
-  "typeof"(scope: IScope): TValueInstructions;
-  "void"(scope: IScope): TValueInstructions;
-  "~"(scope: IScope): TValueInstructions;
+  "!"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "u+"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "u-"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "delete"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "typeof"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "void"(scope: IScope, out?: TEOutput): TValueInstructions;
+  "~"(scope: IScope, out?: TEOutput): TValueInstructions;
 
   // update operators
-  "++"(scope: IScope, prefix: boolean): TValueInstructions;
-  "--"(scope: IScope, prefix: boolean): TValueInstructions;
+  "++"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
+  "--"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
 
   // left right operators
-  "*"(scope: IScope, value: IValue): TValueInstructions;
-  "**"(scope: IScope, value: IValue): TValueInstructions;
-  "+"(scope: IScope, value: IValue): TValueInstructions;
-  "-"(scope: IScope, value: IValue): TValueInstructions;
-  "/"(scope: IScope, value: IValue): TValueInstructions;
-  "%"(scope: IScope, value: IValue): TValueInstructions;
-  "!="(scope: IScope, value: IValue): TValueInstructions;
-  "!=="(scope: IScope, value: IValue): TValueInstructions;
-  "<"(scope: IScope, value: IValue): TValueInstructions;
-  "<="(scope: IScope, value: IValue): TValueInstructions;
-  "=="(scope: IScope, value: IValue): TValueInstructions;
-  "==="(scope: IScope, value: IValue): TValueInstructions;
-  ">"(scope: IScope, value: IValue): TValueInstructions;
-  ">="(scope: IScope, value: IValue): TValueInstructions;
-  "&"(scope: IScope, value: IValue): TValueInstructions;
-  "<<"(scope: IScope, value: IValue): TValueInstructions;
-  ">>"(scope: IScope, value: IValue): TValueInstructions;
-  ">>>"(scope: IScope, value: IValue): TValueInstructions;
-  "^"(scope: IScope, value: IValue): TValueInstructions;
-  "|"(scope: IScope, value: IValue): TValueInstructions;
-  instanceof(scope: IScope, value: IValue): TValueInstructions;
-  in(scope: IScope, value: IValue): TValueInstructions;
-  "&&"(scope: IScope, value: IValue): TValueInstructions;
-  "??"(scope: IScope, value: IValue): TValueInstructions;
-  "||"(scope: IScope, value: IValue): TValueInstructions;
-  "%="(scope: IScope, value: IValue): TValueInstructions;
-  "&="(scope: IScope, value: IValue): TValueInstructions;
-  "*="(scope: IScope, value: IValue): TValueInstructions;
-  "**="(scope: IScope, value: IValue): TValueInstructions;
-  "+="(scope: IScope, value: IValue): TValueInstructions;
-  "-="(scope: IScope, value: IValue): TValueInstructions;
-  "/="(scope: IScope, value: IValue): TValueInstructions;
-  "&&="(scope: IScope, value: IValue): TValueInstructions;
-  "||="(scope: IScope, value: IValue): TValueInstructions;
-  "??="(scope: IScope, value: IValue): TValueInstructions;
-  "<<="(scope: IScope, value: IValue): TValueInstructions;
-  ">>="(scope: IScope, value: IValue): TValueInstructions;
-  ">>>="(scope: IScope, value: IValue): TValueInstructions;
-  "^="(scope: IScope, value: IValue): TValueInstructions;
-  "|="(scope: IScope, value: IValue): TValueInstructions;
-  "="(scope: IScope, value: IValue): TValueInstructions;
+  "*"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "**"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "+"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "-"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "/"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "%"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "!="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "!=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "==="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "<<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">>>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "^"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "|"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  instanceof(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  in(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "??"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "||"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "*="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "**="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "+="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "-="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "/="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "||="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "??="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "<<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  ">>>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "^="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "|="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
 }
 
 /** Defines the possible types of mutability of a value */
@@ -218,6 +222,8 @@ export enum EMutability {
   readonly,
   /** Constant values, won't change during execution */
   constant,
+  /** An immutable value that hasn't been initialized yet */
+  init,
 }
 
 export interface IValue extends IValueOperators {
