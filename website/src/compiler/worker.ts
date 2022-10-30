@@ -7,15 +7,23 @@ self.addEventListener("message", (e: MessageEvent<InputMessage>) => {
     const compiler = new Compiler(options);
 
     const data = compiler.compile(input);
-
-    if (data[1]) {
+    const [, error] = data;
+    if (error) {
+      // logs internal errors during dev mode
+      if (
+        import.meta.env.DEV &&
+        error.inner &&
+        error.inner.constructor.name !== "SyntaxError"
+      ) {
+        console.error(error.inner);
+      }
       // worker messages don't copy stuff from the prototype chain
       // so this should make sure that the error is shared correctly
       data[1] = {
-        loc: data[1].loc,
-        inner: data[1].inner,
-        name: data[1].name,
-        message: data[1].message,
+        loc: error.loc,
+        inner: error.inner,
+        name: error.name,
+        message: error.message,
       };
     }
 
