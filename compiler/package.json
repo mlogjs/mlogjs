@@ -14,8 +14,8 @@
     "test": "jest",
     "lint": "eslint src/**/*.ts",
     "coverage": "jest --coverage",
-    "start": "npm run build && npm i -g . && mlogjs",
-    "prepublishOnly": "npm run build"
+    "start": "pnpm run build && pnpm i -g . && mlogjs",
+    "prepublishOnly": "pnpm run build"
   },
   "repository": {
     "type": "git",
