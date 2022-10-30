@@ -24,7 +24,7 @@ export class PackColor extends MacroFunction {
         );
       }
 
-      const output = new StoreValue(scope);
+      const output = StoreValue.out(scope, out);
       return [output, [new InstructionBase("packcolor", output, ...args)]];
     });
   }

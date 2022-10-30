@@ -58,7 +58,7 @@ export const AssignmentExpression: THandler = (
       ? c.handleEval(scope, node.right)
       : [
           lazyValue({
-            eval: scope => c.handleEval(scope, node.right),
+            eval: (scope, out) => c.handleEval(scope, node.right, out),
             consume: scope => c.handleConsume(scope, node.right),
           }),
           [],

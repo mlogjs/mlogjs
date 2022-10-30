@@ -1,4 +1,5 @@
 import { InstructionBase } from "../../instructions";
+import { EMutability } from "../../types";
 import { ObjectValue, SenseableValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -14,8 +15,8 @@ export class GetBlock extends ObjectValue {
       handler(scope, overload, out, x, y) {
         const output =
           overload === "building"
-            ? new SenseableValue(scope)
-            : new StoreValue(scope);
+            ? SenseableValue.out(scope, out, EMutability.constant)
+            : StoreValue.out(scope, out, EMutability.constant);
 
         return [
           output,

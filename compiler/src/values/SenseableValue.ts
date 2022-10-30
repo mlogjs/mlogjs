@@ -7,7 +7,7 @@ import {
   TEOutput,
   TValueInstructions,
 } from "../types";
-import { assign, camelToDashCase, itemNames } from "../utils";
+import { camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 import { ValueOwner } from "./ValueOwner";
@@ -47,13 +47,13 @@ export class SenseableValue extends StoreValue {
   ) {
     const value = new SenseableValue(scope);
     value.mutability = mutability;
-
-    new ValueOwner({
-      scope,
-      value,
-      constant: mutability === EMutability.constant,
-      name,
-    });
+    if (name)
+      new ValueOwner({
+        scope,
+        value,
+        constant: mutability === EMutability.constant,
+        name,
+      });
 
     return value;
   }
@@ -68,24 +68,23 @@ export class SenseableValue extends StoreValue {
     return out;
   }
 
-  get(scope: IScope, prop: IValue): TValueInstructions<IValue> {
+  get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    const mutability = EMutability.readonly;
     if (prop instanceof LiteralValue && typeof prop.data === "string") {
       const name = itemNames.includes(prop.data)
         ? camelToDashCase(prop.data)
         : prop.data;
 
       const result = senseableProps.includes(prop.data)
-        ? new SenseableValue(scope)
-        : new StoreValue(scope);
+        ? SenseableValue.out(scope, out, mutability)
+        : StoreValue.out(scope, out, mutability);
       return [
         result,
         [new InstructionBase("sensor", result, this, `@${name}`)],
       ];
     }
     if (prop instanceof StoreValue) {
-      const temp = assign(new SenseableValue(scope), {
-        mutability: EMutability.readonly,
-      });
+      const temp = SenseableValue.out(scope, out, mutability);
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
     throw new CompilerError(`Cannot sense "${prop}" property`);

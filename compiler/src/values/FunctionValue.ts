@@ -46,7 +46,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private body: es.BlockStatement;
   private c: Compiler;
   private callSize!: number;
-  private inlineTemp!: ValueOwner<SenseableValue>;
+  private inlineTemp!: IValue;
   private inlineEnd?: LiteralValue;
   private bundled = false;
   private initialized = false;
@@ -161,7 +161,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.inlineTemp.value["="](scope, arg)[1] : [];
+    const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
 
     if (!this.inlineEnd)
       throw new CompilerError(
@@ -175,14 +175,18 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [null, [...argInst, jump]];
   }
 
-  private inlineCall(scope: IScope, args: IValue[]): TValueInstructions {
+  private inlineCall(
+    scope: IScope,
+    args: IValue[],
+    out?: TEOutput
+  ): TValueInstructions {
     // create return value
-    this.inlineTemp = new ValueOwner({
-      scope: this.childScope,
-      value: assign(new SenseableValue(scope), {
-        mutability: EMutability.mutable,
-      }),
-    });
+    this.inlineTemp = out
+      ? SenseableValue.out(scope, out, EMutability.mutable)
+      : new ValueOwner({
+          scope: this.childScope,
+          value: SenseableValue.named(scope, undefined, EMutability.mutable),
+        }).value;
 
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
@@ -214,14 +218,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     inst.push(new AddressResolver(this.inlineEnd));
 
     // return the function value
-    return [this.inlineTemp.value, inst];
+    return [this.inlineTemp, inst];
   }
 
-  call(scope: IScope, args: IValue[]): TValueInstructions {
+  call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions {
     this.ensureInit();
     if (args.length !== this.paramOwners.length)
       throw new CompilerError("Cannot call: argument count not matching.");
-    const inlineCall = this.inlineCall(scope, args);
+    const inlineCall = this.inlineCall(scope, args, out);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;
     return this.normalCall(scope, args);

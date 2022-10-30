@@ -47,7 +47,7 @@ export class ObjectValue extends VoidValue {
     return [new LiteralValue("object"), []];
   }
 
-  get(scope: IScope, key: LiteralValue): TValueInstructions {
+  get(scope: IScope, key: LiteralValue, out?: TEOutput): TValueInstructions {
     // avoids naming collisions with keys like
     // constructor or toString
     if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
@@ -57,13 +57,13 @@ export class ObjectValue extends VoidValue {
     }
     const { $get } = this.data;
     if (!$get) throw new CompilerError("Cannot get undefined member.");
-    return $get.call(scope, [key]);
+    return $get.call(scope, [key], out);
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
     const { $eval } = this.data;
     if (!$eval) return [this, []];
-    return $eval.call(scope, []);
+    return $eval.call(scope, [], out);
   }
   consume(scope: IScope): TValueInstructions {
     const { $consume } = this.data;

@@ -49,7 +49,9 @@ export class BaseValue extends VoidValue implements IValue {
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    const [left, leftInst] = this.eval(scope);
+    const result = SenseableValue.out(scope, out);
+
+    const [left, leftInst] = this.eval(scope, result);
 
     const nullLiteral = new LiteralValue(null as never);
     const endAdress = new LiteralValue(null as never);
@@ -57,13 +59,11 @@ export class BaseValue extends VoidValue implements IValue {
     const [nullTest] = left["=="](scope, nullLiteral);
 
     if (nullTest instanceof LiteralValue) {
-      if (nullTest.data) return other.eval(scope);
+      if (nullTest.data) return other.eval(scope, result);
       else return [left, leftInst];
     }
 
-    const [right, rightInst] = other.eval(scope);
-
-    const result = SenseableValue.out(scope, out);
+    const [right, rightInst] = other.eval(scope, result);
 
     return [
       result,

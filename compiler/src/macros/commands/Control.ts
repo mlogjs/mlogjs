@@ -23,7 +23,8 @@ export class Control extends ObjectValue {
           if (overload !== "color")
             return [null, [new InstructionBase("control", overload, ...args)]];
 
-          const temp = StoreValue.named(scope);
+          const temp: StoreValue = StoreValue.named(scope);
+          temp.ensureOwned();
 
           // this "patch" is here for compatibility reasons
           // I don't want to add another breaking change

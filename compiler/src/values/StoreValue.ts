@@ -26,18 +26,24 @@ export class StoreValue extends BaseValue implements IValue {
     const value = new StoreValue(scope);
     value.mutability = mutability;
 
-    new ValueOwner({
-      scope,
-      value,
-      constant: mutability === EMutability.constant,
-      name,
-    });
+    if (name)
+      new ValueOwner({
+        scope,
+        value,
+        constant: mutability === EMutability.constant,
+        name,
+      });
 
     return value;
   }
 
-  static out(scope: IScope, out: TEOutput | undefined) {
-    if (!out || typeof out === "string") return this.named(scope, out);
+  static out(
+    scope: IScope,
+    out: TEOutput | undefined,
+    mutability = EMutability.mutable
+  ) {
+    if (!out || typeof out === "string")
+      return this.named(scope, out, mutability);
     return out;
   }
 

@@ -2,14 +2,12 @@
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
 import { EMutability, IScope, IValue } from "../types";
-import { assign } from "../utils";
 import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
   StoreValue,
 } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 import { MacroFunction } from "./Function";
 
 const mathOperations: Record<
@@ -36,23 +34,12 @@ const mathOperations: Record<
   rand: null,
 };
 
-function mathConstant(scope: IScope, name: string) {
-  return new ValueOwner({
-    scope,
-    constant: true,
-    name,
-    value: assign(new StoreValue(scope), {
-      mutability: EMutability.constant,
-    }),
-  }).value;
-}
-
 function createMacroMathOperations(scope: IScope) {
   const macroMathOperations: IObjectValueData = {
-    PI: mathConstant(scope, "@pi"),
-    E: mathConstant(scope, "@e"),
-    degToRad: mathConstant(scope, "@degToRad"),
-    radToDeg: mathConstant(scope, "@radToDeg"),
+    PI: StoreValue.named(scope, "@pi", EMutability.constant),
+    E: StoreValue.named(scope, "@e", EMutability.constant),
+    degToRad: StoreValue.named(scope, "@degToRad", EMutability.constant),
+    radToDeg: StoreValue.named(scope, "@radToDeg", EMutability.constant),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];

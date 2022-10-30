@@ -10,7 +10,7 @@ export class Cutscene extends ObjectValue {
         zoom: { args: ["level"] },
         stop: { args: [] },
       },
-      handler(scope, overload, ...args) {
+      handler(scope, overload, out, ...args) {
         const params = Object.assign(["100", "100", "0.06", "0"], args);
         return [null, [new InstructionBase("cutscene", overload, ...params)]];
       },
