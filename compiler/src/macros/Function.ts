@@ -1,8 +1,15 @@
-import { EMutability, IScope, IValue, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import { VoidValue } from "../values";
 
 type TFunction<T extends IValue | null> = (
   scope: IScope,
+  out: TEOutput | undefined,
   ...args: IValue[]
 ) => TValueInstructions<T>;
 
@@ -16,8 +23,8 @@ export class MacroFunction<
     super();
     this.fn = fn;
   }
-  call(scope: IScope, args: IValue[]): TValueInstructions<RT> {
-    return this.fn.apply(this, [scope, ...args]);
+  call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions<RT> {
+    return this.fn.apply(this, [scope, out, ...args]);
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];

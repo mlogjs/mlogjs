@@ -24,7 +24,15 @@ export interface IInstruction {
   alwaysRuns: boolean;
 }
 
-/** The expression output, either a value or a value name */
+/**
+ * The expression output, either a value or a value name.
+ *
+ * Knowing the output variable can be beneficial for static optimizations.
+ *
+ * A string means that the handler should create a value with the given name.
+ *
+ * An IValue means that the handler should try to use `this` as the output value.
+ */
 export type TEOutput = IValue | string;
 
 export type THandler<T extends IValue | null = IValue> = (
@@ -235,15 +243,19 @@ export interface IValue extends IValueOperators {
    * Evaluates `this`, returning it's representation in a more basic
    * value like `StoreValue` with the instructions required to compute that value
    */
-  eval(scope: IScope): TValueInstructions;
+  eval(scope: IScope, out?: TEOutput): TValueInstructions;
   /**
    * Does the same thing as {@link IValue.eval eval}, but ensures that the resulting value has an owner.
    *
    * This behaviour is required when dealing with temporary values inside expressions like comparations.
    */
   consume(scope: IScope): TValueInstructions;
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null>;
-  get(scope: IScope, name: IValue): TValueInstructions;
+  call(
+    scope: IScope,
+    args: IValue[],
+    out?: TEOutput
+  ): TValueInstructions<IValue | null>;
+  get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
   ensureOwned(): asserts this is IOwnedValue;
 }
 /** Helper type that is used in some typescript assertions */
@@ -259,7 +271,8 @@ export interface IBindableValue extends IValue {
 export interface IFunctionValue extends IValue {
   return(
     scope: IScope,
-    argument: IValue | null
+    argument: IValue | null,
+    out?: TEOutput
   ): TValueInstructions<IValue | null>;
 }
 

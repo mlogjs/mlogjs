@@ -6,7 +6,7 @@ import {
   LogicalOperator,
 } from "../operators";
 import { THandler, es, IValue } from "../types";
-import { LiteralValue, StoreValue, VoidValue } from "../values";
+import { LiteralValue, SenseableValue, VoidValue } from "../values";
 
 export const LRExpression: THandler = (
   c,
@@ -15,11 +15,12 @@ export const LRExpression: THandler = (
     left: es.Node;
     right: es.Node;
     operator: AssignementOperator | BinaryOperator | LogicalOperator;
-  }
+  },
+  out
 ) => {
   const [left, leftInst] = c.handleConsume(scope, node.left);
   const [right, rightInst] = c.handleConsume(scope, node.right);
-  const [op, opInst] = left[node.operator](scope, right);
+  const [op, opInst] = left[node.operator](scope, right, out);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
@@ -27,7 +28,8 @@ export const BinaryExpression: THandler = LRExpression;
 export const LogicalExpression: THandler = (
   c,
   scope,
-  node: es.LogicalExpression
+  node: es.LogicalExpression,
+  out
 ) => {
   if (node.operator !== "??")
     return LRExpression(c, scope, node, undefined, null);
@@ -38,7 +40,7 @@ export const LogicalExpression: THandler = (
   });
 
   const [left, leftInst] = c.handleEval(scope, node.left);
-  const [result, resultInst] = left["??"](scope, other);
+  const [result, resultInst] = left["??"](scope, other, out);
   return [result, [...leftInst, ...resultInst]];
 };
 
@@ -69,7 +71,8 @@ export const AssignmentExpression: THandler = (
 export const UnaryExpression: THandler = (
   c,
   scope,
-  { argument, operator }: es.UnaryExpression
+  { argument, operator }: es.UnaryExpression,
+  out
 ) => {
   const [arg, argInst] = c.handleConsume(scope, argument);
   const operatorId =
@@ -77,36 +80,37 @@ export const UnaryExpression: THandler = (
   if (operatorId === "throw")
     throw new CompilerError("throw operator is not supported");
 
-  const [op, opInst] = arg[operatorId](scope);
+  const [op, opInst] = arg[operatorId](scope, out);
   return [op, [...argInst, ...opInst]];
 };
 export const UpdateExpression: THandler = (
   c,
   scope,
-  { argument, operator, prefix }: es.UpdateExpression
+  { argument, operator, prefix }: es.UpdateExpression,
+  out
 ) => {
   const [arg, argInst] = c.handle(scope, argument);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [op, opInst] = arg![operator](scope, prefix);
+  const [op, opInst] = arg![operator](scope, prefix, out);
   return [op, [...argInst, ...opInst]];
 };
 
 export const ConditionalExpression: THandler = (
   c,
   scope,
-  node: es.ConditionalExpression
+  node: es.ConditionalExpression,
+  out
 ) => {
   const [test, testInst] = c.handleConsume(scope, node.test);
   if (test instanceof LiteralValue) {
     if (test.data) return c.handleEval(scope, node.consequent);
     return c.handleEval(scope, node.alternate);
   }
-  // TODO: this creates those annoying jumps on the
-  // temp counter, specially if you nest ternary operators
-  const result: StoreValue = new StoreValue(scope);
-  result.ensureOwned();
-  const consequent = c.handleEval(scope, node.consequent);
-  const alternate = c.handleEval(scope, node.alternate);
+
+  const result = SenseableValue.out(scope, out);
+
+  const consequent = c.handleEval(scope, node.consequent, result);
+  const alternate = c.handleEval(scope, node.alternate, result);
   const alternateStartAdress = new LiteralValue(null as never);
   const endExpressionAdress = new LiteralValue(null as never);
 

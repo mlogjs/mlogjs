@@ -39,8 +39,8 @@ export class UnitControl extends ObjectValue {
           args: ["x", "y", "radius"],
         },
       },
-      handler(scope, overload, ...args) {
-        let result: ObjectValue | StoreValue | null = null;
+      handler(scope, overload, out, ...args) {
+        let result: IValue | null = null;
         let extraArgs: IValue[] = [];
         switch (overload) {
           case "getBlock": {
@@ -52,9 +52,8 @@ export class UnitControl extends ObjectValue {
             break;
           }
           case "within": {
-            const temp = new StoreValue(scope);
-            result = temp;
-            extraArgs = [temp, new LiteralValue(0)];
+            result = StoreValue.out(scope, out);
+            extraArgs = [result, new LiteralValue(0)];
             break;
           }
         }

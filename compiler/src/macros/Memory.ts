@@ -1,6 +1,12 @@
 import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
-import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
+import {
+  IOwnedValue,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import {
   BaseValue,
   LiteralValue,
@@ -24,9 +30,9 @@ class MemoryEntry extends BaseValue {
     super();
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
     if (this.store) return [this.store, []];
-    const temp = new StoreValue(scope);
+    const temp = StoreValue.out(scope, out);
     return [
       temp,
       [new InstructionBase("read", temp, this.mem.cell, this.prop)],
@@ -74,7 +80,7 @@ for (const operator of operators) {
 class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
-      $get: new MacroFunction((scope, prop: IValue) => {
+      $get: new MacroFunction((scope, out, prop: IValue) => {
         if (prop instanceof LiteralValue && typeof prop.data !== "number")
           throw new CompilerError(
             `Invalid memory object property: "${prop.data}"`
@@ -96,7 +102,7 @@ export class MemoryBuilder extends ObjectValue {
   constructor() {
     super({
       $call: new MacroFunction(
-        (scope, cell: IValue, size: IValue = new LiteralValue(64)) => {
+        (scope, out, cell: IValue, size: IValue = new LiteralValue(64)) => {
           if (!(cell instanceof SenseableValue))
             throw new CompilerError("Memory cell must be a senseable value.");
 

@@ -4,7 +4,7 @@ import {
   IParameterDescriptor,
 } from "../assertions";
 import { CompilerError } from "../CompilerError";
-import { IScope, IValue, TValueInstructions } from "../types";
+import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
 import { MacroFunction } from "./Function";
 
 interface IOverloadNamespaceOptions<K extends string> {
@@ -23,6 +23,7 @@ interface IOverloadNamespaceOptions<K extends string> {
   handler(
     scope: IScope,
     overload: K,
+    out: TEOutput | undefined,
     ...args: (IValue | string)[]
   ): TValueInstructions<IValue | null>;
 }
@@ -37,15 +38,15 @@ export function createOverloadNamespace<K extends string>({
   for (const key in overloads) {
     const { named, args } = overloads[key];
     if (named) {
-      result[key] = new MacroFunction((scope, options) => {
+      result[key] = new MacroFunction((scope, out, options) => {
         assertIsObjectMacro(options, named);
 
-        return handler(scope, key, ...assertObjectFields(options, args));
+        return handler(scope, key, out, ...assertObjectFields(options, args));
       });
       continue;
     }
 
-    result[key] = new MacroFunction((scope, ...params) => {
+    result[key] = new MacroFunction((scope, out, ...params) => {
       const handlerParams: (IValue | string)[] = [];
       // validate the paramters
       for (let i = 0; i < args.length; i++) {
@@ -65,7 +66,7 @@ export function createOverloadNamespace<K extends string>({
         handlerParams.push(param);
       }
 
-      return handler(scope, key, ...handlerParams);
+      return handler(scope, key, out, ...handlerParams);
     });
   }
 

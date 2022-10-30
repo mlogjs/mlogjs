@@ -15,6 +15,7 @@ import {
   IInstruction,
   IScope,
   IValue,
+  TEOutput,
   TValueInstructions,
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
@@ -32,6 +33,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   macro = true;
 
   scope: IScope;
+  private out?: TEOutput;
   private childScope!: IScope;
   private params: es.Identifier[];
   private paramOwners: ValueOwner<IValue>[] = [];
@@ -54,17 +56,20 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     params,
     body,
     c,
+    out,
   }: {
     scope: IScope;
     body: es.BlockStatement;
     c: Compiler;
     params: es.Identifier[];
+    out?: TEOutput;
   }) {
     super();
     this.scope = scope;
     this.body = body;
     this.c = c;
     this.params = params;
+    this.out = out;
   }
 
   typeof(): TValueInstructions {

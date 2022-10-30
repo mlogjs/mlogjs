@@ -1,11 +1,12 @@
 import { assertIsObjectMacro, assertIsRuntimeValue } from "../../assertions";
 import { InstructionBase } from "../../instructions";
+import { EMutability } from "../../types";
 import { SenseableValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 export class SpawnUnit extends MacroFunction {
   constructor() {
-    super((scope, options) => {
+    super((scope, out, options) => {
       assertIsObjectMacro(options, "The options");
 
       const { type, x, y, team, rotation } = options.data;
@@ -15,7 +16,7 @@ export class SpawnUnit extends MacroFunction {
       assertIsRuntimeValue(y, "y");
       assertIsRuntimeValue(team, "team");
 
-      const output = new SenseableValue(scope);
+      const output = SenseableValue.out(scope, out, EMutability.constant);
 
       return [
         output,

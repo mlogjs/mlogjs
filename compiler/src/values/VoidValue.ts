@@ -4,6 +4,7 @@ import {
   IValue,
   IValueOperators,
   IValueOwner,
+  TEOutput,
   TValueInstructions,
 } from "../types";
 import { operators } from "../operators";
@@ -14,13 +15,17 @@ export class VoidValue implements IValue {
   mutability = EMutability.mutable;
   macro = false;
 
-  eval(_scope: IScope): TValueInstructions {
+  eval(_scope: IScope, _out?: TEOutput): TValueInstructions {
     throw new CompilerError(`${this} cannot eval.`);
   }
   consume(_scope: IScope): TValueInstructions<IValue> {
     throw new CompilerError(`${this} cannot be consumed.`);
   }
-  call(_scope: IScope, _args: IValue[]): TValueInstructions<IValue | null> {
+  call(
+    _scope: IScope,
+    _args: IValue[],
+    _out?: TEOutput
+  ): TValueInstructions<IValue | null> {
     throw new CompilerError(`${this} cannot call.`);
   }
   get(_scope: IScope, _name: IValue): TValueInstructions {

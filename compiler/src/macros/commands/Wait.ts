@@ -5,7 +5,7 @@ import { CompilerError } from "../../CompilerError";
 
 export class Wait extends MacroFunction<null> {
   constructor() {
-    super((scope, seconds) => {
+    super((scope, out, seconds) => {
       if (
         !(seconds instanceof StoreValue) &&
         !(seconds instanceof LiteralValue && typeof seconds.data === "number")

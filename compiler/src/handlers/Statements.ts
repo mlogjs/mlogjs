@@ -47,12 +47,13 @@ export const ContinueStatement: THandler<null> = (
 export const ReturnStatement: THandler<IValue | null> = (
   c,
   scope,
-  node: es.ReturnStatement
+  node: es.ReturnStatement,
+  out
 ) => {
   const [arg, argInst] = node.argument
     ? c.handle(scope, node.argument)
     : [null, []];
-  const [ret, retInst] = scope.function.return(scope, arg);
+  const [ret, retInst] = scope.function.return(scope, arg, out);
   return [ret, [...argInst, ...retInst]];
 };
 

@@ -4,7 +4,8 @@ import { LiteralValue, ObjectValue } from "../values";
 export const CallExpression: THandler<IValue | null> = (
   c,
   scope,
-  node: es.CallExpression
+  node: es.CallExpression,
+  out
 ) => {
   const inst: IInstruction[] = [];
 
@@ -19,7 +20,7 @@ export const CallExpression: THandler<IValue | null> = (
   const [callee, calleeInst] = c.handleConsume(scope, node.callee);
   inst.push(...calleeInst);
 
-  const [callValue, callInst] = callee.call(scope, args);
+  const [callValue, callInst] = callee.call(scope, args, out);
   inst.push(...callInst);
 
   return [callValue, inst];

@@ -10,13 +10,13 @@ import {
   LogicalOperator,
   updateOperators,
 } from "../operators";
-import { IScope, IValue, TValueInstructions } from "../types";
-import { LiteralValue, VoidValue, StoreValue } from ".";
+import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
 
 export class BaseValue extends VoidValue implements IValue {
-  "u-"(scope: IScope): TValueInstructions {
+  "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = StoreValue.out(scope, out);
     return [
       temp,
       [
@@ -25,14 +25,14 @@ export class BaseValue extends VoidValue implements IValue {
       ],
     ];
   }
-  "u+"(scope: IScope): TValueInstructions {
+  "u+"(scope: IScope, out?: TEOutput): TValueInstructions {
     // TODO: should it return 0 + this ?
-    return this.eval(scope);
+    return this.eval(scope, out);
   }
 
-  "!"(scope: IScope): TValueInstructions {
+  "!"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = StoreValue.out(scope, out);
     const falseLiteral = new LiteralValue(0);
     return [
       temp,
@@ -40,15 +40,15 @@ export class BaseValue extends VoidValue implements IValue {
     ];
   }
 
-  "~"(scope: IScope): TValueInstructions {
+  "~"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = StoreValue.out(scope, out);
     return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
   }
 
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
-  "??"(scope: IScope, other: IValue): TValueInstructions {
+  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
 
     const nullLiteral = new LiteralValue(null as never);
@@ -63,8 +63,7 @@ export class BaseValue extends VoidValue implements IValue {
 
     const [right, rightInst] = other.eval(scope);
 
-    const result: StoreValue = new StoreValue(scope);
-    result.ensureOwned();
+    const result = SenseableValue.out(scope, out);
 
     return [
       result,
@@ -114,11 +113,12 @@ for (const key in operatorMap) {
   BaseValue.prototype[key as K] = function (
     this: BaseValue,
     scope: IScope,
-    value: IValue
+    value: IValue,
+    out?: TEOutput
   ): TValueInstructions {
     const [left, leftInst] = this.consume(scope);
     const [right, rightInst] = value.consume(scope);
-    const temp = new StoreValue(scope);
+    const temp = StoreValue.out(scope, out);
     return [
       temp,
       [
@@ -169,11 +169,12 @@ for (const key of updateOperators) {
   BaseValue.prototype[key] = function (
     this: IValue,
     scope: IScope,
-    prefix: boolean
+    prefix: boolean,
+    out?: TEOutput
   ): TValueInstructions {
     let [ret, inst] = this.consume(scope);
     if (!prefix) {
-      const temp = new StoreValue(scope);
+      const temp = StoreValue.out(scope, out);
       const [tempValue, tempInst] = temp["="](scope, ret);
       ret = tempValue;
       inst.push(...tempInst);

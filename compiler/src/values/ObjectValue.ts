@@ -6,6 +6,7 @@ import {
   IOwnedValue,
   IScope,
   IValue,
+  TEOutput,
   TOperatorMacroMap,
   TValueInstructions,
 } from "../types";
@@ -73,9 +74,13 @@ export class ObjectValue extends VoidValue {
     res.ensureOwned();
     return result;
   }
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
+  call(
+    scope: IScope,
+    args: IValue[],
+    out?: TEOutput
+  ): TValueInstructions<IValue | null> {
     const { $call } = this.data;
-    if (!$call) return super.call(scope, args);
+    if (!$call) return super.call(scope, args, out);
     return $call.call(scope, args);
   }
 

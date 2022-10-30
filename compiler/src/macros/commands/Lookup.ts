@@ -11,8 +11,8 @@ export class Lookup extends ObjectValue {
         item: { args: ["index"] },
         liquid: { args: ["index"] },
       },
-      handler(scope, overload, index) {
-        const output = new StoreValue(scope);
+      handler(scope, overload, out, index) {
+        const output = StoreValue.out(scope, out);
         return [
           output,
           [new InstructionBase("lookup", overload, output, index)],

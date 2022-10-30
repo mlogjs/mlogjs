@@ -42,7 +42,7 @@ export class Draw extends ObjectValue {
         },
       },
 
-      handler(scope, overload, ...args) {
+      handler(scope, overload, out, ...args) {
         return [null, [new InstructionBase("draw", overload, ...args)]];
       },
     });

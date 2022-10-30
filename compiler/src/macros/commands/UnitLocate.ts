@@ -37,7 +37,7 @@ export class UnitLocate extends ObjectValue {
           args: [],
         },
       },
-      handler(scope, overload, ...args) {
+      handler(scope, overload, out, ...args) {
         const outFound = new StoreValue(scope);
         const outX = new StoreValue(scope);
         const outY = new StoreValue(scope);

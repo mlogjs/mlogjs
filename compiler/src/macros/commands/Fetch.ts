@@ -1,5 +1,5 @@
 import { InstructionBase } from "../../instructions";
-import { IValue } from "../../types";
+import { EMutability, IValue } from "../../types";
 import { ObjectValue, SenseableValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -16,8 +16,8 @@ export class Fetch extends ObjectValue {
         build: { args: ["team", "index", "block"] },
         buildCount: { args: ["team", "block"] },
       },
-      handler(scope, overload, team, ...rest) {
-        const output = new SenseableValue(scope);
+      handler(scope, overload, out, team, ...rest) {
+        const output = SenseableValue.out(scope, out, EMutability.constant);
 
         const params: (IValue | string)[] = ["0", "@conveyor"];
 

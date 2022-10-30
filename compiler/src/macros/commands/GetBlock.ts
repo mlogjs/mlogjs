@@ -11,7 +11,7 @@ export class GetBlock extends ObjectValue {
         block: { args: ["x", "y"] },
         building: { args: ["x", "y"] },
       },
-      handler(scope, overload, x, y) {
+      handler(scope, overload, out, x, y) {
         const output =
           overload === "building"
             ? new SenseableValue(scope)

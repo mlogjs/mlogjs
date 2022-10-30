@@ -7,7 +7,7 @@ import { MacroFunction } from "./Function";
 
 export class GetGlobal extends MacroFunction {
   constructor(mutability: EMutability) {
-    super((scope, name: IValue) => {
+    super((scope, out, name: IValue) => {
       if (!(name instanceof LiteralValue) || typeof name.data !== "string")
         throw new CompilerError("The name parameter must be a string literal.");
 

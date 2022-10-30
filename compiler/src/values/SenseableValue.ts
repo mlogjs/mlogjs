@@ -58,9 +58,13 @@ export class SenseableValue extends StoreValue {
     return value;
   }
 
-  static out(scope: IScope, out: TEOutput | undefined) {
+  static out(
+    scope: IScope,
+    out: TEOutput | undefined,
+    mutability = EMutability.mutable
+  ) {
     if (!out || typeof out === "string")
-      return this.named(scope, out, EMutability.mutable);
+      return this.named(scope, out, mutability);
     return out;
   }
 

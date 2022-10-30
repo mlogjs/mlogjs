@@ -30,7 +30,7 @@ export class ApplyStatus extends ObjectValue {
         },
         clear: { args: ["status", "unit"] },
       },
-      handler(scope, overload, effect, unit, duration) {
+      handler(scope, overload, out, effect, unit, duration) {
         if (!(effect instanceof LiteralValue))
           throw new CompilerError("The status effect must be a string literal");
         assertLiteralOneOf(effect, validEffects, "The status effect");

@@ -1,5 +1,5 @@
 import { Compiler } from "../Compiler";
-import { THandler, es, IScope, TValueInstructions } from "../types";
+import { THandler, es, IScope, TValueInstructions, TEOutput } from "../types";
 import { nodeName } from "../utils";
 import { FunctionValue } from "../values/FunctionValue";
 import { ValueOwner } from "../values/ValueOwner";
@@ -7,7 +7,8 @@ import { ValueOwner } from "../values/ValueOwner";
 function handleFunctionNode(
   c: Compiler,
   scope: IScope,
-  node: es.Function
+  node: es.Function,
+  out?: TEOutput
 ): TValueInstructions<FunctionValue> {
   let { params, body } = node;
 
@@ -25,6 +26,7 @@ function handleFunctionNode(
       params: params as es.Identifier[],
       body,
       c,
+      out,
     }),
     [],
   ];
@@ -33,19 +35,21 @@ function handleFunctionNode(
 export const ArrowFunctionExpression: THandler = (
   c,
   scope,
-  node: es.ArrowFunctionExpression
+  node: es.ArrowFunctionExpression,
+  out
 ) => {
-  return handleFunctionNode(c, scope, node);
+  return handleFunctionNode(c, scope, node, out);
 };
 
 export const FunctionDeclaration: THandler = (
   c,
   scope,
-  node: es.FunctionDeclaration
+  node: es.FunctionDeclaration,
+  out
 ) => {
   const identifier = (node.id as es.Identifier).name;
   const name = nodeName(node, !c.compactNames && identifier);
-  const functionIns = handleFunctionNode(c, scope, node);
+  const functionIns = handleFunctionNode(c, scope, node, out);
   const owner = new ValueOwner({
     scope,
     value: functionIns[0],

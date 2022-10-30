@@ -13,7 +13,7 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(scope, overload, x, y, to, team, rotation) {
+      handler(scope, overload, out, x, y, to, team, rotation) {
         return [
           null,
           [

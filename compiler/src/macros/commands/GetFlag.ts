@@ -4,8 +4,8 @@ import { MacroFunction } from "../Function";
 
 export class GetFlag extends MacroFunction {
   constructor() {
-    super((scope, flag) => {
-      const result = new StoreValue(scope);
+    super((scope, out, flag) => {
+      const result = StoreValue.out(scope, out);
       return [result, [new InstructionBase("getflag", result, flag)]];
     });
   }
