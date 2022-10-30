@@ -1,6 +1,7 @@
 import {
   commands,
   Concat,
+  DynamicArrayConstructor,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
@@ -33,6 +34,7 @@ export function initScope(scope: Scope) {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
+  scope.hardSet("DynamicArray", new DynamicArrayConstructor());
 
   // commands
   scope.hardSet("draw", new commands.Draw());
