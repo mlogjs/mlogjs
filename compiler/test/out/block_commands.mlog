@@ -3,7 +3,8 @@ printflush message3
 printflush message1
 drawflush display1
 getlink block:16:6 1
-control color illuminator1 10 50 9
+packcolor &t0 10 50 9
+control color illuminator1 &t0
 control enabled block:16:6 0
 control config sorter1 @plastanium
 control shoot cyclone1 20 40 1
