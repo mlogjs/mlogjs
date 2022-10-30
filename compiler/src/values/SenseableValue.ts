@@ -4,6 +4,7 @@ import { EMutability, IScope, IValue, TValueInstructions } from "../types";
 import { assign, camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
+import { ValueOwner } from "./ValueOwner";
 
 /**
  * Properties that should return a new `SenseableValue`
@@ -31,6 +32,24 @@ export class SenseableValue extends StoreValue {
 
   constructor(scope: IScope) {
     super(scope);
+  }
+
+  static named(
+    scope: IScope,
+    name?: string,
+    mutability = EMutability.constant
+  ) {
+    const value = new SenseableValue(scope);
+    value.mutability = mutability;
+
+    new ValueOwner({
+      scope,
+      value,
+      constant: mutability === EMutability.constant,
+      name,
+    });
+
+    return value;
   }
 
   get(scope: IScope, prop: IValue): TValueInstructions<IValue> {

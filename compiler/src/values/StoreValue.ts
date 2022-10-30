@@ -21,6 +21,20 @@ export class StoreValue extends BaseValue implements IValue {
     super();
   }
 
+  static named(scope: IScope, name?: string, mutability = EMutability.mutable) {
+    const value = new StoreValue(scope);
+    value.mutability = mutability;
+
+    new ValueOwner({
+      scope,
+      value,
+      constant: mutability === EMutability.constant,
+      name,
+    });
+
+    return value;
+  }
+
   typeof(): TValueInstructions {
     return [new LiteralValue("store"), []];
   }
