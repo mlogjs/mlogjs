@@ -5,7 +5,7 @@ import {
   ContinueInstruction,
 } from "../instructions";
 import { es, IScope, IValue, THandler } from "../types";
-import { LiteralValue } from "../values";
+import { LazyValue, LiteralValue } from "../values";
 
 export const ExpressionStatement: THandler<IValue | null> = (
   c,
@@ -50,8 +50,16 @@ export const ReturnStatement: THandler<IValue | null> = (
   node: es.ReturnStatement,
   out
 ) => {
-  const [arg, argInst] = node.argument
-    ? c.handle(scope, node.argument)
+  const { argument } = node;
+
+  const [arg, argInst] = argument
+    ? [
+        new LazyValue({
+          eval: (scope, out) => c.handleEval(scope, argument, out),
+          consume: scope => c.handleConsume(scope, argument),
+        }),
+        [],
+      ]
     : [null, []];
   const [ret, retInst] = scope.function.return(scope, arg, out);
   return [ret, [...argInst, ...retInst]];

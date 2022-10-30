@@ -135,11 +135,17 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.temp.value["="](scope, arg)[1] : [];
+    const inst: IInstruction[] = [];
+    if (arg) {
+      const [value, valueInst] = arg.eval(scope, this.temp.value);
+      const argInst = this.temp.value["="](scope, value)[1];
+      inst.push(...valueInst);
+      inst.push(...argInst);
+    }
     const returnInst = assign(new SetCounterInstruction(this.ret.value), {
       intent: EInstIntent.return,
     });
-    return [null, [...argInst, returnInst]];
+    return [null, [...inst, returnInst]];
   }
 
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
@@ -161,18 +167,24 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     scope: IScope,
     arg: IValue | null
   ): TValueInstructions<null> {
-    const argInst = arg ? this.inlineTemp["="](scope, arg)[1] : [];
-
     if (!this.inlineEnd)
       throw new CompilerError(
         "Error during inline attempt: missing inline end adress"
       );
 
+    const inst: IInstruction[] = [];
+    if (arg) {
+      const [value, valueInst] = arg.eval(scope, this.temp.value);
+      const argInst = this.temp.value["="](scope, value)[1];
+      inst.push(...valueInst);
+      inst.push(...argInst);
+    }
+
     const jump = assign(new JumpInstruction(this.inlineEnd, EJumpKind.Always), {
       intent: EInstIntent.return,
     });
 
-    return [null, [...argInst, jump]];
+    return [null, [...inst, jump]];
   }
 
   private inlineCall(
