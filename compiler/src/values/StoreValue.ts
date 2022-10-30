@@ -46,6 +46,10 @@ export class StoreValue extends BaseValue implements IValue {
     if (compareStores(this, value)) return [this, []];
 
     const [evalValue, evalInst] = value.eval(scope, this);
+
+    if (evalValue.macro)
+      throw new CompilerError("Cannot assign a macro to a store");
+
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
 
