@@ -2,7 +2,7 @@ import { defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
 import alias from "@rollup/plugin-alias";
 
-import pkg from "./package.json";
+import pkg from "./package.json" assert { type: "json" };
 
 const dev = !!process.env.DEV;
 
