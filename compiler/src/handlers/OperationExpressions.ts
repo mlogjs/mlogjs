@@ -5,8 +5,8 @@ import {
   BinaryOperator,
   LogicalOperator,
 } from "../operators";
-import { THandler, es, IValue } from "../types";
-import { LiteralValue, SenseableValue, VoidValue } from "../values";
+import { THandler, es } from "../types";
+import { LazyValue, LiteralValue, SenseableValue } from "../values";
 
 export const LRExpression: THandler = (
   c,
@@ -34,8 +34,8 @@ export const LogicalExpression: THandler = (
   if (node.operator !== "??")
     return LRExpression(c, scope, node, undefined, null);
 
-  const other = lazyValue({
-    eval: scope => c.handleEval(scope, node.right),
+  const other = new LazyValue({
+    eval: (scope, out) => c.handleEval(scope, node.right, out),
     consume: scope => c.handleConsume(scope, node.right),
   });
 
@@ -57,7 +57,7 @@ export const AssignmentExpression: THandler = (
     node.operator !== "??="
       ? c.handleEval(scope, node.right)
       : [
-          lazyValue({
+          new LazyValue({
             eval: (scope, out) => c.handleEval(scope, node.right, out),
             consume: scope => c.handleConsume(scope, node.right),
           }),
@@ -134,13 +134,3 @@ export const ConditionalExpression: THandler = (
     ],
   ];
 };
-
-function lazyValue(options: {
-  eval: IValue["eval"];
-  consume: IValue["consume"];
-}): IValue {
-  const value = new VoidValue();
-  value.eval = options.eval;
-  value.consume = options.consume;
-  return value;
-}
