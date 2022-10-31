@@ -195,10 +195,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // create return value
     this.inlineTemp = out
       ? SenseableValue.out(scope, out, EMutability.mutable)
-      : new ValueOwner({
-          scope: this.childScope,
-          value: SenseableValue.named(scope, undefined, EMutability.mutable),
-        }).value;
+      : SenseableValue.named(this.childScope, undefined, EMutability.mutable);
 
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
