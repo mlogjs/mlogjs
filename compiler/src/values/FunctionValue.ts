@@ -244,6 +244,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 function endsWithReturn(inst: IInstruction[]) {
   for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
+
+    // this means that there is an instruction trying to reference
+    // the final function `set @counter` instruction
+    // of course this generates an unecessary
+    // `set @counter` in cases where a control flow
+    // structure contains a fallback return statement
+    // TODO: fix this with static analysis
+    if (instruction instanceof AddressResolver) return false;
     if (instruction.hidden) continue;
     return instruction instanceof SetCounterInstruction;
   }
