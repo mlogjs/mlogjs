@@ -31,7 +31,8 @@ export const NewExpression = CallExpression;
 export const TaggedTemplateExpression: THandler<IValue | null> = (
   c,
   scope,
-  node: es.TaggedTemplateExpression
+  node: es.TaggedTemplateExpression,
+  out
 ) => {
   const [tag, tagInst] = c.handleConsume(scope, node.tag);
 
@@ -55,7 +56,11 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
     expressionInsts.push(...inst);
   });
 
-  const [result, resultInst] = tag.call(scope, [stringsObject, ...expressions]);
+  const [result, resultInst] = tag.call(
+    scope,
+    [stringsObject, ...expressions],
+    out
+  );
 
   return [result, [...expressionInsts, ...tagInst, ...resultInst]];
 };
