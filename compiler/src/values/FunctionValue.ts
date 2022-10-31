@@ -174,8 +174,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     const inst: IInstruction[] = [];
     if (arg) {
-      const [value, valueInst] = arg.eval(scope, this.temp.value);
-      const argInst = this.temp.value["="](scope, value)[1];
+      const [value, valueInst] = arg.eval(scope, this.inlineTemp);
+      const argInst = this.inlineTemp["="](scope, value)[1];
       inst.push(...valueInst);
       inst.push(...argInst);
     }
