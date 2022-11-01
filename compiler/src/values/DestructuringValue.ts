@@ -19,7 +19,7 @@ export class DestructuringValue extends VoidValue {
     const inst: IInstruction[] = [];
 
     for (const [key, value] of this.members) {
-      const [item, itemInst] = right.get(scope, key);
+      const [item, itemInst] = right.get(scope, key, value);
       inst.push(...itemInst);
       inst.push(...value["="](scope, item)[1]);
     }
