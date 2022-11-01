@@ -141,15 +141,21 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(null as never);
+    const temp = assign(new SenseableValue(scope), {
+      mutability: EMutability.mutable,
+    });
     const inst: IInstruction[] = this.paramOwners
       .map(({ value: param }, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
         ...this.ret.value["="](scope, callAddressLiteral)[1],
         new JumpInstruction(this.addr, EJumpKind.Always),
-        new AddressResolver(callAddressLiteral)
+        new AddressResolver(callAddressLiteral),
+        // ensures that functions can be called multiple times inside expressions
+        ...temp["="](scope, this.temp.value)[1]
       );
-    return [this.temp.value, inst];
+
+    return [temp, inst];
   }
 
   private inlineReturn(
