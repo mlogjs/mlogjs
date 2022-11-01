@@ -1,14 +1,14 @@
-import { LiteralValue, ObjectValue } from "../values";
+import { LiteralValue, ObjectValue, SenseableValue } from "../values";
 import {
   THandler,
   es,
   TValueInstructions,
   IValue,
   IScope,
-  IInstruction,
   EMutability,
+  TEOutput,
 } from "../types";
-import { nodeName } from "../utils";
+import { assign, nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
 import { Compiler } from "../Compiler";
@@ -30,31 +30,36 @@ export const VariableDeclarator: THandler<null> = (
   out,
   kind: "let" | "var" | "const" = "let"
 ) => {
-  const [init, inst]: TValueInstructions<IValue | null> = node.init
-    ? c.handleEval(scope, node.init)
-    : [null, []];
+  const { init } = node;
+  const load: TLoader = init
+    ? (scope, out) => c.handleEval(scope, init, out)
+    : () => [null, []];
 
-  inst.push(...Declare(c, scope, node.id, kind, init)[1]);
-  return [null, inst];
+  return Declare(c, scope, node.id, kind, load);
 };
+
+type TLoader = (
+  scope: IScope,
+  out?: TEOutput
+) => TValueInstructions<IValue | null>;
 
 type TDeclareHandler<T extends es.Node> = (
   c: Compiler,
   scope: IScope,
   node: T,
   kind: "let" | "const" | "var",
-  init: IValue | null
+  load: TLoader
 ) => TValueInstructions<null>;
 
-const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind, init) => {
+const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind, load) => {
   return c.handle(scope, node, () => {
     switch (node.type) {
       case "Identifier":
-        return DeclareIdentifier(c, scope, node, kind, init);
+        return DeclareIdentifier(c, scope, node, kind, load);
       case "ArrayPattern":
-        return DeclareArrayPattern(c, scope, node, kind, init);
+        return DeclareArrayPattern(c, scope, node, kind, load);
       case "ObjectPattern":
-        return DeclareObjectPattern(c, scope, node, kind, init);
+        return DeclareObjectPattern(c, scope, node, kind, load);
       default:
         throw new CompilerError(
           `Unsupported declaration type: ${node.type}`,
@@ -68,10 +73,13 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   scope,
   node,
   kind,
-  init
+  load
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
+
+  const [init, inst] = load(scope, name);
+
   if (kind === "const" && !init)
     throw new CompilerError("Constants must be initialized.", node);
   if (kind === "const" && init?.mutability === EMutability.constant) {
@@ -83,10 +91,25 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
       constant: true,
     });
     scope.set(owner);
-    return [null, []];
+    return [null, inst];
   } else {
-    const value = scope.make(identifier, name);
-    const inst: IInstruction[] = [];
+    let value: IValue;
+    if (init?.owner?.name === name) {
+      value = assign(new SenseableValue(scope), {
+        mutability: EMutability.mutable,
+      });
+      const owner = new ValueOwner({
+        scope,
+        value,
+        identifier,
+        name,
+      });
+      init.owner.moveInto(owner);
+      scope.set(owner);
+    } else {
+      value = scope.make(identifier, name);
+    }
+
     if (init) {
       if (init.macro)
         throw new CompilerError("Macro values must be held by constants", node);
@@ -103,28 +126,46 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
   scope,
   node,
   kind,
-  init
+  load
 ) => {
+  const [init, inst] = load(scope);
   const { elements } = node;
   if (!(init instanceof ObjectValue))
     throw new CompilerError(
       "The value being destructured must be an object value"
     );
 
-  const inst: IInstruction[] = [];
   for (let i = 0; i < elements.length; i++) {
     const element = elements[i];
 
     if (!element) continue;
-    const val = init.data[i];
 
-    if (!val)
-      throw new CompilerError(
-        `The target object does not have a value at index ${i}`,
-        element
-      );
+    const loader: TLoader = (scope, out) => {
+      let val: TValueInstructions<IValue | null> = [null, []];
 
-    inst.push(...Declare(c, scope, element, kind, val)[1]);
+      try {
+        val = init.get(scope, new LiteralValue(i), out);
+      } catch (e) {
+        // catches the "cannot get undefined member" error
+        // TODO: refactor and add error codes
+        // so we don't have to do string checks
+        if (
+          !(e instanceof CompilerError) ||
+          !e.message.includes("undefined member")
+        )
+          throw e;
+      }
+
+      if (!val[0])
+        throw new CompilerError(
+          `The target object does not have a value at index ${i}`,
+          element
+        );
+
+      return val;
+    };
+
+    inst.push(...Declare(c, scope, element, kind, loader)[1]);
   }
   return [null, inst];
 };
@@ -134,16 +175,19 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   scope,
   node,
   kind,
-  base
+  load
 ) => {
+  const [base, inst] = load(scope);
+
   if (!base)
     throw new CompilerError(
       "Cannot use object destructuring without an initializer",
       node
     );
   const { properties } = node;
-  const [init, inst] = base.consume(scope);
+  const [init, initInst] = base.consume(scope);
 
+  inst.push(...initInst);
   const propertiesInst = c.handleMany(scope, properties, prop => {
     if (prop.type === "RestElement")
       throw new CompilerError("The rest operator is not supported", prop);
@@ -155,17 +199,11 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
         ? [new LiteralValue(key.name), []]
         : c.handleConsume(scope, prop.key);
 
-    const propInit = init.get(scope, keyInst[0]);
+    const loader: TLoader = (scope, out) => init.get(scope, keyInst[0], out);
 
-    const declarationInst = Declare(
-      c,
-      scope,
-      value as es.LVal,
-      kind,
-      propInit[0]
-    );
+    const declarationInst = Declare(c, scope, value as es.LVal, kind, loader);
 
-    return [null, [...keyInst[1], ...propInit[1], ...declarationInst[1]]];
+    return [null, [...keyInst[1], ...declarationInst[1]]];
   });
 
   return [null, [...inst, ...propertiesInst[1]]];

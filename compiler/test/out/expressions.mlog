@@ -14,20 +14,20 @@ jump 14 always
 set content:3:6 "very high"
 print content:3:6
 op sub offset:8:6 pos:1:6 5
-op sub &t4 0 offset:8:6
-print &t4
+op sub &t3 0 offset:8:6
+print &t3
 print offset:8:6
 print 10
 print "huh, true"
-set &t5 offset:8:6
-jump 24 notEqual &t5 null
-set &t5 "offset is null?"
+set &t4 offset:8:6
+jump 24 notEqual &t4 null
+set &t4 "offset is null?"
 print "null is null"
-print &t5
+print &t4
 print "preserved"
-op rand &t6 1
-op greaterThan &t7 &t6 0.5
-jump 32 equal &t7 0
+op rand &t5 1
+op greaterThan &t6 &t5 0.5
+jump 32 equal &t6 0
 set item:22:4 null
 jump 33 always
 set item:22:4 @beryllium
