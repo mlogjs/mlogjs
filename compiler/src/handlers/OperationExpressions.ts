@@ -103,8 +103,8 @@ export const ConditionalExpression: THandler = (
 ) => {
   const [test, testInst] = c.handleConsume(scope, node.test);
   if (test instanceof LiteralValue) {
-    if (test.data) return c.handleEval(scope, node.consequent);
-    return c.handleEval(scope, node.alternate);
+    if (test.data) return c.handleEval(scope, node.consequent, out);
+    return c.handleEval(scope, node.alternate, out);
   }
 
   const result = SenseableValue.out(scope, out);
