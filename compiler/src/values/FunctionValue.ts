@@ -137,6 +137,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [null, [...argInst, returnInst]];
   }
 
+  // TODO: use static analysis to determine if
+  // we can safely skip the temp value assignment
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
