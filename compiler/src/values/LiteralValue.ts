@@ -105,17 +105,28 @@ const operatorMap: {
   "||": (a, b) => +(a || b),
 } as const;
 
-for (const key in operatorMap) {
-  type K = keyof typeof operatorMap;
-  const fn = operatorMap[key as K];
-  LiteralValue.prototype[key as K] = function (
+for (const k in operatorMap) {
+  const key = k as keyof typeof operatorMap;
+  const fn = operatorMap[key];
+  LiteralValue.prototype[key] = function (
     this: LiteralValue,
     scope: IScope,
     value: LiteralValue
   ): TValueInstructions {
     if (!(value instanceof LiteralValue)) {
-      return BaseValue.prototype[key as K].apply(this, [scope, value]);
+      return BaseValue.prototype[key].apply(this, [scope, value]);
     }
+
+    if (key === "&&") {
+      if (this.data) return [value, []];
+      return [new LiteralValue(0), []];
+    }
+
+    if (key === "||") {
+      if (!this.data) return [value, []];
+      return [new LiteralValue(1), []];
+    }
+
     return [new LiteralValue(fn(this.data as never, value.data as never)), []];
   };
 }
