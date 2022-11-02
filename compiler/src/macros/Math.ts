@@ -63,7 +63,7 @@ function createMacroMathOperations(scope: IScope) {
 
         return [new LiteralValue(fn(a.num)), []];
       }
-      const temp = new StoreValue(scope);
+      const temp = StoreValue.out(scope, out);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
     });
   }
