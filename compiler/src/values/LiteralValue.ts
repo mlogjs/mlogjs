@@ -12,10 +12,10 @@ import { CompilerError } from "../CompilerError";
 
 const literalMethods: Record<
   string,
-  (this: LiteralValue, scope: IScope) => LiteralValue
+  (this: LiteralValue<TLiteral | null>, scope: IScope) => LiteralValue
 > = {
-  length: function (this: LiteralValue) {
-    if (typeof this.data !== "string")
+  length: function (this: LiteralValue<TLiteral | null>) {
+    if (!this.isString())
       throw new CompilerError(
         "Length method only works on string literal values."
       );
@@ -23,10 +23,13 @@ const literalMethods: Record<
   },
 };
 
-export class LiteralValue extends BaseValue implements IBindableValue {
-  data: TLiteral;
+export class LiteralValue<T extends TLiteral | null = TLiteral>
+  extends BaseValue
+  implements IBindableValue<T>
+{
+  data: T;
   mutability = EMutability.constant;
-  constructor(data: TLiteral) {
+  constructor(data: T) {
     super();
     this.data = data;
   }
@@ -40,7 +43,7 @@ export class LiteralValue extends BaseValue implements IBindableValue {
     return JSON.stringify(this.data);
   }
   get(scope: IScope, name: IValue): TValueInstructions {
-    if (!(name instanceof LiteralValue && typeof name.data === "string"))
+    if (!(name instanceof LiteralValue && name.isString()))
       return super.get(scope, name);
     const method = literalMethods[name.data];
     if (!method)
@@ -60,6 +63,14 @@ export class LiteralValue extends BaseValue implements IBindableValue {
   }
 
   ensureOwned(): void {}
+
+  isString(): this is LiteralValue<string> {
+    return typeof this.data === "string";
+  }
+
+  isNumber(): this is LiteralValue<number> {
+    return typeof this.data === "number";
+  }
 }
 
 type TOperationFn = (a: number, b?: number) => number;
