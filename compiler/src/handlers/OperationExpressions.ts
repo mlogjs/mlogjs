@@ -106,8 +106,8 @@ export const ConditionalExpression: THandler = (
   result.ensureOwned();
   const consequent = c.handleEval(scope, node.consequent);
   const alternate = c.handleEval(scope, node.alternate);
-  const alternateStartAdress = new LiteralValue(null as never);
-  const endExpressionAdress = new LiteralValue(null as never);
+  const alternateStartAdress = new LiteralValue(null);
+  const endExpressionAdress = new LiteralValue(null);
 
   return [
     result,

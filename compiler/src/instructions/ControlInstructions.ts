@@ -4,7 +4,7 @@ import { EJumpKind, JumpInstruction } from "./JumpInstruction";
 export class BreakInstruction extends JumpInstruction {
   intent = EInstIntent.break;
 
-  constructor(address: IBindableValue) {
+  constructor(address: IBindableValue<number | null>) {
     super(address, EJumpKind.Always);
   }
 }
@@ -12,7 +12,7 @@ export class BreakInstruction extends JumpInstruction {
 export class ContinueInstruction extends JumpInstruction {
   intent = EInstIntent.continue;
 
-  constructor(address: IBindableValue) {
+  constructor(address: IBindableValue<number | null>) {
     super(address, EJumpKind.Always);
   }
 }

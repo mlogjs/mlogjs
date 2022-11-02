@@ -51,8 +51,8 @@ export class BaseValue extends VoidValue implements IValue {
   "??"(scope: IScope, other: IValue): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
 
-    const nullLiteral = new LiteralValue(null as never);
-    const endAdress = new LiteralValue(null as never);
+    const nullLiteral = new LiteralValue(null);
+    const endAdress = new LiteralValue(null);
 
     const [nullTest] = left["=="](scope, nullLiteral);
 

@@ -50,7 +50,7 @@ export const TSEnumDeclaration: THandler<null> = (
         member
       );
 
-    if (typeof value.data === "number") {
+    if (value.isNumber()) {
       lastType = "number";
       counter = value.data + 1;
     } else {

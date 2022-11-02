@@ -23,7 +23,7 @@ export const BreakStatement: THandler<null> = (
   const label = node.label?.name;
 
   const target = label ? findScopeLabel(scope, label) : scope;
-  const addr = new LiteralValue(null as never);
+  const addr = new LiteralValue(null);
   target.break.bind(addr);
 
   return [null, [new BreakInstruction(addr)]];
@@ -34,7 +34,7 @@ export const ContinueStatement: THandler<null> = (
   scope,
   node: es.ContinueStatement
 ) => {
-  const addr = new LiteralValue(null as never);
+  const addr = new LiteralValue(null);
 
   const label = node.label?.name;
 
@@ -64,7 +64,7 @@ export const LabeledStatement: THandler<null> = (
   const inner = scope.createScope();
   inner.label = node.label.name;
 
-  const end = new LiteralValue(null as never);
+  const end = new LiteralValue(null);
   const endAdress = new AddressResolver(end).bindBreak(inner);
 
   const [, bodyInst] = c.handle(inner, node.body);

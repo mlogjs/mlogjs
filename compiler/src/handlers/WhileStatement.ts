@@ -12,8 +12,8 @@ export const WhileStatement: THandler<null> = (
   const [test, testLines] = c.handleConsume(scope, node.test);
 
   const childScope = scope.createScope();
-  const startLoopAddr = new LiteralValue(null as never);
-  const endLoopAddr = new LiteralValue(null as never);
+  const startLoopAddr = new LiteralValue(null);
+  const endLoopAddr = new LiteralValue(null);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
@@ -60,7 +60,7 @@ export const DoWhileStatement: THandler<null> = (
   const [test, testLines] = c.handleConsume(scope, node.test);
 
   const childScope = scope.createScope();
-  const startLoopAddr = new LiteralValue(null as never);
+  const startLoopAddr = new LiteralValue(null);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );

@@ -9,7 +9,7 @@ export class GetLink extends MacroFunction {
     super((scope, index: IValue) => {
       if (
         !(index instanceof StoreValue) &&
-        (!(index instanceof LiteralValue) || typeof index.data !== "number")
+        (!(index instanceof LiteralValue) || !index.isNumber())
       )
         throw new CompilerError(
           "The getlink index must be a number literal or a store"

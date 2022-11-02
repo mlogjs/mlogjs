@@ -75,7 +75,7 @@ class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
       $get: new MacroFunction((scope, prop: IValue) => {
-        if (prop instanceof LiteralValue && typeof prop.data !== "number")
+        if (prop instanceof LiteralValue && !prop.isNumber())
           throw new CompilerError(
             `Invalid memory object property: "${prop.data}"`
           );
@@ -100,7 +100,7 @@ export class MemoryBuilder extends ObjectValue {
           if (!(cell instanceof SenseableValue))
             throw new CompilerError("Memory cell must be a senseable value.");
 
-          if (!(size instanceof LiteralValue && typeof size.data === "number"))
+          if (!(size instanceof LiteralValue && size.isNumber()))
             throw new CompilerError(
               "The memory size must be a number literal."
             );
