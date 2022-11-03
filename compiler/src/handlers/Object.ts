@@ -6,11 +6,13 @@ import {
   THandler,
   TValueInstructions,
 } from "../types";
+import { appendSourceLocations } from "../utils";
 import {
   DestructuringValue,
   IObjectValueData,
   LiteralValue,
   ObjectValue,
+  TDestructuringMembers,
 } from "../values";
 import { ValueOwner } from "../values/ValueOwner";
 
@@ -87,27 +89,33 @@ export const MemberExpression: THandler = (
 
 export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
   const inst: IInstruction[] = [];
-  const members = new Map<IValue, IValue>();
+  const members: TDestructuringMembers = new Map();
   for (let i = 0; i < node.elements.length; i++) {
     const element = node.elements[i];
     if (!element) continue;
-    const valueInst = c.handle(scope, element);
-
-    if (!valueInst[0])
+    const [value, valueInst] = c.handle(scope, element);
+    if (!value)
       throw new CompilerError(
         "Destructuring element must resolve to a value",
         element
       );
 
-    inst.push(...valueInst[1]);
-    members.set(new LiteralValue(i), valueInst[0]);
+    inst.push(...valueInst);
+    members.set(new LiteralValue(i), {
+      value,
+      handler(inst) {
+        // assigns the output to the target value
+        inst[1].push(...value["="](scope, inst[0])[1]);
+        appendSourceLocations(inst, element);
+      },
+    });
   }
   return [new DestructuringValue(members), inst];
 };
 
 export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
   const inst: IInstruction[] = [];
-  const members = new Map<IValue, IValue>();
+  const members: TDestructuringMembers = new Map();
   for (const prop of node.properties) {
     if (prop.type === "RestElement")
       throw new CompilerError("The rest operator is not supported");
@@ -121,17 +129,24 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
         : c.handleConsume(scope, prop.key);
     inst.push(...keyInst[1]);
 
-    const valueInst = c.handle(scope, prop.value);
+    const [value, valueInst] = c.handle(scope, prop.value);
 
-    if (!valueInst[0])
+    if (!value)
       throw new CompilerError(
         "Destructuring member must resolve to a value",
         prop.value
       );
 
-    inst.push(...valueInst[1]);
+    inst.push(...valueInst);
 
-    members.set(keyInst[0], valueInst[0]);
+    members.set(keyInst[0], {
+      value,
+      handler(inst) {
+        // assigns the output to the target value
+        inst[1].push(...value["="](scope, inst[0])[1]);
+        appendSourceLocations(inst, prop);
+      },
+    });
   }
   return [new DestructuringValue(members), inst];
 };
