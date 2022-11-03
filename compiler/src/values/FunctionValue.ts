@@ -38,7 +38,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private params: es.Identifier[];
   private paramOwners: ValueOwner<IValue>[] = [];
   private inst!: IInstruction[];
-  private addr!: LiteralValue;
+  private addr!: LiteralValue<number | null>;
   private temp!: ValueOwner<SenseableValue>;
   private ret!: ValueOwner<StoreValue>;
   private inline!: boolean;
@@ -47,7 +47,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private c: Compiler;
   private callSize!: number;
   private inlineTemp!: IValue;
-  private inlineEnd?: LiteralValue;
+  private inlineEnd?: LiteralValue<number | null>;
   private bundled = false;
   private initialized = false;
 
@@ -104,7 +104,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     const { name } = this.owner;
     this.initScope(name);
 
-    this.addr = new LiteralValue(null as never);
+    this.addr = new LiteralValue(null);
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
@@ -148,19 +148,27 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [null, [...inst, returnInst]];
   }
 
+  // TODO: use static analysis to determine if
+  // we can safely skip the temp value assignment
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
-    const callAddressLiteral = new LiteralValue(null as never);
+    const callAddressLiteral = new LiteralValue(null);
+    const temp = assign(new SenseableValue(scope), {
+      mutability: EMutability.mutable,
+    });
     const inst: IInstruction[] = this.paramOwners
       .map(({ value: param }, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
         ...this.ret.value["="](scope, callAddressLiteral)[1],
         new JumpInstruction(this.addr, EJumpKind.Always),
-        new AddressResolver(callAddressLiteral)
+        new AddressResolver(callAddressLiteral),
+        // ensures that functions can be called multiple times inside expressions
+        ...temp["="](scope, this.temp.value)[1]
       );
-    return [this.temp.value, inst];
+
+    return [temp, inst];
   }
 
   private inlineReturn(
@@ -213,7 +221,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       );
     });
 
-    this.inlineEnd = new LiteralValue(null as never);
+    this.inlineEnd = new LiteralValue(null);
 
     this.tryingInline = true;
     let inst = this.c.handle(fnScope, this.body)[1];
@@ -262,6 +270,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 function endsWithReturn(inst: IInstruction[]) {
   for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
+
+    // this means that there is an instruction trying to reference
+    // the final function `set @counter` instruction
+    // of course this generates an unecessary
+    // `set @counter` in cases where a control flow
+    // structure contains a fallback return statement
+    // TODO: fix this with static analysis
+    if (instruction instanceof AddressResolver) return false;
     if (instruction.hidden) continue;
     return instruction instanceof SetCounterInstruction;
   }

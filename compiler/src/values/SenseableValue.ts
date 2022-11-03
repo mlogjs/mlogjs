@@ -82,7 +82,7 @@ export class SenseableValue extends StoreValue {
 
   get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
     const mutability = EMutability.readonly;
-    if (prop instanceof LiteralValue && typeof prop.data === "string") {
+    if (prop instanceof LiteralValue && prop.isString()) {
       const name = itemNames.includes(prop.data)
         ? camelToDashCase(prop.data)
         : prop.data;

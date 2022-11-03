@@ -46,7 +46,7 @@ function createMacroMathOperations(scope: IScope) {
     macroMathOperations[key] = new MacroFunction<IValue>((scope, out, a, b) => {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
-          if (typeof a.data !== "number" || typeof b.data !== "number")
+          if (!a.isNumber() || !b.isNumber())
             throw new CompilerError(
               "Cannot do math operation with non-numerical literals."
             );
@@ -56,7 +56,7 @@ function createMacroMathOperations(scope: IScope) {
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
-        if (typeof a.data !== "number")
+        if (!a.isNumber())
           throw new CompilerError(
             "Cannot do math operation with non-numerical literal."
           );

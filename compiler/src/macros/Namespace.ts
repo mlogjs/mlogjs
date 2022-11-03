@@ -20,7 +20,7 @@ export class NamespaceMacro extends ObjectValue {
   constructor({ changeCasing = false }: NamespaceMacroOptions = {}) {
     super({
       $get: new MacroFunction((scope, out, prop) => {
-        if (!(prop instanceof LiteralValue) || typeof prop.data !== "string")
+        if (!(prop instanceof LiteralValue) || !prop.isString())
           throw new CompilerError(
             "Cannot use dynamic properties on namespace macros"
           );

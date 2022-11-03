@@ -15,11 +15,11 @@ export class Asm extends MacroFunction<null> {
 
       for (let i = 0; i < values.length; i++) {
         const [item] = stringsArray.get(scope, new LiteralValue(i)) as [
-          LiteralValue,
+          LiteralValue<string>,
           never
         ];
 
-        args.push(item.data as string);
+        args.push(item.data);
         args.push(values[i]);
       }
 
@@ -28,8 +28,8 @@ export class Asm extends MacroFunction<null> {
       const [tail] = stringsArray.get(
         scope,
         new LiteralValue(length.data - 1)
-      ) as [LiteralValue, never];
-      args.push(tail.data as string);
+      ) as [LiteralValue<string>, never];
+      args.push(tail.data);
 
       return [null, formatInstructions(args)];
     });

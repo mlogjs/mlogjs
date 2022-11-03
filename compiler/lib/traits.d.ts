@@ -133,6 +133,11 @@ declare global {
     extends WithSymbols<{
       enabled: boolean;
     }> {}
+  interface WithConfig<
+    T extends symbol | number | null = symbol | null
+  > extends WithSymbols<{
+      readonly config: T;
+    }> {}
 
   interface WithSpeed
     extends WithSymbols<{

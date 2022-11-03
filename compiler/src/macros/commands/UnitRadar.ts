@@ -21,7 +21,7 @@ export class UnitRadar extends MacroFunction {
 
       const { length } = filters.data;
 
-      if (!(length instanceof LiteralValue) || typeof length.data !== "number")
+      if (!(length instanceof LiteralValue) || !length.isNumber())
         throw new CompilerError("The length of an array macro must be");
 
       if (length.data !== 3)
