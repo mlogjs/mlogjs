@@ -106,7 +106,7 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
       handler(inst) {
         // assigns the output to the target value
         inst[1].push(...value["="](scope, inst[0])[1]);
-        appendSourceLocations(inst, element);
+        if (c.sourcemap) appendSourceLocations(inst, element);
       },
     });
   }
@@ -144,7 +144,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
       handler(inst) {
         // assigns the output to the target value
         inst[1].push(...value["="](scope, inst[0])[1]);
-        appendSourceLocations(inst, prop);
+        if (c.sourcemap) appendSourceLocations(inst, prop);
       },
     });
   }
