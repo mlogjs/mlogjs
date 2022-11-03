@@ -113,10 +113,6 @@ for (const k in operatorMap) {
     scope: IScope,
     value: LiteralValue
   ): TValueInstructions {
-    if (!(value instanceof LiteralValue)) {
-      return BaseValue.prototype[key].apply(this, [scope, value]);
-    }
-
     if (key === "&&") {
       if (this.data) return [value, []];
       return [new LiteralValue(0), []];
@@ -125,6 +121,10 @@ for (const k in operatorMap) {
     if (key === "||") {
       if (!this.data) return [value, []];
       return [new LiteralValue(1), []];
+    }
+
+    if (!(value instanceof LiteralValue)) {
+      return BaseValue.prototype[key].apply(this, [scope, value]);
     }
 
     return [new LiteralValue(fn(this.data as never, value.data as never)), []];
