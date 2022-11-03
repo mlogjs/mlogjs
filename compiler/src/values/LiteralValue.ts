@@ -5,6 +5,7 @@ import {
   TValueInstructions,
   IValue,
   EMutability,
+  TEOutput,
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
@@ -111,7 +112,8 @@ for (const k in operatorMap) {
   LiteralValue.prototype[key] = function (
     this: LiteralValue,
     scope: IScope,
-    value: LiteralValue
+    value: LiteralValue,
+    out?: TEOutput
   ): TValueInstructions {
     if (key === "&&") {
       if (this.data) return [value, []];
@@ -124,7 +126,7 @@ for (const k in operatorMap) {
     }
 
     if (!(value instanceof LiteralValue)) {
-      return BaseValue.prototype[key].apply(this, [scope, value]);
+      return BaseValue.prototype[key].apply(this, [scope, value, out]);
     }
 
     return [new LiteralValue(fn(this.data as never, value.data as never)), []];
