@@ -36,7 +36,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private params: es.Identifier[];
   private paramOwners: ValueOwner<IValue>[] = [];
   private inst!: IInstruction[];
-  private addr!: LiteralValue;
+  private addr!: LiteralValue<number | null>;
   private temp!: ValueOwner<SenseableValue>;
   private ret!: ValueOwner<StoreValue>;
   private inline!: boolean;
@@ -45,7 +45,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private c: Compiler;
   private callSize!: number;
   private inlineTemp!: ValueOwner<SenseableValue>;
-  private inlineEnd?: LiteralValue;
+  private inlineEnd?: LiteralValue<number | null>;
   private bundled = false;
   private initialized = false;
 
@@ -99,7 +99,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     const { name } = this.owner;
     this.initScope(name);
 
-    this.addr = new LiteralValue(null as never);
+    this.addr = new LiteralValue(null);
     this.temp = new ValueOwner({
       scope: this.childScope,
       name: `${internalPrefix}f${name}`,
@@ -142,7 +142,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
-    const callAddressLiteral = new LiteralValue(null as never);
+    const callAddressLiteral = new LiteralValue(null);
     const temp = assign(new SenseableValue(scope), {
       mutability: EMutability.mutable,
     });
@@ -203,7 +203,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       );
     });
 
-    this.inlineEnd = new LiteralValue(null as never);
+    this.inlineEnd = new LiteralValue(null);
 
     this.tryingInline = true;
     let inst = this.c.handle(fnScope, this.body)[1];

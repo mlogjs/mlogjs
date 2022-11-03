@@ -14,7 +14,7 @@ export const SwitchStatement: THandler<null> = (
 
   const inst: IInstruction[] = [];
 
-  const endAdress = new LiteralValue(null as never);
+  const endAdress = new LiteralValue(null);
   const endLine = new AddressResolver(endAdress).bindBreak(innerScope);
 
   const caseJumps: IInstruction[] = [];
@@ -22,7 +22,7 @@ export const SwitchStatement: THandler<null> = (
 
   for (const scase of node.cases) {
     const [, bodyInst] = c.handleMany(innerScope, scase.consequent);
-    const bodyAdress = new LiteralValue(null as never);
+    const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
     if (!scase.test) {

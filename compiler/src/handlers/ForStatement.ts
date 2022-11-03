@@ -15,10 +15,10 @@ export const ForStatement: THandler<null> = (
     ? c.handleConsume(scope, node.test)
     : [new LiteralValue(1), []];
   const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
-  const startLoopAddr = new LiteralValue(null as never);
+  const startLoopAddr = new LiteralValue(null);
   // continue statements jump here to run the loop update lines
-  const beforeEndAddr = new LiteralValue(null as never);
-  const endLoopAddr = new LiteralValue(null as never);
+  const beforeEndAddr = new LiteralValue(null);
+  const endLoopAddr = new LiteralValue(null);
 
   const startLoopLine = new AddressResolver(startLoopAddr);
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(scope);

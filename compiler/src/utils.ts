@@ -95,22 +95,18 @@ export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
   data: IObjectValueData & {
     raw: ObjectValue & {
       data: IObjectValueData & {
-        length: LiteralValue & {
-          data: number;
-        };
+        length: LiteralValue<number>;
       };
     };
-    length: LiteralValue & {
-      data: number;
-    };
+    length: LiteralValue<number>;
   };
 } {
   return (
     value instanceof ObjectValue &&
     value.data.length instanceof LiteralValue &&
-    typeof value.data.length.data === "number" &&
+    value.data.length.isNumber() &&
     value.data.raw instanceof ObjectValue &&
     value.data.raw.data.length instanceof LiteralValue &&
-    typeof value.data.raw.data.length.data === "number"
+    value.data.raw.data.length.isNumber()
   );
 }

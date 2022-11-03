@@ -8,7 +8,7 @@ export class Wait extends MacroFunction<null> {
     super((scope, seconds) => {
       if (
         !(seconds instanceof StoreValue) &&
-        !(seconds instanceof LiteralValue && typeof seconds.data === "number")
+        !(seconds instanceof LiteralValue && seconds.isNumber())
       )
         throw new CompilerError(
           "The wait seconds must be either a number literal or a store"

@@ -246,8 +246,9 @@ export interface IOwnedValue extends IValue {
 }
 
 export type TLiteral = string | number;
-export interface IBindableValue extends IValue {
-  data: TLiteral;
+export interface IBindableValue<T extends TLiteral | null = TLiteral>
+  extends IValue {
+  data: T;
 }
 
 export interface IFunctionValue extends IValue {

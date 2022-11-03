@@ -1,4 +1,10 @@
 print "string literal"
 print 1
 print 12
+op rand &t0 12
+op greaterThan condition:8:6 &t0 10
+print condition:8:6
+print condition:8:6
+print 1
+print 0
 end

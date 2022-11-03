@@ -6,15 +6,15 @@ export class AddressResolver extends InstructionBase {
     return true;
   }
   public set hidden(value) {}
-  bonds: IBindableValue[];
-  constructor(...bonds: IBindableValue[]) {
+  bonds: IBindableValue<number | null>[];
+  constructor(...bonds: IBindableValue<number | null>[]) {
     super();
     this.bonds = bonds;
   }
   resolve(i: number) {
     for (const literal of this.bonds) literal.data = i;
   }
-  bind(bond: IBindableValue) {
+  bind(bond: IBindableValue<number | null>) {
     this.bonds.push(bond);
   }
   bindBreak(scope: IScope) {
