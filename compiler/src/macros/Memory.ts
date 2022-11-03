@@ -85,8 +85,10 @@ class MemoryMacro extends ObjectValue {
           throw new CompilerError(
             `Invalid memory object property: "${prop.data}"`
           );
-        const obj = new MemoryEntry(scope, this, prop);
-        return [obj, []];
+        const entry = new MemoryEntry(scope, this, prop);
+        if (out) return entry.eval(scope, out);
+
+        return [entry, []];
       }),
       length: size,
       size,

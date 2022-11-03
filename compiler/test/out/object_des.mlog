@@ -24,4 +24,7 @@ print &t3
 ulocate building core 1 @copper &_ &_ &_ &t0:computed:34:6
 sensor x:3:6 &t0:computed:34:6 @x
 sensor y:3:9 &t0:computed:34:6 @y
+read a:40:5 cell1 0
+read b:40:8 cell1 1
+read c:40:11 cell1 2
 end

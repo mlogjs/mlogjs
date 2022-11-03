@@ -34,3 +34,7 @@ print(x, y, health, mem[0]);
 const computed = enemy => unitLocate.building({ group: "core", enemy })[3];
 
 ({ x, y } = computed(true));
+
+// ensures that the memory macro knows when to return
+// an entry macro or an store
+let [a, b, c] = mem;
