@@ -1,4 +1,4 @@
-import { LiteralValue, ObjectValue, SenseableValue } from "../values";
+import { LiteralValue, ObjectValue } from "../values";
 import {
   THandler,
   es,
@@ -8,7 +8,7 @@ import {
   EMutability,
   TEOutput,
 } from "../types";
-import { assign, nodeName } from "../utils";
+import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { ValueOwner } from "../values/ValueOwner";
 import { Compiler } from "../Compiler";
@@ -93,21 +93,14 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
     scope.set(owner);
     return [null, inst];
   } else {
-    let value: IValue;
+    const value = scope.make(identifier, name);
+
     if (init?.owner?.name === name) {
-      value = assign(new SenseableValue(scope), {
-        mutability: EMutability.mutable,
-      });
-      const owner = new ValueOwner({
-        scope,
-        value,
-        identifier,
-        name,
-      });
-      init.owner.moveInto(owner);
-      scope.set(owner);
-    } else {
-      value = scope.make(identifier, name);
+      // prevents the "=" operation from generating
+      // redundant assignments
+      // scope.make always returns an owned value
+      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+      init.owner.moveInto(value.owner!);
     }
 
     if (init) {
