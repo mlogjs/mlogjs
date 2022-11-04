@@ -6,7 +6,6 @@ import {
   THandler,
   TValueInstructions,
 } from "../types";
-import { appendSourceLocations } from "../utils";
 import {
   DestructuringValue,
   IObjectValueData,
@@ -103,10 +102,13 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
     inst.push(...valueInst);
     members.set(new LiteralValue(i), {
       value,
-      handler(inst) {
-        // assigns the output to the target value
-        inst[1].push(...value["="](scope, inst[0])[1]);
-        if (c.sourcemap) appendSourceLocations(inst, element);
+      handler(get) {
+        return c.handle(scope, element, () => {
+          const inst = get();
+          // assigns the output to the target value
+          inst[1].push(...value["="](scope, inst[0])[1]);
+          return inst;
+        });
       },
     });
   }
@@ -141,10 +143,13 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 
     members.set(keyInst[0], {
       value,
-      handler(inst) {
-        // assigns the output to the target value
-        inst[1].push(...value["="](scope, inst[0])[1]);
-        if (c.sourcemap) appendSourceLocations(inst, prop);
+      handler(get) {
+        return c.handle(scope, prop, () => {
+          const inst = get();
+          // assigns the output to the target value
+          inst[1].push(...value["="](scope, inst[0])[1]);
+          return inst;
+        });
       },
     });
   }

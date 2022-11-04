@@ -7,10 +7,8 @@ export type TDestructuringMembers = Map<
     value: IValue;
     /**
      * Handles the input value, is responsible for the assignment.
-     *
-     * Can mutate the instruction array.
      */
-    handler(inst: TValueInstructions): void;
+    handler(get: () => TValueInstructions): TValueInstructions<IValue | null>;
   }
 >;
 
@@ -32,9 +30,8 @@ export class DestructuringValue extends VoidValue {
     const inst: IInstruction[] = [];
 
     for (const [key, { value, handler }] of this.members) {
-      const [item, itemInst] = right.get(scope, key, value);
-      handler([item, itemInst]);
-      inst.push(...itemInst);
+      const [, handlerInst] = handler(() => right.get(scope, key, value));
+      inst.push(...handlerInst);
     }
     return [right, inst];
   }
