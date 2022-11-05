@@ -89,29 +89,30 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   );
 
   const declarationValue = new DeclarationValue({
+    c,
+    scope,
+    node,
     out,
     handler(init, inst) {
-      return c.handle(scope, node, () => {
-        if (kind === "const" && !init)
-          throw new CompilerError("Constants must be initialized.", node);
-        if (kind === "const" && init?.mutability === EMutability.constant) {
-          scope.set(identifier, init);
-          return [null, inst];
-        } else {
-          const value = scope.make(identifier, name);
+      if (kind === "const" && !init)
+        throw new CompilerError("Constants must be initialized.", node);
+      if (kind === "const" && init?.mutability === EMutability.constant) {
+        scope.set(identifier, init);
+        return [null, inst];
+      } else {
+        const value = scope.make(identifier, name);
 
-          if (init) {
-            if (init.macro)
-              throw new CompilerError(
-                "Macro values must be held by constants",
-                node
-              );
-            inst.push(...value["="](scope, init)[1]);
-          }
-          if (kind === "const") value.mutability = EMutability.constant;
-          return [null, inst];
+        if (init) {
+          if (init.macro)
+            throw new CompilerError(
+              "Macro values must be held by constants",
+              node
+            );
+          inst.push(...value["="](scope, init)[1]);
         }
-      });
+        if (kind === "const") value.mutability = EMutability.constant;
+        return [null, inst];
+      }
     },
   });
 
@@ -170,18 +171,18 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
 
   const out = new DestructuringValue(members);
   const value = new DeclarationValue({
+    c,
+    scope,
+    node,
     out,
-
     handler(init, initInst) {
-      return c.handle(scope, node, () => {
-        if (!(init instanceof ObjectValue))
-          throw new CompilerError(
-            "The value being destructured must be an object value"
-          );
+      if (!(init instanceof ObjectValue))
+        throw new CompilerError(
+          "The value being destructured must be an object value"
+        );
 
-        initInst.push(...out["="](scope, init)[1]);
-        return [null, initInst];
-      });
+      initInst.push(...out["="](scope, init)[1]);
+      return [null, initInst];
     },
   });
 
@@ -228,35 +229,53 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
 
   const out = new DestructuringValue(members);
   const declarationValue = new DeclarationValue({
+    c,
+    scope,
+    node,
     out,
     handler(init, initInst) {
-      return c.handle(scope, node, () => {
-        if (!init)
-          throw new CompilerError(
-            "Cannot use object destructuring without an initializer",
-            node
-          );
+      if (!init)
+        throw new CompilerError(
+          "Cannot use object destructuring without an initializer",
+          node
+        );
 
-        initInst.push(...out["="](scope, init)[1]);
+      initInst.push(...out["="](scope, init)[1]);
 
-        return [null, initInst];
-      });
+      return [null, initInst];
     },
   });
   return [declarationValue, [...inst, ...propertiesInst[1]]];
 };
 
 class DeclarationValue extends VoidValue {
+  c: Compiler;
+  scope: IScope;
+  node: es.Node;
   out: IValue;
   /** Handles the init value */
-  handler: (
+  handle: DeclarationValue["handler"];
+
+  constructor({
+    c,
+    scope,
+    node,
+    out,
+    handler,
+  }: Pick<DeclarationValue, "out" | "handler" | "c" | "scope" | "node">) {
+    super();
+
+    this.out = out;
+    this.c = c;
+    this.scope = scope;
+    this.node = node;
+    this.handle = handler;
+  }
+
+  handler(
     init: IValue | null,
     inst: IInstruction[]
-  ) => TValueInstructions<IValue | null>;
-
-  constructor({ out, handler }: Pick<DeclarationValue, "out" | "handler">) {
-    super();
-    this.out = out;
-    this.handler = handler;
+  ): TValueInstructions<IValue | null> {
+    return this.c.handle(this.scope, this.node, () => this.handle(init, inst));
   }
 }
