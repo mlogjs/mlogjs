@@ -17,7 +17,7 @@ export class Fetch extends ObjectValue {
         buildCount: { args: ["team", "block"] },
       },
       handler(scope, overload, out, team, ...rest) {
-        const output = SenseableValue.out(scope, out, EMutability.constant);
+        const output = SenseableValue.from(scope, out, EMutability.constant);
 
         const params: (IValue | string)[] = ["0", "@conveyor"];
 

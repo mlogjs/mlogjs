@@ -3,57 +3,31 @@ import { CompilerError } from "../CompilerError";
 import { SetInstruction } from "../instructions";
 import {
   EMutability,
-  IOwnedValue,
   IScope,
   IValue,
   TEOutput,
   TValueInstructions,
 } from "../types";
-import { discardedName } from "../utils";
-import { ValueOwner } from "./ValueOwner";
 
 /**
  * `StoreValue` represents values unknown at compile time,
  * mostly used with mutable variables and temporary values
  */
 export class StoreValue extends BaseValue implements IValue {
-  mutability = EMutability.mutable;
-  constructor(public scope: IScope) {
+  constructor(public name: string, public mutability = EMutability.mutable) {
     super();
   }
 
-  static named(scope: IScope, name?: string, mutability = EMutability.mutable) {
-    const value = new StoreValue(scope);
-    value.mutability = mutability;
+  static from(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
+    if (out instanceof StoreValue) return out;
+    const name = typeof out === "string" ? out : scope.makeTempName();
 
-    new ValueOwner({
-      scope,
-      value,
-      constant: mutability === EMutability.constant,
-      name,
-    });
-
-    return value;
+    return new StoreValue(name, mutability);
   }
 
-  static out(
-    scope: IScope,
-    out: TEOutput | undefined,
-    mutability = EMutability.mutable
-  ) {
+  static out(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
     if (!out || typeof out === "string") {
-      const value = new StoreValue(scope);
-      value.mutability = mutability;
-
-      if (out)
-        new ValueOwner({
-          scope,
-          value,
-          constant: mutability === EMutability.constant,
-          name: out,
-        });
-
-      return value;
+      return new StoreValue(out ?? scope.makeTempName(), mutability);
     }
     return out;
   }
@@ -63,17 +37,15 @@ export class StoreValue extends BaseValue implements IValue {
   }
 
   "="(scope: IScope, value: IValue): TValueInstructions {
-    if (this.mutability !== EMutability.mutable)
+    if (
+      this.mutability !== EMutability.mutable &&
+      this.mutability !== EMutability.init
+    )
       throw new CompilerError(`Cannot assign to immutable store '${this}'.`);
-    if (this.owner) {
-      if (this.owner === value.owner && value instanceof StoreValue)
-        return [this, []];
-      if (!value.owner?.persistent) {
-        if (!value.owner) this.owner.own(value);
-        else value.owner.moveInto(this.owner);
-        if (value instanceof StoreValue) return [this, []];
-      }
-    }
+
+    if (this.name === value.name && value instanceof StoreValue)
+      return [this, []];
+
     const [evalValue, evalInst] = value.consume(scope);
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
@@ -81,15 +53,10 @@ export class StoreValue extends BaseValue implements IValue {
     return [this, []];
   }
   consume(_scope: IScope): TValueInstructions {
-    this.ensureOwned();
     return [this, []];
   }
 
-  ensureOwned(): asserts this is IOwnedValue {
-    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
-  }
-
   toString() {
-    return this.owner?.name ?? discardedName;
+    return this.name;
   }
 }

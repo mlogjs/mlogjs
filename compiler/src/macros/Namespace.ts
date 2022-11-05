@@ -1,6 +1,6 @@
 import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
-import { EMutability, IScope } from "../types";
+import { EMutability } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
@@ -32,7 +32,7 @@ export class NamespaceMacro extends ObjectValue {
           ? EMutability.readonly
           : EMutability.constant;
 
-        const result = StoreValue.named(scope, `@${symbolName}`, mutability);
+        const result = new StoreValue(`@${symbolName}`, mutability);
 
         return [result, []];
       }),
@@ -42,11 +42,11 @@ export class NamespaceMacro extends ObjectValue {
 }
 
 export class VarsNamespace extends NamespaceMacro {
-  constructor(scope: IScope) {
+  constructor() {
     super();
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
-      unit: SenseableValue.named(scope, "@unit"),
-      this: SenseableValue.named(scope, "@this"),
+      unit: new SenseableValue("@unit"),
+      this: new SenseableValue("@this"),
     });
   }
 }

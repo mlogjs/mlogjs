@@ -16,7 +16,7 @@ export class SpawnUnit extends MacroFunction {
       assertIsRuntimeValue(y, "y");
       assertIsRuntimeValue(team, "team");
 
-      const output = SenseableValue.out(scope, out, EMutability.constant);
+      const output = SenseableValue.from(scope, out, EMutability.constant);
 
       return [
         output,

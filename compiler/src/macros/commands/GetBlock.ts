@@ -15,8 +15,8 @@ export class GetBlock extends ObjectValue {
       handler(scope, overload, out, x, y) {
         const output =
           overload === "building"
-            ? SenseableValue.out(scope, out, EMutability.constant)
-            : StoreValue.out(scope, out, EMutability.constant);
+            ? SenseableValue.from(scope, out, EMutability.constant)
+            : StoreValue.from(scope, out, EMutability.constant);
 
         return [
           output,

@@ -55,7 +55,11 @@ export const AssignmentExpression: THandler = (
   // doesn't need to consume because the operators already do that
   const [right, rightInst] =
     node.operator !== "??="
-      ? c.handleEval(scope, node.right)
+      ? c.handleEval(
+          scope,
+          node.right,
+          node.operator === "=" && left ? left : undefined
+        )
       : [
           new LazyValue({
             eval: (scope, out) => c.handleEval(scope, node.right, out),

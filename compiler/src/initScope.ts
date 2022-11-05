@@ -17,7 +17,7 @@ import { Asm } from "./macros/Asm";
 export function initScope(scope: Scope) {
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro());
-  scope.hardSet("Vars", new VarsNamespace(scope));
+  scope.hardSet("Vars", new VarsNamespace());
   scope.hardSet("Teams", new NamespaceMacro());
   scope.hardSet("Items", new NamespaceMacro({ changeCasing: true }));
   scope.hardSet("Liquids", new NamespaceMacro());
@@ -31,7 +31,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("concat", new Concat());
   scope.hardSet("asm", new Asm());
 
-  scope.hardSet("Math", new MlogMath(scope));
+  scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
 
   // commands

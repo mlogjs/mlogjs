@@ -3,7 +3,6 @@ import {
   IScope,
   IValue,
   IValueOperators,
-  IValueOwner,
   TEOutput,
   TValueInstructions,
 } from "../types";
@@ -11,7 +10,7 @@ import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
-  owner: IValueOwner | null = null;
+  name?: string;
   mutability = EMutability.mutable;
   macro = false;
 
@@ -31,9 +30,11 @@ export class VoidValue implements IValue {
   get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
   }
-  ensureOwned(): void {
-    throw new CompilerError(`${this} cannot be owned`);
+
+  paramOuts(): readonly IValue[] | undefined {
+    return;
   }
+
   toString(): string {
     return "void";
   }

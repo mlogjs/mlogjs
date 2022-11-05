@@ -9,16 +9,19 @@ export const CallExpression: THandler<IValue | null> = (
 ) => {
   const inst: IInstruction[] = [];
 
-  const args = node.arguments.map(node => {
+  const [callee, calleeInst] = c.handleConsume(scope, node.callee);
+  inst.push(...calleeInst);
+
+  const paramOuts = callee.paramOuts();
+
+  const args = node.arguments.map((node, index) => {
     // TODO: this might be why t0 did not increment
     // TODO: figure out if the previous todo is still relevant
-    const [v, i] = c.handleConsume(scope, node);
+    const out = paramOuts?.[index];
+    const [v, i] = c.handleEval(scope, node, out);
     inst.push(...i);
     return v;
   });
-
-  const [callee, calleeInst] = c.handleConsume(scope, node.callee);
-  inst.push(...calleeInst);
 
   const [callValue, callInst] = callee.call(scope, args, out);
   inst.push(...callInst);

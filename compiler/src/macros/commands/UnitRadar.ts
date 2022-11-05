@@ -39,7 +39,7 @@ export class UnitRadar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = SenseableValue.out(scope, out, EMutability.constant);
+      const outUnit = SenseableValue.from(scope, out, EMutability.constant);
 
       return [
         outUnit,

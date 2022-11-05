@@ -215,55 +215,55 @@ set @counter &rmultiplyMatrices:152:0
 op cos &t0:rotate:173:0 z:173:22
 op cos &t1:rotate:173:0 y:173:19
 op mul b11:152:26 &t0:rotate:173:0 &t1:rotate:173:0
-op sin &t3:rotate:173:0 z:173:22
-op sub &t4:rotate:173:0 0 &t3:rotate:173:0
-op cos &t5:rotate:173:0 x:173:16
-op mul &t6:rotate:173:0 &t4:rotate:173:0 &t5:rotate:173:0
-op cos &t7:rotate:173:0 z:173:22
-op sin &t8:rotate:173:0 y:173:19
-op mul &t9:rotate:173:0 &t7:rotate:173:0 &t8:rotate:173:0
-op sin &t10:rotate:173:0 x:173:16
-op mul &t11:rotate:173:0 &t9:rotate:173:0 &t10:rotate:173:0
-op add b12:152:31 &t6:rotate:173:0 &t11:rotate:173:0
-op sin &t13:rotate:173:0 z:173:22
-op sin &t14:rotate:173:0 x:173:16
-op mul &t15:rotate:173:0 &t13:rotate:173:0 &t14:rotate:173:0
-op cos &t16:rotate:173:0 z:173:22
-op cos &t17:rotate:173:0 x:173:16
+op sin &t2:rotate:173:0 z:173:22
+op sub &t3:rotate:173:0 0 &t2:rotate:173:0
+op cos &t4:rotate:173:0 x:173:16
+op mul &t5:rotate:173:0 &t3:rotate:173:0 &t4:rotate:173:0
+op cos &t6:rotate:173:0 z:173:22
+op sin &t7:rotate:173:0 y:173:19
+op mul &t8:rotate:173:0 &t6:rotate:173:0 &t7:rotate:173:0
+op sin &t9:rotate:173:0 x:173:16
+op mul &t10:rotate:173:0 &t8:rotate:173:0 &t9:rotate:173:0
+op add b12:152:31 &t5:rotate:173:0 &t10:rotate:173:0
+op sin &t11:rotate:173:0 z:173:22
+op sin &t12:rotate:173:0 x:173:16
+op mul &t13:rotate:173:0 &t11:rotate:173:0 &t12:rotate:173:0
+op cos &t14:rotate:173:0 z:173:22
+op cos &t15:rotate:173:0 x:173:16
+op mul &t16:rotate:173:0 &t14:rotate:173:0 &t15:rotate:173:0
+op sin &t17:rotate:173:0 y:173:19
 op mul &t18:rotate:173:0 &t16:rotate:173:0 &t17:rotate:173:0
-op sin &t19:rotate:173:0 y:173:19
-op mul &t20:rotate:173:0 &t18:rotate:173:0 &t19:rotate:173:0
-op add b13:152:36 &t15:rotate:173:0 &t20:rotate:173:0
-op sin &t22:rotate:173:0 z:173:22
-op cos &t23:rotate:173:0 y:173:19
-op mul b21:152:41 &t22:rotate:173:0 &t23:rotate:173:0
-op cos &t25:rotate:173:0 z:173:22
-op cos &t26:rotate:173:0 x:173:16
-op mul &t27:rotate:173:0 &t25:rotate:173:0 &t26:rotate:173:0
-op sin &t28:rotate:173:0 z:173:22
-op sin &t29:rotate:173:0 y:173:19
-op mul &t30:rotate:173:0 &t28:rotate:173:0 &t29:rotate:173:0
+op add b13:152:36 &t13:rotate:173:0 &t18:rotate:173:0
+op sin &t19:rotate:173:0 z:173:22
+op cos &t20:rotate:173:0 y:173:19
+op mul b21:152:41 &t19:rotate:173:0 &t20:rotate:173:0
+op cos &t21:rotate:173:0 z:173:22
+op cos &t22:rotate:173:0 x:173:16
+op mul &t23:rotate:173:0 &t21:rotate:173:0 &t22:rotate:173:0
+op sin &t24:rotate:173:0 z:173:22
+op sin &t25:rotate:173:0 y:173:19
+op mul &t26:rotate:173:0 &t24:rotate:173:0 &t25:rotate:173:0
+op sin &t27:rotate:173:0 x:173:16
+op mul &t28:rotate:173:0 &t26:rotate:173:0 &t27:rotate:173:0
+op add b22:152:46 &t23:rotate:173:0 &t28:rotate:173:0
+op cos &t29:rotate:173:0 z:173:22
+op sub &t30:rotate:173:0 0 &t29:rotate:173:0
 op sin &t31:rotate:173:0 x:173:16
 op mul &t32:rotate:173:0 &t30:rotate:173:0 &t31:rotate:173:0
-op add b22:152:46 &t27:rotate:173:0 &t32:rotate:173:0
-op cos &t34:rotate:173:0 z:173:22
-op sub &t35:rotate:173:0 0 &t34:rotate:173:0
-op sin &t36:rotate:173:0 x:173:16
+op sin &t33:rotate:173:0 z:173:22
+op cos &t34:rotate:173:0 x:173:16
+op mul &t35:rotate:173:0 &t33:rotate:173:0 &t34:rotate:173:0
+op sin &t36:rotate:173:0 y:173:19
 op mul &t37:rotate:173:0 &t35:rotate:173:0 &t36:rotate:173:0
-op sin &t38:rotate:173:0 z:173:22
-op cos &t39:rotate:173:0 x:173:16
-op mul &t40:rotate:173:0 &t38:rotate:173:0 &t39:rotate:173:0
-op sin &t41:rotate:173:0 y:173:19
-op mul &t42:rotate:173:0 &t40:rotate:173:0 &t41:rotate:173:0
-op add b23:152:51 &t37:rotate:173:0 &t42:rotate:173:0
-op sin &t44:rotate:173:0 y:173:19
-op sub b31:152:56 0 &t44:rotate:173:0
-op cos &t46:rotate:173:0 y:173:19
-op sin &t47:rotate:173:0 x:173:16
-op mul b32:152:61 &t46:rotate:173:0 &t47:rotate:173:0
-op cos &t49:rotate:173:0 y:173:19
-op cos &t50:rotate:173:0 x:173:16
-op mul b33:152:66 &t49:rotate:173:0 &t50:rotate:173:0
+op add b23:152:51 &t32:rotate:173:0 &t37:rotate:173:0
+op sin &t38:rotate:173:0 y:173:19
+op sub b31:152:56 0 &t38:rotate:173:0
+op cos &t39:rotate:173:0 y:173:19
+op sin &t40:rotate:173:0 x:173:16
+op mul b32:152:61 &t39:rotate:173:0 &t40:rotate:173:0
+op cos &t41:rotate:173:0 y:173:19
+op cos &t42:rotate:173:0 x:173:16
+op mul b33:152:66 &t41:rotate:173:0 &t42:rotate:173:0
 set &rmultiplyMatrices:152:0 268
 jump 159 always
 set @counter &rrotate:173:0

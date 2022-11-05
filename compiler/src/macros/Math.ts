@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { EMutability, IScope, IValue } from "../types";
+import { EMutability, IValue } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
@@ -34,12 +34,12 @@ const mathOperations: Record<
   rand: null,
 };
 
-function createMacroMathOperations(scope: IScope) {
+function createMacroMathOperations() {
   const macroMathOperations: IObjectValueData = {
-    PI: StoreValue.named(scope, "@pi", EMutability.constant),
-    E: StoreValue.named(scope, "@e", EMutability.constant),
-    degToRad: StoreValue.named(scope, "@degToRad", EMutability.constant),
-    radToDeg: StoreValue.named(scope, "@radToDeg", EMutability.constant),
+    PI: new StoreValue("@pi", EMutability.constant),
+    E: new StoreValue("@e", EMutability.constant),
+    degToRad: new StoreValue("@degToRad", EMutability.constant),
+    radToDeg: new StoreValue("@radToDeg", EMutability.constant),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
@@ -52,7 +52,7 @@ function createMacroMathOperations(scope: IScope) {
             );
           return [new LiteralValue(fn(a.num, b.num)), []];
         }
-        const temp = StoreValue.out(scope, out);
+        const temp = StoreValue.from(scope, out);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -63,7 +63,7 @@ function createMacroMathOperations(scope: IScope) {
 
         return [new LiteralValue(fn(a.num)), []];
       }
-      const temp = StoreValue.out(scope, out);
+      const temp = StoreValue.from(scope, out);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
     });
   }
@@ -71,8 +71,8 @@ function createMacroMathOperations(scope: IScope) {
 }
 
 export class MlogMath extends ObjectValue {
-  constructor(scope: IScope) {
-    super(createMacroMathOperations(scope));
+  constructor() {
+    super(createMacroMathOperations());
   }
 }
 

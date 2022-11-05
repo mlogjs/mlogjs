@@ -16,7 +16,7 @@ import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = StoreValue.out(scope, out);
+    const temp = StoreValue.from(scope, out);
     return [
       temp,
       [
@@ -32,7 +32,7 @@ export class BaseValue extends VoidValue implements IValue {
 
   "!"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = StoreValue.out(scope, out);
+    const temp = StoreValue.from(scope, out);
     const falseLiteral = new LiteralValue(0);
     return [
       temp,
@@ -42,28 +42,25 @@ export class BaseValue extends VoidValue implements IValue {
 
   "~"(scope: IScope, out?: TEOutput): TValueInstructions {
     const [that, inst] = this.consume(scope);
-    const temp = StoreValue.out(scope, out);
+    const temp = StoreValue.from(scope, out);
     return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
   }
 
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    if (this instanceof LiteralValue) {
+      if (this.data === null) return other.eval(scope, out);
+      return [this, []];
+    }
+
     const result = SenseableValue.out(scope, out);
 
     const [left, leftInst] = this.eval(scope, result);
+    const [right, rightInst] = other.eval(scope, result);
 
     const nullLiteral = new LiteralValue(null);
     const endAdress = new LiteralValue(null);
-
-    const [nullTest] = left["=="](scope, nullLiteral);
-
-    if (nullTest instanceof LiteralValue) {
-      if (nullTest.data) return other.eval(scope, result);
-      else return [left, leftInst];
-    }
-
-    const [right, rightInst] = other.eval(scope, result);
 
     return [
       result,
@@ -118,7 +115,7 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const [left, leftInst] = this.consume(scope);
     const [right, rightInst] = value.consume(scope);
-    const temp = StoreValue.out(scope, out);
+    const temp = StoreValue.from(scope, out);
     return [
       temp,
       [
@@ -151,15 +148,14 @@ const assignmentToBinary: Record<
   "??=": "??",
 } as const;
 
-for (const op in assignmentToBinary) {
-  type K = keyof typeof assignmentToBinary;
-  BaseValue.prototype[op as K] = function (
+for (const k in assignmentToBinary) {
+  const op = k as keyof typeof assignmentToBinary;
+  BaseValue.prototype[op] = function (
     this: IValue,
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    this.ensureOwned();
-    const [opValue, opInst] = this[assignmentToBinary[op as K]](scope, value);
+    const [opValue, opInst] = this[assignmentToBinary[op]](scope, value, this);
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
   };

@@ -14,7 +14,7 @@ export class GetLink extends MacroFunction {
         throw new CompilerError(
           "The getlink index must be a number literal or a store"
         );
-      const outBuild = SenseableValue.out(scope, out, EMutability.constant);
+      const outBuild = SenseableValue.from(scope, out, EMutability.constant);
       return [outBuild, [new InstructionBase("getlink", outBuild, index)]];
     });
   }

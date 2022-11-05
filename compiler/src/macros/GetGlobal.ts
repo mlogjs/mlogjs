@@ -9,7 +9,7 @@ export class GetGlobal extends MacroFunction {
       if (!(name instanceof LiteralValue) || !name.isString())
         throw new CompilerError("The name parameter must be a string literal.");
 
-      const result = SenseableValue.named(scope, name.data, mutability);
+      const result = new SenseableValue(name.data, mutability);
 
       return [result, []];
     });

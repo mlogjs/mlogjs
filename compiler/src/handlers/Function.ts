@@ -2,7 +2,6 @@ import { Compiler } from "../Compiler";
 import { THandler, es, IScope, TValueInstructions, TEOutput } from "../types";
 import { nodeName } from "../utils";
 import { FunctionValue } from "../values/FunctionValue";
-import { ValueOwner } from "../values/ValueOwner";
 
 function handleFunctionNode(
   c: Compiler,
@@ -44,19 +43,13 @@ export const ArrowFunctionExpression: THandler = (
 export const FunctionDeclaration: THandler = (
   c,
   scope,
-  node: es.FunctionDeclaration,
-  out
+  node: es.FunctionDeclaration
 ) => {
   const identifier = (node.id as es.Identifier).name;
   const name = nodeName(node, !c.compactNames && identifier);
-  const functionIns = handleFunctionNode(c, scope, node, out);
-  const owner = new ValueOwner({
-    scope,
-    value: functionIns[0],
-    identifier,
-    name,
-  });
-  return [scope.set(owner), []];
+  const functionIns = handleFunctionNode(c, scope, node, name);
+  scope.set(identifier, functionIns[0]);
+  return functionIns;
 };
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;

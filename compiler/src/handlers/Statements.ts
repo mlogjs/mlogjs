@@ -5,6 +5,7 @@ import {
   ContinueInstruction,
 } from "../instructions";
 import { es, IScope, IValue, THandler } from "../types";
+import { discardedName } from "../utils";
 import { LazyValue, LiteralValue } from "../values";
 
 export const ExpressionStatement: THandler<IValue | null> = (
@@ -12,7 +13,7 @@ export const ExpressionStatement: THandler<IValue | null> = (
   scope,
   node: es.ExpressionStatement
 ) => {
-  return c.handle(scope, node.expression);
+  return c.handle(scope, node.expression, undefined, discardedName);
 };
 
 export const BreakStatement: THandler<null> = (

@@ -54,7 +54,7 @@ export interface IScope {
   /** Every scope except the top level one has a parent */
   parent: IScope | null;
   /** The registry of variables contained by this scope */
-  data: Record<string, IValueOwner | null>;
+  data: Record<string, IValue | null>;
   name: string;
   /**
    * Additional instructions required by this scope, such as
@@ -87,7 +87,7 @@ export interface IScope {
   /** Checks if there is an owner registered with the specified identifier */
   has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(identifier: string): IOwnedValue;
+  get(identifier: string): INamedValue;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and identifier,
    * throws an error if there already is an owner with the same identitifer.
@@ -96,23 +96,12 @@ export interface IScope {
    */
   set<T extends IValue>(name: string, value: T): T;
   /**
-   * Registers `owner` and it's inner value, throws an error
-   * if there already is an owner with the same identifier.
-   */
-  set<T extends IValue>(owner: IValueOwner<T>): T;
-  /**
    * Registers `value` with an owner that uses `name` as both it's name and identifier,
    * overriding any preexisting variables with the same identifier.
    * @param name
    * @param value
    */
   hardSet<T extends IValue>(name: string, value: T): T;
-  /**
-   * Registers `owner` and it's inner value, overriding
-   * any preexisting variables with the same identifier.
-   * @param owner
-   */
-  hardSet<T extends IValue>(owner: IValueOwner<T>): T;
   /**
    * Creates an owned store and registers it to this scope.
    * @param identifier The name of the variable that will hold the store
@@ -130,32 +119,6 @@ export interface IScope {
   makeTempName(): string;
 }
 
-/**
- * Owners track how variables will behave when it comes to their usage.
- *
- * As an example, Stores use their owners to determine what to do during
- * assignments, like making a compile time alias, moving the values or generating
- * a `set` instruction.
- */
-export interface IValueOwner<T extends IValue = IValue> {
-  scope: IScope;
-  constant: boolean;
-  value: T;
-  /** The name of the variable on the source code that generated this value owner */
-  identifier?: string;
-  /** The name this owner has in it's mlog representation */
-  name: string;
-  /** Whether this owner is temporary or persistent */
-  persistent: boolean;
-  /** Set of values owned by this, can be used to get the owned value count  */
-  owned: Set<T>;
-  /** Adds `target` to the {@link owned set of owned values} and sets its owner to `this` */
-  own(target: T): void;
-  /** Replaces the currently held value by `target` */
-  replace(target: T): void;
-  /** Moves all values owned by `this` into `owner` */
-  moveInto(owner: IValueOwner<T>): void;
-}
 // we can't use type maps to define actual methods
 // and if we don't do this we'll get an error [ts(2425)]
 export interface IValueOperators {
@@ -236,7 +199,9 @@ export enum EMutability {
 
 export interface IValue extends IValueOperators {
   // main properties
-  owner: IValueOwner | null;
+
+  /** The name is used by values that exist on some form in the runtime */
+  name?: string;
   mutability: EMutability;
   macro: boolean;
   /**
@@ -256,11 +221,17 @@ export interface IValue extends IValueOperators {
     out?: TEOutput
   ): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
-  ensureOwned(): asserts this is IOwnedValue;
+
+  /**
+   * Returns the output values for the arguments of a callable value, or `null`.
+   *
+   * This is used to allow the handler to optimize the argument instructions.
+   */
+  paramOuts(): readonly IValue[] | undefined;
 }
 /** Helper type that is used in some typescript assertions */
-export interface IOwnedValue extends IValue {
-  owner: Exclude<IValue["owner"], null>;
+export interface INamedValue extends IValue {
+  name: string;
 }
 
 export type TLiteral = string | number;

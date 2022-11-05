@@ -63,8 +63,6 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     return [new LiteralValue("literal"), []];
   }
 
-  ensureOwned(): void {}
-
   isString(): this is LiteralValue<string> {
     return typeof this.data === "string";
   }

@@ -3,7 +3,6 @@ import { MacroFunction } from "../macros";
 import { operators } from "../operators";
 import {
   EMutability,
-  IOwnedValue,
   IScope,
   IValue,
   TEOutput,
@@ -68,11 +67,7 @@ export class ObjectValue extends VoidValue {
   consume(scope: IScope): TValueInstructions {
     const { $consume } = this.data;
     if ($consume) return $consume.call(scope, []);
-    const result = this.eval(scope);
-    // required by typescript
-    const res: IValue = result[0];
-    res.ensureOwned();
-    return result;
+    return this.eval(scope);
   }
   call(
     scope: IScope,
@@ -83,8 +78,6 @@ export class ObjectValue extends VoidValue {
     if (!$call) return super.call(scope, args, out);
     return $call.call(scope, args);
   }
-
-  ensureOwned(): asserts this is IOwnedValue {}
 }
 
 for (const op of operators) {

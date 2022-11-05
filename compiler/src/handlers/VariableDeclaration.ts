@@ -17,7 +17,6 @@ import {
 } from "../types";
 import { nodeName } from "../utils";
 import { CompilerError } from "../CompilerError";
-import { ValueOwner } from "../values/ValueOwner";
 import { Compiler } from "../Compiler";
 
 export const VariableDeclaration: THandler<null> = (
@@ -83,7 +82,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
-  const out = SenseableValue.named(
+  const out = SenseableValue.from(
     scope,
     name,
     kind === "const" ? EMutability.init : EMutability.mutable
@@ -96,25 +95,10 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
         if (kind === "const" && !init)
           throw new CompilerError("Constants must be initialized.", node);
         if (kind === "const" && init?.mutability === EMutability.constant) {
-          const owner = new ValueOwner({
-            scope,
-            identifier,
-            name,
-            value: init,
-            constant: true,
-          });
-          scope.set(owner);
+          scope.set(identifier, init);
           return [null, inst];
         } else {
           const value = scope.make(identifier, name);
-
-          if (init?.owner?.name === name) {
-            // prevents the "=" operation from generating
-            // redundant assignments
-            // scope.make always returns an owned value
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            init.owner.moveInto(value.owner!);
-          }
 
           if (init) {
             if (init.macro)
@@ -122,7 +106,6 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
                 "Macro values must be held by constants",
                 node
               );
-            console.log("initialized", name);
             inst.push(...value["="](scope, init)[1]);
           }
           if (kind === "const") value.mutability = EMutability.constant;

@@ -1,5 +1,6 @@
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
+import { extractDestrucuringOut } from "../../utils";
 import {
   LiteralValue,
   ObjectValue,
@@ -44,15 +45,21 @@ export class UnitControl extends ObjectValue {
         let extraArgs: IValue[] = [];
         switch (overload) {
           case "getBlock": {
-            const outType = new StoreValue(scope);
-            const outBuilding = new SenseableValue(scope);
+            const outType = StoreValue.from(
+              scope,
+              extractDestrucuringOut(out, 0)
+            );
+            const outBuilding = SenseableValue.from(
+              scope,
+              extractDestrucuringOut(out, 1)
+            );
 
             result = ObjectValue.fromArray([outType, outBuilding]);
             extraArgs = [outType, outBuilding, new LiteralValue(0)];
             break;
           }
           case "within": {
-            result = StoreValue.out(scope, out);
+            result = StoreValue.from(scope, out);
             extraArgs = [result, new LiteralValue(0)];
             break;
           }

@@ -10,7 +10,6 @@ import {
 import { camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
-import { ValueOwner } from "./ValueOwner";
 
 /**
  * Properties that should return a new `SenseableValue`
@@ -34,48 +33,24 @@ const senseableProps = ["controller"];
  * ```
  */
 export class SenseableValue extends StoreValue {
-  mutability = EMutability.constant;
-
-  constructor(scope: IScope) {
-    super(scope);
+  constructor(name: string, mutability = EMutability.constant) {
+    super(name, mutability);
   }
 
-  static named(
+  static from(
     scope: IScope,
-    name?: string,
+    out?: TEOutput,
     mutability = EMutability.constant
   ) {
-    const value = new SenseableValue(scope);
-    value.mutability = mutability;
+    if (out instanceof SenseableValue) return out;
+    const name = typeof out === "string" ? out : scope.makeTempName();
 
-    new ValueOwner({
-      scope,
-      value,
-      constant: mutability === EMutability.constant,
-      name,
-    });
-
-    return value;
+    return new SenseableValue(name, mutability);
   }
 
-  static out(
-    scope: IScope,
-    out: TEOutput | undefined,
-    mutability = EMutability.mutable
-  ) {
+  static out(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
     if (!out || typeof out === "string") {
-      const value = new SenseableValue(scope);
-      value.mutability = mutability;
-
-      if (out)
-        new ValueOwner({
-          scope,
-          value,
-          constant: mutability === EMutability.constant,
-          name: out,
-        });
-
-      return value;
+      return new SenseableValue(out ?? scope.makeTempName(), mutability);
     }
     return out;
   }
@@ -88,15 +63,15 @@ export class SenseableValue extends StoreValue {
         : prop.data;
 
       const result = senseableProps.includes(prop.data)
-        ? SenseableValue.out(scope, out, mutability)
-        : StoreValue.out(scope, out, mutability);
+        ? SenseableValue.from(scope, out, mutability)
+        : StoreValue.from(scope, out, mutability);
       return [
         result,
         [new InstructionBase("sensor", result, this, `@${name}`)],
       ];
     }
     if (prop instanceof StoreValue) {
-      const temp = SenseableValue.out(scope, out, mutability);
+      const temp = SenseableValue.from(scope, out, mutability);
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
     throw new CompilerError(`Cannot sense "${prop}" property`);

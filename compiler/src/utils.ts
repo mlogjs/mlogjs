@@ -1,5 +1,10 @@
-import { es, IValue, TValueInstructions } from "./types";
-import { IObjectValueData, LiteralValue, ObjectValue } from "./values";
+import { es, IValue, TEOutput, TValueInstructions } from "./types";
+import {
+  DestructuringValue,
+  IObjectValueData,
+  LiteralValue,
+  ObjectValue,
+} from "./values";
 
 /**
  * The prefix for internal variables inside the compiler output
@@ -109,4 +114,18 @@ export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
     value.data.raw.data.length instanceof LiteralValue &&
     value.data.raw.data.length.isNumber()
   );
+}
+
+export function extractOutName(out: TEOutput | undefined) {
+  if (!out || typeof out === "string") return out;
+  return out.name;
+}
+
+export function extractDestrucuringOut(
+  out: TEOutput | undefined,
+  field: string | number
+) {
+  if (out === discardedName) return out;
+  if (!(out instanceof DestructuringValue)) return;
+  return out.fields[field] ?? discardedName;
 }

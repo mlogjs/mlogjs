@@ -12,7 +12,7 @@ export class Lookup extends ObjectValue {
         liquid: { args: ["index"] },
       },
       handler(scope, overload, out, index) {
-        const output = StoreValue.out(scope, out);
+        const output = StoreValue.from(scope, out);
         return [
           output,
           [new InstructionBase("lookup", overload, output, index)],

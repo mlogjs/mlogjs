@@ -1,12 +1,5 @@
-import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
-import {
-  IOwnedValue,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-} from "../types";
+import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
 import {
   BaseValue,
   LiteralValue,
@@ -16,7 +9,6 @@ import {
 } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
-import { ValueOwner } from "../values/ValueOwner";
 
 class MemoryEntry extends BaseValue {
   macro = true;
@@ -32,18 +24,17 @@ class MemoryEntry extends BaseValue {
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
     if (this.store) return [this.store, []];
-    const temp = StoreValue.out(scope, out);
+    const temp = StoreValue.from(scope, out);
     return [
       temp,
       [new InstructionBase("read", temp, this.mem.cell, this.prop)],
     ];
   }
 
-  consume(scope: IScope): TValueInstructions {
+  consume(): TValueInstructions {
     if (this.store) return [this.store, []];
-    this.ensureOwned();
-    this.store = new StoreValue(scope);
-    this.owner.own(this.store);
+    this.name ??= this.scope.makeTempName();
+    this.store = new StoreValue(this.name);
     return [
       this.store,
       [new InstructionBase("read", this.store, this.mem.cell, this.prop)],
@@ -60,21 +51,6 @@ class MemoryEntry extends BaseValue {
       ],
     ];
   }
-
-  ensureOwned(): asserts this is IOwnedValue {
-    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
-  }
-}
-
-for (const operator of operators) {
-  if (operator === "=") continue;
-  MemoryEntry.prototype[operator] = function (
-    this: MemoryEntry,
-    ...args: unknown[]
-  ) {
-    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
-    return (BaseValue.prototype[operator] as Function).apply(this, args);
-  };
 }
 
 class MemoryMacro extends ObjectValue {

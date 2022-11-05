@@ -13,7 +13,7 @@ export class Sensor extends MacroFunction {
       if (!(target instanceof SenseableValue))
         throw new CompilerError("The sensor target must be a senseable value");
 
-      const temp = SenseableValue.out(scope, out, EMutability.readonly);
+      const temp = SenseableValue.from(scope, out, EMutability.readonly);
 
       return [temp, [new InstructionBase("sensor", temp, target, property)]];
     });

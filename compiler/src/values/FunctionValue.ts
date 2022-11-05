@@ -1,4 +1,4 @@
-import { assign, internalPrefix, nodeName } from "../utils";
+import { assign, extractOutName, internalPrefix, nodeName } from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -21,7 +21,6 @@ import {
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 import { VoidValue } from "./VoidValue";
-import { ValueOwner } from "./ValueOwner";
 import { SenseableValue } from "./SenseableValue";
 
 export type TFunctionValueInitParams = (childScope: IScope) => {
@@ -29,6 +28,7 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
   paramNames: string[];
 };
 export class FunctionValue extends VoidValue implements IFunctionValue {
+  name: string;
   mutability = EMutability.constant;
   macro = true;
 
@@ -36,11 +36,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private out?: TEOutput;
   private childScope!: IScope;
   private params: es.Identifier[];
-  private paramOwners: ValueOwner<IValue>[] = [];
+  private paramValues: IValue[] = [];
+  private paramNames: string[] = [];
   private inst!: IInstruction[];
   private addr!: LiteralValue<number | null>;
-  private temp!: ValueOwner<SenseableValue>;
-  private ret!: ValueOwner<StoreValue>;
+  private temp!: SenseableValue;
+  private ret!: StoreValue;
   private inline!: boolean;
   private tryingInline!: boolean;
   private body: es.BlockStatement;
@@ -70,53 +71,37 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.c = c;
     this.params = params;
     this.out = out;
+    this.name = extractOutName(out) ?? scope.makeTempName();
   }
 
   typeof(): TValueInstructions {
     return [new LiteralValue("function"), []];
   }
 
-  private initScope(name: string) {
-    this.childScope = this.scope.createFunction(name);
+  private initScope() {
+    this.childScope = this.scope.createFunction(this.name);
     this.childScope.function = this;
     for (const id of this.params) {
       const name = nodeName(id, !this.c.compactNames && id.name);
-      const owner = new ValueOwner({
-        scope: this.childScope,
-        value: assign(new SenseableValue(this.childScope), {
-          mutability: EMutability.mutable,
-        }),
-        identifier: id.name,
-        name,
-      });
-      this.childScope.set(owner);
-      this.paramOwners.push(owner);
+      const value = new SenseableValue(name, EMutability.mutable);
+      this.childScope.set(id.name, value);
+      this.paramValues.push(value);
+      this.paramNames.push(id.name);
     }
-    this.callSize = this.paramOwners.length + 2;
+    this.callSize = this.paramValues.length + 2;
   }
   private ensureInit() {
-    if (!this.owner)
-      throw new CompilerError(`Functions must be owned by a variable`);
-
     if (this.initialized) return;
     this.initialized = true;
 
-    const { name } = this.owner;
-    this.initScope(name);
+    this.initScope();
 
     this.addr = new LiteralValue(null);
-    this.temp = new ValueOwner({
-      scope: this.childScope,
-      name: `${internalPrefix}f${name}`,
-      value: assign(new SenseableValue(this.childScope), {
-        mutability: EMutability.mutable,
-      }),
-    });
-    this.ret = new ValueOwner({
-      scope: this.childScope,
-      name: `${internalPrefix}r${name}`,
-      value: new StoreValue(this.childScope),
-    });
+    this.temp = new SenseableValue(
+      `${internalPrefix}f${this.name}`,
+      EMutability.mutable
+    );
+    this.ret = new StoreValue(`${internalPrefix}r${this.name}`);
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.childScope, this.body)[1],
@@ -124,7 +109,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     if (!endsWithReturn(this.inst)) {
       this.inst.push(
-        assign(new SetCounterInstruction(this.ret.value), {
+        assign(new SetCounterInstruction(this.ret), {
           intent: EInstIntent.return,
         })
       );
@@ -137,12 +122,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   ): TValueInstructions<null> {
     const inst: IInstruction[] = [];
     if (arg) {
-      const [value, valueInst] = arg.eval(scope, this.temp.value);
-      const argInst = this.temp.value["="](scope, value)[1];
+      const [value, valueInst] = arg.eval(scope, this.temp);
+      const argInst = this.temp["="](scope, value)[1];
       inst.push(...valueInst);
       inst.push(...argInst);
     }
-    const returnInst = assign(new SetCounterInstruction(this.ret.value), {
+    const returnInst = assign(new SetCounterInstruction(this.ret), {
       intent: EInstIntent.return,
     });
     return [null, [...inst, returnInst]];
@@ -150,22 +135,25 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   // TODO: use static analysis to determine if
   // we can safely skip the temp value assignment
-  private normalCall(scope: IScope, args: IValue[]): TValueInstructions {
+  private normalCall(
+    scope: IScope,
+    args: IValue[],
+    out?: TEOutput
+  ): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(null);
-    const temp = assign(new SenseableValue(scope), {
-      mutability: EMutability.mutable,
-    });
-    const inst: IInstruction[] = this.paramOwners
-      .map(({ value: param }, i) => param["="](scope, args[i])[1])
+    const temp = SenseableValue.from(scope, out, EMutability.mutable);
+
+    const inst: IInstruction[] = this.paramValues
+      .map((param, i) => param["="](scope, args[i])[1])
       .reduce((s, c) => s.concat(c), [])
       .concat(
-        ...this.ret.value["="](scope, callAddressLiteral)[1],
+        ...this.ret["="](scope, callAddressLiteral)[1],
         new JumpInstruction(this.addr, EJumpKind.Always),
         new AddressResolver(callAddressLiteral),
         // ensures that functions can be called multiple times inside expressions
-        ...temp["="](scope, this.temp.value)[1]
+        ...temp["="](scope, this.temp)[1]
       );
 
     return [temp, inst];
@@ -201,24 +189,17 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     out?: TEOutput
   ): TValueInstructions {
     // create return value
-    this.inlineTemp = out
-      ? SenseableValue.out(scope, out, EMutability.mutable)
-      : SenseableValue.named(this.childScope, undefined, EMutability.mutable);
+    this.inlineTemp = SenseableValue.from(
+      this.childScope,
+      out,
+      EMutability.mutable
+    );
 
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
     // hard set variables within the function scope
-    this.paramOwners.forEach((owner, i) => {
-      const value = args[i];
-      if (!value.owner?.persistent) owner.own(value);
-      fnScope.hardSet(
-        new ValueOwner({
-          scope: fnScope,
-          value,
-          identifier: owner.identifier,
-          name: owner.name,
-        })
-      );
+    this.paramNames.forEach((name, i) => {
+      fnScope.hardSet(name, args[i]);
     });
 
     this.inlineEnd = new LiteralValue(null);
@@ -240,12 +221,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions {
     this.ensureInit();
-    if (args.length !== this.paramOwners.length)
+    if (args.length !== this.paramNames.length)
       throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args, out);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;
-    return this.normalCall(scope, args);
+    return this.normalCall(scope, args, out);
   }
 
   return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
@@ -264,6 +245,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   consume(_scope: IScope): TValueInstructions {
     return [this, []];
+  }
+
+  paramOuts(): readonly IValue[] | undefined {
+    this.ensureInit();
+    if (this.inline || this.tryingInline) return;
+    return this.paramValues;
   }
 }
 

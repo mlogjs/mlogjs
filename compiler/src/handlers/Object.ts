@@ -11,9 +11,9 @@ import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
+  SenseableValue,
   TDestructuringMembers,
 } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 
 export const ObjectExpression: THandler = (
   c,
@@ -38,15 +38,6 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
     const [member, memberInst] = c.handleEval(scope, value);
-
-    // TODO: use an approach that can be defined by each type
-    if (!member.owner && !(member instanceof LiteralValue)) {
-      new ValueOwner({
-        scope,
-        constant: true,
-        value: member,
-      });
-    }
 
     data[index] = member;
     inst.push(...memberInst);
@@ -74,15 +65,40 @@ export const ArrayExpression: THandler = (
 export const MemberExpression: THandler = (
   c,
   scope,
-  node: es.MemberExpression
+  node: es.MemberExpression,
+  out
 ) => {
-  const [obj, objInst] = c.handleConsume(scope, node.object);
-
   const [prop, propInst] = node.computed
     ? c.handleConsume(scope, node.property)
     : [new LiteralValue((node.property as es.Identifier).name), []];
 
-  const [got, gotInst] = obj.get(scope, prop);
+  if (!out) {
+    const [obj, objInst] = c.handleConsume(scope, node.object);
+
+    const [got, gotInst] = obj.get(scope, prop);
+    return [got, [...objInst, ...propInst, ...gotInst]];
+  }
+
+  const temp = SenseableValue.out(scope, out);
+
+  const objOut = new DestructuringValue(
+    new Map([
+      [
+        prop,
+        {
+          value: temp,
+          // a direct assignment should NOT happen
+          handler: () => {
+            throw new CompilerError("Unexpected destructuring assignment");
+          },
+        },
+      ],
+    ])
+  );
+
+  const [obj, objInst] = c.handleEval(scope, node.object, objOut);
+
+  const [got, gotInst] = obj.get(scope, prop, temp);
   return [got, [...objInst, ...propInst, ...gotInst]];
 };
 
