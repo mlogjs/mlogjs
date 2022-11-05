@@ -69,11 +69,11 @@ export const MemberExpression: THandler = (
   out
 ) => {
   const [prop, propInst] = node.computed
-    ? c.handleConsume(scope, node.property)
+    ? c.handleEval(scope, node.property)
     : [new LiteralValue((node.property as es.Identifier).name), []];
 
   if (!out) {
-    const [obj, objInst] = c.handleConsume(scope, node.object);
+    const [obj, objInst] = c.handleEval(scope, node.object);
 
     const [got, gotInst] = obj.get(scope, prop);
     return [got, [...objInst, ...propInst, ...gotInst]];
@@ -144,7 +144,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const keyInst: TValueInstructions =
       !prop.computed && key.type === "Identifier"
         ? [new LiteralValue(key.name), []]
-        : c.handleConsume(scope, prop.key);
+        : c.handleEval(scope, prop.key);
     inst.push(...keyInst[1]);
 
     const [value, valueInst] = c.handle(scope, prop.value);

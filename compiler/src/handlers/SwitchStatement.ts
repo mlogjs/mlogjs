@@ -10,7 +10,7 @@ export const SwitchStatement: THandler<null> = (
 ) => {
   const innerScope = scope.createScope();
 
-  const [ref, refInst] = c.handleConsume(scope, node.discriminant);
+  const [ref, refInst] = c.handleEval(scope, node.discriminant);
 
   const inst: IInstruction[] = [];
 
@@ -34,7 +34,7 @@ export const SwitchStatement: THandler<null> = (
       continue;
     }
 
-    const [test, testInst] = c.handleConsume(innerScope, scase.test);
+    const [test, testInst] = c.handleEval(innerScope, scase.test);
 
     // check if it can be evaluated at compile time
     const [comp] = ref["=="](innerScope, test);

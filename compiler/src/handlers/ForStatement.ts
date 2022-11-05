@@ -12,7 +12,7 @@ export const ForStatement: THandler<null> = (
 
   const initInst = node.init ? c.handle(scope, node.init)[1] : [];
   const [test, testLines] = node.test
-    ? c.handleConsume(scope, node.test)
+    ? c.handleEval(scope, node.test)
     : [new LiteralValue(1), []];
   const updateLines = node.update
     ? c.handle(scope, node.update, undefined, discardedName)[1]

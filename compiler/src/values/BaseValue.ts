@@ -15,7 +15,7 @@ import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
-    const [that, inst] = this.consume(scope);
+    const [that, inst] = this.eval(scope);
     const temp = StoreValue.from(scope, out);
     return [
       temp,
@@ -31,7 +31,7 @@ export class BaseValue extends VoidValue implements IValue {
   }
 
   "!"(scope: IScope, out?: TEOutput): TValueInstructions {
-    const [that, inst] = this.consume(scope);
+    const [that, inst] = this.eval(scope);
     const temp = StoreValue.from(scope, out);
     const falseLiteral = new LiteralValue(0);
     return [
@@ -41,7 +41,7 @@ export class BaseValue extends VoidValue implements IValue {
   }
 
   "~"(scope: IScope, out?: TEOutput): TValueInstructions {
-    const [that, inst] = this.consume(scope);
+    const [that, inst] = this.eval(scope);
     const temp = StoreValue.from(scope, out);
     return [temp, [...inst, new OperationInstruction("not", temp, that, null)]];
   }
@@ -113,8 +113,8 @@ for (const key in operatorMap) {
     value: IValue,
     out?: TEOutput
   ): TValueInstructions {
-    const [left, leftInst] = this.consume(scope);
-    const [right, rightInst] = value.consume(scope);
+    const [left, leftInst] = this.eval(scope);
+    const [right, rightInst] = value.eval(scope);
     const temp = StoreValue.from(scope, out);
     return [
       temp,
@@ -168,7 +168,7 @@ for (const key of updateOperators) {
     prefix: boolean,
     out?: TEOutput
   ): TValueInstructions {
-    let [ret, inst] = this.consume(scope);
+    let [ret, inst] = this.eval(scope);
     if (!prefix) {
       const temp = StoreValue.out(scope, out);
       const [tempValue, tempInst] = temp["="](scope, ret);

@@ -139,18 +139,6 @@ export class Compiler {
     return result;
   }
 
-  handleConsume(scope: IScope, node: es.Node): TValueInstructions {
-    const [res, inst] = this.handle(scope, node);
-
-    if (!res) throw new CompilerError("Cannot consume null", node);
-
-    const [evaluated, evaluatedInst] = res.consume(scope);
-    const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
-
-    if (this.sourcemap) return appendSourceLocations(result, node);
-    return result;
-  }
-
   /**
    * Handles many nodes in order.
    *

@@ -37,9 +37,6 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-  consume(_scope: IScope): TValueInstructions {
-    return [this, []];
-  }
   toString() {
     return JSON.stringify(this.data);
   }

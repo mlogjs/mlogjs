@@ -18,8 +18,8 @@ export const LRExpression: THandler = (
   },
   out
 ) => {
-  const [left, leftInst] = c.handleConsume(scope, node.left);
-  const [right, rightInst] = c.handleConsume(scope, node.right);
+  const [left, leftInst] = c.handleEval(scope, node.left);
+  const [right, rightInst] = c.handleEval(scope, node.right);
   const [op, opInst] = left[node.operator](scope, right, out);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
@@ -34,10 +34,9 @@ export const LogicalExpression: THandler = (
   if (node.operator !== "??")
     return LRExpression(c, scope, node, undefined, null);
 
-  const other = new LazyValue({
-    eval: (scope, out) => c.handleEval(scope, node.right, out),
-    consume: scope => c.handleConsume(scope, node.right),
-  });
+  const other = new LazyValue((scope, out) =>
+    c.handleEval(scope, node.right, out)
+  );
 
   const [left, leftInst] = c.handleEval(scope, node.left);
   const [result, resultInst] = left["??"](scope, other, out);
@@ -52,7 +51,6 @@ export const AssignmentExpression: THandler = (
   }
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
-  // doesn't need to consume because the operators already do that
   const [right, rightInst] =
     node.operator !== "??="
       ? c.handleEval(
@@ -61,10 +59,7 @@ export const AssignmentExpression: THandler = (
           node.operator === "=" && left ? left : undefined
         )
       : [
-          new LazyValue({
-            eval: (scope, out) => c.handleEval(scope, node.right, out),
-            consume: scope => c.handleConsume(scope, node.right),
-          }),
+          new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
           [],
         ];
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -78,7 +73,7 @@ export const UnaryExpression: THandler = (
   { argument, operator }: es.UnaryExpression,
   out
 ) => {
-  const [arg, argInst] = c.handleConsume(scope, argument);
+  const [arg, argInst] = c.handleEval(scope, argument);
   const operatorId =
     operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
   if (operatorId === "throw")
@@ -105,7 +100,7 @@ export const ConditionalExpression: THandler = (
   node: es.ConditionalExpression,
   out
 ) => {
-  const [test, testInst] = c.handleConsume(scope, node.test);
+  const [test, testInst] = c.handleEval(scope, node.test);
   if (test instanceof LiteralValue) {
     if (test.data) return c.handleEval(scope, node.consequent, out);
     return c.handleEval(scope, node.alternate, out);

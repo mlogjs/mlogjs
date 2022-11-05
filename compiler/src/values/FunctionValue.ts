@@ -243,10 +243,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [this, []];
   }
 
-  consume(_scope: IScope): TValueInstructions {
-    return [this, []];
-  }
-
   paramOuts(): readonly IValue[] | undefined {
     this.ensureInit();
     if (this.inline || this.tryingInline) return;

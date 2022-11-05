@@ -210,7 +210,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
     const keyInst: TValueInstructions =
       key.type === "Identifier" && !prop.computed
         ? [new LiteralValue(key.name), []]
-        : c.handleConsume(scope, prop.key);
+        : c.handleEval(scope, prop.key);
 
     const [value, valueInst] = Declare(c, scope, propValue as es.LVal, kind);
 

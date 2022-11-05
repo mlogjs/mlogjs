@@ -9,7 +9,7 @@ export const CallExpression: THandler<IValue | null> = (
 ) => {
   const inst: IInstruction[] = [];
 
-  const [callee, calleeInst] = c.handleConsume(scope, node.callee);
+  const [callee, calleeInst] = c.handleEval(scope, node.callee);
   inst.push(...calleeInst);
 
   const paramOuts = callee.paramOuts();
@@ -37,7 +37,7 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   node: es.TaggedTemplateExpression,
   out
 ) => {
-  const [tag, tagInst] = c.handleConsume(scope, node.tag);
+  const [tag, tagInst] = c.handleEval(scope, node.tag);
 
   const template = node.quasi;
 
@@ -54,7 +54,7 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   const expressionInsts: IInstruction[] = [];
 
   template.expressions.forEach(expression => {
-    const [value, inst] = c.handleConsume(scope, expression);
+    const [value, inst] = c.handleEval(scope, expression);
     expressions.push(value);
     expressionInsts.push(...inst);
   });

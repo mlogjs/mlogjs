@@ -9,7 +9,7 @@ export const WhileStatement: THandler<null> = (
   node: es.WhileStatement
 ) => {
   const lines: IInstruction[] = [];
-  const [test, testLines] = c.handleConsume(scope, node.test);
+  const [test, testLines] = c.handleEval(scope, node.test);
 
   const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);
@@ -57,7 +57,7 @@ export const DoWhileStatement: THandler<null> = (
   node: es.DoWhileStatement
 ) => {
   const lines: IInstruction[] = [];
-  const [test, testLines] = c.handleConsume(scope, node.test);
+  const [test, testLines] = c.handleEval(scope, node.test);
 
   const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);

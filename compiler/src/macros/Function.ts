@@ -29,7 +29,4 @@ export class MacroFunction<
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-  consume(_scope: IScope): TValueInstructions {
-    return [this, []];
-  }
 }

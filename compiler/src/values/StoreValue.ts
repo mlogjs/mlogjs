@@ -46,13 +46,10 @@ export class StoreValue extends BaseValue implements IValue {
     if (this.name === value.name && value instanceof StoreValue)
       return [this, []];
 
-    const [evalValue, evalInst] = value.consume(scope);
+    const [evalValue, evalInst] = value.eval(scope, this);
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
   eval(_scope: IScope): TValueInstructions {
-    return [this, []];
-  }
-  consume(_scope: IScope): TValueInstructions {
     return [this, []];
   }
 

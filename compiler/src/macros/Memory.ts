@@ -24,25 +24,15 @@ class MemoryEntry extends BaseValue {
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
     if (this.store) return [this.store, []];
-    const temp = StoreValue.from(scope, out);
+    const temp = (this.store = StoreValue.from(scope, out));
     return [
       temp,
       [new InstructionBase("read", temp, this.mem.cell, this.prop)],
     ];
   }
 
-  consume(): TValueInstructions {
-    if (this.store) return [this.store, []];
-    this.name ??= this.scope.makeTempName();
-    this.store = new StoreValue(this.name);
-    return [
-      this.store,
-      [new InstructionBase("read", this.store, this.mem.cell, this.prop)],
-    ];
-  }
-
   "="(scope: IScope, value: IValue): TValueInstructions {
-    const [data, dataInst] = value.consume(scope);
+    const [data, dataInst] = value.eval(scope);
     return [
       data,
       [
