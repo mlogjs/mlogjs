@@ -1,7 +1,7 @@
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
 
-const base = "/mlogjs/";
+const base = process.env.BASE ?? "/mlogjs/";
 
 const config: UserConfig = {
   title: "MlogJS",
