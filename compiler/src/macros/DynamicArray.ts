@@ -10,19 +10,18 @@ import {
 import {
   EMutability,
   IInstruction,
-  IOwnedValue,
   IScope,
   IValue,
+  TEOutput,
   TValueInstructions,
 } from "../types";
-import { assign } from "../utils";
+import { assign, extractOutName } from "../utils";
 import {
   LiteralValue,
   ObjectValue,
   SenseableValue,
   StoreValue,
 } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 import { MacroFunction } from "./Function";
 
 /**
@@ -32,29 +31,33 @@ import { MacroFunction } from "./Function";
 const itemSize = 2;
 
 export class DynamicArray extends ObjectValue {
-  valueTemp: ValueOwner<SenseableValue>;
-  returnTemp: ValueOwner<StoreValue>;
-  getterAddr: LiteralValue;
-  setterAddr: LiteralValue;
+  valueTemp: SenseableValue;
+  returnTemp: StoreValue;
+  getterAddr: LiteralValue<number | null>;
+  setterAddr: LiteralValue<number | null>;
 
   bundledSetter = false;
   bundledGetter = false;
 
-  constructor(public scope: IScope, public values: IValue[]) {
+  constructor(
+    public scope: IScope,
+    public name: string,
+    public values: IValue[]
+  ) {
     super({
       // array.get(index)
-      get: new MacroFunction((scope, index) =>
-        this.getValue(scope, index, false)
+      get: new MacroFunction((scope, out, index) =>
+        this.getValue(scope, out, index, false)
       ),
       // array[index]
-      $get: new MacroFunction((scope, index) =>
-        this.getValue(scope, index, true)
+      $get: new MacroFunction((scope, out, index) =>
+        this.getValue(scope, out, index, true)
       ),
-      set: new MacroFunction((scope, index, value) =>
+      set: new MacroFunction((scope, out, index, value) =>
         this.setValue(scope, index, value, false)
       ),
 
-      fill: new MacroFunction((scope, value) => {
+      fill: new MacroFunction((scope, out, value) => {
         const inst: IInstruction[] = [];
 
         for (let i = 0; i < values.length; i++) {
@@ -63,36 +66,32 @@ export class DynamicArray extends ObjectValue {
 
         return [null, inst];
       }),
+
+      length: new LiteralValue(values.length),
     });
 
-    this.valueTemp = new ValueOwner({
-      scope,
-      value: assign(new SenseableValue(scope), {
-        mutability: EMutability.mutable,
-      }),
-      constant: false,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      name: () => `${this.owner!.name}.&temp`,
-    });
+    this.valueTemp = new SenseableValue(
+      `${this.name}.&temp`,
+      EMutability.mutable
+    );
+    this.returnTemp = new StoreValue(`${this.name}.&rt`);
 
-    this.returnTemp = new ValueOwner({
-      scope,
-      value: new StoreValue(scope),
-      constant: false,
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      name: () => `${this.owner!.name}.&rt`,
-    });
-
-    this.getterAddr = new LiteralValue(null as never);
-    this.setterAddr = new LiteralValue(null as never);
+    this.getterAddr = new LiteralValue(null);
+    this.setterAddr = new LiteralValue(null);
   }
 
-  getValue(scope: IScope, index: IValue, checked: boolean): TValueInstructions {
+  getValue(
+    scope: IScope,
+    out: TEOutput | undefined,
+    index: IValue,
+    checked: boolean
+  ): TValueInstructions {
+    if (!index) throw new CompilerError("Missing index argument");
     const { values } = this;
 
-    if (!index) throw new CompilerError("Missing index argument");
-
-    if (index instanceof LiteralValue && typeof index.data === "number") {
+    if (index instanceof LiteralValue) {
+      if (!index.isNumber())
+        throw new CompilerError(`Unknown dynamic array property: "${index}"`);
       if (index.data >= 0 && index.data < values.length)
         return [values[index.data], []];
 
@@ -105,17 +104,19 @@ export class DynamicArray extends ObjectValue {
 
     const inst: IInstruction[] = [];
 
-    const temp = assign(new SenseableValue(scope), {
-      mutability: EMutability.mutable,
-    });
+    // the value will be stored somewhere
+    // no need to save it in a temporary variable
+    const temp = out
+      ? this.valueTemp
+      : SenseableValue.from(scope, undefined, EMutability.mutable);
 
     // used in checked mode, jumps to this address
     // if the index is out of bounds
-    const failAddr = new LiteralValue(null as never);
+    const failAddr = new LiteralValue(null);
 
     if (checked) {
       inst.push(
-        ...temp["="](scope, new LiteralValue(null as never))[1],
+        ...temp["="](scope, new LiteralValue(null))[1],
         new JumpInstruction(
           failAddr,
           EJumpKind.LessThan,
@@ -124,9 +125,9 @@ export class DynamicArray extends ObjectValue {
         ),
         new JumpInstruction(
           failAddr,
-          EJumpKind.GreaterThanEq,
+          EJumpKind.GreaterThan,
           index,
-          new LiteralValue(this.values.length)
+          new LiteralValue(this.values.length - 1)
         )
       );
     }
@@ -134,22 +135,25 @@ export class DynamicArray extends ObjectValue {
     const dIndexData = index["*"](scope, new LiteralValue(itemSize));
     inst.push(...dIndexData[1]);
 
-    const dIndex: IValue = dIndexData[0];
-    dIndex.ensureOwned();
+    const dIndex = dIndexData[0];
 
     const lineData = this.getterAddr["+"](scope, dIndex);
-    const line: IValue = lineData[0];
-    line.ensureOwned();
-    inst.push(...lineData[1], new SetCounterInstruction(line));
+    const line = lineData[0];
+    inst.push(...lineData[1]);
+
+    const returnAdress = new LiteralValue(null as never);
+    inst.push(
+      ...this.returnTemp["="](scope, returnAdress)[1],
+      new SetCounterInstruction(line)
+    );
 
     // without this you can't access the array twice inside the same expression
-    inst.push(...temp["="](scope, this.valueTemp.value)[1]);
+    inst.push(...temp["="](scope, this.valueTemp)[1]);
 
     if (checked) {
       inst.push(new AddressResolver(failAddr));
     }
 
-    const returnAdress = new LiteralValue(null as never);
     inst.push(new AddressResolver(returnAdress));
 
     return [temp, inst];
@@ -170,8 +174,8 @@ export class DynamicArray extends ObjectValue {
 
     for (const value of this.values) {
       this.scope.inst.push(
-        new SetInstruction(this.valueTemp.value, value),
-        new SetCounterInstruction(this.returnTemp.value)
+        new SetInstruction(this.valueTemp, value),
+        new SetCounterInstruction(this.returnTemp)
       );
     }
   }
@@ -184,21 +188,17 @@ export class DynamicArray extends ObjectValue {
 
     for (const value of this.values) {
       this.scope.inst.push(
-        new SetInstruction(value, this.valueTemp.value),
-        new SetCounterInstruction(this.returnTemp.value)
+        new SetInstruction(value, this.valueTemp),
+        new SetCounterInstruction(this.returnTemp)
       );
     }
-  }
-
-  ensureOwned(): asserts this is IOwnedValue {
-    if (this.owner) return;
-    new ValueOwner({ scope: this.scope, value: this });
   }
 }
 
 export class DynamicArrayConstructor extends MacroFunction {
   constructor() {
-    super((scope, init, fillValue?: IValue) => {
+    super((scope, out, init, fillValue?: IValue) => {
+      const name = extractOutName(out) ?? scope.makeTempName();
       const inst: IInstruction[] = [];
       const values: IValue[] = [];
       let length: number;
@@ -215,17 +215,7 @@ export class DynamicArrayConstructor extends MacroFunction {
       }
 
       for (let i = 0; i < length; i++) {
-        values.push(
-          new ValueOwner({
-            scope,
-            value: assign(new SenseableValue(scope), {
-              mutability: EMutability.mutable,
-            }),
-            constant: false,
-            // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-            name: () => `${out.owner!.name}->${i}`,
-          }).value
-        );
+        values.push(new SenseableValue(`${name}->${i}`, EMutability.mutable));
       }
 
       if (init instanceof LiteralValue) {
@@ -237,16 +227,18 @@ export class DynamicArrayConstructor extends MacroFunction {
         const length = init.data.length.data;
 
         for (let i = 0; i < length; i++) {
-          const [value, valueInst] = init.get(scope, new LiteralValue(i));
+          const [value, valueInst] = init.get(
+            scope,
+            new LiteralValue(i),
+            values[i]
+          );
 
           inst.push(...valueInst);
           inst.push(...values[i]["="](scope, value)[1]);
         }
       }
 
-      const out = new DynamicArray(scope, values);
-      new ValueOwner({ scope, constant: true, value: out });
-      return [out, inst];
+      return [new DynamicArray(scope, name, values), inst];
     });
   }
 }
