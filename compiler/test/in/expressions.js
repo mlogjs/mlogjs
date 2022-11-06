@@ -11,7 +11,7 @@ print(-offset);
 print(+offset);
 // should be evaluated at compile time to 10
 print(1 + 2 > 1.4 ? 10 : -5);
-print(1 + 1 != 2 ? "it's false" : "huh, true");
+print(1 + 1 != 2 ? "huh, true" : "it's false");
 
 print(
   null ?? "null is null",
@@ -22,3 +22,5 @@ print(
 let item = Math.rand(1) > 0.5 ? null : Items.beryllium;
 
 item ??= Items.copper;
+
+print(~Math.rand(2 ** 16));

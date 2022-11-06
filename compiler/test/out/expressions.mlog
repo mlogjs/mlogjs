@@ -18,7 +18,7 @@ op sub &t3 0 offset:8:6
 print &t3
 print offset:8:6
 print 10
-print "huh, true"
+print "it's false"
 set &t4 offset:8:6
 jump 24 notEqual &t4 null
 set &t4 "offset is null?"
@@ -33,4 +33,7 @@ jump 33 always
 set item:22:4 @beryllium
 jump 35 notEqual item:22:4 null
 set item:22:4 @copper
+op rand &t7 65536
+op not &t8 &t7
+print &t8
 end
