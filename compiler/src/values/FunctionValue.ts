@@ -149,7 +149,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
     const callAddressLiteral = new LiteralValue(null);
-    const temp = SenseableValue.from(scope, out, EMutability.mutable);
+
+    // the value will be stored somewhere
+    // no need to save it in a temporary variable
+    const temp = out
+      ? this.temp
+      : SenseableValue.from(scope, undefined, EMutability.mutable);
 
     const inst: IInstruction[] = this.paramValues
       .map((param, i) => param["="](scope, args[i])[1])
