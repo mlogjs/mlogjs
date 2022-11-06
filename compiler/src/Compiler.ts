@@ -145,7 +145,7 @@ export class Compiler {
    * The usage of this method over a regular loop over an array of nodes
    * is only required if the code inside the loop generates
    * instructions that are not tracked by the compiler
-   * handler methods ({@link handle}, {@link handleEval}, {@link handleConsume}
+   * handler methods ({@link handle}, {@link handleEval}
    * and {@link handleMany})
    *
    */
