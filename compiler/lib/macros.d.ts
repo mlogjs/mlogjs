@@ -39,4 +39,6 @@ declare class DynamicArray<T> {
   fill(value: T): void;
 
   readonly length: number;
+
+  [Symbol.iterator](): IterableIterator<T>;
 }
