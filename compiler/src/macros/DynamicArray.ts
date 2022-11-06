@@ -206,7 +206,7 @@ class DynamicArrayEntry extends BaseValue {
     const line = lineData[0];
     inst.push(...lineData[1]);
 
-    const returnAdress = new LiteralValue(null as never);
+    const returnAdress = new LiteralValue(null);
     inst.push(
       ...returnTemp["="](scope, returnAdress)[1],
       new SetCounterInstruction(line)
@@ -275,7 +275,7 @@ class DynamicArrayEntry extends BaseValue {
 
 export class DynamicArrayConstructor extends MacroFunction {
   constructor() {
-    super((scope, out, init, fillValue?: IValue) => {
+    super((scope, out, init, fillValue?: IValue, others?: IValue) => {
       const name = extractOutName(out) ?? scope.makeTempName();
       const inst: IInstruction[] = [];
       const values: IValue[] = [];
@@ -297,9 +297,10 @@ export class DynamicArrayConstructor extends MacroFunction {
       }
 
       if (init instanceof LiteralValue) {
-        const value = fillValue ?? new LiteralValue(null as never);
+        const table = others instanceof ObjectValue ? others.data : {};
+        const value = fillValue ?? new LiteralValue(null);
         for (let i = 0; i < length; i++) {
-          inst.push(...values[i]["="](scope, value)[1]);
+          inst.push(...values[i]["="](scope, table[i] ?? value)[1]);
         }
       } else {
         const length = init.data.length.data;

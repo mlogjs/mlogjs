@@ -24,7 +24,7 @@ declare class Memory<S extends MemoryCapacity = 64> {
 declare class DynamicArray<T> {
   constructor(init: readonly T[]);
 
-  constructor(length: number, fillValue: T);
+  constructor(length: number, fillValue: T, others?: Record<number, T>);
 
   /** Checked index access. */
   [index: number]: T;
