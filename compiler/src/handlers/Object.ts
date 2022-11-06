@@ -6,18 +6,21 @@ import {
   THandler,
   TValueInstructions,
 } from "../types";
+import { extractDestrucuringOut } from "../utils";
 import {
   DestructuringValue,
   IObjectValueData,
   LiteralValue,
   ObjectValue,
+  SenseableValue,
+  TDestructuringMembers,
 } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 
 export const ObjectExpression: THandler = (
   c,
   scope,
-  node: es.ObjectExpression
+  node: es.ObjectExpression,
+  out
 ) => {
   const data: IObjectValueData = {};
   const inst = [];
@@ -36,16 +39,11 @@ export const ObjectExpression: THandler = (
     } else {
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
-    const [member, memberInst] = c.handleEval(scope, value);
-
-    // TODO: use an approach that can be defined by each type
-    if (!member.owner && !(member instanceof LiteralValue)) {
-      new ValueOwner({
-        scope,
-        constant: true,
-        value: member,
-      });
-    }
+    const [member, memberInst] = c.handleEval(
+      scope,
+      value,
+      extractDestrucuringOut(out, index)
+    );
 
     data[index] = member;
     inst.push(...memberInst);
@@ -56,13 +54,14 @@ export const ObjectExpression: THandler = (
 export const ArrayExpression: THandler = (
   c,
   scope,
-  node: es.ArrayExpression
+  node: es.ArrayExpression,
+  out
 ) => {
   const items: (IValue | undefined)[] = [];
   const inst: IInstruction[] = [];
-  node.elements.forEach(element => {
+  node.elements.forEach((element, i) => {
     const [value, valueInst] = element
-      ? c.handleEval(scope, element)
+      ? c.handleEval(scope, element, extractDestrucuringOut(out, i))
       : [undefined, []];
     items.push(value);
     inst.push(...valueInst);
@@ -73,41 +72,75 @@ export const ArrayExpression: THandler = (
 export const MemberExpression: THandler = (
   c,
   scope,
-  node: es.MemberExpression
+  node: es.MemberExpression,
+  out
 ) => {
-  const [obj, objInst] = c.handleConsume(scope, node.object);
-
   const [prop, propInst] = node.computed
-    ? c.handleConsume(scope, node.property)
+    ? c.handleEval(scope, node.property)
     : [new LiteralValue((node.property as es.Identifier).name), []];
 
-  const [got, gotInst] = obj.get(scope, prop);
+  if (!out) {
+    const [obj, objInst] = c.handleEval(scope, node.object);
+
+    const [got, gotInst] = obj.get(scope, prop);
+    return [got, [...objInst, ...propInst, ...gotInst]];
+  }
+
+  const temp = SenseableValue.out(scope, out);
+
+  const objOut = new DestructuringValue(
+    new Map([
+      [
+        prop,
+        {
+          value: temp,
+          // a direct assignment should NOT happen
+          handler: () => {
+            throw new CompilerError("Unexpected destructuring assignment");
+          },
+        },
+      ],
+    ])
+  );
+
+  const [obj, objInst] = c.handleEval(scope, node.object, objOut);
+
+  const [got, gotInst] = obj.get(scope, prop, temp);
   return [got, [...objInst, ...propInst, ...gotInst]];
 };
 
 export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
   const inst: IInstruction[] = [];
-  const members = new Map<IValue, IValue>();
+  const members: TDestructuringMembers = new Map();
   for (let i = 0; i < node.elements.length; i++) {
     const element = node.elements[i];
     if (!element) continue;
-    const valueInst = c.handle(scope, element);
-
-    if (!valueInst[0])
+    const [value, valueInst] = c.handle(scope, element);
+    if (!value)
       throw new CompilerError(
         "Destructuring element must resolve to a value",
         element
       );
 
-    inst.push(...valueInst[1]);
-    members.set(new LiteralValue(i), valueInst[0]);
+    inst.push(...valueInst);
+    members.set(new LiteralValue(i), {
+      value,
+      handler(get) {
+        return c.handle(scope, element, () => {
+          const inst = get();
+          // assigns the output to the target value
+          inst[1].push(...value["="](scope, inst[0])[1]);
+          return inst;
+        });
+      },
+    });
   }
   return [new DestructuringValue(members), inst];
 };
 
 export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
   const inst: IInstruction[] = [];
-  const members = new Map<IValue, IValue>();
+  const members: TDestructuringMembers = new Map();
   for (const prop of node.properties) {
     if (prop.type === "RestElement")
       throw new CompilerError("The rest operator is not supported");
@@ -118,20 +151,30 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const keyInst: TValueInstructions =
       !prop.computed && key.type === "Identifier"
         ? [new LiteralValue(key.name), []]
-        : c.handleConsume(scope, prop.key);
+        : c.handleEval(scope, prop.key);
     inst.push(...keyInst[1]);
 
-    const valueInst = c.handle(scope, prop.value);
+    const [value, valueInst] = c.handle(scope, prop.value);
 
-    if (!valueInst[0])
+    if (!value)
       throw new CompilerError(
         "Destructuring member must resolve to a value",
         prop.value
       );
 
-    inst.push(...valueInst[1]);
+    inst.push(...valueInst);
 
-    members.set(keyInst[0], valueInst[0]);
+    members.set(keyInst[0], {
+      value,
+      handler(get) {
+        return c.handle(scope, prop, () => {
+          const inst = get();
+          // assigns the output to the target value
+          inst[1].push(...value["="](scope, inst[0])[1]);
+          return inst;
+        });
+      },
+    });
   }
   return [new DestructuringValue(members), inst];
 };

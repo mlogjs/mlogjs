@@ -5,14 +5,15 @@ import {
   ContinueInstruction,
 } from "../instructions";
 import { es, IScope, IValue, THandler } from "../types";
-import { LiteralValue } from "../values";
+import { discardedName } from "../utils";
+import { LazyValue, LiteralValue } from "../values";
 
 export const ExpressionStatement: THandler<IValue | null> = (
   c,
   scope,
   node: es.ExpressionStatement
 ) => {
-  return c.handle(scope, node.expression);
+  return c.handle(scope, node.expression, undefined, discardedName);
 };
 
 export const BreakStatement: THandler<null> = (
@@ -47,12 +48,15 @@ export const ContinueStatement: THandler<null> = (
 export const ReturnStatement: THandler<IValue | null> = (
   c,
   scope,
-  node: es.ReturnStatement
+  node: es.ReturnStatement,
+  out
 ) => {
-  const [arg, argInst] = node.argument
-    ? c.handle(scope, node.argument)
+  const { argument } = node;
+
+  const [arg, argInst] = argument
+    ? [new LazyValue((scope, out) => c.handleEval(scope, argument, out)), []]
     : [null, []];
-  const [ret, retInst] = scope.function.return(scope, arg);
+  const [ret, retInst] = scope.function.return(scope, arg, out);
   return [ret, [...argInst, ...retInst]];
 };
 

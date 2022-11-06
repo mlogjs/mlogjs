@@ -1,15 +1,13 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { EMutability, IScope, IValue } from "../types";
-import { assign } from "../utils";
+import { EMutability, IValue } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
   StoreValue,
 } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 import { MacroFunction } from "./Function";
 
 const mathOperations: Record<
@@ -36,27 +34,16 @@ const mathOperations: Record<
   rand: null,
 };
 
-function mathConstant(scope: IScope, name: string) {
-  return new ValueOwner({
-    scope,
-    constant: true,
-    name,
-    value: assign(new StoreValue(scope), {
-      mutability: EMutability.constant,
-    }),
-  }).value;
-}
-
-function createMacroMathOperations(scope: IScope) {
+function createMacroMathOperations() {
   const macroMathOperations: IObjectValueData = {
-    PI: mathConstant(scope, "@pi"),
-    E: mathConstant(scope, "@e"),
-    degToRad: mathConstant(scope, "@degToRad"),
-    radToDeg: mathConstant(scope, "@radToDeg"),
+    PI: new StoreValue("@pi", EMutability.constant),
+    E: new StoreValue("@e", EMutability.constant),
+    degToRad: new StoreValue("@degToRad", EMutability.constant),
+    radToDeg: new StoreValue("@radToDeg", EMutability.constant),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
-    macroMathOperations[key] = new MacroFunction<IValue>((scope, a, b) => {
+    macroMathOperations[key] = new MacroFunction<IValue>((scope, out, a, b) => {
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (!a.isNumber() || !b.isNumber())
@@ -65,7 +52,7 @@ function createMacroMathOperations(scope: IScope) {
             );
           return [new LiteralValue(fn(a.num, b.num)), []];
         }
-        const temp = new StoreValue(scope);
+        const temp = StoreValue.from(scope, out);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -76,7 +63,7 @@ function createMacroMathOperations(scope: IScope) {
 
         return [new LiteralValue(fn(a.num)), []];
       }
-      const temp = new StoreValue(scope);
+      const temp = StoreValue.from(scope, out);
       return [temp, [new OperationInstruction(key, temp, a, b)]];
     });
   }
@@ -84,8 +71,8 @@ function createMacroMathOperations(scope: IScope) {
 }
 
 export class MlogMath extends ObjectValue {
-  constructor(scope: IScope) {
-    super(createMacroMathOperations(scope));
+  constructor() {
+    super(createMacroMathOperations());
   }
 }
 

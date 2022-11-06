@@ -11,7 +11,7 @@ export class FlushMessage extends ObjectValue {
         announce: { args: ["duration"] },
         toast: { args: ["duration"] },
       },
-      handler(scope, overload, duration) {
+      handler(scope, overload, out, duration) {
         return [null, [new InstructionBase("message", overload, duration)]];
       },
     });

@@ -1,6 +1,6 @@
-import { assign, camelToDashCase } from "../utils";
+import { camelToDashCase } from "../utils";
 import { MacroFunction } from ".";
-import { EMutability, IScope } from "../types";
+import { EMutability } from "../types";
 import {
   IObjectValueData,
   LiteralValue,
@@ -9,7 +9,6 @@ import {
   StoreValue,
 } from "../values";
 import { CompilerError } from "../CompilerError";
-import { ValueOwner } from "../values/ValueOwner";
 
 const dynamicVars = ["time", "tick"];
 
@@ -20,7 +19,7 @@ export class NamespaceMacro extends ObjectValue {
   changeCasing: boolean;
   constructor({ changeCasing = false }: NamespaceMacroOptions = {}) {
     super({
-      $get: new MacroFunction((scope, prop) => {
+      $get: new MacroFunction((scope, out, prop) => {
         if (!(prop instanceof LiteralValue) || !prop.isString())
           throw new CompilerError(
             "Cannot use dynamic properties on namespace macros"
@@ -33,14 +32,9 @@ export class NamespaceMacro extends ObjectValue {
           ? EMutability.readonly
           : EMutability.constant;
 
-        const owner = new ValueOwner({
-          scope,
-          value: assign(new StoreValue(scope), {
-            mutability,
-          }),
-          name: `@${symbolName}`,
-        });
-        return [owner.value, []];
+        const result = new StoreValue(`@${symbolName}`, mutability);
+
+        return [result, []];
       }),
     });
     this.changeCasing = changeCasing;
@@ -48,19 +42,11 @@ export class NamespaceMacro extends ObjectValue {
 }
 
 export class VarsNamespace extends NamespaceMacro {
-  constructor(scope: IScope) {
+  constructor() {
     super();
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
-      unit: new ValueOwner({
-        scope,
-        name: "@unit",
-        value: new SenseableValue(scope),
-      }).value,
-      this: new ValueOwner({
-        scope,
-        name: "@this",
-        value: new SenseableValue(scope),
-      }).value,
+      unit: new SenseableValue("@unit"),
+      this: new SenseableValue("@this"),
     });
   }
 }

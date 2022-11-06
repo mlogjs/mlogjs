@@ -5,7 +5,7 @@ import { CompilerError } from "../CompilerError";
 
 export class Concat extends MacroFunction {
   constructor() {
-    super((scope, ...values: IValue[]) => {
+    super((scope, out, ...values: IValue[]) => {
       for (const value of values)
         if (!(value instanceof LiteralValue))
           throw new CompilerError(

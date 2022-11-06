@@ -4,22 +4,26 @@ import { LiteralValue, ObjectValue } from "../values";
 export const CallExpression: THandler<IValue | null> = (
   c,
   scope,
-  node: es.CallExpression
+  node: es.CallExpression,
+  out
 ) => {
   const inst: IInstruction[] = [];
 
-  const args = node.arguments.map(node => {
+  const [callee, calleeInst] = c.handleEval(scope, node.callee);
+  inst.push(...calleeInst);
+
+  const paramOuts = callee.paramOuts();
+
+  const args = node.arguments.map((node, index) => {
     // TODO: this might be why t0 did not increment
     // TODO: figure out if the previous todo is still relevant
-    const [v, i] = c.handleConsume(scope, node);
+    const out = paramOuts?.[index];
+    const [v, i] = c.handleEval(scope, node, out);
     inst.push(...i);
     return v;
   });
 
-  const [callee, calleeInst] = c.handleConsume(scope, node.callee);
-  inst.push(...calleeInst);
-
-  const [callValue, callInst] = callee.call(scope, args);
+  const [callValue, callInst] = callee.call(scope, args, out);
   inst.push(...callInst);
 
   return [callValue, inst];
@@ -30,9 +34,10 @@ export const NewExpression = CallExpression;
 export const TaggedTemplateExpression: THandler<IValue | null> = (
   c,
   scope,
-  node: es.TaggedTemplateExpression
+  node: es.TaggedTemplateExpression,
+  out
 ) => {
-  const [tag, tagInst] = c.handleConsume(scope, node.tag);
+  const [tag, tagInst] = c.handleEval(scope, node.tag);
 
   const template = node.quasi;
 
@@ -49,12 +54,16 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   const expressionInsts: IInstruction[] = [];
 
   template.expressions.forEach(expression => {
-    const [value, inst] = c.handleConsume(scope, expression);
+    const [value, inst] = c.handleEval(scope, expression);
     expressions.push(value);
     expressionInsts.push(...inst);
   });
 
-  const [result, resultInst] = tag.call(scope, [stringsObject, ...expressions]);
+  const [result, resultInst] = tag.call(
+    scope,
+    [stringsObject, ...expressions],
+    out
+  );
 
   return [result, [...expressionInsts, ...tagInst, ...resultInst]];
 };

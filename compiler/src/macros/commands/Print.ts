@@ -6,7 +6,7 @@ import { isTemplateObjectArray } from "../../utils";
 
 export class Print extends MacroFunction<null> {
   constructor() {
-    super((scope, ...values: IValue[]) => {
+    super((scope, out, ...values: IValue[]) => {
       const [first] = values;
       const inst: IInstruction[] = [];
 

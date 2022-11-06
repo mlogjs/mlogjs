@@ -4,23 +4,21 @@ import {
   EMutability,
   IFunctionValue,
   IInstruction,
-  IOwnedValue,
+  INamedValue,
   IScope,
   IValue,
-  IValueOwner,
 } from "./types";
 import { CompilerError } from "./CompilerError";
 import { assign, internalPrefix } from "./utils";
-import { ValueOwner } from "./values/ValueOwner";
 
 export class Scope implements IScope {
-  data: Record<string, IValueOwner | null>;
+  data: Record<string, IValue | null>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
   label?: string;
   constructor(
-    values: Record<string, IValueOwner | null>,
+    values: Record<string, IValue | null>,
     public parent: IScope | null = null,
     public stacked = false,
     public ntemp = 0,
@@ -57,52 +55,30 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(identifier: string): IOwnedValue {
-    const owner = this.data[identifier];
-    if (owner) return owner.value as IOwnedValue;
+  get(identifier: string): INamedValue {
+    const value = this.data[identifier];
+    if (value) return value as INamedValue;
     if (this.parent) return this.parent.get(identifier);
     throw new CompilerError(`${identifier} is not declared.`);
   }
 
-  set<T extends IValue>(
-    ...args: [name: string, value: T] | [owner: IValueOwner<T>]
-  ): T {
-    const name = args.length === 1 ? args[0].identifier : args[0];
-    if (!name)
-      throw new CompilerError("Values in a scope must have an identifier");
+  set<T extends IValue>(name: string, value: T): T {
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
-    return this.hardSet(...args);
+    return this.hardSet(name, value);
   }
 
-  hardSet<T extends IValue>(
-    ...args: [name: string, value: T] | [owner: IValueOwner<T>]
-  ): T {
-    const owner =
-      args.length === 1
-        ? args[0]
-        : new ValueOwner({
-            scope: this,
-            identifier: args[0],
-            name: args[0],
-            value: args[1],
-          });
-    const { identifier } = owner;
-    if (!identifier)
+  hardSet<T extends IValue>(name: string, value: T): T {
+    if (!name)
       throw new CompilerError("Values in a scope must have an identifier");
-    this.data[identifier] = owner;
-    return owner.value;
+    this.data[name] = value;
+    return value;
   }
   make(identifier: string, name: string): SenseableValue {
-    const owner = new ValueOwner({
-      scope: this,
-      value: assign(new SenseableValue(this), {
-        mutability: EMutability.mutable,
-      }),
-      identifier,
-      name,
+    const value = assign(new SenseableValue(name), {
+      mutability: EMutability.mutable,
     });
-    return this.set(owner);
+    return this.set(identifier, value);
   }
   makeTempName(): string {
     let result = `${internalPrefix}t${this.ntemp}`;

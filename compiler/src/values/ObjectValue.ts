@@ -1,11 +1,15 @@
 import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "../macros";
-import { operators } from "../operators";
+import {
+  leftRightOperators,
+  unaryOperators,
+  updateOperators,
+} from "../operators";
 import {
   EMutability,
-  IOwnedValue,
   IScope,
   IValue,
+  TEOutput,
   TOperatorMacroMap,
   TValueInstructions,
 } from "../types";
@@ -16,7 +20,6 @@ export interface IObjectValueData extends TOperatorMacroMap {
   [k: string]: IValue | undefined;
   $get?: MacroFunction<IValue>;
   $eval?: MacroFunction<IValue>;
-  $consume?: MacroFunction<IValue>;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -42,11 +45,13 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  typeof(): TValueInstructions {
+  typeof(scope: IScope, out?: TEOutput): TValueInstructions {
+    const { $typeof } = this.data;
+    if ($typeof) return $typeof.call(scope, [], out);
     return [new LiteralValue("object"), []];
   }
 
-  get(scope: IScope, key: LiteralValue): TValueInstructions {
+  get(scope: IScope, key: LiteralValue, out?: TEOutput): TValueInstructions {
     // avoids naming collisions with keys like
     // constructor or toString
     if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
@@ -56,41 +61,56 @@ export class ObjectValue extends VoidValue {
     }
     const { $get } = this.data;
     if (!$get) throw new CompilerError("Cannot get undefined member.");
-    return $get.call(scope, [key]);
+    return $get.call(scope, [key], out);
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
     const { $eval } = this.data;
     if (!$eval) return [this, []];
-    return $eval.call(scope, []);
+    return $eval.call(scope, [], out);
   }
-  consume(scope: IScope): TValueInstructions {
-    const { $consume } = this.data;
-    if ($consume) return $consume.call(scope, []);
-    const result = this.eval(scope);
-    // required by typescript
-    const res: IValue = result[0];
-    res.ensureOwned();
-    return result;
-  }
-  call(scope: IScope, args: IValue[]): TValueInstructions<IValue | null> {
+  call(
+    scope: IScope,
+    args: IValue[],
+    out?: TEOutput
+  ): TValueInstructions<IValue | null> {
     const { $call } = this.data;
-    if (!$call) return super.call(scope, args);
-    return $call.call(scope, args);
+    if (!$call) return super.call(scope, args, out);
+    return $call.call(scope, args, out);
   }
-
-  ensureOwned(): asserts this is IOwnedValue {}
 }
 
-for (const op of operators) {
+for (const op of leftRightOperators) {
   ObjectValue.prototype[op] = function (
     this: ObjectValue,
-    ...args: [IScope, ...never[]]
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput
   ) {
     const $ = this.data[`$${op}`];
-    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
-    if (!$) return (VoidValue.prototype[op] as Function).apply(this, args);
-    const [scope, ...fnArgs] = args;
-    return $.call(scope, fnArgs);
-  } as never;
+    if (!$) return VoidValue.prototype[op].apply(this, [scope, value, out]);
+    return $.call(scope, [value], out);
+  };
+}
+
+for (const op of unaryOperators) {
+  if (op === "typeof") continue;
+  ObjectValue.prototype[op] = function (scope: IScope, out?: TEOutput) {
+    const $ = this.data[`$${op}`];
+    if (!$) return VoidValue.prototype[op].apply(this, [scope, out]);
+    return $.call(scope, [], out);
+  };
+}
+
+for (const op of updateOperators) {
+  ObjectValue.prototype[op] = function (
+    this: ObjectValue,
+    scope: IScope,
+    prefix: boolean,
+    out?: TEOutput
+  ) {
+    const $ = this.data[`$${op}`];
+    if (!$) return VoidValue.prototype[op].apply(this, [scope, prefix, out]);
+    return $.call(scope, [new LiteralValue(+prefix)], out);
+  };
 }

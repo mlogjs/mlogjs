@@ -9,6 +9,7 @@ import {
 import { assertLiteralOneOf } from "../../assertions";
 import { createOverloadNamespace } from "../util";
 import { CompilerError } from "../../CompilerError";
+import { discardedName, extractDestrucuringOut } from "../../utils";
 
 const validBuildingGroups = [
   "core",
@@ -37,11 +38,15 @@ export class UnitLocate extends ObjectValue {
           args: [],
         },
       },
-      handler(scope, overload, ...args) {
-        const outFound = new StoreValue(scope);
-        const outX = new StoreValue(scope);
-        const outY = new StoreValue(scope);
-        const outBuilding = new SenseableValue(scope);
+      handler(scope, overload, out, ...args) {
+        const outFound = StoreValue.from(scope, extractDestrucuringOut(out, 0));
+
+        const outX = StoreValue.from(scope, extractDestrucuringOut(out, 1));
+        const outY = StoreValue.from(scope, extractDestrucuringOut(out, 2));
+        const outBuilding = SenseableValue.from(
+          scope,
+          overload === "ore" ? discardedName : extractDestrucuringOut(out, 3)
+        );
         const outArgs = [outX, outY, outFound, outBuilding];
         let inputArgs: (IValue | string)[] = [];
         switch (overload) {

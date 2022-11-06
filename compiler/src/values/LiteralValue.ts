@@ -5,6 +5,7 @@ import {
   TValueInstructions,
   IValue,
   EMutability,
+  TEOutput,
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
@@ -36,9 +37,6 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-  consume(_scope: IScope): TValueInstructions {
-    return [this, []];
-  }
   toString() {
     return JSON.stringify(this.data);
   }
@@ -61,8 +59,6 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   typeof(): TValueInstructions {
     return [new LiteralValue("literal"), []];
   }
-
-  ensureOwned(): void {}
 
   isString(): this is LiteralValue<string> {
     return typeof this.data === "string";
@@ -111,7 +107,8 @@ for (const k in operatorMap) {
   LiteralValue.prototype[key] = function (
     this: LiteralValue,
     scope: IScope,
-    value: LiteralValue
+    value: LiteralValue,
+    out?: TEOutput
   ): TValueInstructions {
     if (key === "&&") {
       if (this.data) return [value, []];
@@ -124,7 +121,7 @@ for (const k in operatorMap) {
     }
 
     if (!(value instanceof LiteralValue)) {
-      return BaseValue.prototype[key].apply(this, [scope, value]);
+      return BaseValue.prototype[key].apply(this, [scope, value, out]);
     }
 
     return [new LiteralValue(fn(this.data as never, value.data as never)), []];

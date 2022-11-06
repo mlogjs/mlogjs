@@ -8,7 +8,7 @@ const defaultTargetName = "display1";
 
 export class DrawFlush extends MacroFunction<null> {
   constructor() {
-    super((scope, target?: IValue) => {
+    super((scope, out, target?: IValue) => {
       if (!target)
         return [null, [new InstructionBase("drawflush", defaultTargetName)]];
 

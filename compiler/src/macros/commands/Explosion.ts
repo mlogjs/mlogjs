@@ -4,7 +4,7 @@ import { MacroFunction } from "../Function";
 
 export class Explosion extends MacroFunction<null> {
   constructor() {
-    super((scope, options) => {
+    super((scope, out, options) => {
       assertIsObjectMacro(options, "The options");
 
       const params = assertObjectFields(options, [

@@ -1,5 +1,6 @@
 import { InstructionBase } from ".";
 import { IValue } from "../types";
+import { discardedName } from "../utils";
 import { StoreValue } from "../values";
 
 export class SetInstruction extends InstructionBase {
@@ -20,12 +21,12 @@ export class SetInstruction extends InstructionBase {
     return (
       this._hidden ||
       // assignment to discarded value
-      !store.owner ||
+      store.name === discardedName ||
       // self assignment of a store
-      (!!store.owner &&
+      (!!store.name &&
         store instanceof StoreValue &&
         value instanceof StoreValue &&
-        store.owner === value.owner)
+        store.name === value.name)
     );
   }
 }

@@ -13,6 +13,7 @@ import {
   IInstruction,
   IScope,
   IValue,
+  TEOutput,
   THandler,
   TValueInstructions,
 } from "./types";
@@ -110,11 +111,12 @@ export class Compiler {
   handle(
     scope: IScope,
     node: es.Node,
-    handler = this.handlers[node.type]
+    handler = this.handlers[node.type],
+    out?: TEOutput
   ): TValueInstructions<IValue | null> {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      const result = handler(this, scope, node, null);
+      const result = handler(this, scope, node, out, null);
       if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {
@@ -125,24 +127,12 @@ export class Compiler {
     }
   }
 
-  handleEval(scope: IScope, node: es.Node): TValueInstructions {
-    const [res, inst] = this.handle(scope, node);
+  handleEval(scope: IScope, node: es.Node, out?: TEOutput): TValueInstructions {
+    const [res, inst] = this.handle(scope, node, undefined, out);
 
     if (!res) throw new CompilerError("Cannot eval null", node);
 
-    const [evaluated, evaluatedInst] = res.eval(scope);
-    const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
-
-    if (this.sourcemap) return appendSourceLocations(result, node);
-    return result;
-  }
-
-  handleConsume(scope: IScope, node: es.Node): TValueInstructions {
-    const [res, inst] = this.handle(scope, node);
-
-    if (!res) throw new CompilerError("Cannot consume null", node);
-
-    const [evaluated, evaluatedInst] = res.consume(scope);
+    const [evaluated, evaluatedInst] = res.eval(scope, out);
     const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
 
     if (this.sourcemap) return appendSourceLocations(result, node);
@@ -155,7 +145,7 @@ export class Compiler {
    * The usage of this method over a regular loop over an array of nodes
    * is only required if the code inside the loop generates
    * instructions that are not tracked by the compiler
-   * handler methods ({@link handle}, {@link handleEval}, {@link handleConsume}
+   * handler methods ({@link handle}, {@link handleEval}
    * and {@link handleMany})
    *
    */

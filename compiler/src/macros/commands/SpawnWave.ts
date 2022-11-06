@@ -5,7 +5,7 @@ import { MacroFunction } from "../Function";
 
 export class SpawnWave extends MacroFunction<null> {
   constructor() {
-    super((scope, natural, x, y) => {
+    super((scope, out, natural, x, y) => {
       if (
         !(natural instanceof LiteralValue) ||
         (natural.data !== 1 && natural.data !== 0)

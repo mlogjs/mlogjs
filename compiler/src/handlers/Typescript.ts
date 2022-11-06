@@ -2,7 +2,6 @@ import { CompilerError } from "../CompilerError";
 import { es, THandler, TValueInstructions } from "../types";
 import { nodeName } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
-import { ValueOwner } from "../values/ValueOwner";
 
 const TypeCastExpression: THandler = (
   c,
@@ -62,15 +61,10 @@ export const TSEnumDeclaration: THandler<null> = (
     data[name] = value;
   }
 
-  scope.set(
-    new ValueOwner({
-      scope,
-      value: new ObjectValue(data),
-      constant: true,
-      identifier: node.id.name,
-      name: nodeName(node, !c.compactNames && node.id.name),
-    })
-  );
+  const value = new ObjectValue(data);
+  value.name = nodeName(node, !c.compactNames && node.id.name);
+
+  scope.set(node.id.name, value);
 
   return [null, []];
 };

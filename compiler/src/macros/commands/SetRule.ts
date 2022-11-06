@@ -30,7 +30,7 @@ export class SetRule extends ObjectValue {
         rtsMinWeight: { args: ["team", "value"] },
         rtsMinSquad: { args: ["team", "value"] },
       },
-      handler(scope, overload, ...args) {
+      handler(scope, overload, out, ...args) {
         const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
         switch (overload) {
           case "mapArea": {

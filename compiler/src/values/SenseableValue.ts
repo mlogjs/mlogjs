@@ -1,7 +1,13 @@
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { EMutability, IScope, IValue, TValueInstructions } from "../types";
-import { assign, camelToDashCase, itemNames } from "../utils";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
+import { camelToDashCase, itemNames } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 
@@ -27,30 +33,45 @@ const senseableProps = ["controller"];
  * ```
  */
 export class SenseableValue extends StoreValue {
-  mutability = EMutability.constant;
-
-  constructor(scope: IScope) {
-    super(scope);
+  constructor(name: string, mutability = EMutability.constant) {
+    super(name, mutability);
   }
 
-  get(scope: IScope, prop: IValue): TValueInstructions<IValue> {
+  static from(
+    scope: IScope,
+    out?: TEOutput,
+    mutability = EMutability.constant
+  ) {
+    if (out instanceof SenseableValue) return out;
+    const name = typeof out === "string" ? out : scope.makeTempName();
+
+    return new SenseableValue(name, mutability);
+  }
+
+  static out(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
+    if (!out || typeof out === "string") {
+      return new SenseableValue(out ?? scope.makeTempName(), mutability);
+    }
+    return out;
+  }
+
+  get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    const mutability = EMutability.readonly;
     if (prop instanceof LiteralValue && prop.isString()) {
       const name = itemNames.includes(prop.data)
         ? camelToDashCase(prop.data)
         : prop.data;
 
       const result = senseableProps.includes(prop.data)
-        ? new SenseableValue(scope)
-        : new StoreValue(scope);
+        ? SenseableValue.from(scope, out, mutability)
+        : StoreValue.from(scope, out, mutability);
       return [
         result,
         [new InstructionBase("sensor", result, this, `@${name}`)],
       ];
     }
     if (prop instanceof StoreValue) {
-      const temp = assign(new SenseableValue(scope), {
-        mutability: EMutability.readonly,
-      });
+      const temp = SenseableValue.from(scope, out, mutability);
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
     throw new CompilerError(`Cannot sense "${prop}" property`);

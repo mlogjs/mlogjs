@@ -1,6 +1,5 @@
-import { operators } from "../operators";
 import { InstructionBase } from "../instructions";
-import { IOwnedValue, IScope, IValue, TValueInstructions } from "../types";
+import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
 import {
   BaseValue,
   LiteralValue,
@@ -10,7 +9,6 @@ import {
 } from "../values";
 import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
-import { ValueOwner } from "../values/ValueOwner";
 
 class MemoryEntry extends BaseValue {
   macro = true;
@@ -24,28 +22,17 @@ class MemoryEntry extends BaseValue {
     super();
   }
 
-  eval(scope: IScope): TValueInstructions {
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
     if (this.store) return [this.store, []];
-    const temp = new StoreValue(scope);
+    const temp = (this.store = StoreValue.from(scope, out));
     return [
       temp,
       [new InstructionBase("read", temp, this.mem.cell, this.prop)],
     ];
   }
 
-  consume(scope: IScope): TValueInstructions {
-    if (this.store) return [this.store, []];
-    this.ensureOwned();
-    this.store = new StoreValue(scope);
-    this.owner.own(this.store);
-    return [
-      this.store,
-      [new InstructionBase("read", this.store, this.mem.cell, this.prop)],
-    ];
-  }
-
   "="(scope: IScope, value: IValue): TValueInstructions {
-    const [data, dataInst] = value.consume(scope);
+    const [data, dataInst] = value.eval(scope);
     return [
       data,
       [
@@ -54,33 +41,20 @@ class MemoryEntry extends BaseValue {
       ],
     ];
   }
-
-  ensureOwned(): asserts this is IOwnedValue {
-    this.owner ??= new ValueOwner({ scope: this.scope, value: this });
-  }
-}
-
-for (const operator of operators) {
-  if (operator === "=") continue;
-  MemoryEntry.prototype[operator] = function (
-    this: MemoryEntry,
-    ...args: unknown[]
-  ) {
-    // eslint-disable-next-line @typescript-eslint/ban-types, @typescript-eslint/no-unsafe-return
-    return (BaseValue.prototype[operator] as Function).apply(this, args);
-  };
 }
 
 class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
-      $get: new MacroFunction((scope, prop: IValue) => {
+      $get: new MacroFunction((scope, out, prop: IValue) => {
         if (prop instanceof LiteralValue && !prop.isNumber())
           throw new CompilerError(
             `Invalid memory object property: "${prop.data}"`
           );
-        const obj = new MemoryEntry(scope, this, prop);
-        return [obj, []];
+        const entry = new MemoryEntry(scope, this, prop);
+        if (out) return entry.eval(scope, out);
+
+        return [entry, []];
       }),
       length: size,
       size,
@@ -96,7 +70,7 @@ export class MemoryBuilder extends ObjectValue {
   constructor() {
     super({
       $call: new MacroFunction(
-        (scope, cell: IValue, size: IValue = new LiteralValue(64)) => {
+        (scope, out, cell: IValue, size: IValue = new LiteralValue(64)) => {
           if (!(cell instanceof SenseableValue))
             throw new CompilerError("Memory cell must be a senseable value.");
 

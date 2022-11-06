@@ -7,6 +7,7 @@ import {
   assertIsObjectMacro,
   assertLiteralOneOf,
 } from "../../assertions";
+import { EMutability } from "../../types";
 
 export const validRadarFilters = [
   "any",
@@ -29,7 +30,7 @@ export const validRadarSorts = [
 
 export class Radar extends MacroFunction {
   constructor() {
-    super((scope, options) => {
+    super((scope, out, options) => {
       assertIsObjectMacro(options, "The radar options");
 
       const { building, filters, order, sort } = options.data;
@@ -58,7 +59,7 @@ export class Radar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = new SenseableValue(scope);
+      const outUnit = SenseableValue.from(scope, out, EMutability.constant);
       return [
         outUnit,
         [

@@ -1,6 +1,6 @@
 import { AddressResolver, JumpInstruction, EJumpKind } from "../instructions";
 import { es, THandler } from "../types";
-import { withAlwaysRuns } from "../utils";
+import { discardedName, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const ForStatement: THandler<null> = (
@@ -12,9 +12,11 @@ export const ForStatement: THandler<null> = (
 
   const initInst = node.init ? c.handle(scope, node.init)[1] : [];
   const [test, testLines] = node.test
-    ? c.handleConsume(scope, node.test)
+    ? c.handleEval(scope, node.test)
     : [new LiteralValue(1), []];
-  const updateLines = node.update ? c.handle(scope, node.update)[1] : [];
+  const updateLines = node.update
+    ? c.handle(scope, node.update, undefined, discardedName)[1]
+    : [];
   const startLoopAddr = new LiteralValue(null);
   // continue statements jump here to run the loop update lines
   const beforeEndAddr = new LiteralValue(null);

@@ -7,7 +7,7 @@ import { MacroFunction } from "./Function";
 
 export class Asm extends MacroFunction<null> {
   constructor() {
-    super((scope, stringsArray, ...values) => {
+    super((scope, out, stringsArray, ...values) => {
       if (!isTemplateObjectArray(stringsArray))
         throw new CompilerError("Expected to receive a template strings array");
 

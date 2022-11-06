@@ -3,32 +3,35 @@ import {
   IScope,
   IValue,
   IValueOperators,
-  IValueOwner,
+  TEOutput,
   TValueInstructions,
 } from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
 export class VoidValue implements IValue {
-  owner: IValueOwner | null = null;
+  name?: string;
   mutability = EMutability.mutable;
   macro = false;
 
-  eval(_scope: IScope): TValueInstructions {
+  eval(_scope: IScope, _out?: TEOutput): TValueInstructions {
     throw new CompilerError(`${this} cannot eval.`);
   }
-  consume(_scope: IScope): TValueInstructions<IValue> {
-    throw new CompilerError(`${this} cannot be consumed.`);
-  }
-  call(_scope: IScope, _args: IValue[]): TValueInstructions<IValue | null> {
+  call(
+    _scope: IScope,
+    _args: IValue[],
+    _out?: TEOutput
+  ): TValueInstructions<IValue | null> {
     throw new CompilerError(`${this} cannot call.`);
   }
   get(_scope: IScope, _name: IValue): TValueInstructions {
     throw new CompilerError(`${this} cannot get.`);
   }
-  ensureOwned(): void {
-    throw new CompilerError(`${this} cannot be owned`);
+
+  paramOuts(): readonly IValue[] | undefined {
+    return;
   }
+
   toString(): string {
     return "void";
   }
