@@ -15,8 +15,9 @@ import {
   TEOutput,
   TValueInstructions,
 } from "../types";
-import { assign, extractOutName } from "../utils";
+import { extractOutName } from "../utils";
 import {
+  BaseValue,
   LiteralValue,
   ObjectValue,
   SenseableValue,
@@ -31,7 +32,8 @@ import { MacroFunction } from "./Function";
 const itemSize = 2;
 
 export class DynamicArray extends ObjectValue {
-  valueTemp: SenseableValue;
+  getterTemp: SenseableValue;
+  setterTemp: SenseableValue;
   returnTemp: StoreValue;
   getterAddr: LiteralValue<number | null>;
   setterAddr: LiteralValue<number | null>;
@@ -53,6 +55,7 @@ export class DynamicArray extends ObjectValue {
       $get: new MacroFunction((scope, out, index) =>
         this.getValue(scope, out, index, true)
       ),
+      // array.set(index, value)
       set: new MacroFunction((scope, out, index, value) =>
         this.setValue(scope, index, value, false)
       ),
@@ -70,8 +73,12 @@ export class DynamicArray extends ObjectValue {
       length: new LiteralValue(values.length),
     });
 
-    this.valueTemp = new SenseableValue(
-      `${this.name}.&temp`,
+    this.getterTemp = new SenseableValue(
+      `${this.name}.&gtemp`,
+      EMutability.mutable
+    );
+    this.setterTemp = new SenseableValue(
+      `${this.name}.&stemp`,
       EMutability.mutable
     );
     this.returnTemp = new StoreValue(`${this.name}.&rt`);
@@ -100,14 +107,72 @@ export class DynamicArray extends ObjectValue {
       );
     }
 
-    this.initGetter();
+    const entry = new DynamicArrayEntry(scope, this, index, checked);
+    if (out) return entry.eval(scope, out);
+    return [new DynamicArrayEntry(scope, this, index, checked), []];
+  }
 
+  setValue(
+    scope: IScope,
+    index: IValue,
+    value: IValue,
+    checked: boolean
+  ): TValueInstructions {
+    const entry = new DynamicArrayEntry(scope, this, index, checked);
+
+    return entry["="](scope, value);
+  }
+
+  initGetter() {
+    if (this.bundledGetter) return;
+    this.bundledGetter = true;
+
+    this.scope.inst.push(new AddressResolver(this.getterAddr));
+
+    for (const value of this.values) {
+      this.scope.inst.push(
+        new SetInstruction(this.getterTemp, value),
+        new SetCounterInstruction(this.returnTemp)
+      );
+    }
+  }
+
+  initSetter() {
+    if (this.bundledSetter) return;
+    this.bundledSetter = true;
+
+    this.scope.inst.push(new AddressResolver(this.setterAddr));
+
+    for (const value of this.values) {
+      this.scope.inst.push(
+        new SetInstruction(value, this.setterTemp),
+        new SetCounterInstruction(this.returnTemp)
+      );
+    }
+  }
+}
+
+class DynamicArrayEntry extends BaseValue {
+  constructor(
+    public scope: IScope,
+    public array: DynamicArray,
+    public index: IValue,
+    public checked: boolean
+  ) {
+    super();
+  }
+
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
+    this.array.initGetter();
     const inst: IInstruction[] = [];
+
+    const { checked, index } = this;
+    const { getterTemp, values, getterAddr, returnTemp } = this.array;
 
     // the value will be stored somewhere
     // no need to save it in a temporary variable
     const temp = out
-      ? this.valueTemp
+      ? getterTemp
       : SenseableValue.from(scope, undefined, EMutability.mutable);
 
     // used in checked mode, jumps to this address
@@ -127,7 +192,7 @@ export class DynamicArray extends ObjectValue {
           failAddr,
           EJumpKind.GreaterThan,
           index,
-          new LiteralValue(this.values.length - 1)
+          new LiteralValue(values.length - 1)
         )
       );
     }
@@ -137,61 +202,74 @@ export class DynamicArray extends ObjectValue {
 
     const dIndex = dIndexData[0];
 
-    const lineData = this.getterAddr["+"](scope, dIndex);
+    const lineData = getterAddr["+"](scope, dIndex);
     const line = lineData[0];
     inst.push(...lineData[1]);
 
     const returnAdress = new LiteralValue(null as never);
     inst.push(
-      ...this.returnTemp["="](scope, returnAdress)[1],
+      ...returnTemp["="](scope, returnAdress)[1],
       new SetCounterInstruction(line)
     );
 
+    inst.push(new AddressResolver(returnAdress));
+
     // without this you can't access the array twice inside the same expression
-    inst.push(...temp["="](scope, this.valueTemp)[1]);
+    inst.push(...temp["="](scope, getterTemp)[1]);
 
     if (checked) {
       inst.push(new AddressResolver(failAddr));
     }
-
-    inst.push(new AddressResolver(returnAdress));
-
     return [temp, inst];
   }
 
-  setValue(
-    scope: IScope,
-    index: IValue,
-    value: IValue,
-    checked: boolean
-  ): TValueInstructions {}
+  "="(scope: IScope, value: IValue): TValueInstructions {
+    this.array.initSetter();
+    const inst: IInstruction[] = [];
 
-  initGetter() {
-    if (this.bundledGetter) return;
-    this.bundledGetter = true;
+    const { checked, index } = this;
+    const { setterTemp, values, setterAddr, returnTemp } = this.array;
 
-    this.scope.inst.push(new AddressResolver(this.getterAddr));
+    // used in both checked and unchecked modes
+    // indicates where to jump after sucess or failure
+    const returnAdress = new LiteralValue(null);
 
-    for (const value of this.values) {
-      this.scope.inst.push(
-        new SetInstruction(this.valueTemp, value),
-        new SetCounterInstruction(this.returnTemp)
+    if (checked) {
+      inst.push(
+        new JumpInstruction(
+          returnAdress,
+          EJumpKind.LessThan,
+          index,
+          new LiteralValue(0)
+        ),
+        new JumpInstruction(
+          returnAdress,
+          EJumpKind.GreaterThan,
+          index,
+          new LiteralValue(values.length - 1)
+        )
       );
     }
-  }
 
-  initSetter() {
-    if (this.bundledSetter) return;
-    this.bundledSetter = true;
+    inst.push(...setterTemp["="](scope, value)[1]);
 
-    this.scope.inst.push(new AddressResolver(this.setterAddr));
+    const dIndexData = index["*"](scope, new LiteralValue(itemSize));
+    inst.push(...dIndexData[1]);
 
-    for (const value of this.values) {
-      this.scope.inst.push(
-        new SetInstruction(value, this.valueTemp),
-        new SetCounterInstruction(this.returnTemp)
-      );
-    }
+    const dIndex = dIndexData[0];
+
+    const lineData = setterAddr["+"](scope, dIndex);
+    const line = lineData[0];
+    inst.push(...lineData[1]);
+
+    inst.push(
+      ...returnTemp["="](scope, returnAdress)[1],
+      new SetCounterInstruction(line)
+    );
+
+    inst.push(new AddressResolver(returnAdress));
+
+    return [value, inst];
   }
 }
 
