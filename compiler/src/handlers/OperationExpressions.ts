@@ -6,7 +6,7 @@ import {
   LogicalOperator,
   orderIndependentOperators,
 } from "../operators";
-import { THandler, es, IInstruction } from "../types";
+import { THandler, es, EMutability, IInstruction } from "../types";
 import { discardedName } from "../utils";
 import { LazyValue, LiteralValue, SenseableValue } from "../values";
 
@@ -134,7 +134,7 @@ export const ConditionalExpression: THandler = (
     return c.handleEval(scope, node.alternate, out);
   }
 
-  const result = SenseableValue.out(scope, out);
+  const result = SenseableValue.from(scope, out, EMutability.mutable);
 
   const consequent = c.handleEval(scope, node.consequent, result);
   const alternate = c.handleEval(scope, node.alternate, result);

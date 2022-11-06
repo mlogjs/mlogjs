@@ -10,7 +10,13 @@ import {
   LogicalOperator,
   updateOperators,
 } from "../operators";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
 
 export class BaseValue extends VoidValue implements IValue {
@@ -54,7 +60,7 @@ export class BaseValue extends VoidValue implements IValue {
       return [this, []];
     }
 
-    const result = SenseableValue.out(scope, out);
+    const result = SenseableValue.from(scope, out, EMutability.mutable);
 
     const [left, leftInst] = this.eval(scope, result);
     const [right, rightInst] = other.eval(scope, result);
