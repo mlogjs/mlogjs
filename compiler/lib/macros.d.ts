@@ -22,9 +22,15 @@ declare class Memory<S extends MemoryCapacity = 64> {
  * The instructions for dynamic accesses
  */
 declare class DynamicArray<T> {
+  /**
+   * Creates a dynamic acess array, it can contain any type assignable to a store.
+   */
   constructor(init: readonly T[]);
 
-  constructor(length: number, fillValue: T, others?: Record<number, T>);
+  /**
+   * Creates a dynamic acess array, it can contain any type assignable to a store.
+   */
+  constructor(length: number);
 
   /** Checked index access. */
   [index: number]: T;

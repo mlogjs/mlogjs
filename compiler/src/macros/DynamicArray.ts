@@ -275,7 +275,7 @@ class DynamicArrayEntry extends BaseValue {
 
 export class DynamicArrayConstructor extends MacroFunction {
   constructor() {
-    super((scope, out, init, fillValue?: IValue, others?: IValue) => {
+    super((scope, out, init) => {
       const name = extractOutName(out) ?? scope.makeTempName();
       const inst: IInstruction[] = [];
       const values: IValue[] = [];
@@ -296,13 +296,7 @@ export class DynamicArrayConstructor extends MacroFunction {
         values.push(new SenseableValue(`${name}->${i}`, EMutability.mutable));
       }
 
-      if (init instanceof LiteralValue) {
-        const table = others instanceof ObjectValue ? others.data : {};
-        const value = fillValue ?? new LiteralValue(null);
-        for (let i = 0; i < length; i++) {
-          inst.push(...values[i]["="](scope, table[i] ?? value)[1]);
-        }
-      } else {
+      if (init instanceof ObjectValue) {
         const length = init.data.length.data;
 
         for (let i = 0; i < length; i++) {
