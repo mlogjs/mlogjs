@@ -38,3 +38,10 @@ const computed = enemy => unitLocate.building({ group: "core", enemy })[3];
 // ensures that the memory macro knows when to return
 // an entry macro or an store
 let [a, b, c] = mem;
+
+// should be optimized for the out value extraction
+({ a, b } = { a: getLink(1).ammo, b: getLink(2).health });
+[a, b] = [getLink(1).health, getLink(2).ammo];
+
+// the output values should have the discarded name
+({ a: getLink(0), b: getLink(1).copper });

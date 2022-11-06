@@ -27,4 +27,15 @@ sensor y:3:9 &t0:computed:34:6 @y
 read a:40:5 cell1 0
 read b:40:8 cell1 1
 read c:40:11 cell1 2
+getlink &t2 1
+sensor a:40:5 &t2 @ammo
+getlink &t3 2
+sensor b:40:8 &t3 @health
+getlink &t4 1
+sensor a:40:5 &t4 @health
+getlink &t5 2
+sensor b:40:8 &t5 @ammo
+getlink &_ 0
+getlink &t6 1
+sensor &_ &t6 @copper
 end

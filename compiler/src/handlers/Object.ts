@@ -6,6 +6,7 @@ import {
   THandler,
   TValueInstructions,
 } from "../types";
+import { extractDestrucuringOut } from "../utils";
 import {
   DestructuringValue,
   IObjectValueData,
@@ -18,7 +19,8 @@ import {
 export const ObjectExpression: THandler = (
   c,
   scope,
-  node: es.ObjectExpression
+  node: es.ObjectExpression,
+  out
 ) => {
   const data: IObjectValueData = {};
   const inst = [];
@@ -37,7 +39,11 @@ export const ObjectExpression: THandler = (
     } else {
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
-    const [member, memberInst] = c.handleEval(scope, value);
+    const [member, memberInst] = c.handleEval(
+      scope,
+      value,
+      extractDestrucuringOut(out, index)
+    );
 
     data[index] = member;
     inst.push(...memberInst);
@@ -48,13 +54,14 @@ export const ObjectExpression: THandler = (
 export const ArrayExpression: THandler = (
   c,
   scope,
-  node: es.ArrayExpression
+  node: es.ArrayExpression,
+  out
 ) => {
   const items: (IValue | undefined)[] = [];
   const inst: IInstruction[] = [];
-  node.elements.forEach(element => {
+  node.elements.forEach((element, i) => {
     const [value, valueInst] = element
-      ? c.handleEval(scope, element)
+      ? c.handleEval(scope, element, extractDestrucuringOut(out, i))
       : [undefined, []];
     items.push(value);
     inst.push(...valueInst);
