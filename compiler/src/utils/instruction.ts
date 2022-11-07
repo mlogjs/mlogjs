@@ -31,7 +31,7 @@ export function hideRedundantJumps(inst: IInstruction[]) {
     let searchIndex = i + 1;
     let current = inst[searchIndex];
 
-    while (current.hidden) {
+    while (current?.hidden) {
       if (
         current instanceof AddressResolver &&
         current.bonds.includes(address)
