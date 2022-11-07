@@ -3,6 +3,7 @@ import { EInstIntent, IInstruction, IValue } from "../types";
 
 export class InstructionBase implements IInstruction {
   intent = EInstIntent.none;
+  intentSource?: IValue;
   alwaysRuns = true;
 
   protected _hidden = false;

@@ -178,6 +178,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     const jump = assign(new JumpInstruction(this.inlineEnd, EJumpKind.Always), {
       intent: EInstIntent.return,
+      intentSource: this,
     });
 
     return [null, [...inst, jump]];
@@ -209,7 +210,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.tryingInline = false;
 
     const returnIndex = inst.findIndex(
-      i => i.alwaysRuns && i.intent === EInstIntent.return
+      i =>
+        i.alwaysRuns &&
+        i.intent === EInstIntent.return &&
+        i.intentSource === this
     );
     if (returnIndex !== -1) inst = inst.slice(0, returnIndex + 1);
 
