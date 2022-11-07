@@ -1,0 +1,5 @@
+set a:3:4 5
+set &t1:c:10:0 10
+op mul &t0:b:6:0 5 &t1:c:10:0
+print &t0:b:6:0
+end
