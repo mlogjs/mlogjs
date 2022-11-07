@@ -28,3 +28,6 @@ export const itemNames = [
   "fissileMatter",
   "dormantCyst",
 ];
+
+/** The name of a special processor variable, controls the instruction pointer */
+export const counterName = "@counter";

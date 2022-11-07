@@ -1,4 +1,4 @@
-import { assertIsArrayMacro } from "../utils";
+import { assertIsArrayMacro, counterName } from "../utils";
 import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
@@ -197,20 +197,15 @@ class DynamicArrayEntry extends BaseValue {
       );
     }
 
+    const returnAdress = new LiteralValue(null);
+    inst.push(...returnTemp["="](scope, returnAdress)[1]);
+
+    const counter = new StoreValue(counterName);
     const dIndexData = index["*"](scope, new LiteralValue(itemSize));
     inst.push(...dIndexData[1]);
 
-    const dIndex = dIndexData[0];
-
-    const lineData = getterAddr["+"](scope, dIndex);
-    const line = lineData[0];
-    inst.push(...lineData[1]);
-
-    const returnAdress = new LiteralValue(null);
-    inst.push(
-      ...returnTemp["="](scope, returnAdress)[1],
-      new SetCounterInstruction(line)
-    );
+    const lineData = getterAddr["+"](scope, dIndexData[0], counter);
+    inst.push(...lineData[1], ...counter["="](scope, lineData[0])[1]);
 
     inst.push(new AddressResolver(returnAdress));
 
@@ -253,19 +248,14 @@ class DynamicArrayEntry extends BaseValue {
 
     inst.push(...setterTemp["="](scope, value)[1]);
 
+    inst.push(...returnTemp["="](scope, returnAdress)[1]);
+
+    const counter = new StoreValue(counterName);
     const dIndexData = index["*"](scope, new LiteralValue(itemSize));
     inst.push(...dIndexData[1]);
 
-    const dIndex = dIndexData[0];
-
-    const lineData = setterAddr["+"](scope, dIndex);
-    const line = lineData[0];
-    inst.push(...lineData[1]);
-
-    inst.push(
-      ...returnTemp["="](scope, returnAdress)[1],
-      new SetCounterInstruction(line)
-    );
+    const lineData = setterAddr["+"](scope, dIndexData[0], counter);
+    inst.push(...lineData[1], ...counter["="](scope, lineData[0])[1]);
 
     inst.push(new AddressResolver(returnAdress));
 
