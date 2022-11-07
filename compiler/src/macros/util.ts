@@ -1,10 +1,10 @@
+import { CompilerError } from "../CompilerError";
+import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
 import {
   assertIsObjectMacro,
   assertObjectFields,
   IParameterDescriptor,
-} from "../assertions";
-import { CompilerError } from "../CompilerError";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+} from "../utils";
 import { MacroFunction } from "./Function";
 
 interface IOverloadNamespaceOptions<K extends string> {

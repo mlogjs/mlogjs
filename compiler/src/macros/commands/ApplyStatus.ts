@@ -1,6 +1,6 @@
-import { assertLiteralOneOf } from "../../assertions";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
+import { assertLiteralOneOf } from "../../utils";
 import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 

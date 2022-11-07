@@ -6,7 +6,7 @@ import {
   SenseableValue,
   StoreValue,
 } from "../../values";
-import { assertLiteralOneOf } from "../../assertions";
+import { assertLiteralOneOf } from "../../utils";
 import { createOverloadNamespace } from "../util";
 import { CompilerError } from "../../CompilerError";
 import { discardedName, extractDestrucuringOut } from "../../utils";

@@ -1,5 +1,5 @@
-import { assertIsObjectMacro, assertObjectFields } from "../../assertions";
 import { InstructionBase } from "../../instructions";
+import { assertIsObjectMacro, assertObjectFields } from "../../utils";
 import { MacroFunction } from "../Function";
 
 export class Explosion extends MacroFunction<null> {

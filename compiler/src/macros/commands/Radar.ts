@@ -2,12 +2,12 @@ import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { LiteralValue, SenseableValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { EMutability } from "../../types";
 import {
   assertIsArrayMacro,
   assertIsObjectMacro,
   assertLiteralOneOf,
-} from "../../assertions";
-import { EMutability } from "../../types";
+} from "../../utils";
 
 export const validRadarFilters = [
   "any",
