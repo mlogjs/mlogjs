@@ -1,4 +1,4 @@
-import { assertIsArrayMacro } from "../assertions";
+import { assertIsArrayMacro } from "../utils";
 import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
