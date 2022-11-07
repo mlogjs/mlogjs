@@ -1,6 +1,47 @@
-import { CompilerError } from "./CompilerError";
-import { IValue } from "./types";
-import { LiteralValue, ObjectValue, StoreValue } from "./values";
+import { CompilerError } from "../CompilerError";
+import { IValue, TEOutput } from "../types";
+import {
+  DestructuringValue,
+  IObjectValueData,
+  LiteralValue,
+  ObjectValue,
+  StoreValue,
+} from "../values";
+import { discardedName } from "./constants";
+
+export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
+  data: IObjectValueData & {
+    raw: ObjectValue & {
+      data: IObjectValueData & {
+        length: LiteralValue<number>;
+      };
+    };
+    length: LiteralValue<number>;
+  };
+} {
+  return (
+    value instanceof ObjectValue &&
+    value.data.length instanceof LiteralValue &&
+    value.data.length.isNumber() &&
+    value.data.raw instanceof ObjectValue &&
+    value.data.raw.data.length instanceof LiteralValue &&
+    value.data.raw.data.length.isNumber()
+  );
+}
+
+export function extractOutName(out: TEOutput | undefined) {
+  if (!out || typeof out === "string") return out;
+  return out.name;
+}
+
+export function extractDestrucuringOut(
+  out: TEOutput | undefined,
+  field: string | number
+) {
+  if (out === discardedName) return out;
+  if (!(out instanceof DestructuringValue)) return;
+  return out.fields[field] ?? discardedName;
+}
 
 /** Asserts that `value` is a `LiteralValue` that contains a string */
 export function assertStringLiteral(
@@ -50,8 +91,11 @@ export function assertIsArrayMacro(
   value: IValue | undefined,
   name: string
 ): asserts value is ObjectValue {
-  if (!(value instanceof ObjectValue) || !value.data.length)
-    throw new CompilerError(`${name} must be an array macro`);
+  if (value instanceof ObjectValue) {
+    const { length } = value.data;
+    if (length instanceof LiteralValue && length.isNumber()) return;
+  }
+  throw new CompilerError(`${name} must be an array macro`);
 }
 
 /** Helper type used to describe the overloads of a macro function. See {@link assertObjectFields} */

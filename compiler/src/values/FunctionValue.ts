@@ -1,4 +1,10 @@
-import { assign, extractOutName, internalPrefix, nodeName } from "../utils";
+import {
+  assign,
+  extractOutName,
+  hideRedundantJumps,
+  internalPrefix,
+  nodeName,
+} from "../utils";
 import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
@@ -178,6 +184,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     const jump = assign(new JumpInstruction(this.inlineEnd, EJumpKind.Always), {
       intent: EInstIntent.return,
+      intentSource: this,
     });
 
     return [null, [...inst, jump]];
@@ -209,7 +216,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.tryingInline = false;
 
     const returnIndex = inst.findIndex(
-      i => i.alwaysRuns && i.intent === EInstIntent.return
+      i =>
+        i.alwaysRuns &&
+        i.intent === EInstIntent.return &&
+        i.intentSource === this
     );
     if (returnIndex !== -1) inst = inst.slice(0, returnIndex + 1);
 
@@ -224,6 +234,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (args.length !== this.paramNames.length)
       throw new CompilerError("Cannot call: argument count not matching.");
     const inlineCall = this.inlineCall(scope, args, out);
+    hideRedundantJumps(inlineCall[1]);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
     if (this.inline || inlineSize <= this.callSize) return inlineCall;
     return this.normalCall(scope, args, out);

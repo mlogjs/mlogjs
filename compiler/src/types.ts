@@ -14,6 +14,11 @@ export enum EInstIntent {
 
 export interface IInstruction {
   intent: EInstIntent;
+  /**
+   * Used by function values to check if a return instruction
+   * originates from them or other function.
+   */
+  intentSource?: IValue;
   hidden: boolean;
   resolve(i: number): void;
   source?: es.SourceLocation;

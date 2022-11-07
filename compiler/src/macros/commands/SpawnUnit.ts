@@ -1,6 +1,6 @@
-import { assertIsObjectMacro, assertIsRuntimeValue } from "../../assertions";
 import { InstructionBase } from "../../instructions";
 import { EMutability } from "../../types";
+import { assertIsObjectMacro, assertIsRuntimeValue } from "../../utils";
 import { SenseableValue } from "../../values";
 import { MacroFunction } from "../Function";
 

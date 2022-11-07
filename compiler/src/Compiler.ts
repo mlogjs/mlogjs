@@ -2,22 +2,17 @@ import { parse } from "@babel/parser";
 import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
-import {
-  AddressResolver,
-  EndInstruction,
-  JumpInstruction,
-} from "./instructions";
+import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import {
   es,
-  IInstruction,
   IScope,
   IValue,
   TEOutput,
   THandler,
   TValueInstructions,
 } from "./types";
-import { appendSourceLocations } from "./utils";
+import { appendSourceLocations, hideRedundantJumps } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
@@ -164,35 +159,6 @@ export class Compiler {
       lines.push(...nodeLines);
     }
     return [null, lines];
-  }
-}
-
-/** Removes jump instructions that point right to the next line */
-function hideRedundantJumps(inst: IInstruction[]) {
-  for (let i = 0; i < inst.length; i++) {
-    const instruction = inst[i];
-    if (!(instruction instanceof JumpInstruction)) continue;
-
-    const { address } = instruction;
-
-    let searchIndex = i + 1;
-    let current = inst[searchIndex];
-
-    while (current.hidden) {
-      if (
-        current instanceof AddressResolver &&
-        current.bonds.includes(address)
-      ) {
-        // only gets assigned if `current` is an adress resolver
-        // that resolves the jump adress
-        // and that is also right next to the jump,
-        // without any actual instructions in between
-        instruction.hidden = true;
-        break;
-      }
-      searchIndex++;
-      current = inst[searchIndex];
-    }
   }
 }
 
