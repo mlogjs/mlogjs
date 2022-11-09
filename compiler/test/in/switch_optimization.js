@@ -2,7 +2,7 @@
 // from inferring the type as `1`
 /** @type {number} */
 const a = 1;
-
+let b = 1;
 // Tests the optimization when the case is
 // "isolated" from the others
 switch (a) {
@@ -37,4 +37,22 @@ switch (a) {
   case Math.floor(Math.rand(10)):
     print("foo");
     break;
+}
+
+// Test optimization with dynamic compare values
+switch (a) {
+  case 0:
+    print("zero");
+    break;
+  case b:
+    print("dynamic b");
+    break;
+  case 1:
+    print("one");
+    break;
+  case Math.floor(Math.rand(10)):
+    print("random");
+    break;
+  default:
+    print("default");
 }

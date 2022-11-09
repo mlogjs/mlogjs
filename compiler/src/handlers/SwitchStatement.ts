@@ -5,7 +5,7 @@ import {
   JumpInstruction,
   SetCounterInstruction,
 } from "../instructions";
-import { EInstIntent, es, IInstruction, THandler } from "../types";
+import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
 import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -28,6 +28,7 @@ export const SwitchStatement: THandler<null> = (
 
   // if there is a case that is guaranteed to run
   let constantCase = false;
+  let onlyConstantTests = true;
 
   for (const scase of node.cases) {
     const [, bodyInst] = c.handleMany(innerScope, scase.consequent);
@@ -50,6 +51,8 @@ export const SwitchStatement: THandler<null> = (
     }
 
     const [test, testInst] = c.handleEval(innerScope, scase.test);
+    if (onlyConstantTests)
+      onlyConstantTests = test.mutability === EMutability.constant;
 
     let jump: IInstruction[];
     // check if it can be evaluated at compile time
@@ -65,7 +68,12 @@ export const SwitchStatement: THandler<null> = (
         includeJump = false;
       } else {
         // this case is only accessible via the comparison jump
-        if (noFallInto && endsWithoutFalltrough(bodyInst, endLine)) {
+        // and all the other cases will never run
+        if (
+          noFallInto &&
+          onlyConstantTests &&
+          endsWithoutFalltrough(bodyInst, endLine)
+        ) {
           return [null, [...bodyInst, endLine]];
         }
 
