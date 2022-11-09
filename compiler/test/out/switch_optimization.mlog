@@ -1,0 +1,9 @@
+print "second"
+op rand &t0 10
+op floor &t1 &t0
+jump 5 strictEqual 1 &t1
+jump 6 always
+print "meh"
+print "b"
+print "c"
+end
