@@ -56,23 +56,17 @@ export const SwitchStatement: THandler<null> = (
     // the scope copy prevents unecessary increases in the temp counter
     const [comp] = ref["=="](innerScope.copy(), test);
 
-    // if the constant expression resolves to false
-    // the whole case gets omitted
-    // otherwise it returns the instructions for
-    // the body of this case
     if (comp instanceof LiteralValue) {
       // whether other cases can falltrough and reach this one
       const noFallInto = !canFallInto;
       if (!comp.data) {
+        // this case is not accessible in any way
         if (noFallInto) continue;
         includeJump = false;
       } else {
-        if (noFallInto) {
-          if (endsWithoutFalltrough(bodyInst, endLine))
-            return [null, [...bodyInst, endLine]];
-          // clear the previous case tests and bodies
-          inst.splice(0, inst.length);
-          caseJumps.splice(0, caseJumps.length);
+        // this case is only accessible via the comparison jump
+        if (noFallInto && endsWithoutFalltrough(bodyInst, endLine)) {
+          return [null, [...bodyInst, endLine]];
         }
 
         jump = c.handle(innerScope, scase, () => [
