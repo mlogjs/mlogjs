@@ -1,5 +1,11 @@
-import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
-import { es, IInstruction, THandler } from "../types";
+import {
+  AddressResolver,
+  BreakInstruction,
+  EJumpKind,
+  JumpInstruction,
+  SetCounterInstruction,
+} from "../instructions";
+import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
 import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -20,41 +26,72 @@ export const SwitchStatement: THandler<null> = (
   const caseJumps: IInstruction[] = [];
   let defaultJump: IInstruction | undefined;
 
+  // if there is a case that is guaranteed to run
+  let constantCase = false;
+  let onlyConstantTests = true;
+
   for (const scase of node.cases) {
     const [, bodyInst] = c.handleMany(innerScope, scase.consequent);
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
+    const canFallInto = !endsWithoutFalltrough(inst, endLine);
+    let includeJump = !constantCase;
+    const includeBody = !constantCase || canFallInto;
+
     if (!scase.test) {
-      [defaultJump] = c.handle(innerScope, scase, () => [
-        null,
-        [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-      ])[1];
-      inst.push(bodyLine, ...bodyInst);
+      if (includeJump) {
+        [defaultJump] = c.handle(innerScope, scase, () => [
+          null,
+          [new JumpInstruction(bodyAdress, EJumpKind.Always)],
+        ])[1];
+      }
+      if (includeBody) inst.push(bodyLine, ...bodyInst);
       continue;
     }
 
     const [test, testInst] = c.handleEval(innerScope, scase.test);
+    if (onlyConstantTests)
+      onlyConstantTests = test.mutability === EMutability.constant;
 
+    let jump: IInstruction[];
     // check if it can be evaluated at compile time
-    const [comp] = ref["=="](innerScope, test);
+    // the scope copy prevents unecessary increases in the temp counter
+    const [comp] = ref["=="](innerScope.copy(), test);
 
-    // if the constant expression resolves to false
-    // the whole case gets omitted
-    // otherwise it returns the instructions for
-    // the body of this case
     if (comp instanceof LiteralValue) {
-      if (comp.data) return [null, bodyInst];
-      else continue;
+      // whether other cases can falltrough and reach this one
+      const noFallInto = !canFallInto;
+      if (!comp.data) {
+        // this case is not accessible in any way
+        if (noFallInto) continue;
+        includeJump = false;
+      } else {
+        // this case is only accessible via the comparison jump
+        // and all the other cases will never run
+        if (
+          noFallInto &&
+          onlyConstantTests &&
+          endsWithoutFalltrough(bodyInst, endLine)
+        ) {
+          return [null, [...bodyInst, endLine]];
+        }
+
+        jump = c.handle(innerScope, scase, () => [
+          null,
+          [new JumpInstruction(bodyAdress, EJumpKind.Always)],
+        ])[1];
+        constantCase = true;
+      }
     }
     // makes sourcemapping for the jump more specific
-    const [, jump] = c.handle(innerScope, scase, () => [
+    jump ??= c.handle(innerScope, scase, () => [
       null,
       [new JumpInstruction(bodyAdress, EJumpKind.StrictEqual, ref, test)],
-    ]);
+    ])[1];
 
-    caseJumps.push(...testInst, ...jump);
-    inst.push(bodyLine, ...bodyInst);
+    if (includeJump) caseJumps.push(...testInst, ...jump);
+    if (includeBody) inst.push(bodyLine, ...bodyInst);
   }
 
   // ensures that the processor exits
@@ -72,9 +109,33 @@ export const SwitchStatement: THandler<null> = (
     [
       ...refInst,
       ...caseJumps,
-      ...(caseJumps.length > 0 ? [defaultJump] : []),
+      ...(caseJumps.length > 0 && !constantCase ? [defaultJump] : []),
       ...inst,
       endLine,
     ],
   ];
 };
+
+function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
+  if (inst.length === 0) return true;
+  for (let i = inst.length - 1; i >= 0; i--) {
+    const instruction = inst[i];
+
+    // this means that there is an instruction trying to reference
+    // the final function `set @counter` instruction
+    // of course this generates an unecessary
+    // `set @counter` in cases where a control flow
+    // structure contains a fallback return statement
+    // TODO: fix this with static analysis
+    if (instruction instanceof AddressResolver) return false;
+    if (instruction.hidden) continue;
+
+    return (
+      instruction instanceof SetCounterInstruction ||
+      instruction.intent === EInstIntent.return ||
+      (instruction instanceof BreakInstruction &&
+        endLine.bonds.includes(instruction.address))
+    );
+  }
+  return false;
+}

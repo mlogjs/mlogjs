@@ -1,0 +1,16 @@
+set b:5:4 1
+print "second"
+op rand &t0 10
+op floor &t1 &t0
+jump 6 strictEqual 1 &t1
+jump 7 always
+print "meh"
+print "b"
+print "default"
+print "c"
+jump 12 strictEqual 1 b:5:4
+jump 14 always
+print "dynamic b"
+jump 15 always
+print "one"
+end
