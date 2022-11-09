@@ -3,8 +3,9 @@ import {
   BreakInstruction,
   EJumpKind,
   JumpInstruction,
+  SetCounterInstruction,
 } from "../instructions";
-import { es, IInstruction, THandler } from "../types";
+import { EInstIntent, es, IInstruction, THandler } from "../types";
 import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -33,21 +34,22 @@ export const SwitchStatement: THandler<null> = (
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
+    const canFallInto = !endsWithoutFalltrough(inst, endLine);
+    let includeJump = !constantCase;
+    const includeBody = !constantCase || canFallInto;
+
     if (!scase.test) {
-      [defaultJump] = c.handle(innerScope, scase, () => [
-        null,
-        [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-      ])[1];
-      inst.push(bodyLine, ...bodyInst);
+      if (includeJump) {
+        [defaultJump] = c.handle(innerScope, scase, () => [
+          null,
+          [new JumpInstruction(bodyAdress, EJumpKind.Always)],
+        ])[1];
+      }
+      if (includeBody) inst.push(bodyLine, ...bodyInst);
       continue;
     }
 
     const [test, testInst] = c.handleEval(innerScope, scase.test);
-
-    const callFallInto = !endsWithBreak(inst);
-
-    let includeJump = !constantCase;
-    const includeBody = !constantCase || callFallInto;
 
     let jump: IInstruction[];
     // check if it can be evaluated at compile time
@@ -60,14 +62,14 @@ export const SwitchStatement: THandler<null> = (
     // the body of this case
     if (comp instanceof LiteralValue) {
       // whether other cases can falltrough and reach this one
-      const noFallInto = inst.length === 0 || !callFallInto;
-
+      const noFallInto = !canFallInto;
       if (!comp.data) {
         if (noFallInto) continue;
         includeJump = false;
       } else {
         if (noFallInto) {
-          if (endsWithBreak(bodyInst)) return [null, [...bodyInst, endLine]];
+          if (endsWithoutFalltrough(bodyInst, endLine))
+            return [null, [...bodyInst, endLine]];
           // clear the previous case tests and bodies
           inst.splice(0, inst.length);
           caseJumps.splice(0, caseJumps.length);
@@ -112,7 +114,8 @@ export const SwitchStatement: THandler<null> = (
   ];
 };
 
-function endsWithBreak(inst: IInstruction[]) {
+function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
+  if (inst.length === 0) return true;
   for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
 
@@ -124,7 +127,13 @@ function endsWithBreak(inst: IInstruction[]) {
     // TODO: fix this with static analysis
     if (instruction instanceof AddressResolver) return false;
     if (instruction.hidden) continue;
-    return instruction instanceof BreakInstruction;
+
+    return (
+      instruction instanceof SetCounterInstruction ||
+      instruction.intent === EInstIntent.return ||
+      (instruction instanceof BreakInstruction &&
+        endLine.bonds.includes(instruction.address))
+    );
   }
   return false;
 }

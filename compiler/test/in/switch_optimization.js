@@ -14,6 +14,8 @@ switch (a) {
     break;
   case 3:
     print("third");
+  default:
+    print("default");
 }
 
 // Tests the optimization with falltrough
@@ -27,6 +29,8 @@ switch (a) {
     print("meh");
   case 1:
     print("b");
+  default:
+    print("default");
   case 3:
     print("c");
     break;

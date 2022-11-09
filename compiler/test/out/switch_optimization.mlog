@@ -5,5 +5,6 @@ jump 5 strictEqual 1 &t1
 jump 6 always
 print "meh"
 print "b"
+print "default"
 print "c"
 end
