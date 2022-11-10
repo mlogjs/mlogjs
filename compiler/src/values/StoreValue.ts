@@ -49,6 +49,27 @@ export class StoreValue extends BaseValue implements IValue {
     const [evalValue, evalInst] = value.eval(scope, this);
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
+
+  "=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+    if (compareStores(this, value)) return [new LiteralValue(1), []];
+    return super["=="](scope, value, out);
+  }
+
+  "==="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+    if (compareStores(this, value)) return [new LiteralValue(1), []];
+    return super["==="](scope, value, out);
+  }
+
+  "!="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+    if (compareStores(this, value)) return [new LiteralValue(0), []];
+    return super["!="](scope, value, out);
+  }
+
+  "!=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+    if (compareStores(this, value)) return [new LiteralValue(0), []];
+    return super["!=="](scope, value, out);
+  }
+
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
@@ -56,4 +77,15 @@ export class StoreValue extends BaseValue implements IValue {
   toString() {
     return this.name;
   }
+}
+
+function compareStores(left: StoreValue, right: IValue) {
+  return (
+    left === right ||
+    // prevents a store from being equal to a senseable value
+    (right instanceof left.constructor &&
+      right.mutability === EMutability.constant &&
+      left.mutability === EMutability.constant &&
+      right.name === left.name)
+  );
 }
