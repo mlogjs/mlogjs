@@ -6,7 +6,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
-import { withAlwaysRuns } from "../utils";
+import { lazy, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const SwitchStatement: THandler<null> = (
@@ -31,7 +31,7 @@ export const SwitchStatement: THandler<null> = (
   let onlyConstantTests = true;
 
   for (const scase of node.cases) {
-    const [, bodyInst] = c.handleMany(innerScope, scase.consequent);
+    const bodyInst = lazy(() => c.handleMany(innerScope, scase.consequent)[1]);
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
@@ -46,7 +46,7 @@ export const SwitchStatement: THandler<null> = (
           [new JumpInstruction(bodyAdress, EJumpKind.Always)],
         ])[1];
       }
-      if (includeBody) inst.push(bodyLine, ...bodyInst);
+      if (includeBody) inst.push(bodyLine, ...bodyInst());
       continue;
     }
 
@@ -72,9 +72,9 @@ export const SwitchStatement: THandler<null> = (
         if (
           noFallInto &&
           onlyConstantTests &&
-          endsWithoutFalltrough(bodyInst, endLine)
+          endsWithoutFalltrough(bodyInst(), endLine)
         ) {
-          return [null, [...bodyInst, endLine]];
+          return [null, [...bodyInst(), endLine]];
         }
 
         jump = c.handle(innerScope, scase, () => [
@@ -91,7 +91,7 @@ export const SwitchStatement: THandler<null> = (
     ])[1];
 
     if (includeJump) caseJumps.push(...testInst, ...jump);
-    if (includeBody) inst.push(bodyLine, ...bodyInst);
+    if (includeBody) inst.push(bodyLine, ...bodyInst());
   }
 
   // ensures that the processor exits
