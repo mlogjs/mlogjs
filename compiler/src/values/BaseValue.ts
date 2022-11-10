@@ -74,16 +74,22 @@ export class BaseValue extends VoidValue implements IValue {
       ],
     ];
   }
+
+  "!=="(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    const [equal, equalInst] = this["==="](scope, other);
+    const [result, resultInst] = equal["!"](scope, out);
+
+    return [result, [...equalInst, ...resultInst]];
+  }
 }
 
 const operatorMap: Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??" | "!==">,
   string
 > = {
   "==": "equal",
   "===": "strictEqual",
   "!=": "notEqual",
-  "!==": "notEqual",
   "<": "lessThan",
   ">": "greaterThan",
   "<=": "lessThanEq",
