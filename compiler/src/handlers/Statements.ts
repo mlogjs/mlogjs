@@ -60,6 +60,8 @@ export const ReturnStatement: THandler<IValue | null> = (
   return [ret, [...argInst, ...retInst]];
 };
 
+export const EmptyStatement: THandler<null> = () => [null, []];
+
 export const LabeledStatement: THandler<null> = (
   c,
   scope,

@@ -178,3 +178,6 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
   }
   return [new DestructuringValue(members), inst];
 };
+
+// the mlog runtime already does this check for us
+export const OptionalMemberExpression = MemberExpression;
