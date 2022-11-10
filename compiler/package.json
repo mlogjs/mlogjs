@@ -1,6 +1,6 @@
 {
   "name": "mlogjs",
-  "version": "0.4.7",
+  "version": "0.4.8",
   "description": "Compiler that compiles Javascript to Mindustry Logic Code.",
   "main": "./dist/index.cjs",
   "module": "./dist/index.mjs",
