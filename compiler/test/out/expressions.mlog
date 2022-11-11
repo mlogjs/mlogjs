@@ -36,4 +36,7 @@ set item:22:4 @copper
 op rand &t7 65536
 op not &t8 &t7
 print &t8
+op strictEqual &t9 item:22:4 @copper
+op equal &t10 &t9 0
+print &t10
 end

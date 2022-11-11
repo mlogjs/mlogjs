@@ -39,3 +39,9 @@ export function assign<T extends {}>(
 ): T {
   return Object.assign(obj, props);
 }
+
+/** Lazily computes and caches an expression */
+export function lazy<T>(fn: () => T) {
+  let value: T;
+  return () => (value ??= fn());
+}

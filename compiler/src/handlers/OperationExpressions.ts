@@ -5,7 +5,8 @@ import {
   BinaryOperator,
   LogicalOperator,
 } from "../operators";
-import { THandler, es } from "../types";
+import { THandler, es, IInstruction } from "../types";
+import { discardedName } from "../utils";
 import { LazyValue, LiteralValue, SenseableValue } from "../values";
 
 export const LRExpression: THandler = (
@@ -132,4 +133,28 @@ export const ConditionalExpression: THandler = (
       new AddressResolver(endExpressionAdress),
     ],
   ];
+};
+
+export const SequenceExpression: THandler = (
+  c,
+  scope,
+  node: es.SequenceExpression,
+  out
+) => {
+  const { expressions } = node;
+  const inst: IInstruction[] = [];
+
+  // compute every expression except the last one
+  for (let i = 0; i < expressions.length - 1; i++) {
+    const [, exprInst] = c.handleEval(scope, expressions[i], discardedName);
+    inst.push(...exprInst);
+  }
+
+  const [value, valueInst] = c.handleEval(
+    scope,
+    expressions[expressions.length - 1],
+    out
+  );
+
+  return [value, [...inst, ...valueInst]];
 };
