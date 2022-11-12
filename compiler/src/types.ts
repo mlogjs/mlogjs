@@ -86,6 +86,11 @@ export interface IScope {
   /** Tracks the dependency relation beteween values and cached operations */
   cacheDependencies: Record<string, string[]>;
   /**
+   * Tells array macros whether to check index access performed.
+   * This field is mutable.
+   */
+  checkIndexes: boolean;
+  /**
    * Creates a new scope that has `this` as it's parent.
    */
   createScope(): IScope;

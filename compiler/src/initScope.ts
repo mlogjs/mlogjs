@@ -5,6 +5,7 @@ import {
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
+  Unchecked,
   VarsNamespace,
 } from "./macros";
 import { GetGlobal } from "./macros/GetGlobal";
@@ -35,6 +36,7 @@ export function initScope(scope: Scope) {
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
   scope.hardSet("DynamicArray", new DynamicArrayConstructor());
+  scope.hardSet("unchecked", new Unchecked());
 
   // commands
   scope.hardSet("draw", new commands.Draw());

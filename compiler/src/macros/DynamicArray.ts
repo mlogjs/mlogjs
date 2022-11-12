@@ -46,18 +46,13 @@ export class DynamicArray extends ObjectValue {
     public name: string,
     public values: IValue[]
   ) {
+    const getterName = `${name}.&gtemp`;
+    const setterName = `${name}.&stemp`;
+    const returnName = `${name}.&rt`;
     super({
-      // array.get(index)
-      get: new MacroFunction((scope, out, index) =>
-        this.getValue(scope, out, index, false)
-      ),
       // array[index]
       $get: new MacroFunction((scope, out, index) =>
-        this.getValue(scope, out, index, true)
-      ),
-      // array.set(index, value)
-      set: new MacroFunction((scope, out, index, value) =>
-        this.setValue(scope, index, value, false)
+        this.getValue(scope, out, index, scope.checkIndexes)
       ),
 
       fill: new MacroFunction((scope, out, value) => {
@@ -72,16 +67,13 @@ export class DynamicArray extends ObjectValue {
 
       length: new LiteralValue(values.length),
     });
+    this.scope = scope;
+    this.name = name;
+    this.values = values;
 
-    this.getterTemp = new SenseableValue(
-      `${this.name}.&gtemp`,
-      EMutability.mutable
-    );
-    this.setterTemp = new SenseableValue(
-      `${this.name}.&stemp`,
-      EMutability.mutable
-    );
-    this.returnTemp = new StoreValue(`${this.name}.&rt`);
+    this.getterTemp = new SenseableValue(getterName, EMutability.mutable);
+    this.setterTemp = new SenseableValue(setterName, EMutability.mutable);
+    this.returnTemp = new StoreValue(returnName);
 
     this.getterAddr = new LiteralValue(null);
     this.setterAddr = new LiteralValue(null);

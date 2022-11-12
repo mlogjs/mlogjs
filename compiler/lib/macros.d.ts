@@ -35,16 +35,38 @@ declare class DynamicArray<T> {
   /** Checked index access. */
   [index: number]: T;
 
-  /** Unchecked index acess, only do this if  */
-  get(index: number): T;
-
-  /** Sets the value at the given index */
-  set(index: number, value: T): T;
-
   /** Fills the array with a given value */
   fill(value: T): void;
 
+  /** The number of items defined in this array */
   readonly length: number;
 
   [Symbol.iterator](): IterableIterator<T>;
 }
+
+/**
+ * A function that tells the compiler not to add
+ * bound checking in the array accesses in the given expression.
+ *
+ * Only access that are computed inside the call are unchecked:
+ *
+ * ```js
+ * // checked
+ * const a = array[i]
+ * // unckecked
+ * const b = unchecked(array[i])
+ *
+ * // the array accesses inside `doSomething`
+ * // are NOT unchecked
+ * unchecked(doSomething(i))
+ *
+ * // only `array[i * 2]` is unchecked
+ * const c = unchecked(doSomething(i) * array[i * 2])
+ *
+ * function doSomething(i) {
+ *     // will always be checked
+ *     return (array[i - 1] + array[i + 1]) / 2
+ * }
+ * ```
+ */
+declare function unchecked<T>(expression: T): T;
