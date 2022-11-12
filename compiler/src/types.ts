@@ -253,11 +253,16 @@ export interface IValue extends IValueOperators {
   get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
 
   /**
-   * Returns the output values for the arguments of a callable value, or `null`.
-   *
-   * This is used to allow the handler to optimize the argument instructions.
+   * A hook that the CallExpression and related handlers call
+   * before evaluating the function parameters.
    */
-  paramOuts(): readonly IValue[] | undefined;
+  preCall(scope: IScope, out?: TEOutput): readonly IValue[] | undefined;
+
+  /**
+   * A hook that the CallExpression and related handlers call
+   * after the call has been evaluated.
+   */
+  postCall(scope: IScope): void;
 }
 /** Helper type that is used in some typescript assertions */
 export interface INamedValue extends IValue {

@@ -259,7 +259,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return [this, []];
   }
 
-  paramOuts(): readonly IValue[] | undefined {
+  preCall(): readonly IValue[] | undefined {
     this.ensureInit();
     if (this.inline || this.tryingInline) return;
     return this.paramValues;

@@ -12,7 +12,7 @@ export const CallExpression: THandler<IValue | null> = (
   const [callee, calleeInst] = c.handleEval(scope, node.callee);
   inst.push(...calleeInst);
 
-  const paramOuts = callee.paramOuts();
+  const paramOuts = callee.preCall(scope, out);
 
   const args = node.arguments.map((node, index) => {
     // TODO: this might be why t0 did not increment
@@ -25,6 +25,8 @@ export const CallExpression: THandler<IValue | null> = (
 
   const [callValue, callInst] = callee.call(scope, args, out);
   inst.push(...callInst);
+
+  callee.postCall(scope);
 
   return [callValue, inst];
 };
