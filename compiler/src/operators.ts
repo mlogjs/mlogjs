@@ -118,3 +118,16 @@ export const operatorMap: {
   "&&": "land",
   "||": "or",
 } as const;
+
+export const orderIndependentOperators: readonly Operator[] = [
+  "!=",
+  "!==",
+  "&&",
+  "&",
+  "*",
+  "+",
+  "==",
+  "===",
+  "|",
+  "||",
+] as const;

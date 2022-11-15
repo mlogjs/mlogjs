@@ -34,6 +34,8 @@ const mathOperations: Record<
   rand: null,
 };
 
+const orderIndependentOperations = ["max", "min", "len"];
+
 function createMacroMathOperations() {
   const macroMathOperations: IObjectValueData = {
     PI: new StoreValue("@pi", EMutability.constant),
@@ -52,7 +54,18 @@ function createMacroMathOperations() {
             );
           return [new LiteralValue(fn(a.num, b.num)), []];
         }
+
+        const cachedResult = scope.getCachedOperation(key, a, b);
+        if (cachedResult) return [cachedResult, []];
+
+        // max, min and len do not change if the arguments change in order
+        if (orderIndependentOperations.includes(key)) {
+          const cachedResult = scope.getCachedOperation(key, b, a);
+          if (cachedResult) return [cachedResult, []];
+        }
+
         const temp = StoreValue.from(scope, out);
+        scope.addCachedOperation(key, temp, a, b);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -63,8 +76,15 @@ function createMacroMathOperations() {
 
         return [new LiteralValue(fn(a.num)), []];
       }
+      const cachedResult = scope.getCachedOperation(key, a);
+      if (cachedResult) return [cachedResult, []];
+
       const temp = StoreValue.from(scope, out);
-      return [temp, [new OperationInstruction(key, temp, a, b)]];
+
+      // ensures that operations like `rand` are not cached
+      if (mathOperations[key]) scope.addCachedOperation(key, temp, a);
+
+      return [temp, [new OperationInstruction(key, temp, a, null)]];
     });
   }
   return macroMathOperations;

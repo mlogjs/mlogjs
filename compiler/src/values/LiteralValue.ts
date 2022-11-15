@@ -33,6 +33,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   constructor(data: T) {
     super();
     this.data = data;
+    this.name = this.toString();
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];

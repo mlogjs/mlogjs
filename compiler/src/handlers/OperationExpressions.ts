@@ -4,6 +4,7 @@ import {
   AssignementOperator,
   BinaryOperator,
   LogicalOperator,
+  orderIndependentOperators,
 } from "../operators";
 import { THandler, es, IInstruction } from "../types";
 import { discardedName } from "../utils";
@@ -15,13 +16,30 @@ export const LRExpression: THandler = (
   node: {
     left: es.Node;
     right: es.Node;
-    operator: AssignementOperator | BinaryOperator | LogicalOperator;
+    operator: BinaryOperator | LogicalOperator;
   },
   out
 ) => {
   const [left, leftInst] = c.handleEval(scope, node.left);
   const [right, rightInst] = c.handleEval(scope, node.right);
+
+  if (!(left instanceof LiteralValue) || !(right instanceof LiteralValue)) {
+    const cachedResult = scope.getCachedOperation(node.operator, left, right);
+    if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
+
+    // because a * b is the same as b * a
+    if (orderIndependentOperators.includes(node.operator)) {
+      const cachedResult = scope.getCachedOperation(node.operator, right, left);
+      if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
+    }
+  }
+
   const [op, opInst] = left[node.operator](scope, right, out);
+
+  if (!(op instanceof LiteralValue)) {
+    scope.addCachedOperation(node.operator, op, left, right);
+  }
+
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
@@ -63,8 +81,10 @@ export const AssignmentExpression: THandler = (
           new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
           [],
         ];
+
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = left![node.operator](scope, right);
+  if (left) scope.clearDependentCache(left);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
@@ -75,12 +95,17 @@ export const UnaryExpression: THandler = (
   out
 ) => {
   const [arg, argInst] = c.handleEval(scope, argument);
+
+  const cachedResult = scope.getCachedOperation(operator, arg);
+  if (cachedResult) return [cachedResult, argInst];
+
   const operatorId =
     operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
   if (operatorId === "throw")
     throw new CompilerError("throw operator is not supported");
 
   const [op, opInst] = arg[operatorId](scope, out);
+  scope.addCachedOperation(operator, op, arg);
   return [op, [...argInst, ...opInst]];
 };
 export const UpdateExpression: THandler = (
@@ -90,6 +115,8 @@ export const UpdateExpression: THandler = (
   out
 ) => {
   const [arg, argInst] = c.handle(scope, argument);
+
+  if (arg) scope.clearDependentCache(arg);
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = arg![operator](scope, prefix, out);
   return [op, [...argInst, ...opInst]];
