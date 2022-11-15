@@ -23,18 +23,23 @@ export const LRExpression: THandler = (
   const [left, leftInst] = c.handleEval(scope, node.left);
   const [right, rightInst] = c.handleEval(scope, node.right);
 
-  const cachedResult = scope.getCachedOperation(node.operator, left, right);
-  if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
-
-  // because a * b is the same as b * a
-  if (orderIndependentOperators.includes(node.operator)) {
-    const cachedResult = scope.getCachedOperation(node.operator, right, left);
+  if (!(left instanceof LiteralValue) || !(right instanceof LiteralValue)) {
+    const cachedResult = scope.getCachedOperation(node.operator, left, right);
     if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
+
+    // because a * b is the same as b * a
+    if (orderIndependentOperators.includes(node.operator)) {
+      const cachedResult = scope.getCachedOperation(node.operator, right, left);
+      if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
+    }
   }
 
   const [op, opInst] = left[node.operator](scope, right, out);
 
-  scope.addCachedOperation(node.operator, op, left, right);
+  if (!(op instanceof LiteralValue)) {
+    scope.addCachedOperation(node.operator, op, left, right);
+  }
+
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
