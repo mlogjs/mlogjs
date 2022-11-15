@@ -106,6 +106,7 @@ export class Scope implements IScope {
 
     this.operationCache[id] = result;
 
+    this.clearDependentCache(result);
     addCacheDependency(this, left.name, id);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (right) addCacheDependency(this, right.name!, id);
