@@ -70,7 +70,6 @@ export const AssignmentExpression: THandler = (
   }
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
-  if (left) scope.clearDependentCache(left);
   const [right, rightInst] =
     node.operator !== "??="
       ? c.handleEval(
@@ -85,6 +84,7 @@ export const AssignmentExpression: THandler = (
 
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
   const [op, opInst] = left![node.operator](scope, right);
+  if (left) scope.clearDependentCache(left);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
