@@ -1,0 +1,34 @@
+set a:1:4 1
+op add &_ a:1:4 1
+op add &_ a:1:4 2
+op add &t0 a:1:4 1
+op log &t1 a:1:4
+op div &t2 &t1 0.6931471805599453
+print "\na + 2: "
+print &_
+print "\na + 1: "
+print &t0
+print "\n2 + a: "
+print &_
+print "\n1 + a: "
+print &t0
+print "\nlog2 a: "
+print &t2
+print "\n"
+op rand &t3 2
+op greaterThanEq &t4 &t3 1
+jump 30 equal &t4 0
+op rand &t5 2
+op greaterThanEq &t6 &t5 1
+print &t6
+print &t2
+print "\n"
+op add a:1:4 a:1:4 1
+op log &t7 a:1:4
+op div &t8 &t7 0.6931471805599453
+print &t8
+print "\n"
+op add &t5 a:1:4 1
+print &t5
+printflush message1
+end
