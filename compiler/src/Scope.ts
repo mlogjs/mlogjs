@@ -124,8 +124,7 @@ export class Scope implements IScope {
   }
 
   clearDependentCache(value: IValue): void {
-    if (!value.name)
-      throw new CompilerError("Values in the operation cache must have a name");
+    if (!value.name) return;
 
     const dependents = this.cacheDependencies[value.name];
     if (dependents) {
