@@ -19,12 +19,13 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   inst.push(
     ...testInst,
     new JumpInstruction(endIfAddr, EJumpKind.Equal, test, new LiteralValue(0)),
-    ...withAlwaysRuns(c.handle(scope, node.consequent), false)[1],
-    new AddressResolver(endIfAddr)
+    ...withAlwaysRuns(c.handle(scope, node.consequent), false)[1]
   );
 
-  const endElseAddr = new LiteralValue(null);
-  if (node.alternate) {
+  if (!node.alternate) {
+    inst.push(new AddressResolver(endIfAddr));
+  } else {
+    const endElseAddr = new LiteralValue(null);
     inst.push(
       new JumpInstruction(endElseAddr, EJumpKind.Always),
       new AddressResolver(endIfAddr),
