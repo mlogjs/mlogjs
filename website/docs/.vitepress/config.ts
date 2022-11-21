@@ -12,7 +12,7 @@ const config: UserConfig = {
     logo: "/logo.png",
     outline: [2, 3],
     editLink: {
-      pattern: "https://github.com/mlogjs/mlogjs/website/docs/:path",
+      pattern: "https://github.com/mlogjs/mlogjs/tree/main/website/docs/:path",
     },
     nav: [
       { text: "Guide", link: "/guide/" },
