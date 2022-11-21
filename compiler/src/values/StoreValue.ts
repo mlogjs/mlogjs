@@ -43,8 +43,7 @@ export class StoreValue extends BaseValue implements IValue {
     )
       throw new CompilerError(`Cannot assign to immutable store '${this}'.`);
 
-    if (this.name === value.name && value instanceof StoreValue)
-      return [this, []];
+    if (compareStores(this, value)) return [this, []];
 
     const [evalValue, evalInst] = value.eval(scope, this);
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
@@ -82,6 +81,6 @@ export class StoreValue extends BaseValue implements IValue {
 function compareStores(left: StoreValue, right: IValue) {
   return (
     // prevents a store from being equal to a senseable value
-    right instanceof left.constructor && right.name === left.name
+    right instanceof StoreValue && right.name === left.name
   );
 }
