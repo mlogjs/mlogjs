@@ -79,8 +79,5 @@ export class StoreValue extends BaseValue implements IValue {
 }
 
 function compareStores(left: StoreValue, right: IValue) {
-  return (
-    // prevents a store from being equal to a senseable value
-    right instanceof StoreValue && right.name === left.name
-  );
+  return right instanceof StoreValue && right.name === left.name;
 }
