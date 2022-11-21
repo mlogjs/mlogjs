@@ -22,7 +22,7 @@ export function withAlwaysRuns<T extends IValue | null>(
 
 /** Removes jump instructions that point right to the next line */
 export function hideRedundantJumps(inst: IInstruction[]) {
-  for (let i = 0; i < inst.length; i++) {
+  for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
     if (!(instruction instanceof JumpInstruction)) continue;
 
