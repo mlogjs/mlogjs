@@ -6,7 +6,7 @@ import {
   THandler,
   TValueInstructions,
 } from "../types";
-import { extractDestrucuringOut } from "../utils";
+import { extractDestrucuringOut, pipeInsts } from "../utils";
 import {
   DestructuringValue,
   IObjectValueData,
@@ -23,7 +23,7 @@ export const ObjectExpression: THandler = (
   out
 ) => {
   const data: IObjectValueData = {};
-  const inst = [];
+  const inst: IInstruction[] = [];
   for (const prop of node.properties) {
     if (prop.type === "SpreadElement")
       throw new CompilerError("Cannot handle spread element", prop);
@@ -39,14 +39,11 @@ export const ObjectExpression: THandler = (
     } else {
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
-    const [member, memberInst] = c.handleEval(
-      scope,
-      value,
-      extractDestrucuringOut(out, index)
-    );
+
+    const memberOut = extractDestrucuringOut(out, index);
+    const member = pipeInsts(c.handleEval(scope, value, memberOut), inst);
 
     data[index] = member;
-    inst.push(...memberInst);
   }
   return [new ObjectValue(data), inst];
 };
@@ -60,11 +57,15 @@ export const ArrayExpression: THandler = (
   const items: (IValue | undefined)[] = [];
   const inst: IInstruction[] = [];
   node.elements.forEach((element, i) => {
-    const [value, valueInst] = element
-      ? c.handleEval(scope, element, extractDestrucuringOut(out, i))
-      : [undefined, []];
+    if (!element) {
+      items.push(undefined);
+      return;
+    }
+    const value = pipeInsts(
+      c.handleEval(scope, element, extractDestrucuringOut(out, i)),
+      inst
+    );
     items.push(value);
-    inst.push(...valueInst);
   });
   return [ObjectValue.fromArray(items), inst];
 };
@@ -115,21 +116,20 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
   for (let i = 0; i < node.elements.length; i++) {
     const element = node.elements[i];
     if (!element) continue;
-    const [value, valueInst] = c.handle(scope, element);
+    const value = pipeInsts(c.handle(scope, element), inst);
     if (!value)
       throw new CompilerError(
         "Destructuring element must resolve to a value",
         element
       );
 
-    inst.push(...valueInst);
     members.set(new LiteralValue(i), {
       value,
       handler(get) {
         return c.handle(scope, element, () => {
           const inst = get();
           // assigns the output to the target value
-          inst[1].push(...value["="](scope, inst[0])[1]);
+          pipeInsts(value["="](scope, inst[0]), inst[1]);
           return inst;
         });
       },
@@ -152,9 +152,9 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
       !prop.computed && key.type === "Identifier"
         ? [new LiteralValue(key.name), []]
         : c.handleEval(scope, prop.key);
-    inst.push(...keyInst[1]);
+    pipeInsts(keyInst, inst);
 
-    const [value, valueInst] = c.handle(scope, prop.value);
+    const value = pipeInsts(c.handle(scope, prop.value), inst);
 
     if (!value)
       throw new CompilerError(
@@ -162,15 +162,13 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
         prop.value
       );
 
-    inst.push(...valueInst);
-
     members.set(keyInst[0], {
       value,
       handler(get) {
         return c.handle(scope, prop, () => {
           const inst = get();
           // assigns the output to the target value
-          inst[1].push(...value["="](scope, inst[0])[1]);
+          pipeInsts(value["="](scope, inst[0]), inst[1]);
           return inst;
         });
       },

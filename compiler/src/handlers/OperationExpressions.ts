@@ -6,8 +6,8 @@ import {
   LogicalOperator,
   orderIndependentOperators,
 } from "../operators";
-import { THandler, es, EMutability, IInstruction } from "../types";
-import { discardedName } from "../utils";
+import { THandler, es, IInstruction, EMutability } from "../types";
+import { discardedName, pipeInsts } from "../utils";
 import { LazyValue, LiteralValue, SenseableValue } from "../values";
 
 export const LRExpression: THandler = (
@@ -173,15 +173,13 @@ export const SequenceExpression: THandler = (
 
   // compute every expression except the last one
   for (let i = 0; i < expressions.length - 1; i++) {
-    const [, exprInst] = c.handleEval(scope, expressions[i], discardedName);
-    inst.push(...exprInst);
+    pipeInsts(c.handleEval(scope, expressions[i], discardedName), inst);
   }
 
-  const [value, valueInst] = c.handleEval(
-    scope,
-    expressions[expressions.length - 1],
-    out
+  const value = pipeInsts(
+    c.handleEval(scope, expressions[expressions.length - 1], out),
+    inst
   );
 
-  return [value, [...inst, ...valueInst]];
+  return [value, inst];
 };

@@ -6,13 +6,14 @@ import { EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import {
   es,
+  IInstruction,
   IScope,
   IValue,
   TEOutput,
   THandler,
   TValueInstructions,
 } from "./types";
-import { appendSourceLocations, hideRedundantJumps } from "./utils";
+import { appendSourceLocations, hideRedundantJumps, pipeInsts } from "./utils";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
@@ -149,14 +150,12 @@ export class Compiler {
     nodes: T[],
     handler?: (node: T) => TValueInstructions<IValue | null>
   ): TValueInstructions<null> {
-    const lines = [];
+    const lines: IInstruction[] = [];
     for (const node of hoistedFunctionNodes(nodes)) {
-      const [, nodeLines] = this.handle(
-        scope,
-        node,
-        handler && (() => handler(node))
+      pipeInsts(
+        this.handle(scope, node, handler && (() => handler(node))),
+        lines
       );
-      lines.push(...nodeLines);
     }
     return [null, lines];
   }
