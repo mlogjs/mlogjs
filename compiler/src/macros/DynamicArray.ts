@@ -82,12 +82,12 @@ export class DynamicArray extends ObjectValue {
             length: new StoreValue(lengthName, EMutability.readonly),
             push: new MacroFunction((scope, out, item) => {
               const checked = scope.checkIndexes;
-              const entry = new DynamicArrayEntry(
+              const entry = new DynamicArrayEntry({
                 scope,
-                this,
-                lengthStore,
-                checked
-              );
+                array: this,
+                index: lengthStore,
+                checked,
+              });
               const [, inst] = entry["="](scope, item);
               return [new LiteralValue(null), inst];
             }),
@@ -99,30 +99,17 @@ export class DynamicArray extends ObjectValue {
                 lengthStore["-"](scope, new LiteralValue(1)),
                 inst
               );
-              const failAddr = new LiteralValue(null);
 
-              if (checked) {
-                inst.push(
-                  new JumpInstruction(
-                    failAddr,
-                    EJumpKind.LessThan,
-                    index,
-                    new LiteralValue(0)
-                  ),
-                  new JumpInstruction(
-                    failAddr,
-                    EJumpKind.GreaterThan,
-                    index,
-                    new LiteralValue(values.length - 1)
-                  )
-                );
-              }
-
-              const entry = new DynamicArrayEntry(scope, this, index, false);
+              const entry = new DynamicArrayEntry({
+                scope,
+                array: this,
+                index,
+                checked,
+                newLength: index,
+              });
 
               const result = pipeInsts(entry.eval(scope, out), inst);
               pipeInsts(entry["="](scope, new LiteralValue(null)), inst);
-              inst.push(new AddressResolver(failAddr));
               return [result, inst];
             }),
           }
@@ -160,9 +147,9 @@ export class DynamicArray extends ObjectValue {
         );
     }
 
-    const entry = new DynamicArrayEntry(scope, this, index, checked);
+    const entry = new DynamicArrayEntry({ scope, array: this, index, checked });
     if (out) return entry.eval(scope, out);
-    return [new DynamicArrayEntry(scope, this, index, checked), []];
+    return [entry, []];
   }
 
   initGetter() {
@@ -195,13 +182,27 @@ export class DynamicArray extends ObjectValue {
 }
 
 class DynamicArrayEntry extends BaseValue {
-  constructor(
-    public scope: IScope,
-    public array: DynamicArray,
-    public index: IValue | LiteralValue<number>,
-    public checked: boolean
-  ) {
+  scope: IScope;
+  array: DynamicArray;
+  index: IValue | LiteralValue<number>;
+  checked: boolean;
+  newLength?: IValue;
+  constructor({
+    array,
+    checked,
+    index,
+    scope,
+    newLength,
+  }: Pick<
+    DynamicArrayEntry,
+    "scope" | "array" | "index" | "checked" | "newLength"
+  >) {
     super();
+    this.array = array;
+    this.scope = scope;
+    this.checked = checked;
+    this.index = index;
+    this.newLength = newLength;
   }
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -325,7 +326,9 @@ class DynamicArrayEntry extends BaseValue {
     }
 
     if (lengthStore) {
-      const len = pipeInsts(index["+"](scope, new LiteralValue(1)), inst);
+      const len =
+        this.newLength ??
+        pipeInsts(index["+"](scope, new LiteralValue(1)), inst);
       pipeInsts(lengthStore["="](scope, len), inst);
     }
 
