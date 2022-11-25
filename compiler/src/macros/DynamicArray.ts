@@ -122,6 +122,22 @@ export class DynamicArray extends ObjectValue {
               pipeInsts(entry["="](scope, nullLiteral), inst);
               return [result, inst];
             }),
+            getLast: new MacroFunction((scope, out) => {
+              const checked = scope.checkIndexes;
+              const inst: IInstruction[] = [];
+              const index = pipeInsts(
+                lengthStore["-"](scope, new LiteralValue(1)),
+                inst
+              );
+              const entry = new DynamicArrayEntry({
+                scope,
+                array: this,
+                index,
+                checked,
+              });
+              const result = pipeInsts(entry.eval(scope, out), inst);
+              return [result, inst];
+            }),
           }
         : {}),
     });
