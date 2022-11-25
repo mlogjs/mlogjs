@@ -1,4 +1,9 @@
-import { assertIsArrayMacro, counterName, pipeInsts } from "../utils";
+import {
+  assertIsArrayMacro,
+  counterName,
+  discardedName,
+  pipeInsts,
+} from "../utils";
 import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
@@ -108,8 +113,13 @@ export class DynamicArray extends ObjectValue {
                 newLength: index,
               });
 
-              const result = pipeInsts(entry.eval(scope, out), inst);
-              pipeInsts(entry["="](scope, new LiteralValue(null)), inst);
+              const nullLiteral = new LiteralValue(null);
+              const result =
+                out === discardedName
+                  ? nullLiteral
+                  : pipeInsts(entry.eval(scope, out), inst);
+
+              pipeInsts(entry["="](scope, nullLiteral), inst);
               return [result, inst];
             }),
           }

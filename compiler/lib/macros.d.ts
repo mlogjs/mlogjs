@@ -49,7 +49,6 @@ declare class DynamicArray<T> extends MutableArray<T> {
   pop(): T;
   push(item: T): void;
   getLast(): T;
-  removeLast(): void;
   removeAt(index: number): void;
 
   get length(): number;
