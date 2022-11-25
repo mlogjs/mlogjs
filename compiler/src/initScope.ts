@@ -35,7 +35,8 @@ export function initScope(scope: Scope) {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
-  scope.hardSet("DynamicArray", new DynamicArrayConstructor());
+  scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
+  scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
   scope.hardSet("unchecked", new Unchecked());
 
   // commands

@@ -28,7 +28,7 @@ export class VoidValue implements IValue {
     throw new CompilerError(`${this} cannot get.`);
   }
 
-  preCall(_scope: IScope, _out?: TEOutput): readonly IValue[] | undefined {
+  preCall(_scope: IScope, _out?: TEOutput): readonly TEOutput[] | undefined {
     return;
   }
 

@@ -1,4 +1,4 @@
-import { assertIsArrayMacro, counterName } from "../utils";
+import { assertIsArrayMacro, counterName, pipeInsts } from "../utils";
 import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
@@ -37,6 +37,7 @@ export class DynamicArray extends ObjectValue {
   returnTemp: StoreValue;
   getterAddr: LiteralValue<number | null>;
   setterAddr: LiteralValue<number | null>;
+  lengthStore?: StoreValue;
 
   bundledSetter = false;
   bundledGetter = false;
@@ -44,11 +45,14 @@ export class DynamicArray extends ObjectValue {
   constructor(
     public scope: IScope,
     public name: string,
-    public values: IValue[]
+    public values: IValue[],
+    dynamic: boolean
   ) {
     const getterName = `${name}.&gtemp`;
     const setterName = `${name}.&stemp`;
     const returnName = `${name}.&rt`;
+    const lengthName = `${name}.&len`;
+    const lengthStore = new StoreValue(lengthName);
     super({
       // array[index]
       $get: new MacroFunction((scope, out, index) =>
@@ -59,13 +63,70 @@ export class DynamicArray extends ObjectValue {
         const inst: IInstruction[] = [];
 
         for (let i = 0; i < values.length; i++) {
-          inst.push(...values[i]["="](scope, value)[1]);
+          pipeInsts(values[i]["="](scope, value), inst);
+        }
+        if (this.lengthStore) {
+          pipeInsts(
+            this.lengthStore["="](scope, new LiteralValue(values.length)),
+            inst
+          );
         }
 
         return [null, inst];
       }),
 
-      length: new LiteralValue(values.length),
+      size: new LiteralValue(values.length),
+
+      ...(dynamic
+        ? {
+            length: new StoreValue(lengthName, EMutability.readonly),
+            push: new MacroFunction((scope, out, item) => {
+              const checked = scope.checkIndexes;
+              const entry = new DynamicArrayEntry(
+                scope,
+                this,
+                lengthStore,
+                checked
+              );
+              const [, inst] = entry["="](scope, item);
+              return [new LiteralValue(null), inst];
+            }),
+            pop: new MacroFunction((scope, out) => {
+              const checked = scope.checkIndexes;
+              const inst: IInstruction[] = [];
+
+              const index = pipeInsts(
+                lengthStore["-"](scope, new LiteralValue(1)),
+                inst
+              );
+              const failAddr = new LiteralValue(null);
+
+              if (checked) {
+                inst.push(
+                  new JumpInstruction(
+                    failAddr,
+                    EJumpKind.LessThan,
+                    index,
+                    new LiteralValue(0)
+                  ),
+                  new JumpInstruction(
+                    failAddr,
+                    EJumpKind.GreaterThan,
+                    index,
+                    new LiteralValue(values.length - 1)
+                  )
+                );
+              }
+
+              const entry = new DynamicArrayEntry(scope, this, index, false);
+
+              const result = pipeInsts(entry.eval(scope, out), inst);
+              pipeInsts(entry["="](scope, new LiteralValue(null)), inst);
+              inst.push(new AddressResolver(failAddr));
+              return [result, inst];
+            }),
+          }
+        : {}),
     });
     this.scope = scope;
     this.name = name;
@@ -74,6 +135,7 @@ export class DynamicArray extends ObjectValue {
     this.getterTemp = new SenseableValue(getterName, EMutability.mutable);
     this.setterTemp = new SenseableValue(setterName, EMutability.mutable);
     this.returnTemp = new StoreValue(returnName);
+    if (dynamic) this.lengthStore = lengthStore;
 
     this.getterAddr = new LiteralValue(null);
     this.setterAddr = new LiteralValue(null);
@@ -91,28 +153,16 @@ export class DynamicArray extends ObjectValue {
     if (index instanceof LiteralValue) {
       if (!index.isNumber())
         throw new CompilerError(`Unknown dynamic array property: "${index}"`);
-      if (index.data >= 0 && index.data < values.length)
-        return [values[index.data], []];
 
-      throw new CompilerError(
-        `The index ${index.data} is out of bounds: [0, ${values.length - 1}]`
-      );
+      if (index.data < 0 || index.data >= values.length)
+        throw new CompilerError(
+          `The index ${index.data} is out of bounds: [0, ${values.length - 1}]`
+        );
     }
 
     const entry = new DynamicArrayEntry(scope, this, index, checked);
     if (out) return entry.eval(scope, out);
     return [new DynamicArrayEntry(scope, this, index, checked), []];
-  }
-
-  setValue(
-    scope: IScope,
-    index: IValue,
-    value: IValue,
-    checked: boolean
-  ): TValueInstructions {
-    const entry = new DynamicArrayEntry(scope, this, index, checked);
-
-    return entry["="](scope, value);
   }
 
   initGetter() {
@@ -148,17 +198,22 @@ class DynamicArrayEntry extends BaseValue {
   constructor(
     public scope: IScope,
     public array: DynamicArray,
-    public index: IValue,
+    public index: IValue | LiteralValue<number>,
     public checked: boolean
   ) {
     super();
   }
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
+    const { checked, index } = this;
+
+    if (index instanceof LiteralValue) {
+      return [this.array.values[index.data], []];
+    }
+
     this.array.initGetter();
     const inst: IInstruction[] = [];
 
-    const { checked, index } = this;
     const { getterTemp, values, getterAddr, returnTemp } = this.array;
 
     // the value will be stored somewhere
@@ -190,19 +245,21 @@ class DynamicArrayEntry extends BaseValue {
     }
 
     const returnAdress = new LiteralValue(null);
-    inst.push(...returnTemp["="](scope, returnAdress)[1]);
+    pipeInsts(returnTemp["="](scope, returnAdress), inst);
 
     const counter = new StoreValue(counterName);
-    const dIndexData = index["*"](scope, new LiteralValue(itemSize));
-    inst.push(...dIndexData[1]);
+    const doubleIndex = pipeInsts(
+      index["*"](scope, new LiteralValue(itemSize)),
+      inst
+    );
 
-    const lineData = getterAddr["+"](scope, dIndexData[0], counter);
-    inst.push(...lineData[1], ...counter["="](scope, lineData[0])[1]);
+    const line = pipeInsts(getterAddr["+"](scope, doubleIndex, counter), inst);
+    pipeInsts(counter["="](scope, line), inst);
 
     inst.push(new AddressResolver(returnAdress));
 
     // without this you can't access the array twice inside the same expression
-    inst.push(...temp["="](scope, getterTemp)[1]);
+    pipeInsts(temp["="](scope, getterTemp), inst);
 
     if (checked) {
       inst.push(new AddressResolver(failAddr));
@@ -211,52 +268,75 @@ class DynamicArrayEntry extends BaseValue {
   }
 
   "="(scope: IScope, value: IValue): TValueInstructions {
-    this.array.initSetter();
+    const { checked, index } = this;
+    const { setterTemp, values, setterAddr, returnTemp, lengthStore } =
+      this.array;
+
     const inst: IInstruction[] = [];
 
-    const { checked, index } = this;
-    const { setterTemp, values, setterAddr, returnTemp } = this.array;
+    // where to jump in checked mode if the index is out of range
+    const failAddress = new LiteralValue(null);
 
-    // used in both checked and unchecked modes
-    // indicates where to jump after sucess or failure
-    const returnAdress = new LiteralValue(null);
+    if (index instanceof LiteralValue) {
+      const member = values[index.data];
+      pipeInsts(member["="](scope, value), inst);
+    } else {
+      this.array.initSetter();
 
-    if (checked) {
-      inst.push(
-        new JumpInstruction(
-          returnAdress,
-          EJumpKind.LessThan,
-          index,
-          new LiteralValue(0)
-        ),
-        new JumpInstruction(
-          returnAdress,
-          EJumpKind.GreaterThan,
-          index,
-          new LiteralValue(values.length - 1)
-        )
+      // used in both checked and unchecked modes
+      // indicates where to jump after success
+      const returnAdress = new LiteralValue(null);
+
+      if (checked) {
+        inst.push(
+          new JumpInstruction(
+            failAddress,
+            EJumpKind.LessThan,
+            index,
+            new LiteralValue(0)
+          ),
+          new JumpInstruction(
+            failAddress,
+            EJumpKind.GreaterThan,
+            index,
+            new LiteralValue(values.length - 1)
+          )
+        );
+      }
+
+      pipeInsts(setterTemp["="](scope, value), inst);
+
+      pipeInsts(returnTemp["="](scope, returnAdress), inst);
+
+      const counter = new StoreValue(counterName);
+      const doubleIndex = pipeInsts(
+        index["*"](scope, new LiteralValue(itemSize)),
+        inst
       );
+
+      const line = pipeInsts(
+        setterAddr["+"](scope, doubleIndex, counter),
+        inst
+      );
+
+      pipeInsts(counter["="](scope, line), inst);
+
+      inst.push(new AddressResolver(returnAdress));
     }
 
-    inst.push(...setterTemp["="](scope, value)[1]);
+    if (lengthStore) {
+      const len = pipeInsts(index["+"](scope, new LiteralValue(1)), inst);
+      pipeInsts(lengthStore["="](scope, len), inst);
+    }
 
-    inst.push(...returnTemp["="](scope, returnAdress)[1]);
-
-    const counter = new StoreValue(counterName);
-    const dIndexData = index["*"](scope, new LiteralValue(itemSize));
-    inst.push(...dIndexData[1]);
-
-    const lineData = setterAddr["+"](scope, dIndexData[0], counter);
-    inst.push(...lineData[1], ...counter["="](scope, lineData[0])[1]);
-
-    inst.push(new AddressResolver(returnAdress));
+    inst.push(new AddressResolver(failAddress));
 
     return [value, inst];
   }
 }
 
 export class DynamicArrayConstructor extends MacroFunction {
-  constructor() {
+  constructor(dynamic: boolean) {
     super((scope, out, init) => {
       const name = extractOutName(out) ?? scope.makeTempName();
       const inst: IInstruction[] = [];
@@ -282,18 +362,28 @@ export class DynamicArrayConstructor extends MacroFunction {
         const length = init.data.length.data;
 
         for (let i = 0; i < length; i++) {
-          const [value, valueInst] = init.get(
-            scope,
-            new LiteralValue(i),
-            values[i]
+          const value = pipeInsts(
+            init.get(scope, new LiteralValue(i), values[i]),
+            inst
           );
-
-          inst.push(...valueInst);
-          inst.push(...values[i]["="](scope, value)[1]);
+          pipeInsts(values[i]["="](scope, value), inst);
         }
       }
 
-      return [new DynamicArray(scope, name, values), inst];
+      if (dynamic) {
+        const lengthStore = new StoreValue(getLengthName(name));
+        pipeInsts(
+          lengthStore["="](
+            scope,
+            new LiteralValue(init instanceof ObjectValue ? length : 0)
+          ),
+          inst
+        );
+      }
+
+      return [new DynamicArray(scope, name, values, dynamic), inst];
     });
   }
 }
+
+const getLengthName = (name: string) => `${name}.&len`;

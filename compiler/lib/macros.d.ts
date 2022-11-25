@@ -21,7 +21,7 @@ declare class Memory<S extends MemoryCapacity = 64> {
  *
  * The instructions for dynamic accesses
  */
-declare class DynamicArray<T> {
+declare class MutableArray<T> {
   /**
    * Creates a dynamic acess array, it can contain any type assignable to a store.
    */
@@ -39,9 +39,20 @@ declare class DynamicArray<T> {
   fill(value: T): void;
 
   /** The number of items defined in this array */
-  readonly length: number;
+  readonly size: number;
 
   [Symbol.iterator](): IterableIterator<T>;
+}
+
+declare class DynamicArray<T> extends MutableArray<T> {
+  /** Pops the last item of the array */
+  pop(): T;
+  push(item: T): void;
+  getLast(): T;
+  removeLast(): void;
+  removeAt(index: number): void;
+
+  get length(): number;
 }
 
 /**

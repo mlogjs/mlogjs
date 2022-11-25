@@ -261,7 +261,7 @@ export interface IValue extends IValueOperators {
    * A hook that the CallExpression and related handlers call
    * before evaluating the function parameters.
    */
-  preCall(scope: IScope, out?: TEOutput): readonly IValue[] | undefined;
+  preCall(scope: IScope, out?: TEOutput): readonly TEOutput[] | undefined;
 
   /**
    * A hook that the CallExpression and related handlers call
