@@ -49,7 +49,7 @@ declare class DynamicArray<T> extends MutableArray<T> {
   pop(): T;
   push(item: T): void;
   getLast(): T;
-  removeAt(index: number): void;
+  removeAt(index: number): T;
 
   get length(): number;
 }

@@ -8,12 +8,14 @@ import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
   EJumpKind,
+  InstructionBase,
   JumpInstruction,
   SetCounterInstruction,
   SetInstruction,
 } from "../instructions";
 import {
   EMutability,
+  IBindableValue,
   IInstruction,
   IScope,
   IValue,
@@ -42,10 +44,12 @@ export class DynamicArray extends ObjectValue {
   returnTemp: StoreValue;
   getterAddr: LiteralValue<number | null>;
   setterAddr: LiteralValue<number | null>;
+  removeAtAddr: LiteralValue<number | null>;
   lengthStore?: StoreValue;
 
   bundledSetter = false;
   bundledGetter = false;
+  bundledRemoveAt = false;
 
   constructor(
     public scope: IScope,
@@ -148,6 +152,81 @@ export class DynamicArray extends ObjectValue {
               const result = pipeInsts(entry.eval(scope, out), inst);
               return [result, inst];
             }),
+            removeAt: new MacroFunction((scope, out, index) => {
+              if (!index) throw new CompilerError("Missing index argument");
+              this.initRemoveAt();
+              if (index instanceof LiteralValue) {
+                if (!index.isNumber())
+                  throw new CompilerError(
+                    "The index must be a store or a number literal"
+                  );
+
+                if (index.data < 0 || index.data > values.length - 1)
+                  throw new CompilerError(
+                    `The index ${index.data} is out of the bounds: [0, ${
+                      values.length - 1
+                    }]`
+                  );
+              }
+              const checked = scope.checkIndexes;
+              const hasOut = out !== discardedName;
+              const { returnTemp } = this;
+              const inst: IInstruction[] = [];
+              let result: IValue = new LiteralValue(null);
+
+              const returnAdress = new LiteralValue(null);
+              const failAddress = new LiteralValue(null);
+
+              const upperBound = new JumpInstruction(
+                failAddress,
+                EJumpKind.GreaterThanEq,
+                index,
+                lengthStore
+              );
+
+              if (hasOut) {
+                const entry = new DynamicArrayEntry({
+                  scope,
+                  array: this,
+                  checked: scope.checkIndexes,
+                  index,
+                  failAddress,
+                  upperBound,
+                });
+                result = pipeInsts(entry.eval(scope), inst);
+              }
+
+              if (checked && !hasOut) {
+                if (!(index instanceof LiteralValue)) {
+                  inst.push(
+                    new JumpInstruction(
+                      failAddress,
+                      EJumpKind.LessThan,
+                      index,
+                      new LiteralValue(0)
+                    )
+                  );
+                }
+                inst.push(upperBound);
+              }
+
+              pipeInsts(returnTemp["="](scope, returnAdress), inst);
+
+              const counter = new StoreValue(counterName);
+              inst.push(
+                new InstructionBase(
+                  "op",
+                  "add",
+                  counter,
+                  this.removeAtAddr,
+                  index
+                )
+              );
+              inst.push(new AddressResolver(returnAdress));
+              pipeInsts(lengthStore["--"](scope, true), inst);
+              inst.push(new AddressResolver(failAddress));
+              return [result, inst];
+            }),
           }
         : {}),
     });
@@ -162,6 +241,7 @@ export class DynamicArray extends ObjectValue {
 
     this.getterAddr = new LiteralValue(null);
     this.setterAddr = new LiteralValue(null);
+    this.removeAtAddr = new LiteralValue(null);
   }
 
   getValue(
@@ -215,6 +295,24 @@ export class DynamicArray extends ObjectValue {
       );
     }
   }
+
+  initRemoveAt() {
+    if (this.bundledRemoveAt) return;
+    this.bundledRemoveAt = true;
+
+    const { inst } = this.scope;
+    inst.push(new AddressResolver(this.removeAtAddr));
+
+    for (let i = 0; i < this.values.length - 1; i++) {
+      const value = this.values[i];
+      const next = this.values[i + 1];
+
+      pipeInsts(value["="](this.scope, next), inst);
+    }
+    const last = this.values[this.values.length - 1];
+    pipeInsts(last["="](this.scope, new LiteralValue(null)), inst);
+    inst.push(new SetCounterInstruction(this.returnTemp));
+  }
 }
 
 class DynamicArrayEntry extends BaseValue {
@@ -224,6 +322,7 @@ class DynamicArrayEntry extends BaseValue {
   checked: boolean;
   newLength?: IValue;
   failAddress?: IBindableValue<number | null>;
+  upperBound?: JumpInstruction;
   constructor({
     array,
     checked,
@@ -231,9 +330,16 @@ class DynamicArrayEntry extends BaseValue {
     scope,
     newLength,
     failAddress,
+    upperBound,
   }: Pick<
     DynamicArrayEntry,
-    "scope" | "array" | "index" | "checked" | "newLength" | "failAddress"
+    | "scope"
+    | "array"
+    | "index"
+    | "checked"
+    | "newLength"
+    | "failAddress"
+    | "upperBound"
   >) {
     super();
     this.array = array;
@@ -242,6 +348,7 @@ class DynamicArrayEntry extends BaseValue {
     this.index = index;
     this.newLength = newLength;
     this.failAddress = failAddress;
+    this.upperBound = upperBound;
   }
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -275,12 +382,13 @@ class DynamicArrayEntry extends BaseValue {
           index,
           new LiteralValue(0)
         ),
-        new JumpInstruction(
-          failAddr,
-          EJumpKind.GreaterThan,
-          index,
-          new LiteralValue(values.length - 1)
-        )
+        this.upperBound ??
+          new JumpInstruction(
+            failAddr,
+            EJumpKind.GreaterThan,
+            index,
+            new LiteralValue(values.length - 1)
+          )
       );
     }
 
@@ -335,12 +443,13 @@ class DynamicArrayEntry extends BaseValue {
             index,
             new LiteralValue(0)
           ),
-          new JumpInstruction(
-            failAddress,
-            EJumpKind.GreaterThan,
-            index,
-            new LiteralValue(values.length - 1)
-          )
+          this.upperBound ??
+            new JumpInstruction(
+              failAddress,
+              EJumpKind.GreaterThan,
+              index,
+              new LiteralValue(values.length - 1)
+            )
         );
       }
 
@@ -367,7 +476,7 @@ class DynamicArrayEntry extends BaseValue {
     if (lengthStore) {
       const len =
         this.newLength ??
-        pipeInsts(index["+"](scope, new LiteralValue(1)), inst);
+        pipeInsts(index["+"](scope, new LiteralValue(1), lengthStore), inst);
       pipeInsts(lengthStore["="](scope, len), inst);
     }
 
