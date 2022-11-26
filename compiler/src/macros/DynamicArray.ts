@@ -109,17 +109,40 @@ export class DynamicArray extends ObjectValue {
                 scope,
                 array: this,
                 index,
-                checked,
+                checked: false,
                 newLength: index,
               });
 
               const nullLiteral = new LiteralValue(null);
-              const result =
-                out === discardedName
-                  ? nullLiteral
-                  : pipeInsts(entry.eval(scope, out), inst);
 
+              const failAddress = new LiteralValue(null);
+              const hasOut = out !== discardedName;
+              if (checked) {
+                if (hasOut)
+                  pipeInsts(
+                    this.getterTemp["="](scope, new LiteralValue(null)),
+                    inst
+                  );
+                inst.push(
+                  new JumpInstruction(
+                    failAddress,
+                    EJumpKind.LessThan,
+                    index,
+                    new LiteralValue(0)
+                  ),
+                  new JumpInstruction(
+                    failAddress,
+                    EJumpKind.GreaterThan,
+                    index,
+                    new LiteralValue(values.length - 1)
+                  )
+                );
+              }
+              const result = hasOut
+                ? pipeInsts(entry.eval(scope, out), inst)
+                : nullLiteral;
               pipeInsts(entry["="](scope, nullLiteral), inst);
+              inst.push(new AddressResolver(failAddress));
               return [result, inst];
             }),
             getLast: new MacroFunction((scope, out) => {
