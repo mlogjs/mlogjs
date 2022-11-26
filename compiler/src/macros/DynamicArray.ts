@@ -105,43 +105,30 @@ export class DynamicArray extends ObjectValue {
                 inst
               );
 
+              const failAddress = new LiteralValue(null);
+
               const entry = new DynamicArrayEntry({
                 scope,
                 array: this,
                 index,
-                checked: false,
+                checked,
                 newLength: index,
+                failAddress,
               });
 
               const nullLiteral = new LiteralValue(null);
 
-              const failAddress = new LiteralValue(null);
               const hasOut = out !== discardedName;
-              if (checked) {
-                if (hasOut)
-                  pipeInsts(
-                    this.getterTemp["="](scope, new LiteralValue(null)),
-                    inst
-                  );
-                inst.push(
-                  new JumpInstruction(
-                    failAddress,
-                    EJumpKind.LessThan,
-                    index,
-                    new LiteralValue(0)
-                  ),
-                  new JumpInstruction(
-                    failAddress,
-                    EJumpKind.GreaterThan,
-                    index,
-                    new LiteralValue(values.length - 1)
-                  )
-                );
-              }
+
               const result = hasOut
                 ? pipeInsts(entry.eval(scope, out), inst)
                 : nullLiteral;
+
+              // only add checks if the scope is checked and
+              // aren't any previous checks
+              entry.checked = checked && !hasOut;
               pipeInsts(entry["="](scope, nullLiteral), inst);
+
               inst.push(new AddressResolver(failAddress));
               return [result, inst];
             }),
@@ -236,15 +223,17 @@ class DynamicArrayEntry extends BaseValue {
   index: IValue | LiteralValue<number>;
   checked: boolean;
   newLength?: IValue;
+  failAddress?: IBindableValue<number | null>;
   constructor({
     array,
     checked,
     index,
     scope,
     newLength,
+    failAddress,
   }: Pick<
     DynamicArrayEntry,
-    "scope" | "array" | "index" | "checked" | "newLength"
+    "scope" | "array" | "index" | "checked" | "newLength" | "failAddress"
   >) {
     super();
     this.array = array;
@@ -252,6 +241,7 @@ class DynamicArrayEntry extends BaseValue {
     this.checked = checked;
     this.index = index;
     this.newLength = newLength;
+    this.failAddress = failAddress;
   }
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -274,7 +264,7 @@ class DynamicArrayEntry extends BaseValue {
 
     // used in checked mode, jumps to this address
     // if the index is out of bounds
-    const failAddr = new LiteralValue(null);
+    const failAddr = this.failAddress ?? new LiteralValue(null);
 
     if (checked) {
       inst.push(
@@ -311,7 +301,7 @@ class DynamicArrayEntry extends BaseValue {
     // without this you can't access the array twice inside the same expression
     pipeInsts(temp["="](scope, getterTemp), inst);
 
-    if (checked) {
+    if (checked && !this.failAddress) {
       inst.push(new AddressResolver(failAddr));
     }
     return [temp, inst];
@@ -325,7 +315,7 @@ class DynamicArrayEntry extends BaseValue {
     const inst: IInstruction[] = [];
 
     // where to jump in checked mode if the index is out of range
-    const failAddress = new LiteralValue(null);
+    const failAddress = this.failAddress ?? new LiteralValue(null);
 
     if (index instanceof LiteralValue) {
       const member = values[index.data];
@@ -381,7 +371,7 @@ class DynamicArrayEntry extends BaseValue {
       pipeInsts(lengthStore["="](scope, len), inst);
     }
 
-    inst.push(new AddressResolver(failAddress));
+    if (!this.failAddress) inst.push(new AddressResolver(failAddress));
 
     return [value, inst];
   }
