@@ -37,6 +37,7 @@ declare class MutableArray<T> {
 
   /** Fills the array with a given value */
   fill(value: T): void;
+  last(): T;
 
   /** The number of items defined in this array */
   readonly size: number;
@@ -48,7 +49,6 @@ declare class DynamicArray<T> extends MutableArray<T> {
   /** Pops the last item of the array */
   pop(): T;
   push(item: T): void;
-  getLast(): T;
   removeAt(index: number): T;
 
   get length(): number;

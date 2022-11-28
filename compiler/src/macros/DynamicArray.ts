@@ -62,6 +62,7 @@ export class DynamicArray extends ObjectValue {
     const returnName = `${name}.&rt`;
     const lengthName = `${name}.&len`;
     const lengthStore = new StoreValue(lengthName);
+    const sizeValue = new LiteralValue(values.length);
     super({
       // array[index]
       $get: new MacroFunction((scope, out, index) =>
@@ -84,7 +85,25 @@ export class DynamicArray extends ObjectValue {
         return [null, inst];
       }),
 
-      size: new LiteralValue(values.length),
+      last: new MacroFunction((scope, out) => {
+        const checked = scope.checkIndexes;
+        const inst: IInstruction[] = [];
+
+        const index = pipeInsts(
+          (this.lengthStore ?? sizeValue)["-"](scope, new LiteralValue(1)),
+          inst
+        );
+        const entry = new DynamicArrayEntry({
+          scope,
+          array: this,
+          index,
+          checked,
+        });
+        const result = pipeInsts(entry.eval(scope, out), inst);
+        return [result, inst];
+      }),
+
+      size: sizeValue,
 
       ...(dynamic
         ? {
@@ -134,22 +153,6 @@ export class DynamicArray extends ObjectValue {
               pipeInsts(entry["="](scope, nullLiteral), inst);
 
               inst.push(new AddressResolver(failAddress));
-              return [result, inst];
-            }),
-            getLast: new MacroFunction((scope, out) => {
-              const checked = scope.checkIndexes;
-              const inst: IInstruction[] = [];
-              const index = pipeInsts(
-                lengthStore["-"](scope, new LiteralValue(1)),
-                inst
-              );
-              const entry = new DynamicArrayEntry({
-                scope,
-                array: this,
-                index,
-                checked,
-              });
-              const result = pipeInsts(entry.eval(scope, out), inst);
               return [result, inst];
             }),
             removeAt: new MacroFunction((scope, out, index) => {
