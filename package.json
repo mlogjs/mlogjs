@@ -5,8 +5,8 @@
   ],
   "packageManager": "pnpm@7.14.1",
   "devDependencies": {
-    "prettier": "^2.5.1",
-    "typescript": "^4.8.3",
+    "prettier": "^2.8.1",
+    "typescript": "^4.9.4",
     "vite": "^3.2.1"
   }
 }
