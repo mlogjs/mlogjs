@@ -37,7 +37,7 @@ declare class MutableArray<T> {
 
   /** Fills the array with a given value */
   fill(value: T): void;
-  last(): T;
+  at(index: number): T;
 
   /** The number of items defined in this array */
   readonly size: number;

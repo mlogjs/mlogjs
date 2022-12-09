@@ -85,19 +85,42 @@ export class DynamicArray extends ObjectValue {
         return [null, inst];
       }),
 
-      last: new MacroFunction((scope, out) => {
-        const checked = scope.checkIndexes;
+      at: new MacroFunction((scope, out, index) => {
         const inst: IInstruction[] = [];
 
-        const index = pipeInsts(
-          (this.lengthStore ?? sizeValue)["-"](scope, new LiteralValue(1)),
+        const isLiteral = index instanceof LiteralValue;
+        if (isLiteral) {
+          assertBounds(index, -values.length, values.length - 1);
+        }
+
+        const indexTemp = isLiteral ? index : StoreValue.from(scope);
+
+        const address = new LiteralValue(null);
+
+        if (!isLiteral) {
+          pipeInsts(indexTemp["="](scope, index), inst);
+          inst.push(
+            new JumpInstruction(
+              address,
+              EJumpKind.GreaterThanEq,
+              indexTemp,
+              new LiteralValue(0)
+            )
+          );
+        }
+
+        const finalIndex = pipeInsts(
+          indexTemp["+"](scope, this.lengthStore ?? sizeValue, indexTemp),
           inst
         );
+
+        if (!isLiteral) inst.push(new AddressResolver(address));
+
         const entry = new DynamicArrayEntry({
           scope,
           array: this,
-          index,
-          checked,
+          index: finalIndex,
+          checked: scope.checkIndexes,
         });
         const result = pipeInsts(entry.eval(scope, out), inst);
         return [result, inst];
@@ -159,17 +182,7 @@ export class DynamicArray extends ObjectValue {
               if (!index) throw new CompilerError("Missing index argument");
               this.initRemoveAt();
               if (index instanceof LiteralValue) {
-                if (!index.isNumber())
-                  throw new CompilerError(
-                    "The index must be a store or a number literal"
-                  );
-
-                if (index.data < 0 || index.data > values.length - 1)
-                  throw new CompilerError(
-                    `The index ${index.data} is out of the bounds: [0, ${
-                      values.length - 1
-                    }]`
-                  );
+                assertBounds(index, 0, values.length - 1);
               }
               const checked = scope.checkIndexes;
               const hasOut = out !== discardedName;
@@ -257,13 +270,7 @@ export class DynamicArray extends ObjectValue {
     const { values } = this;
 
     if (index instanceof LiteralValue) {
-      if (!index.isNumber())
-        throw new CompilerError(`Unknown dynamic array property: "${index}"`);
-
-      if (index.data < 0 || index.data >= values.length)
-        throw new CompilerError(
-          `The index ${index.data} is out of bounds: [0, ${values.length - 1}]`
-        );
+      assertBounds(index, 0, values.length - 1);
     }
 
     const entry = new DynamicArrayEntry({ scope, array: this, index, checked });
@@ -541,3 +548,18 @@ export class DynamicArrayConstructor extends MacroFunction {
 }
 
 const getLengthName = (name: string) => `${name}.&len`;
+
+function assertBounds(
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  index: LiteralValue<any>,
+  min: number,
+  max: number
+): asserts index is LiteralValue<number> {
+  if (!index.isNumber())
+    throw new CompilerError("The index must be a store or a number literal");
+
+  if (index.data < min || index.data > max)
+    throw new CompilerError(
+      `The index "${index.data}" is out of bounds: [${min}, ${max}]`
+    );
+}

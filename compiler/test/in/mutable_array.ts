@@ -15,7 +15,7 @@ print`
 ${units[0]}
 ${units[1]}
 ${units[2]}
-${units.last()}
+${units.at(-1)}
 `;
 printFlush();
 wait(0.5);
