@@ -34,7 +34,7 @@ export default defineConfig([
       typescript({
         tsconfig: "./tsconfig.json",
         compilerOptions: {
-          declarationDir: "types",
+          outDir: "./dist",
           declaration: true,
           sourceMap: dev,
         },

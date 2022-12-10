@@ -13,8 +13,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "vitepress": "1.0.0-alpha.26",
-    "vue": "^3.2.41"
+    "vitepress": "1.0.0-alpha.30",
+    "vue": "^3.2.45"
   },
   "dependencies": {
     "@guolao/vue-monaco-editor": "^0.0.5",
