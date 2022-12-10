@@ -31,7 +31,7 @@ while (true) {
         print`removed: ${arr.pop()}\n`;
         break;
       case 3: {
-        print`removed: ${arr.last()}\n`;
+        print`removed: ${arr.at(-1)}\n`;
         arr.pop();
         break;
       }
