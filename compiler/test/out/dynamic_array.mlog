@@ -80,7 +80,7 @@ print "removed: "
 print &t2
 print "\n"
 jump 101 always
-op sub &t5 arr:1:6.&len 1
+op add &t5 -1 arr:1:6.&len
 set &t6 null
 jump 90 lessThan &t5 0
 jump 90 greaterThan &t5 4
