@@ -326,6 +326,7 @@ export class DynamicArray extends ObjectValue {
 }
 
 class DynamicArrayEntry extends BaseValue {
+  macro = true;
   scope: IScope;
   array: DynamicArray;
   index: IValue | LiteralValue<number>;
