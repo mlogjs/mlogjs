@@ -209,7 +209,15 @@ export class DynamicArray extends ObjectValue {
                   failAddress,
                   upperBound,
                 });
-                result = pipeInsts(entry.eval(scope), inst);
+
+                if (index instanceof LiteralValue) {
+                  const value = pipeInsts(entry.eval(scope), inst);
+                  result = StoreValue.from(scope, out);
+
+                  pipeInsts(result["="](scope, value), inst);
+                } else {
+                  result = pipeInsts(entry.eval(scope, out), inst);
+                }
               }
 
               if (checked && !hasOut) {
@@ -376,9 +384,12 @@ class DynamicArrayEntry extends BaseValue {
 
     // the value will be stored somewhere
     // no need to save it in a temporary variable
-    const temp = out
-      ? getterTemp
-      : SenseableValue.from(scope, undefined, EMutability.mutable);
+    const temp =
+      out instanceof StoreValue
+        ? out
+        : out
+        ? getterTemp
+        : SenseableValue.from(scope, undefined, EMutability.mutable);
 
     // used in checked mode, jumps to this address
     // if the index is out of bounds
