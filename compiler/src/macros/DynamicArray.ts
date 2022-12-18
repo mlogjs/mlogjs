@@ -221,7 +221,7 @@ export class DynamicArray extends ObjectValue {
               }
 
               if (checked) {
-                if (!(hasOut && index instanceof LiteralValue)) {
+                if (!hasOut && !(index instanceof LiteralValue)) {
                   inst.push(
                     new JumpInstruction(
                       failAddress,
@@ -231,7 +231,8 @@ export class DynamicArray extends ObjectValue {
                     )
                   );
                 }
-                inst.push(upperBound);
+                if (!hasOut || index instanceof LiteralValue)
+                  inst.push(upperBound);
               }
 
               pipeInsts(returnTemp["="](scope, returnAdress), inst);
