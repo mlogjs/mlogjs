@@ -220,8 +220,8 @@ export class DynamicArray extends ObjectValue {
                 }
               }
 
-              if (checked && !hasOut) {
-                if (!(index instanceof LiteralValue)) {
+              if (checked) {
+                if (!(hasOut && index instanceof LiteralValue)) {
                   inst.push(
                     new JumpInstruction(
                       failAddress,
