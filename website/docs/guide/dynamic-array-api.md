@@ -43,6 +43,10 @@ And you can fill the array with a value using `fill`.
 array.fill(0);
 ```
 
+::: warning
+Using indexes that are not integers can lead to unpredictable runtime behavior.
+:::
+
 ## `DynamicArray`
 
 A `DynamicArray` instance is a `MutableArray` that "emulates" a resizeable array with a mutable length.
