@@ -45,6 +45,7 @@ const config: UserConfig = {
             { text: "Helper methods", link: "/guide/helper-methods" },
             { text: "Commands", link: "/guide/commands" },
             { text: "Memory API", link: "/guide/memory-api" },
+            { text: "Dynamic Array API", link: "/guide/dynamic-array-api" },
             { text: "Supported Syntax", link: "/guide/syntax-support" },
           ],
         },
