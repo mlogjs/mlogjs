@@ -133,8 +133,25 @@ It can remove bound checks from:
 ::: warning
 
 Using `unchecked` is can lead to undefined behavior and corruption of a script's control flow
-if the operations don't use valid indexes, so make sure that the index you use is valid
-when combining index accesses, the `at` and `removeAt` methods with `unchecked`.
-Similarly, make sure that the array has a valid state (a definition that changes for each method) when combining the `push`, `pop` and `removeAt` methods with `unchecked`.
+if the operations are performed with a _bad state_. Here is a list of things
+that are considered bad state for each method when combined with `unchecked`:
+
+- Index accesses and `.at`:
+
+  - The array is empty
+  - The index is not an integer
+  - The index is out of bounds
+
+- `.push`
+
+  - The array is full
+
+- `.pop`
+
+  - The array is empty
+
+- `.removeAt`
+  - The array is empty
+  - The index is greater than or equal to the length of the array.
 
 :::
