@@ -134,7 +134,7 @@ It can remove bound checks from:
   unchecked(array.removeAt(4));
   ```
 
-::: warning
+::: danger
 
 Using `unchecked` is can lead to undefined behavior and corruption of a script's control flow
 if the operations are performed with a _bad state_. Here is a list of things
