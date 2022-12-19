@@ -136,7 +136,7 @@ It can remove bound checks from:
 
 ::: danger
 
-Using `unchecked` is can lead to undefined behavior and corruption of a script's control flow
+Using `unchecked` can lead to undefined behavior and corruption of a script's control flow
 if the operations are performed with a _bad state_. Here is a list of things
 that are considered bad state for each method when combined with `unchecked`:
 
