@@ -94,6 +94,8 @@ declare class DynamicArray<T> extends MutableArray<T> {
    *
    * This method only generates the instructions for getting the value when needed.
    *
+   * The index must be within the range: [`0`, `this.length - 1`]
+   *
    * You can use `unchecked` to skip the bound check.
    *
    * ```js
