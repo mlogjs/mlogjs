@@ -48,3 +48,12 @@ export function hideRedundantJumps(inst: IInstruction[]) {
     }
   }
 }
+
+/** A helper that appends the instructions from `value` into `inst` and returns it's `IValue` instance */
+export function pipeInsts<T extends IValue | null>(
+  value: TValueInstructions<T>,
+  inst: IInstruction[]
+): T {
+  inst.push(...value[1]);
+  return value[0];
+}

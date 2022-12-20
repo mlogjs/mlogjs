@@ -10,8 +10,15 @@ import {
   LogicalOperator,
   updateOperators,
 } from "../operators";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
+import { pipeInsts } from "../utils";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -54,7 +61,7 @@ export class BaseValue extends VoidValue implements IValue {
       return [this, []];
     }
 
-    const result = SenseableValue.out(scope, out);
+    const result = SenseableValue.from(scope, out, EMutability.mutable);
 
     const [left, leftInst] = this.eval(scope, result);
     const [right, rightInst] = other.eval(scope, result);
@@ -177,9 +184,8 @@ for (const key of updateOperators) {
     let [ret, inst] = this.eval(scope);
     if (!prefix) {
       const temp = StoreValue.out(scope, out);
-      const [tempValue, tempInst] = temp["="](scope, ret);
+      const tempValue = pipeInsts(temp["="](scope, ret), inst);
       ret = tempValue;
-      inst.push(...tempInst);
     }
     const kind = key === "++" ? "+=" : "-=";
     return [ret, [...inst, ...this[kind](scope, new LiteralValue(1))[1]]];

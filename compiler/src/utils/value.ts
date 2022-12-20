@@ -90,11 +90,16 @@ export function assertIsObjectMacro(
 export function assertIsArrayMacro(
   value: IValue | undefined,
   name: string
-): asserts value is ObjectValue {
+): asserts value is ObjectValue & {
+  data: {
+    length: LiteralValue<number>;
+  };
+} {
   if (value instanceof ObjectValue) {
     const { length } = value.data;
     if (length instanceof LiteralValue && length.isNumber()) return;
   }
+
   throw new CompilerError(`${name} must be an array macro`);
 }
 

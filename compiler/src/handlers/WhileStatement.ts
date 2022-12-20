@@ -1,5 +1,5 @@
 import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
-import { es, IInstruction, THandler } from "../types";
+import { es, THandler } from "../types";
 import { withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -8,7 +8,6 @@ export const WhileStatement: THandler<null> = (
   scope,
   node: es.WhileStatement
 ) => {
-  const lines: IInstruction[] = [];
   const [test, testLines] = c.handleEval(scope, node.test);
 
   const childScope = scope.createScope();
@@ -25,30 +24,35 @@ export const WhileStatement: THandler<null> = (
 
   if (test instanceof LiteralValue) {
     if (test.data) {
-      lines.push(
-        startLoopLine,
-        ...c.handle(childScope, node.body)[1],
-        new JumpInstruction(startLoopAddr, EJumpKind.Always),
-        endLoopLine
-      );
+      return [
+        null,
+        [
+          startLoopLine,
+          ...c.handle(childScope, node.body)[1],
+          new JumpInstruction(startLoopAddr, EJumpKind.Always),
+          endLoopLine,
+        ],
+      ];
     }
-    return [null, lines];
+    return [null, []];
   }
 
-  lines.push(
-    startLoopLine,
-    ...testLines,
-    new JumpInstruction(
-      endLoopAddr,
-      EJumpKind.Equal,
-      test,
-      new LiteralValue(0)
-    ),
-    ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
-    new JumpInstruction(startLoopAddr, EJumpKind.Always),
-    endLoopLine
-  );
-  return [null, lines];
+  return [
+    null,
+    [
+      startLoopLine,
+      ...testLines,
+      new JumpInstruction(
+        endLoopAddr,
+        EJumpKind.Equal,
+        test,
+        new LiteralValue(0)
+      ),
+      ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
+      new JumpInstruction(startLoopAddr, EJumpKind.Always),
+      endLoopLine,
+    ],
+  ];
 };
 
 export const DoWhileStatement: THandler<null> = (
@@ -56,7 +60,6 @@ export const DoWhileStatement: THandler<null> = (
   scope,
   node: es.DoWhileStatement
 ) => {
-  const lines: IInstruction[] = [];
   const [test, testLines] = c.handleEval(scope, node.test);
 
   const childScope = scope.createScope();
@@ -72,11 +75,10 @@ export const DoWhileStatement: THandler<null> = (
   const [, bodyLines] = c.handle(childScope, node.body);
 
   if (test instanceof LiteralValue) {
-    if (!test.data) return [null, [...lines, ...bodyLines]];
+    if (!test.data) return [null, bodyLines];
     return [
       null,
       [
-        ...lines,
         startLoopLine,
         ...bodyLines,
         new JumpInstruction(startLoopAddr, EJumpKind.Always),
@@ -84,16 +86,18 @@ export const DoWhileStatement: THandler<null> = (
     ];
   }
 
-  lines.push(
-    startLoopLine,
-    ...bodyLines,
-    ...testLines,
-    new JumpInstruction(
-      startLoopAddr,
-      EJumpKind.Equal,
-      test,
-      new LiteralValue(1)
-    )
-  );
-  return [null, lines];
+  return [
+    null,
+    [
+      startLoopLine,
+      ...bodyLines,
+      ...testLines,
+      new JumpInstruction(
+        startLoopAddr,
+        EJumpKind.Equal,
+        test,
+        new LiteralValue(1)
+      ),
+    ],
+  ];
 };

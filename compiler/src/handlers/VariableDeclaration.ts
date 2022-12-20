@@ -15,7 +15,7 @@ import {
   EMutability,
   IInstruction,
 } from "../types";
-import { nodeName } from "../utils";
+import { nodeName, pipeInsts } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { Compiler } from "../Compiler";
 
@@ -42,9 +42,9 @@ export const VariableDeclarator: THandler<null> = (
 
   if (init) {
     const [result, resultInst] = c.handleEval(scope, init, value.out);
-    inst.push(...value.handler(result, resultInst)[1]);
+    pipeInsts(value.handler(result, resultInst), inst);
   } else {
-    inst.push(...value.handler(null, [])[1]);
+    pipeInsts(value.handler(null, []), inst);
   }
 
   return [null, inst];
@@ -108,7 +108,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
               "Macro values must be held by constants",
               node
             );
-          inst.push(...value["="](scope, init)[1]);
+          pipeInsts(value["="](scope, init), inst);
         }
         if (kind === "const") value.mutability = EMutability.constant;
         return [null, inst];
@@ -135,8 +135,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
 
     if (!element) continue;
 
-    const [value, valueInst] = Declare(c, scope, element, kind);
-    inst.push(...valueInst);
+    const value = pipeInsts(Declare(c, scope, element, kind), inst);
 
     members.set(new LiteralValue(i), {
       value: value.out,
@@ -180,8 +179,8 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
         throw new CompilerError(
           "The value being destructured must be an object value"
         );
+      pipeInsts(out["="](scope, init), initInst);
 
-      initInst.push(...out["="](scope, init)[1]);
       return [null, initInst];
     },
   });
@@ -195,8 +194,6 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   node,
   kind
 ) => {
-  const inst: IInstruction[] = [];
-
   const members: TDestructuringMembers = new Map();
 
   const { properties } = node;
@@ -240,12 +237,12 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
           node
         );
 
-      initInst.push(...out["="](scope, init)[1]);
+      pipeInsts(out["="](scope, init), initInst);
 
       return [null, initInst];
     },
   });
-  return [declarationValue, [...inst, ...propertiesInst[1]]];
+  return [declarationValue, propertiesInst[1]];
 };
 
 class DeclarationValue extends VoidValue {

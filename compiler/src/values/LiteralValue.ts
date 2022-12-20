@@ -28,6 +28,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   extends BaseValue
   implements IBindableValue<T>
 {
+  name: string;
   data: T;
   mutability = EMutability.constant;
   constructor(data: T) {

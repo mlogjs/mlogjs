@@ -1,4 +1,5 @@
 import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
+import { pipeInsts } from "../utils";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
@@ -46,8 +47,10 @@ export class DestructuringValue extends VoidValue {
     const inst: IInstruction[] = [];
 
     for (const [key, { value, handler }] of this.members) {
-      const [, handlerInst] = handler(() => right.get(scope, key, value));
-      inst.push(...handlerInst);
+      pipeInsts(
+        handler(() => right.get(scope, key, value)),
+        inst
+      );
     }
     return [right, inst];
   }

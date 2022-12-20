@@ -1,4 +1,5 @@
 import { es, IInstruction, IValue, THandler } from "../types";
+import { pipeInsts } from "../utils";
 import { LiteralValue, ObjectValue } from "../values";
 
 export const CallExpression: THandler<IValue | null> = (
@@ -9,22 +10,18 @@ export const CallExpression: THandler<IValue | null> = (
 ) => {
   const inst: IInstruction[] = [];
 
-  const [callee, calleeInst] = c.handleEval(scope, node.callee);
-  inst.push(...calleeInst);
+  const callee = pipeInsts(c.handleEval(scope, node.callee), inst);
 
-  const paramOuts = callee.paramOuts();
+  const paramOuts = callee.preCall(scope, out);
 
   const args = node.arguments.map((node, index) => {
-    // TODO: this might be why t0 did not increment
-    // TODO: figure out if the previous todo is still relevant
     const out = paramOuts?.[index];
-    const [v, i] = c.handleEval(scope, node, out);
-    inst.push(...i);
-    return v;
+    return pipeInsts(c.handleEval(scope, node, out), inst);
   });
 
-  const [callValue, callInst] = callee.call(scope, args, out);
-  inst.push(...callInst);
+  const callValue = pipeInsts(callee.call(scope, args, out), inst);
+
+  callee.postCall(scope);
 
   return [callValue, inst];
 };
@@ -54,9 +51,8 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   const expressionInsts: IInstruction[] = [];
 
   template.expressions.forEach(expression => {
-    const [value, inst] = c.handleEval(scope, expression);
+    const value = pipeInsts(c.handleEval(scope, expression), expressionInsts);
     expressions.push(value);
-    expressionInsts.push(...inst);
   });
 
   const [result, resultInst] = tag.call(

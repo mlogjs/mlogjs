@@ -1,9 +1,11 @@
 import {
   commands,
   Concat,
+  DynamicArrayConstructor,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
+  Unchecked,
   VarsNamespace,
 } from "./macros";
 import { GetGlobal } from "./macros/GetGlobal";
@@ -33,6 +35,9 @@ export function initScope(scope: Scope) {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
+  scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
+  scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
+  scope.hardSet("unchecked", new Unchecked());
 
   // commands
   scope.hardSet("draw", new commands.Draw());

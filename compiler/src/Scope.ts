@@ -17,6 +17,9 @@ export class Scope implements IScope {
   continue!: AddressResolver;
   function!: IFunctionValue;
   label?: string;
+  // Only `unchecked` is supposed to change this
+  checkIndexes = true;
+
   constructor(
     values: Record<string, IValue | null>,
     public parent: IScope | null = null,
