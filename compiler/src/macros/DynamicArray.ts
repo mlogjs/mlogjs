@@ -60,7 +60,7 @@ export class DynamicArray extends ObjectValue {
     const getterName = `${name}.&gtemp`;
     const setterName = `${name}.&stemp`;
     const returnName = `${name}.&rt`;
-    const lengthName = `${name}.&len`;
+    const lengthName = getLengthName(name);
     const lengthStore = new StoreValue(lengthName);
     const sizeValue = new LiteralValue(values.length);
     super({
