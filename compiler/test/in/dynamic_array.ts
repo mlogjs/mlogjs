@@ -1,6 +1,14 @@
 const arr = new DynamicArray<number>(5);
 arr.fill(0);
 
+print`last: ${arr.removeAt(arr.size - 1)}\n`;
+
+const index = -Math.floor(Math.rand(arr.length));
+print`${index}: ${arr.at(index)}\n`;
+printFlush();
+
+wait(2);
+
 const counterLimit = 4;
 let counter = 0;
 
