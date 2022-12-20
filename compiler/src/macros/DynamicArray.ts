@@ -109,10 +109,13 @@ export class DynamicArray extends ObjectValue {
           );
         }
 
-        const finalIndex = pipeInsts(
-          indexTemp["+"](scope, this.lengthStore ?? sizeValue, indexTemp),
-          inst
-        );
+        const finalIndex =
+          isLiteral && index.data >= 0
+            ? index
+            : pipeInsts(
+                indexTemp["+"](scope, this.lengthStore ?? sizeValue, indexTemp),
+                inst
+              );
 
         if (!isLiteral) inst.push(new AddressResolver(address));
 
