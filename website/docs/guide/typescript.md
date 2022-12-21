@@ -19,19 +19,13 @@ npm install -g typescript
 
 ## Intellisense
 
-To get the autocompletion and type checking features from your IDE you will have
-to create a `tsconfig.json` file at the root of your project with the following contents:
+To get the autocompletion and type checking features from your IDE you can run the
+following command on an empty directory:
 
-```json
-{
-  "compilerOptions": {
-    "allowJs": true,
-    "noEmit": true,
-    "types": ["mlogjs/lib"]
-  },
-  "include": ["*.js", "*.ts*"],
-  "exclude": ["node_modules"]
-}
+```bash
+mlogjs setup --tsconfig
 ```
+
+It will copy the type definitions into a `lib` folder and the `--tsconfig` flag will make it create a `tsconfig.json` file with the minimal recommended configuration.
 
 If you place your scripts in a nested folder, you should add it to the `include` field of your `tsconfig.json`
