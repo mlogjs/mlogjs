@@ -10,6 +10,7 @@ import {
   EJumpKind,
   InstructionBase,
   JumpInstruction,
+  OperationInstruction,
   SetCounterInstruction,
   SetInstruction,
 } from "../instructions";
@@ -500,10 +501,24 @@ class DynamicArrayEntry extends BaseValue {
     }
 
     if (lengthStore) {
-      const len =
-        this.newLength ??
-        pipeInsts(index["+"](scope, new LiteralValue(1), lengthStore), inst);
-      pipeInsts(lengthStore["="](scope, len), inst);
+      if (this.newLength) {
+        pipeInsts(lengthStore["="](scope, this.newLength), inst);
+      } else {
+        const indexIsLength = index.name === lengthStore.name;
+
+        const len = pipeInsts(
+          index["+"](
+            scope,
+            new LiteralValue(1),
+            indexIsLength ? lengthStore : undefined
+          ),
+          inst
+        );
+        if (!indexIsLength)
+          inst.push(
+            new OperationInstruction("max", lengthStore, len, lengthStore)
+          );
+      }
     }
 
     if (!this.failAddress) inst.push(new AddressResolver(failAddress));
