@@ -28,6 +28,9 @@
     "url": "https://github.com/weisrc/mlogjs/issues"
   },
   "homepage": "https://github.com/weisrc/mlogjs#readme",
+  "engines": {
+    "node": ">=16"
+  },
   "dependencies": {
     "@babel/parser": "^7.20.5",
     "@babel/types": "^7.20.5",
@@ -39,7 +42,7 @@
     "@rollup/plugin-alias": "^4.0.2",
     "@rollup/plugin-typescript": "^10.0.1",
     "@types/jest": "^29.2.4",
-    "@types/node": "^15.14.9",
+    "@types/node": "^16.18.10",
     "@types/yargs": "^17.0.17",
     "@typescript-eslint/eslint-plugin": "^5.46.0",
     "@typescript-eslint/parser": "^5.46.0",
