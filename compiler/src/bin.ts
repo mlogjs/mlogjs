@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, writeFileSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, cpSync } from "fs";
 import { hideBin } from "yargs/helpers";
 import { Compiler } from ".";
 import { highlight } from "cli-highlight";
@@ -6,7 +6,58 @@ import yargs from "yargs";
 import chalk from "chalk";
 import { join, parse, resolve } from "path";
 
+// eslint-disable-next-line @typescript-eslint/no-floating-promises
 yargs(hideBin(process.argv))
+  .command(
+    "setup [dir]",
+    "Copies the compiler type definitions in the current folder",
+    yargs => {
+      return yargs
+        .positional("dir", {
+          default: ".",
+          type: "string",
+          describe:
+            "The directory where the type definitions folder will be copied",
+        })
+        .option("tsconfig", {
+          type: "boolean",
+          default: false,
+          describe:
+            "Wether a tsconfig.json file should be created in the current directory",
+        });
+    },
+    argv => {
+      const parentFolderName = "/compiler";
+      const currentPath = __dirname.replace(/\\/g, "/");
+
+      const parent = currentPath.slice(
+        0,
+        currentPath.lastIndexOf(parentFolderName)
+      );
+      const libPath = join(parent, "compiler/lib");
+      const dir = resolve(process.cwd(), argv.dir);
+      const target = join(dir, "lib");
+      cpSync(libPath, target, {
+        recursive: true,
+      });
+
+      if (!argv.tsconfig) return;
+
+      const tsconfigPath = join(dir, "tsconfig.json");
+      const json = {
+        compilerOptions: {
+          allowJs: true,
+          checkJs: true,
+          moduleDetection: "force",
+          noEmit: true,
+          noLib: true,
+        },
+        include: ["./lib", "*.js", "*.ts"],
+        exclude: ["node_modules"],
+      };
+      writeFileSync(tsconfigPath, JSON.stringify(json, null, "\t"));
+    }
+  )
   .command(
     "$0 [path] [out]",
     "compiles your Javascript file to MLog",
