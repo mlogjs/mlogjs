@@ -110,7 +110,7 @@ op rand z:173:22 2
 set x:173:16 2
 set y:173:19 5
 set &rrotate:173:0 113
-jump 214 always
+jump 216 always
 jump 10 always
 end
 op mul &t0:drawLine:139:0 a31:25:4 p1x:139:18
@@ -156,6 +156,7 @@ op add &t35:drawLine:139:0 &t33:drawLine:139:0 &t34:drawLine:139:0
 op mul &t36:drawLine:139:0 &t35:drawLine:139:0 persp2:143:8
 op add &t37:drawLine:139:0 &t36:drawLine:139:0 38.5
 draw line &t16:drawLine:139:0 &t23:drawLine:139:0 &t30:drawLine:139:0 &t37:drawLine:139:0
+set &fdrawLine:139:0 null
 set @counter &rdrawLine:139:0
 set _a11:153:8 a11:19:4
 set _a12:154:4 a12:20:2
@@ -211,6 +212,7 @@ op mul &t33:multiplyMatrices:152:0 _a32:160:4 b23:152:51
 op add &t34:multiplyMatrices:152:0 &t32:multiplyMatrices:152:0 &t33:multiplyMatrices:152:0
 op mul &t35:multiplyMatrices:152:0 _a33:161:4 b33:152:66
 op add a33:27:2 &t34:multiplyMatrices:152:0 &t35:multiplyMatrices:152:0
+set &fmultiplyMatrices:152:0 null
 set @counter &rmultiplyMatrices:152:0
 op cos &t0:rotate:173:0 z:173:22
 op cos &t1:rotate:173:0 y:173:19
@@ -240,6 +242,7 @@ op add b23:152:51 &t16:rotate:173:0 &t18:rotate:173:0
 op sub b31:152:56 0 &t6:rotate:173:0
 op mul b32:152:61 &t1:rotate:173:0 &t8:rotate:173:0
 op mul b33:152:66 &t1:rotate:173:0 &t4:rotate:173:0
-set &rmultiplyMatrices:152:0 244
-jump 159 always
+set &rmultiplyMatrices:152:0 246
+jump 160 always
+set &frotate:173:0 null
 set @counter &rrotate:173:0

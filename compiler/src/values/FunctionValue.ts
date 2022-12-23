@@ -115,6 +115,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     ];
 
     if (!endsWithReturn(this.inst)) {
+      pipeInsts(this.temp["="](this.scope, new LiteralValue(null)), this.inst);
       this.inst.push(
         assign(new SetCounterInstruction(this.ret), {
           intent: EInstIntent.return,

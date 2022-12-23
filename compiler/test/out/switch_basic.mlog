@@ -8,13 +8,13 @@ set &t1:matchItem:18:0 @sand
 print &t1:matchItem:18:0
 set item:57:18 @copper
 set &ritemUses:57:0 11
-jump 72 always
+jump 73 always
 set item:57:18 @coal
 set &ritemUses:57:0 14
-jump 72 always
+jump 73 always
 set item:57:18 @silicon
 set &ritemUses:57:0 17
-jump 72 always
+jump 73 always
 print "always runs!\n"
 printflush message1
 end
@@ -69,19 +69,21 @@ set &fmatchItem:18:0 @pyratite
 set @counter &rmatchItem:18:0
 set &fmatchItem:18:0 null
 set @counter &rmatchItem:18:0
+set &fmatchItem:18:0 null
 set @counter &rmatchItem:18:0
-jump 76 strictEqual item:57:18 @copper
-jump 80 strictEqual item:57:18 @coal
-jump 84 strictEqual item:57:18 @silicon
-jump 85 always
+jump 77 strictEqual item:57:18 @copper
+jump 81 strictEqual item:57:18 @coal
+jump 85 strictEqual item:57:18 @silicon
+jump 86 always
 print "Basic material\n"
 print "Ammo for some units\n"
 print "Duo ammo\n"
-jump 85 always
+jump 86 always
 print "Burn things\n"
 print "Scorch ammo\n"
 print "Energy\n"
-jump 85 always
+jump 86 always
 print "Silligone\n"
 print "Something at the end\n"
+set &fitemUses:57:0 null
 set @counter &ritemUses:57:0
