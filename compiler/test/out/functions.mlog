@@ -28,4 +28,5 @@ op strictEqual &t3:op:26:0 type:26:12 3
 jump 30 equal &t3:op:26:0 0
 op div &fop:26:0 a:26:18 b:26:21
 set @counter &rop:26:0
+set &fop:26:0 null
 set @counter &rop:26:0

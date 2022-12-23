@@ -55,7 +55,7 @@ export const ReturnStatement: THandler<IValue | null> = (
 
   const [arg, argInst] = argument
     ? [new LazyValue((scope, out) => c.handleEval(scope, argument, out)), []]
-    : [null, []];
+    : [new LiteralValue(null), []];
   const [ret, retInst] = scope.function.return(scope, arg, out);
   return [ret, [...argInst, ...retInst]];
 };
