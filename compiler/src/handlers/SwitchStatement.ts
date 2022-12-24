@@ -62,6 +62,7 @@ export const SwitchStatement: THandler<null> = (
     if (comp instanceof LiteralValue) {
       // whether other cases can falltrough and reach this one
       const noFallInto = !canFallInto;
+      const isLastCase = scase === node.cases[node.cases.length - 1];
       if (!comp.data) {
         // this case is not accessible in any way
         if (noFallInto) continue;
@@ -72,7 +73,7 @@ export const SwitchStatement: THandler<null> = (
         if (
           noFallInto &&
           onlyConstantTests &&
-          endsWithoutFalltrough(bodyInst(), endLine)
+          (isLastCase || endsWithoutFalltrough(bodyInst(), endLine))
         ) {
           return [null, [...bodyInst(), endLine]];
         }
