@@ -1,0 +1,9 @@
+set i:1:4 0
+op rand &t1 1
+op greaterThan &t2 &t1 0.5
+jump 5 equal &t2 0
+jump 8 always
+op add i:1:4 i:1:4 1
+op lessThan &t0 i:1:4 100
+jump 1 equal &t0 1
+end

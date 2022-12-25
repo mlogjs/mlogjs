@@ -64,9 +64,11 @@ export const DoWhileStatement: THandler<null> = (
 
   const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);
+  const endLoopAddr = new LiteralValue(null);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
+  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
   if (scope.label) {
     startLoopLine.bindContinue(scope);
@@ -82,6 +84,7 @@ export const DoWhileStatement: THandler<null> = (
         startLoopLine,
         ...bodyLines,
         new JumpInstruction(startLoopAddr, EJumpKind.Always),
+        endLoopLine,
       ],
     ];
   }
@@ -98,6 +101,7 @@ export const DoWhileStatement: THandler<null> = (
         test,
         new LiteralValue(1)
       ),
+      endLoopLine,
     ],
   ];
 };
