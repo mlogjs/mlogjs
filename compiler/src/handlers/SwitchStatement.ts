@@ -112,7 +112,7 @@ export const SwitchStatement: THandler<null> = (
       ...caseJumps,
       ...(caseJumps.length > 0 && !constantCase ? [defaultJump] : []),
       ...inst,
-      endLine,
+      ...(usesEndLine(endLine, inst) ? [endLine] : []),
     ],
   ];
 };
@@ -137,6 +137,18 @@ function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
       (instruction instanceof BreakInstruction &&
         endLine.bonds.includes(instruction.address))
     );
+  }
+  return false;
+}
+
+function usesEndLine(endLine: AddressResolver, inst: IInstruction[]) {
+  for (let i = inst.length - 1; i >= 0; i--) {
+    const instruction = inst[i];
+    if (
+      instruction instanceof BreakInstruction &&
+      endLine.bonds.includes(instruction.address)
+    )
+      return true;
   }
   return false;
 }
