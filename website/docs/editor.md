@@ -1,5 +1,6 @@
 ---
 layout: page
+title: Editor
 ---
 
 <script setup lang="ts">
