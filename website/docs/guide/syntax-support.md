@@ -325,11 +325,15 @@ const builds = {
 const target = radar({
   building: builds.turret,
   filters: ["player", "enemy", "any"],
-  order: 1,
+  order: true,
   sort: "distance",
 });
 
-control.shootp(builds.turret, target, true);
+control.shootp({
+  building: builds.turret,
+  unit: target,
+  shoot: true,
+});
 
 print("Shooting ", target);
 printFlush(builds.message);
