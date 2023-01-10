@@ -1255,7 +1255,7 @@ Contains the variants of the `fetch` instruction.
   The index starts at 0.
 
   ```js
-  const count = fetch.unitCount();
+  const count = fetch.unitCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const unit = fetch.unit(Teams.sharded, i);
     print`x: ${unit.x}, y: ${unit.y}\n`;
@@ -1268,7 +1268,7 @@ Contains the variants of the `fetch` instruction.
   Gets the amount of units existing on a given team.
 
   ```js
-  const count = fetch.unitCount();
+  const count = fetch.unitCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const unit = fetch.unit(Teams.sharded, i);
     print`x: ${unit.x}, y: ${unit.y}\n`;
@@ -1283,7 +1283,7 @@ Contains the variants of the `fetch` instruction.
   The index starts at 0.
 
   ```js
-  const count = fetch.playerCount();
+  const count = fetch.playerCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const player = fetch.player(Teams.sharded, i);
     print`x: ${player.x}, y: ${player.y}\n`;
@@ -1296,7 +1296,7 @@ Contains the variants of the `fetch` instruction.
   Gets the amount of players existing on a given team.
 
   ```js
-  const count = fetch.playerCount();
+  const count = fetch.playerCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const player = fetch.player(Teams.sharded, i);
     print`x: ${player.x}, y: ${player.y}\n`;
@@ -1311,7 +1311,7 @@ Contains the variants of the `fetch` instruction.
   The index of the starts at 0.
 
   ```js
-  const count = fetch.coreCount();
+  const count = fetch.coreCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const core = fetch.core(Teams.sharded, i);
     print`x: ${core.x}, y: ${core.y}\n`;
@@ -1324,7 +1324,7 @@ Contains the variants of the `fetch` instruction.
   Gets the amount of cores existing on a given team.
 
   ```js
-  const count = fetch.coreCount();
+  const count = fetch.coreCount(Teams.sharded);
   for (let i = 0; i < count; i++) {
     const core = fetch.core(Teams.sharded, i);
     print`x: ${core.x}, y: ${core.y}\n`;
@@ -1339,7 +1339,7 @@ Contains the variants of the `fetch` instruction.
   The index starts at 0.
 
   ```js
-  const count = fetch.buildCount();
+  const count = fetch.buildCount(Teams.sharded, Blocks.router);
   for (let i = 0; i < count; i++) {
     const router = fetch.build(Teams.sharded, i, Blocks.router);
     print`x: ${router.x}, y: ${router.y}\n`;
@@ -1352,7 +1352,7 @@ Contains the variants of the `fetch` instruction.
   Gets the amount of buildings existing on a given team.
 
   ```js
-  const count = fetch.buildCount();
+  const count = fetch.buildCount(Teams.sharded, Blocks.router);
   for (let i = 0; i < count; i++) {
     const router = fetch.build(Teams.sharded, i, Blocks.router);
     print`x: ${router.x}, y: ${router.y}\n`;
