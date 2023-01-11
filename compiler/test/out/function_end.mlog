@@ -1,0 +1,13 @@
+set number:3:19 8
+set &rcubeRoots:3:0 3
+jump 4 always
+end
+op pow rationalPart:6:8 number:3:19 0.3333333333333333
+print rationalPart:6:8
+print " * [cos(0°) + i sen(0°)]\n"
+print rationalPart:6:8
+print " * [cos(120°) + i sen(120°)]\n"
+print rationalPart:6:8
+print " * [cos(240°) + i sen(240°)]\n"
+printflush message1
+end
