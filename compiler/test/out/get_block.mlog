@@ -13,4 +13,3 @@ sensor &t0 building:2:6 @health
 print "the building has "
 print &t0
 print " health"
-end

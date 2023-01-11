@@ -9,4 +9,3 @@ jump 9 always
 set &t2 1
 op add i:1:4 i:1:4 &t2
 jump 1 always
-end

@@ -10,4 +10,3 @@ sensor &t1 unit:7:6 @health
 print "available health: "
 print &t1
 printflush message1
-end

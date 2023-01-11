@@ -11,4 +11,3 @@ control shoot cyclone1 20 40 1
 control shootp cyclone1 @unit 1
 radar enemy boss flying maxHealth cyclone1 1 &_
 sensor &_ cyclone1 @health
-end

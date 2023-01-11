@@ -6,4 +6,3 @@ jump 7 equal &t1 0
 print i:1:4
 print " ends on zero"
 jump 1 always
-end

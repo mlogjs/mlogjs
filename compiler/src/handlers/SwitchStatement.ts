@@ -6,7 +6,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
-import { lazy, withAlwaysRuns } from "../utils";
+import { lazy, usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const SwitchStatement: THandler<null> = (
@@ -24,7 +24,7 @@ export const SwitchStatement: THandler<null> = (
   const endLine = new AddressResolver(endAdress).bindBreak(innerScope);
 
   const caseJumps: IInstruction[] = [];
-  let defaultJump: IInstruction | undefined;
+  let defaultJump: JumpInstruction | undefined;
 
   // if there is a case that is guaranteed to run
   let constantCase = false;
@@ -44,7 +44,7 @@ export const SwitchStatement: THandler<null> = (
         [defaultJump] = c.handle(innerScope, scase, () => [
           null,
           [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-        ])[1];
+        ])[1] as JumpInstruction[];
       }
       if (includeBody) inst.push(bodyLine, ...bodyInst());
       continue;
@@ -100,7 +100,6 @@ export const SwitchStatement: THandler<null> = (
   defaultJump ??= new JumpInstruction(endAdress, EJumpKind.Always);
 
   if (caseJumps.length > 0) {
-    withAlwaysRuns([null, inst], false);
     withAlwaysRuns([null, [...caseJumps.slice(1), defaultJump]], false);
     withAlwaysRuns([null, inst], false);
   }
@@ -112,7 +111,7 @@ export const SwitchStatement: THandler<null> = (
       ...caseJumps,
       ...(caseJumps.length > 0 && !constantCase ? [defaultJump] : []),
       ...inst,
-      ...(usesEndLine(endLine, inst) ? [endLine] : []),
+      ...(usesEndLine(endLine, inst, defaultJump) ? [endLine] : []),
     ],
   ];
 };
@@ -141,14 +140,11 @@ function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
   return false;
 }
 
-function usesEndLine(endLine: AddressResolver, inst: IInstruction[]) {
-  for (let i = inst.length - 1; i >= 0; i--) {
-    const instruction = inst[i];
-    if (
-      instruction instanceof BreakInstruction &&
-      endLine.bonds.includes(instruction.address)
-    )
-      return true;
-  }
-  return false;
+function usesEndLine(
+  endLine: AddressResolver,
+  inst: IInstruction[],
+  defaultJump: JumpInstruction
+) {
+  if (endLine.bonds.includes(defaultJump.address)) return true;
+  return usesAddressResolver(endLine, inst);
 }

@@ -4,4 +4,3 @@ print "\n"
 op sub i:1:4 i:1:4 1
 op greaterThan &t0 i:1:4 0
 jump 1 equal &t0 1
-end

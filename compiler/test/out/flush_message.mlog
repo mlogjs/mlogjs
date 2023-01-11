@@ -3,4 +3,3 @@ print "You is a "
 print player:3:6
 message announce 3
 wait 10
-end

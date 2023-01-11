@@ -2,4 +2,3 @@ set foo:1:4 10
 set foo:4:6 15
 print foo:4:6
 print foo:1:4
-end
