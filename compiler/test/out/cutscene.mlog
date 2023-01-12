@@ -10,4 +10,3 @@ print "Camera controls!"
 message announce 4
 wait 5
 cutscene stop 100 100 0.06 0
-end

@@ -57,3 +57,18 @@ export function pipeInsts<T extends IValue | null>(
   inst.push(...value[1]);
   return value[0];
 }
+
+export function usesAddressResolver(
+  resolver: AddressResolver,
+  instructions: IInstruction[]
+) {
+  for (let i = 0; i < instructions.length; i++) {
+    const inst = instructions[i];
+    if (
+      inst instanceof JumpInstruction &&
+      resolver.bonds.includes(inst.address)
+    )
+      return true;
+  }
+  return false;
+}

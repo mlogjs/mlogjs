@@ -5,7 +5,7 @@ import {
   ContinueInstruction,
 } from "../instructions";
 import { es, IScope, IValue, THandler } from "../types";
-import { discardedName } from "../utils";
+import { discardedName, usesAddressResolver } from "../utils";
 import { LazyValue, LiteralValue } from "../values";
 
 export const ExpressionStatement: THandler<IValue | null> = (
@@ -75,7 +75,9 @@ export const LabeledStatement: THandler<null> = (
 
   const [, bodyInst] = c.handle(inner, node.body);
 
-  return [null, [...bodyInst, endAdress]];
+  if (usesAddressResolver(endAdress, bodyInst)) bodyInst.push(endAdress);
+
+  return [null, bodyInst];
 };
 
 function findScopeLabel(scope: IScope, label: string) {

@@ -22,4 +22,3 @@ draw clear 0 0 0
 draw rect x:5:4 y:6:4 5 5
 drawflush display1
 jump 5 always
-end

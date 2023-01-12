@@ -45,4 +45,3 @@ op mul &t16 &t15 15
 op add &t17 &t16 40
 draw line 40 40 &t14 &t17
 drawflush display1
-end

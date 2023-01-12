@@ -114,11 +114,12 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       ...this.c.handle(this.childScope, this.body)[1],
     ];
 
-    if (!endsWithReturn(this.inst)) {
+    if (!endsWithReturn(this, this.inst)) {
       pipeInsts(this.temp["="](this.scope, new LiteralValue(null)), this.inst);
       this.inst.push(
         assign(new SetCounterInstruction(this.ret), {
           intent: EInstIntent.return,
+          intentSource: this,
         })
       );
     }
@@ -135,6 +136,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     }
     const returnInst = assign(new SetCounterInstruction(this.ret), {
       intent: EInstIntent.return,
+      intentSource: this,
     });
     return [null, [...inst, returnInst]];
   }
@@ -264,7 +266,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 }
 
-function endsWithReturn(inst: IInstruction[]) {
+function endsWithReturn(fun: FunctionValue, inst: IInstruction[]) {
   for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
 
@@ -276,7 +278,11 @@ function endsWithReturn(inst: IInstruction[]) {
     // TODO: fix this with static analysis
     if (instruction instanceof AddressResolver) return false;
     if (instruction.hidden) continue;
-    return instruction instanceof SetCounterInstruction;
+    return (
+      instruction.intent === EInstIntent.exit ||
+      (instruction.intent === EInstIntent.return &&
+        instruction.intentSource === fun)
+    );
   }
   return false;
 }

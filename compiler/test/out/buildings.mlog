@@ -9,4 +9,3 @@ print " : "
 print &t1
 print "\n"
 printflush message1
-end

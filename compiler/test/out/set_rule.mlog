@@ -21,4 +21,3 @@ setrule waveSending 1 0 0 100 100
 setrule waveSpacing 256 0 0 100 100
 setrule waveTimer 1 0 0 100 100
 setrule waves 1 0 0 100 100
-end

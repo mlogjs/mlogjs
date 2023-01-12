@@ -39,4 +39,3 @@ print &t8
 op strictEqual &t9 item:22:4 @copper
 op equal &t10 &t9 0
 print &t10
-end

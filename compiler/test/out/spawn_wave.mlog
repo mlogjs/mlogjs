@@ -6,4 +6,3 @@ op equal &t0 shooting:3:24 0
 jump 7 equal &t0 0
 end
 spawnwave shootX:3:8 shootY:3:16 false
-end

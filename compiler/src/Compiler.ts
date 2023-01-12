@@ -2,7 +2,7 @@ import { parse } from "@babel/parser";
 import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
 import { initScope } from "./initScope";
-import { EndInstruction } from "./instructions";
+import { AddressResolver, EndInstruction } from "./instructions";
 import { Scope } from "./Scope";
 import {
   es,
@@ -57,7 +57,11 @@ export class Compiler {
       initScope(scope);
 
       const valueInst = this.handle(scope, program);
-      valueInst[1].push(new EndInstruction(), ...scope.inst);
+      if (needsEndInstruction(valueInst[1], scope)) {
+        valueInst[1].push(new EndInstruction());
+      }
+      valueInst[1].push(...scope.inst);
+
       hideRedundantJumps(valueInst[1]);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
@@ -175,4 +179,10 @@ function* hoistedFunctionNodes<T extends es.Node>(nodes: T[]) {
       yield node;
     }
   }
+}
+
+function needsEndInstruction(inst: IInstruction[], scope: IScope) {
+  const last = inst[inst.length - 1];
+  if (last instanceof AddressResolver) return true;
+  return scope.inst.length > 0;
 }

@@ -1,4 +1,3 @@
 set i:1:4 0
 print i:1:4
 op add i:1:4 i:1:4 1
-end

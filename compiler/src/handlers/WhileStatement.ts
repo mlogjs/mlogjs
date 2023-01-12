@@ -1,6 +1,6 @@
 import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import { es, THandler } from "../types";
-import { withAlwaysRuns } from "../utils";
+import { usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const WhileStatement: THandler<null> = (
@@ -23,18 +23,18 @@ export const WhileStatement: THandler<null> = (
   }
 
   if (test instanceof LiteralValue) {
-    if (test.data) {
-      return [
-        null,
-        [
-          startLoopLine,
-          ...c.handle(childScope, node.body)[1],
-          new JumpInstruction(startLoopAddr, EJumpKind.Always),
-          endLoopLine,
-        ],
-      ];
-    }
-    return [null, []];
+    if (!test.data) return [null, []];
+
+    const bodyInst = c.handle(childScope, node.body)[1];
+    return [
+      null,
+      [
+        startLoopLine,
+        ...bodyInst,
+        new JumpInstruction(startLoopAddr, EJumpKind.Always),
+        ...(usesAddressResolver(endLoopLine, bodyInst) ? [endLoopLine] : []),
+      ],
+    ];
   }
 
   return [
@@ -64,9 +64,11 @@ export const DoWhileStatement: THandler<null> = (
 
   const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);
+  const endLoopAddr = new LiteralValue(null);
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
+  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
   if (scope.label) {
     startLoopLine.bindContinue(scope);
@@ -82,6 +84,7 @@ export const DoWhileStatement: THandler<null> = (
         startLoopLine,
         ...bodyLines,
         new JumpInstruction(startLoopAddr, EJumpKind.Always),
+        ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
       ],
     ];
   }
@@ -98,6 +101,7 @@ export const DoWhileStatement: THandler<null> = (
         test,
         new LiteralValue(1)
       ),
+      ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
     ],
   ];
 };

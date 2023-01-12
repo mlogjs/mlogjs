@@ -38,4 +38,3 @@ sensor b:40:8 &t5 @ammo
 getlink &_ 0
 getlink &t6 1
 sensor &_ &t6 @copper
-end

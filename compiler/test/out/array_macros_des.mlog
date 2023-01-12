@@ -14,4 +14,3 @@ print e:12:5
 print f:12:8
 print g:12:11
 print h:12:14
-end

@@ -15,4 +15,3 @@ read &t2 bank1 1
 op add &t3 &t2 1
 write &t3 bank1 1
 printflush message1
-end

@@ -1,40 +1,39 @@
 set dynamicItem:1:4 4
 set n:18:19 dynamicItem:1:4
 set &rmatchItem:18:0 4
-jump 20 always
+jump 19 always
 set &t0 &fmatchItem:18:0
 print &t0
 set &t1:matchItem:18:0 @sand
 print &t1:matchItem:18:0
 set item:57:18 @copper
 set &ritemUses:57:0 11
-jump 73 always
+jump 70 always
 set item:57:18 @coal
 set &ritemUses:57:0 14
-jump 73 always
-set item:57:18 @silicon
-set &ritemUses:57:0 17
-jump 73 always
+jump 70 always
+print "Silligone\n"
+print "Something at the end\n"
 print "always runs!\n"
 printflush message1
 end
-jump 37 strictEqual n:18:19 1
-jump 39 strictEqual n:18:19 2
-jump 41 strictEqual n:18:19 3
-jump 43 strictEqual n:18:19 4
-jump 45 strictEqual n:18:19 5
-jump 47 strictEqual n:18:19 6
-jump 49 strictEqual n:18:19 7
-jump 51 strictEqual n:18:19 8
-jump 53 strictEqual n:18:19 9
-jump 55 strictEqual n:18:19 10
-jump 57 strictEqual n:18:19 11
-jump 59 strictEqual n:18:19 12
-jump 61 strictEqual n:18:19 13
-jump 63 strictEqual n:18:19 14
-jump 65 strictEqual n:18:19 15
-jump 67 strictEqual n:18:19 16
-jump 69 always
+jump 36 strictEqual n:18:19 1
+jump 38 strictEqual n:18:19 2
+jump 40 strictEqual n:18:19 3
+jump 42 strictEqual n:18:19 4
+jump 44 strictEqual n:18:19 5
+jump 46 strictEqual n:18:19 6
+jump 48 strictEqual n:18:19 7
+jump 50 strictEqual n:18:19 8
+jump 52 strictEqual n:18:19 9
+jump 54 strictEqual n:18:19 10
+jump 56 strictEqual n:18:19 11
+jump 58 strictEqual n:18:19 12
+jump 60 strictEqual n:18:19 13
+jump 62 strictEqual n:18:19 14
+jump 64 strictEqual n:18:19 15
+jump 66 strictEqual n:18:19 16
+jump 68 always
 set &fmatchItem:18:0 @copper
 set @counter &rmatchItem:18:0
 set &fmatchItem:18:0 @lead
@@ -69,20 +68,18 @@ set &fmatchItem:18:0 @pyratite
 set @counter &rmatchItem:18:0
 set &fmatchItem:18:0 null
 set @counter &rmatchItem:18:0
-set &fmatchItem:18:0 null
-set @counter &rmatchItem:18:0
-jump 77 strictEqual item:57:18 @copper
-jump 81 strictEqual item:57:18 @coal
-jump 85 strictEqual item:57:18 @silicon
-jump 86 always
+jump 74 strictEqual item:57:18 @copper
+jump 78 strictEqual item:57:18 @coal
+jump 82 strictEqual item:57:18 @silicon
+jump 83 always
 print "Basic material\n"
 print "Ammo for some units\n"
 print "Duo ammo\n"
-jump 86 always
+jump 83 always
 print "Burn things\n"
 print "Scorch ammo\n"
 print "Energy\n"
-jump 86 always
+jump 83 always
 print "Silligone\n"
 print "Something at the end\n"
 set &fitemUses:57:0 null

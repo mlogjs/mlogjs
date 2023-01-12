@@ -10,6 +10,11 @@ export enum EInstIntent {
   break,
   continue,
   return,
+  /**
+   * This is used by the `end` and `stop` instructions.
+   * Means that the processor will restart or shutdown.
+   */
+  exit,
 }
 
 export interface IInstruction {

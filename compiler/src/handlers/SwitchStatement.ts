@@ -6,7 +6,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
-import { lazy, withAlwaysRuns } from "../utils";
+import { lazy, usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
 export const SwitchStatement: THandler<null> = (
@@ -24,7 +24,7 @@ export const SwitchStatement: THandler<null> = (
   const endLine = new AddressResolver(endAdress).bindBreak(innerScope);
 
   const caseJumps: IInstruction[] = [];
-  let defaultJump: IInstruction | undefined;
+  let defaultJump: JumpInstruction | undefined;
 
   // if there is a case that is guaranteed to run
   let constantCase = false;
@@ -44,7 +44,7 @@ export const SwitchStatement: THandler<null> = (
         [defaultJump] = c.handle(innerScope, scase, () => [
           null,
           [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-        ])[1];
+        ])[1] as JumpInstruction[];
       }
       if (includeBody) inst.push(bodyLine, ...bodyInst());
       continue;
@@ -62,6 +62,7 @@ export const SwitchStatement: THandler<null> = (
     if (comp instanceof LiteralValue) {
       // whether other cases can falltrough and reach this one
       const noFallInto = !canFallInto;
+      const isLastCase = scase === node.cases[node.cases.length - 1];
       if (!comp.data) {
         // this case is not accessible in any way
         if (noFallInto) continue;
@@ -72,7 +73,7 @@ export const SwitchStatement: THandler<null> = (
         if (
           noFallInto &&
           onlyConstantTests &&
-          endsWithoutFalltrough(bodyInst(), endLine)
+          (isLastCase || endsWithoutFalltrough(bodyInst(), endLine))
         ) {
           return [null, [...bodyInst(), endLine]];
         }
@@ -99,7 +100,6 @@ export const SwitchStatement: THandler<null> = (
   defaultJump ??= new JumpInstruction(endAdress, EJumpKind.Always);
 
   if (caseJumps.length > 0) {
-    withAlwaysRuns([null, inst], false);
     withAlwaysRuns([null, [...caseJumps.slice(1), defaultJump]], false);
     withAlwaysRuns([null, inst], false);
   }
@@ -111,7 +111,7 @@ export const SwitchStatement: THandler<null> = (
       ...caseJumps,
       ...(caseJumps.length > 0 && !constantCase ? [defaultJump] : []),
       ...inst,
-      endLine,
+      ...(usesEndLine(endLine, inst, defaultJump) ? [endLine] : []),
     ],
   ];
 };
@@ -138,4 +138,13 @@ function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
     );
   }
   return false;
+}
+
+function usesEndLine(
+  endLine: AddressResolver,
+  inst: IInstruction[],
+  defaultJump: JumpInstruction
+) {
+  if (endLine.bonds.includes(defaultJump.address)) return true;
+  return usesAddressResolver(endLine, inst);
 }

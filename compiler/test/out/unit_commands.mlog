@@ -16,4 +16,3 @@ ulocate building core 0 @copper coreX:19:16 coreY:19:23 coreFound:19:5 core:19:3
 ulocate ore core true @lead oreX:23:15 oreY:23:21 oreFound:23:5 &_
 ulocate damaged core true @copper dX:24:13 dY:24:17 dFound:24:5 dBuilding:24:21
 ulocate spawn core true @copper sX:25:13 sY:25:17 sFound:25:5 sBuilding:25:21
-end

@@ -10,4 +10,3 @@ print "\nusing\ntagged\ntemplates"
 print variable:4:6
 print " emty start and emtpy end "
 print variable:4:6
-end
