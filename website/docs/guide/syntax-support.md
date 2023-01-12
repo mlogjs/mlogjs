@@ -284,7 +284,7 @@ Limitations:
 ### Null coalescing operator
 
 The null coalescing operator (`??`) allows you to lazily evaluated the right side
-of the expression when the left side is `null`.
+of the expression when the left side is `undefined`.
 
 ```js
 const sorter = getBuilding("sorter1");
@@ -296,7 +296,7 @@ const itemToFetch = sorter.config ?? Items.graphite;
 
 Behavior:
 
-- Evaluates the left side, if it resolves to `null` it evaluates the right side and returns its value
+- Evaluates the left side, if it resolves to `undefined` it evaluates the right side and returns its value
 
 ### Ternary operator (conditional expression)
 
@@ -449,4 +449,4 @@ You can declare custom type aliases and interfaces. Since the compiler does not 
 
 ### Non null assertions
 
-Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `null` before using them.
+Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `undefined` before using them.

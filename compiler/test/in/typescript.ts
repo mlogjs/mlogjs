@@ -14,7 +14,7 @@ print(
   State.incremented
 );
 
-let foo = getVar<number | symbol | null>("@unknown");
+let foo = getVar<number | symbol | undefined>("@unknown");
 
 let bar = foo as number;
 

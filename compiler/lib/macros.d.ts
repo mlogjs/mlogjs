@@ -60,7 +60,7 @@ declare class DynamicArray<T> extends MutableArray<T> {
   constructor(length: number);
 
   /**
-   * Sets the last item of the array to `null` and decreases its length by 1.
+   * Sets the last item of the array to `undefined` and decreases its length by 1.
    *
    * This method only generates the instructions for getting the value when needed.
    *

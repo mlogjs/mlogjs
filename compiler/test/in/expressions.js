@@ -14,12 +14,12 @@ print(1 + 2 > 1.4 ? 10 : -5);
 print(1 + 1 != 2 ? "huh, true" : "it's false");
 
 print(
-  null ?? "null is null",
+  undefined ?? "undefined is null",
   offset ?? "offset is null?",
   "preserved" ?? "should not appear"
 );
 
-let item = Math.rand(1) > 0.5 ? null : Items.beryllium;
+let item = Math.rand(1) > 0.5 ? undefined : Items.beryllium;
 
 item ??= Items.copper;
 

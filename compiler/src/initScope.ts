@@ -12,11 +12,13 @@ import { GetGlobal } from "./macros/GetGlobal";
 import { Scope } from "./Scope";
 import { EMutability } from "./types";
 import { Asm } from "./macros/Asm";
+import { LiteralValue } from "./values";
 
 /**
  * Adds all the compiler globals to `scope`
  */
 export function initScope(scope: Scope) {
+  scope.hardSet("undefined", new LiteralValue(null));
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro());
   scope.hardSet("Vars", new VarsNamespace());

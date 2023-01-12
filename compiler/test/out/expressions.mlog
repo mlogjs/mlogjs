@@ -19,7 +19,7 @@ print "it's false"
 set &t1 offset:8:6
 jump 21 notEqual &t1 null
 set &t1 "offset is null?"
-print "null is null"
+print "undefined is null"
 print &t1
 print "preserved"
 op rand &t2 1
