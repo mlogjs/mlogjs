@@ -58,8 +58,10 @@ export class Compiler {
 
       const valueInst = this.handle(scope, program);
       if (needsEndInstruction(valueInst[1], scope)) {
-        valueInst[1].push(new EndInstruction(), ...scope.inst);
+        valueInst[1].push(new EndInstruction());
       }
+      valueInst[1].push(...scope.inst);
+
       hideRedundantJumps(valueInst[1]);
       this.resolve(valueInst);
       output = this.serialize(valueInst) + "\n";
