@@ -7,8 +7,8 @@ import {
   SenseableValue,
   StoreValue,
 } from "../values";
-import { MacroFunction } from "./Function";
 import { CompilerError } from "../CompilerError";
+import { MacroFunction } from "./Function";
 
 class MemoryEntry extends BaseValue {
   macro = true;
@@ -54,18 +54,6 @@ class MemoryEntry extends BaseValue {
 class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
-      $get: new MacroFunction((scope, out, prop: IValue) => {
-        if (prop instanceof LiteralValue && !prop.isNumber()) {
-          throw new CompilerError(
-            `The member [${prop.debugString()}] is not present in [${this.debugString()}]`
-          );
-        }
-
-        const entry = new MemoryEntry(scope, this, prop);
-        if (out) return entry.eval(scope, out);
-
-        return [entry, []];
-      }),
       length: size,
       size,
     });
@@ -73,6 +61,25 @@ class MemoryMacro extends ObjectValue {
 
   debugString(): string {
     return `Memory("${this.cell.toString()}")`;
+  }
+
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    if (super.hasProperty(scope, key)) return super.get(scope, key, out);
+
+    if (key instanceof LiteralValue && !key.isNumber())
+      throw new CompilerError(
+        `The member [${key.debugString()}] is not present in [${this.debugString()}]`
+      );
+
+    const entry = new MemoryEntry(scope, this, key);
+    if (out) return entry.eval(scope, out);
+
+    return [entry, []];
+  }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    if (prop instanceof LiteralValue && prop.isNumber()) return true;
+    return super.hasProperty(scope, prop);
   }
 
   toString() {

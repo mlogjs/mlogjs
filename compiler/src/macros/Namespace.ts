@@ -1,6 +1,11 @@
 import { camelToDashCase } from "../utils";
-import { MacroFunction } from ".";
-import { EMutability } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import {
   IObjectValueData,
   LiteralValue,
@@ -18,26 +23,30 @@ interface NamespaceMacroOptions {
 export class NamespaceMacro extends ObjectValue {
   changeCasing: boolean;
   constructor({ changeCasing = false }: NamespaceMacroOptions = {}) {
-    super({
-      $get: new MacroFunction((scope, out, prop) => {
-        if (!(prop instanceof LiteralValue) || !prop.isString())
-          throw new CompilerError(
-            "Cannot use dynamic properties on namespace macros"
-          );
-        const symbolName = this.changeCasing
-          ? camelToDashCase(prop.data)
-          : prop.data;
-
-        const mutability = dynamicVars.includes(symbolName)
-          ? EMutability.readonly
-          : EMutability.constant;
-
-        const result = new StoreValue(`@${symbolName}`, mutability);
-
-        return [result, []];
-      }),
-    });
+    super();
     this.changeCasing = changeCasing;
+  }
+
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    if (super.hasProperty(scope, key)) return super.get(scope, key, out);
+
+    if (!(key instanceof LiteralValue) || !key.isString())
+      throw new CompilerError(
+        "Cannot use dynamic properties on namespace macros"
+      );
+    const symbolName = this.changeCasing ? camelToDashCase(key.data) : key.data;
+
+    const mutability = dynamicVars.includes(symbolName)
+      ? EMutability.readonly
+      : EMutability.constant;
+
+    const result = new StoreValue(`@${symbolName}`, mutability);
+
+    return [result, []];
+  }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    return prop instanceof LiteralValue && prop.isString();
   }
 }
 

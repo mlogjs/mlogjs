@@ -32,6 +32,10 @@ export class VoidValue implements IValue {
     );
   }
 
+  hasProperty(_scope: IScope, _prop: IValue): boolean {
+    return false;
+  }
+
   preCall(_scope: IScope, _out?: TEOutput): readonly TEOutput[] | undefined {
     return;
   }

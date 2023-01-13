@@ -52,6 +52,13 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
       );
     return [method.apply(this, [scope]), []];
   }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    if (this.isString() && prop instanceof LiteralValue && prop.isString())
+      return Object.prototype.hasOwnProperty.call(literalMethods, prop.data);
+    return false;
+  }
+
   get num() {
     if (this.data === null) return 0;
     if (typeof this.data === "string") return 1;

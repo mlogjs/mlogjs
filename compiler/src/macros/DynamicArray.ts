@@ -66,9 +66,6 @@ export class DynamicArray extends ObjectValue {
     const sizeValue = new LiteralValue(values.length);
     super({
       // array[index]
-      $get: new MacroFunction((scope, out, index) =>
-        this.getValue(scope, out, index, scope.checkIndexes)
-      ),
 
       fill: new MacroFunction((scope, out, value) => {
         const inst: IInstruction[] = [];
@@ -273,22 +270,32 @@ export class DynamicArray extends ObjectValue {
     this.removeAtAddr = new LiteralValue(null);
   }
 
-  getValue(
-    scope: IScope,
-    out: TEOutput | undefined,
-    index: IValue,
-    checked: boolean
-  ): TValueInstructions {
-    if (!index) throw new CompilerError("Missing index argument");
+  get(scope: IScope, index: IValue, out?: TEOutput): TValueInstructions {
+    if (super.hasProperty(scope, index)) return super.get(scope, index, out);
+
     const { values } = this;
 
     if (index instanceof LiteralValue) {
       assertBounds(index, 0, values.length - 1);
     }
 
-    const entry = new DynamicArrayEntry({ scope, array: this, index, checked });
+    const entry = new DynamicArrayEntry({
+      scope,
+      array: this,
+      index,
+      checked: scope.checkIndexes,
+    });
+
     if (out) return entry.eval(scope, out);
     return [entry, []];
+  }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    if (prop instanceof LiteralValue && prop.isNumber()) {
+      return prop.data >= 0 && prop.data < this.values.length;
+    }
+
+    return super.hasProperty(scope, prop);
   }
 
   initGetter() {

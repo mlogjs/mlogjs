@@ -139,22 +139,9 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
 
     members.set(new LiteralValue(i), {
       value: value.out,
-      handler(get) {
+      handler(get, propExists) {
         return c.handle(scope, element, () => {
-          let [init, initInst]: TValueInstructions<IValue | null> = [null, []];
-
-          try {
-            [init, initInst] = get();
-          } catch (e) {
-            // catches the "cannot get undefined member" error
-            // TODO: refactor and add error codes
-            // so we don't have to do string checks
-            if (
-              !(e instanceof CompilerError) ||
-              !e.message.includes("is not present in")
-            )
-              throw e;
-          }
+          const [init, initInst] = propExists() ? get() : [null, []];
 
           if (!init)
             throw new CompilerError(

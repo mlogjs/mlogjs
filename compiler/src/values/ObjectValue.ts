@@ -33,10 +33,10 @@ export class ObjectValue extends VoidValue {
 
   static fromArray(
     items: IObjectValueData[keyof IObjectValueData][],
-    intialData?: IObjectValueData
+    initialData?: IObjectValueData
   ): ObjectValue {
     const data: IObjectValueData = {
-      ...intialData,
+      ...initialData,
       length: new LiteralValue(items.length),
     };
     items.forEach((item, i) => {
@@ -51,20 +51,34 @@ export class ObjectValue extends VoidValue {
     return [new LiteralValue("object"), []];
   }
 
-  get(scope: IScope, key: LiteralValue, out?: TEOutput): TValueInstructions {
-    // avoids naming collisions with keys like
-    // constructor or toString
-    if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
-      // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-      const member = this.data[key.data]!;
-      return [member, []];
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
+    if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
+      // avoids naming collisions with keys like
+      // constructor or toString
+      if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
+        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+        return [this.data[key.data]!, []];
+      }
     }
+
     const { $get } = this.data;
     if (!$get)
       throw new CompilerError(
         `The member [${key.debugString()}] is not present in [${this.debugString()}]`
       );
     return $get.call(scope, [key], out);
+  }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    if (prop instanceof LiteralValue && (prop.isNumber() || prop.isString())) {
+      const hasMember = Object.prototype.hasOwnProperty.call(
+        this.data,
+        prop.data
+      );
+      if (hasMember) return hasMember;
+    }
+
+    return false;
   }
 
   eval(scope: IScope, out?: TEOutput): TValueInstructions {

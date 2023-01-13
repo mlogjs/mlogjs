@@ -263,6 +263,13 @@ export interface IValue extends IValueOperators {
   get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
 
   /**
+   * Wether `this` has a given property.
+   * This method is used to know if it's safe to get a
+   * field of an object without errors.
+   */
+  hasProperty(scope: IScope, prop: IValue): boolean;
+
+  /**
    * A hook that the CallExpression and related handlers call
    * before evaluating the function parameters.
    */
