@@ -1,15 +1,11 @@
 import { CompilerError } from "../CompilerError";
-import {
-  es,
-  IInstruction,
-  IValue,
-  THandler,
-  TValueInstructions,
-} from "../types";
+import { es, IInstruction, IValue, THandler } from "../types";
 import { extractDestrucuringOut, pipeInsts } from "../utils";
 import {
+  AssignmentValue,
   DestructuringValue,
   IObjectValueData,
+  LazyValue,
   LiteralValue,
   ObjectValue,
   SenseableValue,
@@ -124,6 +120,8 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
     const element = node.elements[i];
     if (!element) continue;
     const value = pipeInsts(c.handle(scope, element), inst);
+    const hasDefault = value instanceof AssignmentValue;
+
     if (!value)
       throw new CompilerError(
         "Destructuring element must resolve to a value",
@@ -131,13 +129,23 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
       );
 
     members.set(new LiteralValue(i), {
-      value,
-      handler(get) {
+      value: hasDefault ? value.left : value,
+      handler(get, propExists) {
         return c.handle(scope, element, () => {
-          const inst = get();
-          // assigns the output to the target value
-          pipeInsts(value["="](scope, inst[0]), inst[1]);
-          return inst;
+          if (propExists() || !hasDefault) {
+            const inst = get();
+            // assigns the output to the target value
+            pipeInsts(value["="](scope, inst[0]), inst[1]);
+            return inst;
+          }
+
+          const inst: IInstruction[] = [];
+          const evaluated = pipeInsts(
+            value.right.eval(scope, value.left),
+            inst
+          );
+          const result = pipeInsts(value.left["="](scope, evaluated), inst);
+          return [result, inst];
         });
       },
     });
@@ -154,14 +162,14 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 
     if (!prop) continue;
 
-    const { key } = prop;
-    const keyInst: TValueInstructions =
-      !prop.computed && key.type === "Identifier"
-        ? [new LiteralValue(key.name), []]
-        : c.handleEval(scope, prop.key);
-    pipeInsts(keyInst, inst);
+    const propKey = prop.key;
+    const key =
+      propKey.type === "Identifier" && !prop.computed
+        ? new LiteralValue(propKey.name)
+        : pipeInsts(c.handleEval(scope, propKey), inst);
 
     const value = pipeInsts(c.handle(scope, prop.value), inst);
+    const hasDefault = value instanceof AssignmentValue;
 
     if (!value)
       throw new CompilerError(
@@ -169,14 +177,25 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
         prop.value
       );
 
-    members.set(keyInst[0], {
-      value,
-      handler(get) {
+    members.set(key, {
+      value: hasDefault ? value.left : value,
+      handler(get, propExists) {
         return c.handle(scope, prop, () => {
-          const inst = get();
-          // assigns the output to the target value
-          pipeInsts(value["="](scope, inst[0]), inst[1]);
-          return inst;
+          if (propExists() || !hasDefault) {
+            const inst = get();
+
+            // assigns the output to the target value
+            pipeInsts(value["="](scope, inst[0]), inst[1]);
+            return inst;
+          }
+
+          const inst: IInstruction[] = [];
+          const evaluated = pipeInsts(
+            value.right.eval(scope, value.left),
+            inst
+          );
+          const result = pipeInsts(value.left["="](scope, evaluated), inst);
+          return [result, inst];
         });
       },
     });
@@ -191,3 +210,19 @@ export const OptionalMemberExpression: THandler = (
   node: es.OptionalMemberExpression,
   out
 ) => MemberExpression(c, scope, node, out, true);
+
+export const AssignmentPattern: THandler<IValue> = (
+  c,
+  scope,
+  node: es.AssignmentPattern
+) => {
+  const [left, inst] = c.handle(scope, node.left);
+  if (!left)
+    throw new CompilerError(
+      "Left side of assignment pattern could not be resolved",
+      node.left
+    );
+  const right = new LazyValue((_, out) => c.handleEval(scope, node.right, out));
+
+  return [new AssignmentValue(left, right), inst];
+};

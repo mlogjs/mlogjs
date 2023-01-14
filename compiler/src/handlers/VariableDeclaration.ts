@@ -1,5 +1,6 @@
 import {
   DestructuringValue,
+  LazyValue,
   LiteralValue,
   ObjectValue,
   SenseableValue,
@@ -66,6 +67,8 @@ const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
         return DeclareArrayPattern(c, scope, node, kind);
       case "ObjectPattern":
         return DeclareObjectPattern(c, scope, node, kind);
+      case "AssignmentPattern":
+        return DeclareAssignmentPattern(c, scope, node, kind);
       default:
         throw new CompilerError(
           `Unsupported declaration type: ${node.type}`,
@@ -140,8 +143,10 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     members.set(new LiteralValue(i), {
       value: value.out,
       handler(get, propExists) {
-        return c.handle(scope, element, () => {
-          const [init, initInst] = propExists() ? get() : [null, []];
+        const [init, inst] = c.handle(scope, element, () => {
+          let [init, initInst] = propExists()
+            ? get()
+            : [value.defaultInit ? new LiteralValue(null) : null, []];
 
           if (!init)
             throw new CompilerError(
@@ -149,8 +154,16 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
               element
             );
 
-          return value.handler(init, initInst);
+          const getDefault = value.defaultInit;
+          if (getDefault) {
+            init = pipeInsts(
+              init["??"](scope, new LazyValue(() => getDefault()), value.out),
+              initInst
+            );
+          }
+          return [init, initInst];
         });
+        return value.handler(init, inst);
       },
     });
   }
@@ -200,11 +213,25 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
 
     members.set(keyInst[0], {
       value: value.out,
-      handler(get) {
-        return c.handle(scope, propValue, () => {
-          const [init, initInst] = get();
-          return value.handler(init, initInst);
+      handler(get, propExists) {
+        const [init, inst] = c.handle(scope, propValue, () => {
+          let [init, initInst] =
+            propExists() || !value.defaultInit
+              ? get()
+              : [new LiteralValue(null), []];
+
+          const getDefault = value.defaultInit;
+          if (getDefault) {
+            init = pipeInsts(
+              init["??"](scope, new LazyValue(() => getDefault()), value.out),
+              initInst
+            );
+          }
+
+          return [init, initInst];
         });
+
+        return value.handler(init, inst);
       },
     });
 
@@ -232,6 +259,18 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   return [declarationValue, propertiesInst[1]];
 };
 
+const DeclareAssignmentPattern: TDeclareHandler<es.AssignmentPattern> = (
+  c,
+  scope,
+  node,
+  kind
+) => {
+  const [value, inst] = Declare(c, scope, node.left, kind);
+
+  value.defaultInit = () => c.handleEval(scope, node.right, value.out);
+
+  return [value, inst];
+};
 class DeclarationValue extends VoidValue {
   c: Compiler;
   scope: IScope;
@@ -239,6 +278,7 @@ class DeclarationValue extends VoidValue {
   out: IValue;
   /** Handles the init value */
   handle: DeclarationValue["handler"];
+  defaultInit?: () => TValueInstructions;
 
   constructor({
     c,
