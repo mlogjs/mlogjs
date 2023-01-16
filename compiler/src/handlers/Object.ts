@@ -163,10 +163,10 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     if (!prop) continue;
 
     const propKey = prop.key;
-    const key =
+    const [key, keyInst] =
       propKey.type === "Identifier" && !prop.computed
-        ? new LiteralValue(propKey.name)
-        : pipeInsts(c.handleEval(scope, propKey), inst);
+        ? [new LiteralValue(propKey.name), []]
+        : c.handleEval(scope, propKey);
 
     const value = pipeInsts(c.handle(scope, prop.value), inst);
     const hasDefault = value instanceof AssignmentValue;
@@ -181,15 +181,13 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
       value: hasDefault ? value.left : value,
       handler(get, propExists) {
         return c.handle(scope, prop, () => {
+          const inst = keyInst;
           if (propExists() || !hasDefault) {
-            const inst = get();
-
+            const input = pipeInsts(get(), inst);
             // assigns the output to the target value
-            pipeInsts(value["="](scope, inst[0]), inst[1]);
-            return inst;
+            const output = pipeInsts(value["="](scope, input), inst);
+            return [output, inst];
           }
-
-          const inst: IInstruction[] = [];
           const evaluated = pipeInsts(
             value.right.eval(scope, value.left),
             inst

@@ -227,14 +227,14 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
             );
           }
 
-          return [init, initInst];
+          return [init, [...keyInst[1], ...initInst]];
         });
 
         return value.handler(init, inst);
       },
     });
 
-    return [null, [...keyInst[1], ...valueInst]];
+    return [null, valueInst];
   });
 
   const out = new DestructuringValue(members);

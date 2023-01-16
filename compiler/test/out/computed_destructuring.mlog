@@ -1,0 +1,58 @@
+set &t2->0 5
+set &t2->1 4
+set &t2->2 3
+set &t2->3 2
+set &t2->4 1
+set n:7:19 1
+set &rcalculate:7:0 8
+jump 43 always
+set &t0 &fcalculate:7:0
+set a:1:22 null
+jump 16 lessThan &t0 0
+jump 16 greaterThan &t0 4
+set &t2.&rt 15
+op mul &t3 &t0 2
+op add @counter 48 &t3
+set a:1:22 &t2.&gtemp
+jump 21 notEqual a:1:22 null
+set n:7:19 2
+set &rcalculate:7:0 20
+jump 43 always
+set a:1:22 &fcalculate:7:0
+set n:7:19 3
+set &rcalculate:7:0 24
+jump 43 always
+set &t1 &fcalculate:7:0
+set b:1:56 null
+jump 32 lessThan &t1 0
+jump 32 greaterThan &t1 4
+set &t2.&rt 31
+op mul &t4 &t1 2
+op add @counter 48 &t4
+set b:1:56 &t2.&gtemp
+jump 37 notEqual b:1:56 null
+set n:7:19 4
+set &rcalculate:7:0 36
+jump 43 always
+set b:1:56 &fcalculate:7:0
+print "a: "
+print a:1:22
+print ", b: "
+print b:1:56
+printflush message1
+end
+print "calculating "
+print n:7:19
+print "\n"
+set &fcalculate:7:0 n:7:19
+set @counter &rcalculate:7:0
+set &t2.&gtemp &t2->0
+set @counter &t2.&rt
+set &t2.&gtemp &t2->1
+set @counter &t2.&rt
+set &t2.&gtemp &t2->2
+set @counter &t2.&rt
+set &t2.&gtemp &t2->3
+set @counter &t2.&rt
+set &t2.&gtemp &t2->4
+set @counter &t2.&rt
