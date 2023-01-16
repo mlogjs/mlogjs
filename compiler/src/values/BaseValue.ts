@@ -20,7 +20,7 @@ import {
   TValueInstructions,
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
-import { pipeInsts } from "../utils";
+import { discardedName, pipeInsts } from "../utils";
 import { JumpOutValue } from "./JumpOutValue";
 
 export class BaseValue extends VoidValue implements IValue {
@@ -168,12 +168,12 @@ for (const key of updateOperators) {
     out?: TEOutput
   ): TValueInstructions {
     let [ret, inst] = this.eval(scope);
-    if (!prefix) {
-      const temp = StoreValue.out(scope, out);
-      const tempValue = pipeInsts(temp["="](scope, ret), inst);
-      ret = tempValue;
+    if (!prefix && out !== discardedName) {
+      const temp = StoreValue.from(scope, out);
+      ret = pipeInsts(temp["="](scope, ret), inst);
     }
     const kind = key === "++" ? "+=" : "-=";
-    return [ret, [...inst, ...this[kind](scope, new LiteralValue(1))[1]]];
+    pipeInsts(this[kind](scope, new LiteralValue(1)), inst);
+    return [ret, inst];
   };
 }
