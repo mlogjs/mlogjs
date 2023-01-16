@@ -294,6 +294,7 @@ export class DynamicArray extends ObjectValue {
     if (prop instanceof LiteralValue && prop.isNumber()) {
       return prop.data >= 0 && prop.data < this.values.length;
     }
+    if (prop instanceof StoreValue) return true;
 
     return super.hasProperty(scope, prop);
   }

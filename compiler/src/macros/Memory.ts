@@ -78,7 +78,11 @@ class MemoryMacro extends ObjectValue {
   }
 
   hasProperty(scope: IScope, prop: IValue): boolean {
-    if (prop instanceof LiteralValue && prop.isNumber()) return true;
+    if (
+      (prop instanceof LiteralValue && prop.isNumber()) ||
+      prop instanceof StoreValue
+    )
+      return true;
     return super.hasProperty(scope, prop);
   }
 
