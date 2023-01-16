@@ -85,8 +85,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
-  const out = SenseableValue.from(
-    scope,
+  const out = new SenseableValue(
     name,
     kind === "const" ? EMutability.init : EMutability.mutable
   );
