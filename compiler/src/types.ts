@@ -273,6 +273,9 @@ export interface IValue extends IValueOperators {
    * after the call has been evaluated.
    */
   postCall(scope: IScope): void;
+
+  /** The string representation of `this` in error messages. */
+  debugString(): string;
 }
 /** Helper type that is used in some typescript assertions */
 export interface INamedValue extends IValue {

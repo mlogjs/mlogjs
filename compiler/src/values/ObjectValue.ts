@@ -60,7 +60,10 @@ export class ObjectValue extends VoidValue {
       return [member, []];
     }
     const { $get } = this.data;
-    if (!$get) throw new CompilerError("Cannot get undefined member.");
+    if (!$get)
+      throw new CompilerError(
+        `The member [${key.debugString()}] is not present in [${this.debugString()}]`
+      );
     return $get.call(scope, [key], out);
   }
 
@@ -77,6 +80,15 @@ export class ObjectValue extends VoidValue {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args, out);
     return $call.call(scope, args, out);
+  }
+
+  debugString(): string {
+    if (this.name) return `ObjectValue("${this.name}")`;
+    return "ObjectValue";
+  }
+
+  toString(): string {
+    return "[macro ObjectValue]";
   }
 }
 

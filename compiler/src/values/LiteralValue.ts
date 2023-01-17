@@ -69,6 +69,10 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   isNumber(): this is LiteralValue<number> {
     return typeof this.data === "number";
   }
+
+  debugString(): string {
+    return this.toString();
+  }
 }
 
 type TOperationFn = (a: number, b?: number) => number;

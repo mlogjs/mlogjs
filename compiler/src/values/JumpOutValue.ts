@@ -76,4 +76,12 @@ export class JumpOutValue extends VoidValue {
   eval(_scope: IScope, _out?: TEOutput): TValueInstructions<IValue> {
     return [this, []];
   }
+
+  debugString(): string {
+    return "JumpOutValue";
+  }
+
+  toString(): string {
+    return "[macro JumpOutValue]";
+  }
 }

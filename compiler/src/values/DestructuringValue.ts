@@ -58,4 +58,12 @@ export class DestructuringValue extends VoidValue {
   eval(_scope: IScope): TValueInstructions<IValue> {
     return [this, []];
   }
+
+  debugString(): string {
+    return "DestructuringValue";
+  }
+
+  toString(): string {
+    return "[macro DestructuringValue]";
+  }
 }
