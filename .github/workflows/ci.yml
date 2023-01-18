@@ -8,27 +8,16 @@ jobs:
   ci:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-      - uses: pnpm/action-setup@v2.0.1
+      - uses: actions/checkout@v3
+      - uses: pnpm/action-setup@v2
         with:
-          version: 7.14.1
-      - uses: actions/setup-node@v2
+          version: 7
+      - uses: actions/setup-node@v3
         with:
           node-version: 16.x
           cache: pnpm
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -C compiler clean
       - run: pnpm -C compiler/test exec tsc #typecheck tests
       - run: pnpm -C compiler coverage
-      - run: pnpm -C compiler build
-      - run: pnpm -C website build
-      - run: pnpm -C website docs:copy
-      - if: contains(github.ref, 'main')
-        env:
-          MESSAGE: ${{ github.event.head_commit.message }}
-        run: |
-          git add -f compiler/dist docs
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "$MESSAGE"
-          git push origin main:ci -f
+      - run: pnpm -C compiler build # tests compiler build process
+      - run: pnpm -C website build # tests website build process
