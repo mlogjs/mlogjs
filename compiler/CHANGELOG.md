@@ -7,37 +7,276 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added optimizations to `if/else` statements that act as guard clauses.
+- Added optimizations to the compiler to only add the `end` instruction when necessary.
+- Added the `setup` subcommand to the CLI.
+- Added the `DynamicArray` macro to support arrays with variable size (and with a fixed size limit).
+- Added the `MutableArray` macro to support dynamically indexed arrays.
+
+### Changed
+
+- Changed the equality of stores. They are now treated as equal if they have the same runtime name.
+
+### Fixed
+
+- Fixed break statements not working inside `do while` statements.
+- Fixed functions returning values from previous calls.
+- Fixed doc examples for the `fetch` command.
+- Fixed the hiding of redundant `jump` instructions.
+
 ## [0.4.10] - 2022-11-17
+
+### Added
+
+- Added operation caching for arithmethic operators and Math functions.
+
+### FIxed
+
+- Fixed empty `if` statements having their jumps unduly removed.
 
 ## [0.4.9] - 2022-11-10
 
+### Added
+
+- Added support for empty statements.
+- Added support for optional chaining (`obj?.foo`).
+- Added support for the comma operator (`let foo = (a, b, c)`)
+
+### Fixed
+
+- Fixed the implementation of the `!==` operator.
+
 ## [0.4.8] - 2022-11-09
+
+### Fixed
+
+- Fixed the implementation of `switch` statement optimizations.
 
 ## [0.4.7] - 2022-11-08
 
+### Changed
+
+- Changed the internal model used to handle temporary values.
+- Literal constants can now make logical expressions short circuit at compile time.
+
+### Fixed
+
+- Fixed chained ternary operators having unecessary temporary values.
+- Fixed the implementation of inlined return statements.
+
 ## [0.4.6] - 2022-10-31
+
+### Fixed
+
+- Fixed function return values being overridden when called multiple times inside expressions.
 
 ## [0.4.5] - 2022-10-31
 
+### Changed
+
+- Restored the type declarations for the `config` member in blocks.
+- Patched `control.color` to still work after v7, retaning its syntax.
+
+  ```js
+  // current syntax
+  control.color(building, r, g, b);
+
+  // what would be the new syntax if the patch wasn't made
+  control.color(building, packColor(r, g, b, a));
+  ```
+
+### Fixed
+
+- Fixed functions not always returning from their bodies.
+
 ## [0.4.4] - 2022-10-30
+
+### Added
+
+- Added support to sense the new items and liquids from mindustry v7 on blocks.
+
+### Fixed
+
+- Fixed the implementation of the `continue` statement in `for` loops.
 
 ## [0.4.3] - 2022-10-29
 
+### Added
+
+- Added an example containing a function to calculate a term of the fibonacci sequence.
+
+### Changed
+
+- Synchronized the repository and the compiler's READMEs
+
+### Fixed
+
+- Fixed the docs for `draw.image`
+
 ## [0.4.2] - 2022-10-24
+
+### Added
+
+- Added an example that computes pascal's triangle.
+- Added support for javascript labels.
+- Added support for function hoisting.
+
+### Changed
+
+- Docs are now built using vitepress.
+
+### Fixed
+
+- Fixed the implementation of the `??=` operator.
+- Self assignments are now removed from the final output (`set a a`).
 
 ## [0.4.1] - 2022-10-15
 
+### Addded
+
+- Added testable examples for the compiler.
+- Added support for multiline `asm` calls.
+
+### Fixed
+
+- Fixed incorrect mapping between scopes and temporary values.
+
 ## [0.4.0] - 2022-09-25
+
+### Added
+
+- Added support for the Mindustry v7 instructions.
+- Added support for the Mindustry v7 items, blocks and liquids.
+- Added support for tagged template expressions (`` foo`string ${a}` ``)
+- Added default parameters for `printFlush` (message1) and `drawFlush` (display1)
+- Added support for the nullish coalescing operator (`a ?? b`).
+- Added support for the `switch` statement.
+- Added support for bidirectional sourcemapping to the online editor.
+- Added mlog highlighting to the online editor.
+
+### Changed
+
+- (Breaking) Some commands now take named parameters instead of positional parameters.
+- (Breaking) Mlog code is now inlined by calling the `asm` function instead of just using template strings.
+
+  ```js
+  let a;
+  // before
+  `set ${a} 1`;
+
+  // after
+  asm`set ${a} 1`;
+  ```
+
+- Changed the online editor theme to dark.
+- The online editor now compiles code inside a service worker.
+
+### Fixed
+
+- Fixed inlined return statements not generating jump instructions.
+- Fixed inlined functions having incorrect return values.
 
 ## [0.3.0] - 2022-06-01
 
+### Added
+
+- Added documentation for `Vars.tick` and `Vars.time`.
+
+### Changed
+
+- Using the `typeof` operator on a senseable value now returns `"store"` again.
+- Values returned by `getVar` are no longer assumed to be constant.
+
+### Fixed
+
+- Fixed the name of temporary values inside functions.
+
 ## [0.3.0-beta.0] - 2022-05-25
+
+### Added
+
+- Added support for `@tick` (`Vars.tick`) and `@time` (`Vars.time`).
+- Added docs for the supported javascript syntax.
+- Added docs for the supported typescript syntax.
+- Added support for object and array destructuring assignments.
+- Added support for nested destructuring patterns.
+- Added the `endScript` function.
+- Added support for the ternary operator.
+- Added support for typescript's type casts.
+- Added support for typescript's enums.
+- Added support for typescript's non null assertions.
+- Added support for typescript's type and interface declarations.
+- Added support for `do while` loops.
+- Added jsdoc comments to built-in functions.
+
+### Changed
+
+- Babel is now used to parse code instead of acorn.
+- Variable names generated with `--compact-names=false` now follow the pattern `[name]:[line]:[column]`
+- The online editor's output line counter now starts at zero.
+- (breaking) The building and unit macros have been replaced by senseable values.
+
+### Removed
+
+- The building and unit macros have been removed.
+
+### Fixed
+
+- Fixed the `bin` field in the compiler's `package.json`.
+- Fixed the `do while` loop output when it had a constant condition.
+- Fixed handling of arrow functions.
+- Fixed destructuring assignments with dynamic keys.
+- Fixed destructuring assignments with memory entries on the left side.
+
+  ```js
+  // now works
+  const mem = new Memory(getBuilding("cell1"));
+  ({ a: mem[0] } = { a: 1 });
+  ```
+
+- Fixed jsdoc examples in the type definitions being broken in the online editor.
+- Fixed the location of errors thrown inside object literals and destructuring patterns.
+- Fixed the output of the `sensor` command.
 
 ## [0.2.2] - 2022-03-12
 
+### Fixed
+
+- Fixed the generated code for the `print` command.
+- Fixed assignments to memory entries not returning a value.
+- Fixed the compile time evaluation of calls to `Math.angle`.
+
 ## [0.2.1] - 2022-03-06
 
+### Added
+
+- Created an online editor.
+
+### Changed
+
+- Parsing is now made with acorn instead of esprima.
+
 ## [0.2.0] - 2022-03-05
+
+### Added
+
+- Added first class support for all the available instructions and variables.
+- Added support for shallow array destructuring.
+
+### Changed
+
+- Reading and writing to memory cells is now done via the `Memory` macro.
+- Methods have been moved out of the block macros, each into a built-in function.
+
+### Removed
+
+- Removed the `Store` and `Temp` factories.
+
+### Fixed
+
+- Fixed the unary operators `!` and `~` not working.
 
 ## [0.1.11] - 2021-06-20
 
