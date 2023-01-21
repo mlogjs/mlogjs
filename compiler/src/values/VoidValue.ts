@@ -26,9 +26,9 @@ export class VoidValue implements IValue {
   ): TValueInstructions<IValue | null> {
     throw new CompilerError(`[${this.debugString()}] is not callable.`);
   }
-  get(_scope: IScope, _name: IValue): TValueInstructions {
+  get(_scope: IScope, name: IValue): TValueInstructions {
     throw new CompilerError(
-      `[${this.debugString()}] does not have any members`
+      `The member [${name.debugString()}] does not exist in [${this.debugString()}]`
     );
   }
 
