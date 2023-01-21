@@ -280,25 +280,73 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [0.1.11] - 2021-06-20
 
+### Changed
+
+- Block macros are now serialized to their names.
+
 ## [0.1.10] - 2021-06-14
+
+### Added
+
+- Added support for arrays.
 
 ## [0.1.9] - 2021-06-13
 
+### Added
+
+- Added the `Entity` factory, which works as an alias for `Block`.
+- Added more type definitions.
+
 ## [0.1.8] - 2021-05-26
 
+### Added
+
+- Added a breakout game example.
+
+### Changed
+
+- The library type definitions have been moved from `mlogcc.d.ts` to `mlogjs.d.ts`.
+
 ## [0.1.7] - 2021-05-23
+
+### Added
+
+- Added the `concat` function to contatenate constant strings.
+- Added a `.length` field to constant strings.
 
 ## [0.1.6] - 2021-05-19
 
 ## [0.1.5] - 2021-05-16
 
+### Changed
+
+- The optimization for temp values was reintroduced.
+
 ## [0.1.4] - 2021-05-16
+
+### Changed
+
+- Removed the optimization for temp values.
 
 ## [0.1.3] - 2021-05-16
 
 ## [0.1.2] - 2021-05-16
 
+### Added
+
+- Added custom support for the `typeof` operator.
+
+### Changed
+
+- Renamed the project to `mlogjs`.
+
+### Fixed
+
+- Fixed `sensor` not automatically adding `"@"` before the name.
+
 ## [0.1.1] - 2021-05-15
+
+- First version.
 
 [unreleased]: https://github.com/mlogjs/mlogjs/compare/v0.4.10...HEAD
 [0.4.10]: https://github.com/mlogjs/mlogjs/compare/v0.4.9...v0.4.10
