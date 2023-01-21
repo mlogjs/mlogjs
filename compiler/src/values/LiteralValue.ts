@@ -48,7 +48,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     const method = literalMethods[name.data];
     if (!method)
       throw new CompilerError(
-        `Method ${name.data} does not exist on literal values.`
+        `The member [${name.debugString()}] does not exist on literal values.`
       );
     return [method.apply(this, [scope]), []];
   }
