@@ -47,7 +47,7 @@ class MemoryEntry extends BaseValue {
   }
 
   toString(): string {
-    return "[macro MemoryEntry]";
+    return '"[macro MemoryEntry]"';
   }
 }
 
@@ -74,7 +74,7 @@ class MemoryMacro extends ObjectValue {
   }
 
   toString() {
-    return "[macro Memory]";
+    return '"[macro Memory]"';
   }
 }
 

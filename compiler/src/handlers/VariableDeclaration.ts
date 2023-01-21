@@ -281,6 +281,6 @@ class DeclarationValue extends VoidValue {
   }
 
   toString() {
-    return "[macro DeclarationValue]";
+    return '"[macro DeclarationValue]"';
   }
 }

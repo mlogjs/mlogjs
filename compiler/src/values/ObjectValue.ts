@@ -88,7 +88,7 @@ export class ObjectValue extends VoidValue {
   }
 
   toString(): string {
-    return "[macro ObjectValue]";
+    return '"[macro ObjectValue]"';
   }
 }
 

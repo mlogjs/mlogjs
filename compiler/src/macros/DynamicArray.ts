@@ -344,7 +344,7 @@ export class DynamicArray extends ObjectValue {
 
   toString() {
     const id = this.dynamic ? "DynamicArray" : "MutableArray";
-    return `[macro ${id}]`;
+    return `"[macro ${id}]"`;
   }
 }
 
@@ -543,7 +543,7 @@ class DynamicArrayEntry extends BaseValue {
 
   toString() {
     const name = this.array.dynamic ? "DynamicArray" : "MutableArray";
-    return `[macro ${name}Entry]`;
+    return `"[macro ${name}Entry]"`;
   }
 }
 

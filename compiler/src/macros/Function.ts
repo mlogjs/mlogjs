@@ -35,6 +35,6 @@ export class MacroFunction<
   }
 
   toString(): string {
-    return "[macro MacroFunction]";
+    return '"[macro MacroFunction]"';
   }
 }

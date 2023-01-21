@@ -64,6 +64,6 @@ export class DestructuringValue extends VoidValue {
   }
 
   toString(): string {
-    return "[macro DestructuringValue]";
+    return '"[macro DestructuringValue]"';
   }
 }

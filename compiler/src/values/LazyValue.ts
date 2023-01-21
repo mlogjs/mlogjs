@@ -16,6 +16,6 @@ export class LazyValue extends VoidValue {
   }
 
   toString(): string {
-    return "[macro LazyValue]";
+    return '"[macro LazyValue]"';
   }
 }

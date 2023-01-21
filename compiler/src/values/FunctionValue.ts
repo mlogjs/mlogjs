@@ -272,7 +272,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   }
 
   toString() {
-    return "[macro FunctionValue]";
+    return '"[macro FunctionValue]"';
   }
 }
 

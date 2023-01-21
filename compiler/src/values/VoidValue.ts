@@ -43,7 +43,7 @@ export class VoidValue implements IValue {
   }
 
   toString(): string {
-    return "[macro VoidValue]";
+    return '"[macro VoidValue]"';
   }
 }
 
