@@ -1,6 +1,6 @@
 <div markdown="1" align="center">
 
-[![mlogjs](https://mlogjs.github.io/mlogjs/logo.png)][docs]
+[![mlogjs](https://mlogjs.netlify.app/logo.png)][docs]
 
 # **JavaScript [MLog](https://mindustrygame.github.io/wiki/logic/0-introduction/) Compiler**
 
@@ -64,5 +64,5 @@ MIT
 
 [npm]: https://www.npmjs.com/package/mlogjs
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
-[docs]: https://mlogjs.github.io/mlogjs
-[online editor]: https://mlogjs.github.io/mlogjs/editor.html
+[docs]: https://mlogjs.netlify.app
+[online editor]: https://mlogjs.netlify.app/editor.html
