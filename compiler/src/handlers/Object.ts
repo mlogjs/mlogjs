@@ -74,7 +74,8 @@ export const MemberExpression: THandler = (
   c,
   scope,
   node: es.MemberExpression,
-  out
+  out,
+  optional = false
 ) => {
   const [prop, propInst] = node.computed
     ? c.handleEval(scope, node.property)
@@ -82,6 +83,9 @@ export const MemberExpression: THandler = (
 
   if (!out) {
     const [obj, objInst] = c.handleEval(scope, node.object);
+
+    if (optional && obj instanceof LiteralValue && obj.data === null)
+      return [obj, [...objInst, ...propInst]];
 
     const [got, gotInst] = obj.get(scope, prop);
     return [got, [...objInst, ...propInst, ...gotInst]];
@@ -105,6 +109,9 @@ export const MemberExpression: THandler = (
   );
 
   const [obj, objInst] = c.handleEval(scope, node.object, objOut);
+
+  if (optional && obj instanceof LiteralValue && obj.data === null)
+    return [obj, [...objInst, ...propInst]];
 
   const [got, gotInst] = obj.get(scope, prop, temp);
   return [got, [...objInst, ...propInst, ...gotInst]];
@@ -178,4 +185,9 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 };
 
 // the mlog runtime already does this check for us
-export const OptionalMemberExpression = MemberExpression;
+export const OptionalMemberExpression: THandler = (
+  c,
+  scope,
+  node: es.OptionalMemberExpression,
+  out
+) => MemberExpression(c, scope, node, out, true);
