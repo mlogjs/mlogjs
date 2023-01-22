@@ -19,6 +19,8 @@ jobs:
       - run: pnpm -C compiler coverage
       - run: pnpm -C compiler build
       - run: pnpm -C website build
+        env:
+          BUILD_VERSION: unreleased
       - run: pnpm -C website docs:copy
       - if: contains(github.ref, 'main')
         env:

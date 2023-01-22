@@ -3,8 +3,10 @@ import { rawResolver } from "./raw_resolver";
 
 const base = process.env.BASE ?? "/mlogjs/";
 
+const unreleased = process.env.BUILD_VERSION === "unreleased";
+
 const config: UserConfig = {
-  title: "MlogJS",
+  title: unreleased ? "MlogJS (unreleased)" : "MlogJS",
   description: "Compile javascript into mindustry logic code",
   base,
 
@@ -52,7 +54,10 @@ const config: UserConfig = {
       ],
     },
 
-    socialLinks: [{ icon: "github", link: "https://github.com/mlogjs/mlogjs" }],
+    socialLinks: [
+      { icon: "github", link: "https://github.com/mlogjs/mlogjs" },
+      { icon: "discord", link: "https://discord.gg/xjJFpERd" },
+    ],
   },
   markdown: {
     theme: "dark-plus",
