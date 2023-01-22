@@ -6,7 +6,9 @@
 
 [![ci](https://github.com/weisrc/mlogjs/actions/workflows/ci.yml/badge.svg)][ci]
 [![npm](https://img.shields.io/npm/v/mlogjs?color=cb3837&logo=npm)][npm]
-[![docs](https://img.shields.io/badge/docs-mlogjs-41B883?logo=readthedocs)][docs]
+[![docs](https://img.shields.io/badge/docs-stable-41B883?logo=readthedocs)][docs]
+[![unreleased docs](https://img.shields.io/badge/docs-unreleased-41B883?logo=readthedocs)][unreleased docs]
+[![chat](https://img.shields.io/badge/chat-discord-blue?logo=discord)][discord]
 
 </div>
 
@@ -17,7 +19,7 @@
 - Fully Typed API
 - Macros
 - All Instructions and Variables
-- An [online editor]
+- An online editor integrated to the docs
 
 ## Installation
 
@@ -42,13 +44,6 @@ printFlush();
 mlogjs hello.js
 ```
 
-## Resources
-
-- [Discord](https://discord.gg/SvgjCtZnR5)
-- [Documentation][docs]
-- [NPM package][npm]
-- [GitHub Action CI][ci]
-
 ## Contribute
 
 Having trouble? [Ask for help on discord](https://discord.gg/DxXkqsWx)
@@ -65,4 +60,5 @@ MIT
 [npm]: https://www.npmjs.com/package/mlogjs
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
 [docs]: https://mlogjs.netlify.app
-[online editor]: https://mlogjs.netlify.app/editor.html
+[unreleased docs]: https://mlogjs.github.io/mlogjs/
+[discord]: https://discord.gg/SvgjCtZnR5
