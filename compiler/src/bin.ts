@@ -51,6 +51,7 @@ yargs(hideBin(process.argv))
           moduleDetection: "force",
           noEmit: true,
           noLib: true,
+          target: "ESNext",
         },
         include: ["./lib", "*.js", "*.ts"],
         exclude: ["node_modules"],

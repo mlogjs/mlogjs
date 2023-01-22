@@ -62,6 +62,7 @@ function beforeMount(monaco: Monaco) {
   defaults.setCompilerOptions({
     noLib: true,
     allowNonTsExtensions: true,
+    target: monaco.languages.typescript.ScriptTarget.ESNext,
   });
   for (const [name, content] of lib) {
     defaults.addExtraLib(content, name);
