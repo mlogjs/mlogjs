@@ -50,8 +50,7 @@ export const LogicalExpression: THandler = (
   node: es.LogicalExpression,
   out
 ) => {
-  if (node.operator !== "??")
-    return LRExpression(c, scope, node, undefined, null);
+  if (node.operator !== "??") return LRExpression(c, scope, node, out, null);
 
   const other = new LazyValue((scope, out) =>
     c.handleEval(scope, node.right, out)

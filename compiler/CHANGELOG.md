@@ -21,6 +21,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed logical expressions creating unnecessary temp values
 - Fixed optional chaning not working on null literals (`null?.foo`).
 - Fixed break statements not working inside `do while` statements.
 - Fixed functions returning values from previous calls.

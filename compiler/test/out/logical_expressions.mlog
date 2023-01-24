@@ -1,0 +1,15 @@
+op rand &t0 10
+op greaterThan a:1:6 &t0 5
+op rand &t1 10
+op greaterThan b:2:6 &t1 5
+op land c:3:6 a:1:6 b:2:6
+op or d:4:6 a:1:6 b:2:6
+print "\na: "
+print a:1:6
+print "\nb: "
+print b:2:6
+print "\na && b: "
+print c:3:6
+print "\na || b: "
+print d:4:6
+print "\n"
