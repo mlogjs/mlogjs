@@ -1,4 +1,5 @@
 import { IBindableValue, IValue } from "../types";
+import { JumpOutValue } from "../values/JumpOutValue";
 import { InstructionBase } from "./InstructionBase";
 
 export enum EJumpKind {
@@ -20,5 +21,26 @@ export class JumpInstruction extends InstructionBase {
     right: IValue | null = null
   ) {
     super("jump", address, kind, left, right);
+  }
+
+  /**
+   * Works with the `JumpOutValue` class to determine
+   * wether a jump should be added if the expression wasn't jump compressed.
+   */
+  static or(
+    test: IValue,
+    out: JumpOutValue,
+    kind: EJumpKind,
+    right: IValue | (() => IValue)
+  ) {
+    if (test === out) return [];
+    return [
+      new JumpInstruction(
+        out.address,
+        kind,
+        test,
+        typeof right === "function" ? right() : right
+      ),
+    ];
   }
 }
