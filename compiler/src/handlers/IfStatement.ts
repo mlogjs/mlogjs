@@ -21,10 +21,9 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   const consequent = withAlwaysRuns(c.handle(scope, node.consequent), false);
 
   inst.push(
-    ...JumpInstruction.or(test, testOut, EJumpKind.Equal, new LiteralValue(0))
+    ...JumpInstruction.or(test, testOut, EJumpKind.Equal, new LiteralValue(0)),
+    ...consequent[1]
   );
-
-  inst.push(...consequent[1]);
 
   if (!node.alternate) {
     inst.push(new AddressResolver(endIfAddr));
