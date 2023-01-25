@@ -28,8 +28,8 @@ export class JumpInstruction extends InstructionBase {
    * wether a jump should be added if the expression wasn't jump compressed.
    */
   static or(
-    test: IValue,
     out: JumpOutValue,
+    test: IValue,
     kind: EJumpKind,
     right: IValue | (() => IValue)
   ) {

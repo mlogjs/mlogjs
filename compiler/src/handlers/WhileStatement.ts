@@ -46,8 +46,8 @@ export const WhileStatement: THandler<null> = (
       startLoopLine,
       ...testLines,
       ...JumpInstruction.or(
-        test,
         testOut,
+        test,
         EJumpKind.Equal,
         new LiteralValue(0)
       ),
@@ -101,8 +101,8 @@ export const DoWhileStatement: THandler<null> = (
       ...bodyLines,
       ...testLines,
       ...JumpInstruction.or(
-        test,
         testOut,
+        test,
         EJumpKind.Equal,
         new LiteralValue(1)
       ),

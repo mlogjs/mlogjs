@@ -40,8 +40,8 @@ export const ForStatement: THandler<null> = (
       startLoopLine,
       ...testLines,
       ...JumpInstruction.or(
-        test,
         testOut,
+        test,
         EJumpKind.Equal,
         new LiteralValue(0)
       ),

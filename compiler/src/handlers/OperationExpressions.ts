@@ -149,8 +149,8 @@ export const ConditionalExpression: THandler = (
     [
       ...testInst,
       ...JumpInstruction.or(
-        test,
         testOut,
+        test,
         EJumpKind.Equal,
         new LiteralValue(0)
       ),
