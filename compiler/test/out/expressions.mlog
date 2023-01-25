@@ -1,41 +1,37 @@
 op rand pos:1:6 10
-op lessThan &t0 pos:1:6 2
-jump 5 equal &t0 0
+jump 4 greaterThanEq pos:1:6 2
 set content:3:6 "low"
-jump 14 always
-op lessThan &t1 pos:1:6 4
-jump 9 equal &t1 0
+jump 11 always
+jump 7 greaterThanEq pos:1:6 4
 set content:3:6 "medium"
-jump 14 always
-op lessThan &t2 pos:1:6 6
-jump 13 equal &t2 0
+jump 11 always
+jump 10 greaterThanEq pos:1:6 6
 set content:3:6 "high"
-jump 14 always
+jump 11 always
 set content:3:6 "very high"
 print content:3:6
 op sub offset:8:6 pos:1:6 5
-op sub &t3 0 offset:8:6
-print &t3
+op sub &t0 0 offset:8:6
+print &t0
 print offset:8:6
 print 10
 print "it's false"
-set &t4 offset:8:6
-jump 24 notEqual &t4 null
-set &t4 "offset is null?"
+set &t1 offset:8:6
+jump 21 notEqual &t1 null
+set &t1 "offset is null?"
 print "null is null"
-print &t4
+print &t1
 print "preserved"
-op rand &t5 1
-op greaterThan &t6 &t5 0.5
-jump 32 equal &t6 0
+op rand &t2 1
+jump 28 lessThanEq &t2 0.5
 set item:22:4 null
-jump 33 always
+jump 29 always
 set item:22:4 @beryllium
-jump 35 notEqual item:22:4 null
+jump 31 notEqual item:22:4 null
 set item:22:4 @copper
-op rand &t7 65536
-op not &t8 &t7
-print &t8
-op strictEqual &t9 item:22:4 @copper
-op equal &t10 &t9 0
-print &t10
+op rand &t3 65536
+op not &t4 &t3
+print &t4
+op strictEqual &t5 item:22:4 @copper
+op equal &t6 &t5 0
+print &t6

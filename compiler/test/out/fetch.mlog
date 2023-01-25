@@ -1,14 +1,13 @@
 fetch buildCount routers:1:6 @sharded 0 @router
 set i:3:9 0
-op lessThan &t0 i:3:9 routers:1:6
-jump 14 equal &t0 0
+jump 13 greaterThanEq i:3:9 routers:1:6
 fetch build router:4:8 @sharded i:3:9 @router
-sensor &t1 router:4:8 @x
-sensor &t2 router:4:8 @y
+sensor &t0 router:4:8 @x
+sensor &t1 router:4:8 @y
 print "x: "
-print &t1
+print &t0
 print " y: "
-print &t2
+print &t1
 print "\n"
 op add i:3:9 i:3:9 1
 jump 2 always

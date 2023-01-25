@@ -2,11 +2,10 @@ ubind @gamma
 sensor shootX:3:8 @unit @shootX
 sensor shootY:3:16 @unit @shootY
 sensor shooting:3:24 @unit @shooting
-op equal &t0 shooting:3:24 0
-jump 7 equal &t0 0
+jump 6 notEqual shooting:3:24 0
 end
 spawn @eclipse shootX:3:8 shootY:3:16 0 @malis unit:7:6
-sensor &t1 unit:7:6 @health
+sensor &t0 unit:7:6 @health
 print "available health: "
-print &t1
+print &t0
 printflush message1
