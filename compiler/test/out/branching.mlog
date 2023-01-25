@@ -1,5 +1,4 @@
 set i:1:4 1
-op greaterThan &t0 i:1:4 10
-jump 4 equal &t0 0
+jump 3 lessThanEq i:1:4 10
 print "I will always show up in the code"
 print "Stays"

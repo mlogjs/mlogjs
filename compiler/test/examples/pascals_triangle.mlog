@@ -3,34 +3,30 @@ set lastSize:12:4 2
 write 1 cell2 0
 write 1 cell2 1
 set i:18:9 3
-op lessThanEq &t0 i:18:9 10
-jump 36 equal &t0 0
+jump 32 greaterThan i:18:9 10
 write 1 cell1 0
 set j:23:11 1
-op lessThan &t1 j:23:11 lastSize:12:4
-jump 18 equal &t1 0
-op sub &t2 j:23:11 1
-read &t3 cell2 &t2
-read &t4 cell2 j:23:11
-op add &t5 &t3 &t4
-write &t5 cell1 j:23:11
+jump 16 greaterThanEq j:23:11 lastSize:12:4
+op sub &t0 j:23:11 1
+read &t1 cell2 &t0
+read &t2 cell2 j:23:11
+op add &t3 &t1 &t2
+write &t3 cell1 j:23:11
 op add j:23:11 j:23:11 1
-jump 9 always
+jump 8 always
 write 1 cell1 lastSize:12:4
 op add lastSize:12:4 lastSize:12:4 1
 set c:30:11 0
-op lessThan &t1 c:30:11 lastSize:12:4
-jump 33 equal &t1 0
-read &t2 cell1 c:30:11
-print &t2
-read &t3 cell1 c:30:11
-write &t3 cell2 c:30:11
-op sub &t4 lastSize:12:4 1
-op lessThan &t5 c:30:11 &t4
-jump 31 equal &t5 0
+jump 29 greaterThanEq c:30:11 lastSize:12:4
+read &t0 cell1 c:30:11
+print &t0
+read &t1 cell1 c:30:11
+write &t1 cell2 c:30:11
+op sub &t2 lastSize:12:4 1
+jump 27 greaterThanEq c:30:11 &t2
 print " "
 op add c:30:11 c:30:11 1
-jump 21 always
+jump 19 always
 print "\n"
 op add i:18:9 i:18:9 1
 jump 5 always

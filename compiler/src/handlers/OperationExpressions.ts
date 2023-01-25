@@ -9,6 +9,7 @@ import {
 import { THandler, es, IInstruction, EMutability } from "../types";
 import { discardedName, pipeInsts } from "../utils";
 import { LazyValue, LiteralValue, SenseableValue } from "../values";
+import { JumpOutValue } from "../values/JumpOutValue";
 
 export const LRExpression: THandler = (
   c,
@@ -50,8 +51,7 @@ export const LogicalExpression: THandler = (
   node: es.LogicalExpression,
   out
 ) => {
-  if (node.operator !== "??")
-    return LRExpression(c, scope, node, undefined, null);
+  if (node.operator !== "??") return LRExpression(c, scope, node, out, null);
 
   const other = new LazyValue((scope, out) =>
     c.handleEval(scope, node.right, out)
@@ -128,7 +128,12 @@ export const ConditionalExpression: THandler = (
   node: es.ConditionalExpression,
   out
 ) => {
-  const [test, testInst] = c.handleEval(scope, node.test);
+  const alternateStartAdress = new LiteralValue(null);
+  const endExpressionAdress = new LiteralValue(null);
+
+  const testOut = new JumpOutValue(node, alternateStartAdress, false);
+  const [test, testInst] = c.handleEval(scope, node.test, testOut);
+
   if (test instanceof LiteralValue) {
     if (test.data) return c.handleEval(scope, node.consequent, out);
     return c.handleEval(scope, node.alternate, out);
@@ -138,19 +143,12 @@ export const ConditionalExpression: THandler = (
 
   const consequent = c.handleEval(scope, node.consequent, result);
   const alternate = c.handleEval(scope, node.alternate, result);
-  const alternateStartAdress = new LiteralValue(null);
-  const endExpressionAdress = new LiteralValue(null);
 
   return [
     result,
     [
       ...testInst,
-      new JumpInstruction(
-        alternateStartAdress,
-        EJumpKind.Equal,
-        test,
-        new LiteralValue(0)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...consequent[1],
       ...result["="](scope, consequent[0])[1],
       new JumpInstruction(endExpressionAdress, EJumpKind.Always),

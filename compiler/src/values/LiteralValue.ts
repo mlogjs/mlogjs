@@ -74,11 +74,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
 type TOperationFn = (a: number, b?: number) => number;
 type TBinOperationFn = (a: number, b: number) => number;
 
-const operatorMap: {
-  [k in
-    | Exclude<BinaryOperator, "instanceof" | "in">
-    | Exclude<LogicalOperator, "??">]: TBinOperationFn;
-} = {
+const operatorMap = {
   "==": (a, b) => +(a == b),
   "===": (a, b) => +(a === b),
   "!=": (a, b) => +(a != b),
@@ -101,7 +97,10 @@ const operatorMap: {
   "<<": (a, b) => a << b,
   "&&": (a, b) => +(a && b),
   "||": (a, b) => +(a || b),
-} as const;
+} as const satisfies Record<
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
+  TBinOperationFn
+>;
 
 for (const k in operatorMap) {
   const key = k as keyof typeof operatorMap;

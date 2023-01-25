@@ -10,8 +10,7 @@ op rand &t2 10
 op sub ballVY:37:6 &t2 5
 set brickCount:40:6 6
 set i:41:11 0
-op lessThan &t3 i:41:11 6
-jump 17 equal &t3 0
+jump 16 greaterThanEq i:41:11 6
 write 1 bank1 i:41:11
 op add i:41:11 i:41:11 1
 jump 12 always
@@ -19,85 +18,79 @@ draw clear 0 0 0
 draw rect paddleX:31:6 10 paddleWidth:30:6 5
 draw rect ballX:34:6 ballY:35:6 5 5
 sensor &t3 switch1 @enabled
-jump 27 equal &t3 0
+jump 25 equal &t3 0
 op sub &t4 176 paddleWidth:30:6
-op lessThan &t5 paddleX:31:6 &t4
-jump 26 equal &t5 0
+jump 24 greaterThanEq paddleX:31:6 &t4
 op add paddleX:31:6 paddleX:31:6 3
-jump 30 always
-op greaterThan &t4 paddleX:31:6 0
-jump 30 equal &t4 0
+jump 27 always
+jump 27 lessThanEq paddleX:31:6 0
 op sub paddleX:31:6 paddleX:31:6 3
 op add ballX:34:6 ballX:34:6 ballVX:36:6
 op add ballY:35:6 ballY:35:6 ballVY:37:6
 op add ballXEnd:69:8 ballX:34:6 5
 op add ballYEnd:70:8 ballY:35:6 5
-op lessThan &t5 ballX:34:6 0
-op greaterThan &t6 ballXEnd:69:8 176
-op or &t7 &t5 &t6
-jump 39 equal &t7 0
+op lessThan &t4 ballX:34:6 0
+op greaterThan &t5 ballXEnd:69:8 176
+op or &t6 &t4 &t5
+jump 36 equal &t6 0
 op mul ballVX:36:6 ballVX:36:6 -1
-op greaterThan &t8 ballYEnd:70:8 176
-jump 42 equal &t8 0
+jump 38 lessThanEq ballYEnd:70:8 176
 op mul ballVY:37:6 ballVY:37:6 -1
-op greaterThan &t9 ballXEnd:69:8 paddleX:31:6
-op add &t10 paddleX:31:6 paddleWidth:30:6
-op lessThan &t11 ballX:34:6 &t10
-op land &t12 &t9 &t11
-op greaterThan &t13 ballYEnd:70:8 10
+op greaterThan &t7 ballXEnd:69:8 paddleX:31:6
+op add &t8 paddleX:31:6 paddleWidth:30:6
+op lessThan &t9 ballX:34:6 &t8
+op land &t10 &t7 &t9
+op greaterThan &t11 ballYEnd:70:8 10
+op land &t12 &t10 &t11
+op lessThan &t13 ballY:35:6 15
 op land &t14 &t12 &t13
-op lessThan &t15 ballY:35:6 15
-op land &t16 &t14 &t15
-jump 58 equal &t16 0
+jump 54 equal &t14 0
 op mul ballVY:37:6 ballVY:37:6 -1.1
-op add &t17 ballX:34:6 2.5
-op sub &t18 &t17 paddleX:31:6
-op add &t19 &t18 &t0
-op div &t20 &t19 10
-op add ballVX:36:6 ballVX:36:6 &t20
+op add &t15 ballX:34:6 2.5
+op sub &t16 &t15 paddleX:31:6
+op add &t17 &t16 &t0
+op div &t18 &t17 10
+op add ballVX:36:6 ballVX:36:6 &t18
 op sub paddleWidth:30:6 paddleWidth:30:6 1
 set brickPtr:89:8 0
 set y:90:13 126
-op greaterThan &t17 y:90:13 106
-jump 95 equal &t17 0
+jump 88 lessThanEq y:90:13 106
 set x:91:15 1
-op lessThan &t18 x:91:15 176
-jump 93 equal &t18 0
-read &t19 bank1 brickPtr:89:8
-op equal &t20 &t19 1
-jump 90 equal &t20 0
+jump 86 greaterThanEq x:91:15 176
+read &t15 bank1 brickPtr:89:8
+jump 83 notEqual &t15 1
 draw rect x:91:15 y:90:13 57.666666666666664 9
-op greaterThan &t21 ballXEnd:69:8 x:91:15
-op add &t22 x:91:15 58.666666666666664
-op lessThan &t23 ballX:34:6 &t22
+op greaterThan &t16 ballXEnd:69:8 x:91:15
+op add &t17 x:91:15 58.666666666666664
+op lessThan &t18 ballX:34:6 &t17
+op land &t19 &t16 &t18
+op greaterThan &t20 ballYEnd:70:8 y:90:13
+op land &t21 &t19 &t20
+op add &t22 y:90:13 10
+op lessThan &t23 ballY:35:6 &t22
 op land &t24 &t21 &t23
-op greaterThan &t25 ballYEnd:70:8 y:90:13
-op land &t26 &t24 &t25
-op add &t27 y:90:13 10
-op lessThan &t28 ballY:35:6 &t27
-op land &t29 &t26 &t28
-jump 90 equal &t29 0
+jump 83 equal &t24 0
 write 0 bank1 brickPtr:89:8
 op sub brickCount:40:6 brickCount:40:6 1
-op sub &t30 x:91:15 4
-op greaterThan &t31 ballX:34:6 &t30
-op add &t32 x:91:15 62.666666666666664
-op lessThan &t33 ballX:34:6 &t32
-op land &t34 &t31 &t33
-jump 89 equal &t34 0
+op sub &t25 x:91:15 4
+op greaterThan &t26 ballX:34:6 &t25
+op add &t27 x:91:15 62.666666666666664
+op lessThan &t28 ballX:34:6 &t27
+op land &t29 &t26 &t28
+jump 82 equal &t29 0
 op mul ballVY:37:6 ballVY:37:6 -1
-jump 90 always
+jump 83 always
 op mul ballVX:36:6 ballVX:36:6 -1
 op add brickPtr:89:8 brickPtr:89:8 1
 op add x:91:15 x:91:15 58.666666666666664
-jump 63 always
+jump 58 always
 op sub y:90:13 y:90:13 10
-jump 60 always
-op lessThan &t17 ballY:35:6 0
-op equal &t18 brickCount:40:6 0
-op or &t19 &t17 &t18
-jump 100 equal &t19 0
-jump 102 always
+jump 56 always
+op lessThan &t15 ballY:35:6 0
+op equal &t16 brickCount:40:6 0
+op or &t17 &t15 &t16
+jump 93 equal &t17 0
+jump 95 always
 drawflush display1
-jump 17 always
+jump 16 always
 jump 1 always

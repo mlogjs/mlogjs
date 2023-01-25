@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for compression of the `op` + `jump` instructions.
 - Added optimizations to `if/else` statements that act as guard clauses.
 - Added optimizations to the compiler to only add the `end` instruction when necessary.
 - Added the `setup` subcommand to the CLI.
@@ -21,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed logical expressions creating unnecessary temp values
 - Fixed optional chaning not working on null literals (`null?.foo`).
 - Fixed break statements not working inside `do while` statements.
 - Fixed functions returning values from previous calls.

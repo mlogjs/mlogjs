@@ -2,7 +2,6 @@ ubind @gamma
 sensor shootX:3:8 @unit @shootX
 sensor shootY:3:16 @unit @shootY
 sensor shooting:3:24 @unit @shooting
-op equal &t0 shooting:3:24 0
-jump 7 equal &t0 0
+jump 6 notEqual shooting:3:24 0
 end
 explosion @sharded shootX:3:8 shootY:3:16 5 10 1 1 1

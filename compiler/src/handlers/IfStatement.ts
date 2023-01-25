@@ -3,10 +3,14 @@ import { EJumpKind } from "../instructions";
 import { THandler, es, IInstruction, EInstIntent } from "../types";
 import { pipeInsts, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
+import { JumpOutValue } from "../values/JumpOutValue";
 
 export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   const inst: IInstruction[] = [];
-  const test = pipeInsts(c.handleEval(scope, node.test), inst);
+  const endIfAddr = new LiteralValue(null);
+  const testOut = new JumpOutValue(node, endIfAddr, false);
+
+  const test = pipeInsts(c.handleEval(scope, node.test, testOut), inst);
 
   if (test instanceof LiteralValue) {
     if (test.data) return [null, c.handle(scope, node.consequent)[1]];
@@ -14,13 +18,9 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
     return [null, []];
   }
 
-  const endIfAddr = new LiteralValue(null);
   const consequent = withAlwaysRuns(c.handle(scope, node.consequent), false);
 
-  inst.push(
-    new JumpInstruction(endIfAddr, EJumpKind.Equal, test, new LiteralValue(0)),
-    ...consequent[1]
-  );
+  inst.push(...JumpInstruction.or(test, testOut), ...consequent[1]);
 
   if (!node.alternate) {
     inst.push(new AddressResolver(endIfAddr));

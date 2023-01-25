@@ -16,18 +16,17 @@ print "\nlog2 a: "
 print &t2
 print "\n"
 op rand &t3 2
-op greaterThanEq &t4 &t3 1
-jump 30 equal &t4 0
-op rand &t5 2
-op greaterThanEq &t6 &t5 1
-print &t6
+jump 29 lessThan &t3 1
+op rand &t4 2
+op greaterThanEq &t5 &t4 1
+print &t5
 print &t2
 print "\n"
 op add a:1:4 a:1:4 1
-op log &t7 a:1:4
-op div &t8 &t7 0.6931471805599453
-print &t8
+op log &t6 a:1:4
+op div &t7 &t6 0.6931471805599453
+print &t7
 print "\n"
-op add &t5 a:1:4 1
-print &t5
+op add &t4 a:1:4 1
+print &t4
 printflush message1

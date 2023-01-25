@@ -8,7 +8,7 @@ set arr:1:6.&len 5
 set &t0 arr:1:6->4
 jump 12 greaterThanEq 4 arr:1:6.&len
 set arr:1:6.&rt 11
-op add @counter 147 4
+op add @counter 144 4
 op sub arr:1:6.&len arr:1:6.&len 1
 print "last: "
 print &t0
@@ -24,7 +24,7 @@ jump 28 lessThan &t3 0
 jump 28 greaterThan &t3 4
 set arr:1:6.&rt 27
 op mul &t5 &t3 2
-op add @counter 153 &t5
+op add @counter 150 &t5
 set &t4 arr:1:6.&gtemp
 print index:6:6
 print ": "
@@ -33,114 +33,111 @@ print "\n"
 printflush message1
 wait 2
 set counter:13:4 0
-op equal &t6 arr:1:6.&len 0
-jump 52 equal &t6 0
+jump 50 notEqual arr:1:6.&len 0
 set i:18:13 1
-op lessThanEq &t7 i:18:13 5
-jump 51 equal &t7 0
-op rand &t8 20
-op add &t9 &t8 1
-op floor &t10 &t9
-op pow &t11 &t10 2
-set arr:1:6.&stemp &t11
-set arr:1:6.&rt 48
-op mul &t12 arr:1:6.&len 2
-op add @counter 163 &t12
+jump 49 greaterThan i:18:13 5
+op rand &t6 20
+op add &t7 &t6 1
+op floor &t8 &t7
+op pow &t9 &t8 2
+set arr:1:6.&stemp &t9
+set arr:1:6.&rt 46
+op mul &t10 arr:1:6.&len 2
+op add @counter 160 &t10
 op add arr:1:6.&len arr:1:6.&len 1
 op add i:18:13 i:18:13 1
-jump 38 always
-jump 129 always
-jump 57 strictEqual counter:13:4 0
-jump 73 strictEqual counter:13:4 1
-jump 91 strictEqual counter:13:4 2
-jump 108 strictEqual counter:13:4 3
+jump 37 always
 jump 127 always
-op rand &t7 arr:1:6.&len
-op floor &t8 &t7
+jump 55 strictEqual counter:13:4 0
+jump 71 strictEqual counter:13:4 1
+jump 89 strictEqual counter:13:4 2
+jump 106 strictEqual counter:13:4 3
+jump 125 always
+op rand &t6 arr:1:6.&len
+op floor &t7 &t6
 set number:26:14 null
-jump 69 lessThan &t8 0
-jump 69 greaterThanEq &t8 arr:1:6.&len
-set arr:1:6.&rt 65
-op mul &t9 &t8 2
-op add @counter 153 &t9
+jump 67 lessThan &t7 0
+jump 67 greaterThanEq &t7 arr:1:6.&len
+set arr:1:6.&rt 63
+op mul &t8 &t7 2
+op add @counter 150 &t8
 set number:26:14 arr:1:6.&gtemp
-set arr:1:6.&rt 68
-op add @counter 147 &t8
+set arr:1:6.&rt 66
+op add @counter 144 &t7
 op sub arr:1:6.&len arr:1:6.&len 1
 print "removed: "
 print number:26:14
 print "\n"
-jump 127 always
-op rand &t7 arr:1:6.&len
-op floor index:32:14 &t7
+jump 125 always
+op rand &t6 arr:1:6.&len
+op floor index:32:14 &t6
 set number:33:14 null
-jump 82 lessThan index:32:14 0
-jump 82 greaterThan index:32:14 4
-set arr:1:6.&rt 81
-op mul &t8 index:32:14 2
-op add @counter 153 &t8
+jump 80 lessThan index:32:14 0
+jump 80 greaterThan index:32:14 4
+set arr:1:6.&rt 79
+op mul &t7 index:32:14 2
+op add @counter 150 &t7
 set number:33:14 arr:1:6.&gtemp
-jump 87 lessThan index:32:14 0
-jump 87 greaterThanEq index:32:14 arr:1:6.&len
-set arr:1:6.&rt 86
-op add @counter 147 index:32:14
+jump 85 lessThan index:32:14 0
+jump 85 greaterThanEq index:32:14 arr:1:6.&len
+set arr:1:6.&rt 84
+op add @counter 144 index:32:14
 op sub arr:1:6.&len arr:1:6.&len 1
 print "removed: "
 print number:33:14
 print "\n"
-jump 127 always
-op sub &t7 arr:1:6.&len 1
-set &t8 null
-jump 104 lessThan &t7 0
-jump 104 greaterThan &t7 4
-set arr:1:6.&rt 98
-op mul &t9 &t7 2
-op add @counter 153 &t9
-set &t8 arr:1:6.&gtemp
+jump 125 always
+op sub &t6 arr:1:6.&len 1
+set &t7 null
+jump 102 lessThan &t6 0
+jump 102 greaterThan &t6 4
+set arr:1:6.&rt 96
+op mul &t8 &t6 2
+op add @counter 150 &t8
+set &t7 arr:1:6.&gtemp
 set arr:1:6.&stemp null
-set arr:1:6.&rt 103
-op mul &t10 &t7 2
-op add @counter 163 &t10
-set arr:1:6.&len &t7
+set arr:1:6.&rt 101
+op mul &t9 &t6 2
+op add @counter 160 &t9
+set arr:1:6.&len &t6
 print "removed: "
-print &t8
+print &t7
 print "\n"
-jump 127 always
-op add &t11 -1 arr:1:6.&len
-set &t12 null
-jump 116 lessThan &t11 0
-jump 116 greaterThan &t11 4
-set arr:1:6.&rt 115
-op mul &t13 &t11 2
-op add @counter 153 &t13
-set &t12 arr:1:6.&gtemp
+jump 125 always
+op add &t10 -1 arr:1:6.&len
+set &t11 null
+jump 114 lessThan &t10 0
+jump 114 greaterThan &t10 4
+set arr:1:6.&rt 113
+op mul &t12 &t10 2
+op add @counter 150 &t12
+set &t11 arr:1:6.&gtemp
 print "removed: "
-print &t12
+print &t11
 print "\n"
-op sub &t14 arr:1:6.&len 1
-jump 127 lessThan &t14 0
-jump 127 greaterThan &t14 4
+op sub &t13 arr:1:6.&len 1
+jump 125 lessThan &t13 0
+jump 125 greaterThan &t13 4
 set arr:1:6.&stemp null
-set arr:1:6.&rt 126
-op mul &t15 &t14 2
-op add @counter 163 &t15
-set arr:1:6.&len &t14
-op add &t7 counter:13:4 1
-op mod counter:13:4 &t7 4
+set arr:1:6.&rt 124
+op mul &t14 &t13 2
+op add @counter 160 &t14
+set arr:1:6.&len &t13
+op add &t6 counter:13:4 1
+op mod counter:13:4 &t6 4
 set i:50:11 0
-op lessThan &t7 i:50:11 arr:1:6.&len
-jump 143 equal &t7 0
-set &t8 null
-jump 139 lessThan i:50:11 0
-jump 139 greaterThan i:50:11 4
-set arr:1:6.&rt 138
-op mul &t9 i:50:11 2
-op add @counter 153 &t9
-set &t8 arr:1:6.&gtemp
-print &t8
+jump 140 greaterThanEq i:50:11 arr:1:6.&len
+set &t6 null
+jump 136 lessThan i:50:11 0
+jump 136 greaterThan i:50:11 4
+set arr:1:6.&rt 135
+op mul &t7 i:50:11 2
+op add @counter 150 &t7
+set &t6 arr:1:6.&gtemp
+print &t6
 print "\n"
 op add i:50:11 i:50:11 1
-jump 130 always
+jump 128 always
 printflush message1
 wait 1.5
 jump 35 always

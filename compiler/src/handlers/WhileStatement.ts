@@ -2,17 +2,20 @@ import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import { es, THandler } from "../types";
 import { usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
+import { JumpOutValue } from "../values/JumpOutValue";
 
 export const WhileStatement: THandler<null> = (
   c,
   scope,
   node: es.WhileStatement
 ) => {
-  const [test, testLines] = c.handleEval(scope, node.test);
-
-  const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);
   const endLoopAddr = new LiteralValue(null);
+  const testOut = new JumpOutValue(node, endLoopAddr, false);
+
+  const [test, testLines] = c.handleEval(scope, node.test, testOut);
+
+  const childScope = scope.createScope();
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
@@ -42,12 +45,7 @@ export const WhileStatement: THandler<null> = (
     [
       startLoopLine,
       ...testLines,
-      new JumpInstruction(
-        endLoopAddr,
-        EJumpKind.Equal,
-        test,
-        new LiteralValue(0)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
       endLoopLine,
@@ -60,11 +58,13 @@ export const DoWhileStatement: THandler<null> = (
   scope,
   node: es.DoWhileStatement
 ) => {
-  const [test, testLines] = c.handleEval(scope, node.test);
-
-  const childScope = scope.createScope();
   const startLoopAddr = new LiteralValue(null);
   const endLoopAddr = new LiteralValue(null);
+  const testOut = new JumpOutValue(node, startLoopAddr, true);
+
+  const [test, testLines] = c.handleEval(scope, node.test, testOut);
+
+  const childScope = scope.createScope();
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
     childScope
   );
@@ -95,12 +95,7 @@ export const DoWhileStatement: THandler<null> = (
       startLoopLine,
       ...bodyLines,
       ...testLines,
-      new JumpInstruction(
-        startLoopAddr,
-        EJumpKind.Equal,
-        test,
-        new LiteralValue(1)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
     ],
   ];

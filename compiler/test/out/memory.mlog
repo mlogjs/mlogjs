@@ -2,16 +2,15 @@ print "Expecting "
 print 512
 print " bytes to be available"
 read &t0 bank1 0
-op equal &t1 &t0 0
-jump 9 equal &t1 0
+jump 8 notEqual &t0 0
 write 1 bank1 0
 print "Processor intialized"
-jump 16 always
+jump 15 always
 read runs:11:6 bank1 1
 print "This code has run "
 print runs:11:6
 print " time(s)"
-read &t2 bank1 1
-op add &t3 &t2 1
-write &t3 bank1 1
+read &t1 bank1 1
+op add &t2 &t1 1
+write &t2 bank1 1
 printflush message1

@@ -1,6 +1,5 @@
 set i:1:4 0
-op lessThan &t0 i:1:4 100
-jump 6 equal &t0 0
+jump 5 greaterThanEq i:1:4 100
 print i:1:4
 op add i:1:4 i:1:4 1
 jump 1 always

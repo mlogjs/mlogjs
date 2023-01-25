@@ -1,6 +1,5 @@
 sensor &t0 switch1 @enabled
-op equal &t1 &t0 0
-jump 4 equal &t1 0
+jump 3 notEqual &t0 0
 end
 control enabled switch1 0
 cutscene pan 10 10 0.02 0
