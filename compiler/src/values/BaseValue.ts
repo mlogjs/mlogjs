@@ -13,6 +13,7 @@ import {
 } from "../operators";
 import {
   EMutability,
+  IInstruction,
   IScope,
   IValue,
   TEOutput,
@@ -20,6 +21,7 @@ import {
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
 import { pipeInsts } from "../utils";
+import { JumpOutValue } from "./JumpOutValue";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -39,13 +41,11 @@ export class BaseValue extends VoidValue implements IValue {
   }
 
   "!"(scope: IScope, out?: TEOutput): TValueInstructions {
-    const [that, inst] = this.eval(scope);
-    const temp = StoreValue.from(scope, out);
+    const inst: IInstruction[] = [];
     const falseLiteral = new LiteralValue(0);
-    return [
-      temp,
-      [...inst, new OperationInstruction("equal", temp, that, falseLiteral)],
-    ];
+    const that = pipeInsts(this.eval(scope), inst);
+    const result = pipeInsts(that["=="](scope, falseLiteral, out), inst);
+    return [result, inst];
   }
 
   "~"(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -84,6 +84,12 @@ export class BaseValue extends VoidValue implements IValue {
   }
 
   "!=="(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    if (out instanceof JumpOutValue && out.canHandle("!==")) {
+      const [left, leftInst] = this.eval(scope);
+      const [right, rightInst] = other.eval(scope);
+      return [out, [...leftInst, ...rightInst, out.handle("!==", left, right)]];
+    }
+
     const [equal, equalInst] = this["==="](scope, other);
     const [result, resultInst] = equal["!"](scope, out);
 
@@ -102,6 +108,12 @@ for (const key in operatorMap) {
   ): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
     const [right, rightInst] = value.eval(scope);
+
+    if (out instanceof JumpOutValue && out.canHandle(key)) {
+      const jump = out.handle(key, left, right);
+      return [out, [...leftInst, ...rightInst, jump]];
+    }
+
     const temp = StoreValue.from(scope, out);
     return [
       temp,
