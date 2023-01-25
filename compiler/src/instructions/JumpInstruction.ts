@@ -1,4 +1,5 @@
 import { IBindableValue, IValue } from "../types";
+import { LiteralValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
 import { InstructionBase } from "./InstructionBase";
 
@@ -27,19 +28,14 @@ export class JumpInstruction extends InstructionBase {
    * Works with the `JumpOutValue` class to determine
    * wether a jump should be added if the expression wasn't jump compressed.
    */
-  static or(
-    out: JumpOutValue,
-    test: IValue,
-    kind: EJumpKind,
-    right: IValue | (() => IValue)
-  ) {
+  static or(test: IValue, out: JumpOutValue) {
     if (test === out) return [];
     return [
       new JumpInstruction(
         out.address,
-        kind,
+        EJumpKind.Equal,
         test,
-        typeof right === "function" ? right() : right
+        new LiteralValue(+out.whenTrue)
       ),
     ];
   }

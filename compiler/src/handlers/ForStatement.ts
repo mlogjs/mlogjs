@@ -39,12 +39,7 @@ export const ForStatement: THandler<null> = (
       ...initInst,
       startLoopLine,
       ...testLines,
-      ...JumpInstruction.or(
-        testOut,
-        test,
-        EJumpKind.Equal,
-        new LiteralValue(0)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
       beforeEndLine,
       ...updateLines,

@@ -148,12 +148,7 @@ export const ConditionalExpression: THandler = (
     result,
     [
       ...testInst,
-      ...JumpInstruction.or(
-        testOut,
-        test,
-        EJumpKind.Equal,
-        new LiteralValue(0)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...consequent[1],
       ...result["="](scope, consequent[0])[1],
       new JumpInstruction(endExpressionAdress, EJumpKind.Always),

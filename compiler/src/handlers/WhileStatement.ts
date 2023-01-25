@@ -45,12 +45,7 @@ export const WhileStatement: THandler<null> = (
     [
       startLoopLine,
       ...testLines,
-      ...JumpInstruction.or(
-        testOut,
-        test,
-        EJumpKind.Equal,
-        new LiteralValue(0)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
       endLoopLine,
@@ -100,12 +95,7 @@ export const DoWhileStatement: THandler<null> = (
       startLoopLine,
       ...bodyLines,
       ...testLines,
-      ...JumpInstruction.or(
-        testOut,
-        test,
-        EJumpKind.Equal,
-        new LiteralValue(1)
-      ),
+      ...JumpInstruction.or(test, testOut),
       ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
     ],
   ];
