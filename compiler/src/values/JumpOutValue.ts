@@ -28,6 +28,8 @@ type WhenTrueOperator = Exclude<
 >;
 
 export class JumpOutValue extends VoidValue {
+  macro = true;
+
   constructor(
     public node: es.Node,
     public address: IBindableValue<number | null>,
