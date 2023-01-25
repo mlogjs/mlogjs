@@ -1,6 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { EJumpKind, JumpInstruction } from "../instructions";
-import { Operator, operatorMap, comparisonBinaryOperators } from "../operators";
+import { BinaryOperator } from "../operators";
 import {
   es,
   IBindableValue,
@@ -11,6 +11,16 @@ import {
 } from "../types";
 import { VoidValue } from "./VoidValue";
 
+const operatorMap = {
+  "!=": EJumpKind.NotEqual,
+  "<": EJumpKind.LessThan,
+  "<=": EJumpKind.LessThanEq,
+  "==": EJumpKind.Equal,
+  "===": EJumpKind.StrictEqual,
+  ">": EJumpKind.GreaterThan,
+  ">=": EJumpKind.GreaterThanEq,
+} as const satisfies Partial<Record<BinaryOperator, EJumpKind>>;
+
 const invertedOperatorMap = {
   "==": operatorMap["!="],
   "!=": operatorMap["=="],
@@ -19,13 +29,10 @@ const invertedOperatorMap = {
   "<": operatorMap[">="],
   ">=": operatorMap["<"],
   "<=": operatorMap[">"],
-} as const satisfies Partial<Record<Operator, string>>;
+} as const satisfies Partial<Record<BinaryOperator, EJumpKind>>;
 
-type WhenFalseOperator = keyof typeof invertedOperatorMap;
-type WhenTrueOperator = Exclude<
-  (typeof comparisonBinaryOperators)[number],
-  "!=="
->;
+type TWhenFalseOperator = keyof typeof invertedOperatorMap;
+type TWhenTrueOperator = keyof typeof operatorMap;
 
 export class JumpOutValue extends VoidValue {
   macro = true;
@@ -40,18 +47,13 @@ export class JumpOutValue extends VoidValue {
 
   canHandle(
     operator: string
-  ): operator is WhenTrueOperator | WhenFalseOperator {
-    if (this.whenTrue) {
-      return (
-        operator in operatorMap &&
-        Object.values(EJumpKind).includes(operatorMap[operator as never])
-      );
-    }
+  ): operator is TWhenTrueOperator | TWhenFalseOperator {
+    if (this.whenTrue) return operator in operatorMap;
     return operator in invertedOperatorMap;
   }
 
   handle(
-    operator: WhenTrueOperator | WhenFalseOperator,
+    operator: TWhenTrueOperator | TWhenFalseOperator,
     left: IValue,
     right: IValue
   ) {
@@ -59,11 +61,11 @@ export class JumpOutValue extends VoidValue {
     if (this.whenTrue) {
       if (operator === "!==")
         throw new CompilerError('Unsupported jump compression operator "!=="');
-      kind = mapOperator(operator);
+      kind = operatorMap[operator];
     } else {
       if (operator === "===")
         throw new CompilerError('Unsupported jump compression operator "==="');
-      kind = mapInverseOperator(operator);
+      kind = invertedOperatorMap[operator];
     }
     const jump = new JumpInstruction(this.address, kind, left, right);
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -73,41 +75,5 @@ export class JumpOutValue extends VoidValue {
 
   eval(_scope: IScope, _out?: TEOutput): TValueInstructions<IValue> {
     return [this, []];
-  }
-}
-function mapOperator(operator: WhenTrueOperator): EJumpKind {
-  switch (operator) {
-    case "!=":
-      return EJumpKind.NotEqual;
-    case "<":
-      return EJumpKind.LessThan;
-    case "<=":
-      return EJumpKind.LessThanEq;
-    case "==":
-      return EJumpKind.Equal;
-    case "===":
-      return EJumpKind.StrictEqual;
-    case ">":
-      return EJumpKind.GreaterThan;
-    case ">=":
-      return EJumpKind.GreaterThanEq;
-  }
-}
-function mapInverseOperator(operator: WhenFalseOperator): EJumpKind {
-  switch (operator) {
-    case "!=":
-      return EJumpKind.Equal;
-    case "!==":
-      return EJumpKind.StrictEqual;
-    case "<":
-      return EJumpKind.GreaterThanEq;
-    case "<=":
-      return EJumpKind.GreaterThan;
-    case "==":
-      return EJumpKind.NotEqual;
-    case ">":
-      return EJumpKind.LessThanEq;
-    case ">=":
-      return EJumpKind.LessThan;
   }
 }
