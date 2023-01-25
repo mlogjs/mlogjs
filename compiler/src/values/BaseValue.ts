@@ -8,6 +8,7 @@ import {
   AssignementOperator,
   BinaryOperator,
   LogicalOperator,
+  operatorMap,
   updateOperators,
 } from "../operators";
 import {
@@ -89,33 +90,6 @@ export class BaseValue extends VoidValue implements IValue {
     return [result, [...equalInst, ...resultInst]];
   }
 }
-
-const operatorMap: Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??" | "!==">,
-  string
-> = {
-  "==": "equal",
-  "===": "strictEqual",
-  "!=": "notEqual",
-  "<": "lessThan",
-  ">": "greaterThan",
-  "<=": "lessThanEq",
-  ">=": "greaterThanEq",
-  "+": "add",
-  "-": "sub",
-  "*": "mul",
-  "/": "div",
-  "%": "mod",
-  "**": "pow",
-  "|": "or",
-  "&": "and",
-  "^": "xor",
-  ">>": "shr",
-  ">>>": "shr",
-  "<<": "shl",
-  "&&": "land",
-  "||": "or",
-} as const;
 
 for (const key in operatorMap) {
   type K = keyof typeof operatorMap;
