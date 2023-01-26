@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the `Math.asin`, `Math.acos` and `Math.atan` methods.
 - Added the `Math.idiv` method to perform integer division.
 - Added the `Math.pow` method (the `**` operator is still available).
 - Added support for compression of the `op` + `jump` instructions.
