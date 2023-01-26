@@ -144,8 +144,13 @@ interface Math {
   /** Returns the tangent of an angle in degrees */
   tan(x: number): number;
 
+  /**Returns the greatest integer less than or equal to `x` */
   floor(x: number): number;
+
+  /**Returns the smallest integer greater than or equal to `x` */
   ceil(x: number): number;
+
+  /** Returns the positive square root of a number */
   sqrt(x: number): number;
 
   /**
