@@ -52,6 +52,12 @@ function createMacroMathOperations() {
   for (const key in mathOperations) {
     const fn = mathOperations[key];
     macroMathOperations[key] = new MacroFunction<IValue>((scope, out, a, b) => {
+      const argumentCount = +!!a + +!!b;
+      if (fn && argumentCount != fn.length) {
+        throw new CompilerError(
+          `Expected ${fn.length} arguments, but got ${argumentCount}`
+        );
+      }
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (!a.isNumber() || !b.isNumber())
