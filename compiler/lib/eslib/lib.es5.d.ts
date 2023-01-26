@@ -135,9 +135,15 @@ interface Math {
    */
   log10(x: number): number;
 
+  /** Returns the sine of an angle in degrees.*/
   sin(x: number): number;
+
+  /** Returns the cosine of an angle in degrees */
   cos(x: number): number;
+
+  /** Returns the tangent of an angle in degrees */
   tan(x: number): number;
+
   floor(x: number): number;
   ceil(x: number): number;
   sqrt(x: number): number;
