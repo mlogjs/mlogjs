@@ -158,6 +158,15 @@ interface Math {
    * @param range
    */
   rand(range: number): number;
+
+  /** Returns the arc sine of a number, in degrees */
+  asin(x: number): number;
+
+  /** Returns the arc cosine of a number, in degrees */
+  acos(x: number): number;
+
+  /** Returns the arc tangent of a number, in degrees */
+  atan(x: number): number;
 }
 declare const Math: Math;
 

@@ -15,22 +15,28 @@ op floor &_ a:1:4
 op ceil &_ a:1:4
 op sqrt &_ a:1:4
 op rand &_ a:1:4
-set temp:22:4 0
-set temp:22:4 20
-set temp:22:4 10.5
-set temp:22:4 62.300527191945
-set temp:22:4 22.588713996153036
-op noise temp:22:4 10.5 20
-set temp:22:4 10.5
-set temp:22:4 2.3513752571634776
-set temp:22:4 1.021189299069938
-set temp:22:4 0.18223552549214747
-set temp:22:4 0.9832549075639546
-set temp:22:4 0.18533904493153439
-set temp:22:4 10
-set temp:22:4 11
-set temp:22:4 3.24037034920393
-op rand temp:22:4 10.5
+op asin &_ a:1:4
+op acos &_ a:1:4
+op atan &_ a:1:4
+set temp:25:4 0
+set temp:25:4 20
+set temp:25:4 10.5
+set temp:25:4 62.300527191945
+set temp:25:4 22.588713996153036
+op noise temp:25:4 10.5 20
+set temp:25:4 10.5
+set temp:25:4 2.3513752571634776
+set temp:25:4 1.021189299069938
+set temp:25:4 0.18223552549214747
+set temp:25:4 0.9832549075639546
+set temp:25:4 0.18533904493153439
+set temp:25:4 10
+set temp:25:4 11
+set temp:25:4 3.24037034920393
+op rand temp:25:4 10.5
+set temp:25:4 null
+set temp:25:4 null
+set temp:25:4 84.5596679689945
 print "\n"
 print @pi
 print "\n"

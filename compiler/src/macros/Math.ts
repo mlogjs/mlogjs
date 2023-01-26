@@ -34,6 +34,9 @@ const mathOperations: Record<
   floor: a => Math.floor(a),
   ceil: a => Math.ceil(a),
   sqrt: a => Math.sqrt(a),
+  asin: a => toDegrees(Math.asin(a)),
+  acos: a => toDegrees(Math.acos(a)),
+  atan: a => toDegrees(Math.atan(a)),
   rand: null,
 };
 
