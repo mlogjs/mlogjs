@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the `Math.asin`, `Math.acos` and `Math.atan` methods.
+- Added the `Math.idiv` method to perform integer division.
+- Added the `Math.pow` method (the `**` operator is still available).
 - Added support for compression of the `op` + `jump` instructions.
 - Added optimizations to `if/else` statements that act as guard clauses.
 - Added optimizations to the compiler to only add the `end` instruction when necessary.
@@ -22,7 +25,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
-- Fixed logical expressions creating unnecessary temp values
+- Fixed the internal implementations of `Math.sin`, `Math.cos` and `Math.tan`.
+- Fixed logical expressions creating unnecessary temp values.
 - Fixed optional chaning not working on null literals (`null?.foo`).
 - Fixed break statements not working inside `do while` statements.
 - Fixed functions returning values from previous calls.
