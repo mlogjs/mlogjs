@@ -167,6 +167,22 @@ interface Math {
 
   /** Returns the arc tangent of a number, in degrees */
   atan(x: number): number;
+
+  /**
+   * Returns the integer result of the division: `x / y`.
+   *
+   * @param x
+   * @param y
+   */
+  idiv(x: number, y: number): number;
+
+  /**
+   * Returns the value of a base expression taken to a specified power.
+   *
+   * @param x The base value of the expression.
+   * @param y The exponent value of the expression.
+   */
+  pow(x: number, y: number): number;
 }
 declare const Math: Math;
 

@@ -18,6 +18,8 @@ Math.rand(a);
 Math.asin(a);
 Math.acos(a);
 Math.atan(a);
+Math.idiv(a, 2);
+Math.pow(a, 2);
 
 // compile time evaluation
 
@@ -41,6 +43,8 @@ temp = Math.rand(10.5);
 temp = Math.asin(10.5);
 temp = Math.acos(10.5);
 temp = Math.atan(10.5);
+temp = Math.idiv(5, 2);
+temp = Math.pow(2, 9);
 
 print`
 ${Math.PI}

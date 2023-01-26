@@ -28,5 +28,12 @@ op div &t7 &t6 0.6931471805599453
 print &t7
 print "\n"
 op add &t4 a:1:4 1
+print "a + 1: "
 print &t4
+op pow &t5 a:1:4 2
+print "\nMath.pow(a, 2): "
+print &t5
+print "\na ** 2: "
+print &t5
+print "\n"
 printflush message1
