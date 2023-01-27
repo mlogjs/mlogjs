@@ -12,6 +12,9 @@ export class Draw extends ObjectValue {
         color: {
           args: ["r", "g", "b", { key: "a", default: "" }],
         },
+        col: {
+          args: ["rgbaData"],
+        },
         stroke: {
           args: ["width"],
         },

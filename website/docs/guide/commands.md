@@ -57,6 +57,16 @@ Nothing is drawn until `drawFlush` is called.
   draw.color(255, 255, 255, 128);
   ```
 
+- #### `draw.col`
+
+  Sets the color for the next drawing operations.
+
+  Uses compressed rgba data from `packColor`.
+
+  ```js
+  draw.col(packColor(1, 1, 1, 1));
+  ```
+
 - #### `draw.stroke`
 
   Sets the width of the next lines to be drawn.

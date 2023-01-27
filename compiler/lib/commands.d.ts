@@ -46,6 +46,18 @@ declare global {
     function color(r: number, g: number, b: number, a?: number): void;
 
     /**
+     * Sets the color for the next drawing operations.
+     *
+     * Uses compressed rgba data from `packColor`.
+     *
+     * ```js
+     * draw.col(packColor(1, 1, 1, 1));
+     * ```
+     *
+     */
+    function col(rgbaData: number): void;
+
+    /**
      * Sets the width of the next lines to be drawn.
      *
      *  ```js
