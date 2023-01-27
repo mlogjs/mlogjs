@@ -7,14 +7,15 @@ unitControl.getBlock(0, 0);
 unitControl.idle();
 unitControl.itemDrop(Blocks.air, 100);
 unitControl.itemTake(getBuilding("shard1"), Items.copper, 10);
+unitControl.unbind();
 
 // specially handled cases
 const isWithin = unitControl.within({ x: 1, y: 2, radius: 10 });
 print(isWithin);
 
-const [type, building] = unitControl.getBlock(10, 20);
+const [type, building, floor] = unitControl.getBlock(10, 20);
 
-print(type, building);
+print(type, building, floor);
 
 let [coreFound, coreX, coreY, core] = unitLocate.building({
   group: "core",
