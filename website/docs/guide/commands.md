@@ -293,12 +293,10 @@ Contains the multiple variants of the `control` instruction
 
   Sets the color of an illuminator.
 
-  The RGB values must be within the range: [0, 255].
-
   ```js
   const illuminator = getBuilding("illuminator1");
 
-  control.color(illuminator, 10, 150, 210);
+  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
   ```
 
 ### `radar`

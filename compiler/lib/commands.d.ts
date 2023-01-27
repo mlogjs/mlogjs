@@ -344,20 +344,13 @@ declare global {
     /**
      * Sets the color of an illuminator.
      *
-     * The RGB values must be within the range: [0, 255].
-     *
      *  ```js
      *  const illuminator = getBuilding("illuminator1");
      *
-     *  control.color(illuminator, 10, 150, 210);
+     *  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
      *  ```
      */
-    function color(
-      building: BasicBuilding,
-      r: number,
-      g: number,
-      b: number
-    ): void;
+    function color(building: BasicBuilding, rgbaData: number): void;
   }
 
   /**
@@ -491,7 +484,12 @@ declare global {
    *  const colorData = packColor(0.1, 0.6, 0.8, 0.1);
    *
    *  // world processor only
+   *  // sets the color of the ambient light
    *  setRule.ambientLight(colorData);
+   *
+   *  // set color of illuminator
+   *  const illuminator = getBuilding("illuminator1");
+   *  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
    *  ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
