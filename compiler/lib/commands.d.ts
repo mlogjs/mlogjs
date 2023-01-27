@@ -704,12 +704,19 @@ declare global {
     function getBlock<T extends BasicBuilding = AnyBuilding>(
       x: number,
       y: number
-    ): [type: BlockSymbol | null, building: T | null];
+    ): [
+      type: BlockSymbol | null,
+      building: T | null,
+      floor: EnvBlockSymbol | OreSymbol | null
+    ];
 
     /**
      * Checks if the unit bound to this processor is within a radius of a given position.
      */
     function within(options: { x: number; y: number; radius: number }): boolean;
+
+    /** Frees the unit from the control of the processor, making it resume its regular AI. */
+    function unbind(): void;
   }
 
   /**

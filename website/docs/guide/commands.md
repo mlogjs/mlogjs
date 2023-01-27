@@ -680,7 +680,7 @@ Controls the unit bound to the processor
   Makes the unit bound to this processor get data about a block at the given position
 
   ```js
-  const [type, building] = unitControl.getBlock(10, 20);
+  const [type, building, floor] = unitControl.getBlock(10, 20);
 
   // do something with the results
   ```
@@ -695,6 +695,14 @@ Controls the unit bound to the processor
     y: 20,
     radius: 5,
   });
+  ```
+
+- #### `unitControl.unbind`
+
+  Frees the unit from the control of the processor, making it resume its regular AI.
+
+  ```js
+  unitControl.unbind();
   ```
 
 ### `unitRadar`
