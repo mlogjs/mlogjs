@@ -3,13 +3,13 @@ ucontrol approach 0 0 5
 ucontrol boost 1
 ucontrol build 0 0 @router 0
 ucontrol flag 123
-ucontrol getBlock 0 0 &_ &_ 0
+ucontrol getBlock 0 0 &_ &_ &_
 ucontrol idle
 ucontrol itemDrop @air 100
 ucontrol itemTake shard1 @copper 10
 ucontrol within 1 2 10 isWithin:12:6 0
 print isWithin:12:6
-ucontrol getBlock 10 20 type:15:7 building:15:13 0
+ucontrol getBlock 10 20 type:15:7 building:15:13 &_
 print type:15:7
 print building:15:13
 ulocate building core 0 @copper coreX:19:16 coreY:19:23 coreFound:19:5 core:19:30
