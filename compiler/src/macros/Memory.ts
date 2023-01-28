@@ -55,10 +55,12 @@ class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
       $get: new MacroFunction((scope, out, prop: IValue) => {
-        if (prop instanceof LiteralValue && !prop.isNumber())
+        if (prop instanceof LiteralValue && !prop.isNumber()) {
           throw new CompilerError(
-            `Invalid memory object property: "${prop.data}"`
+            `The member [${prop.debugString()}] is not present in [${this.debugString()}]`
           );
+        }
+
         const entry = new MemoryEntry(scope, this, prop);
         if (out) return entry.eval(scope, out);
 
