@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for the `draw.col` command overload.
+- Added support for the `unitControl.unbind` command overload.
 - Added the `Math.asin`, `Math.acos` and `Math.atan` methods.
 - Added the `Math.idiv` method to perform integer division.
 - Added the `Math.pow` method (the `**` operator is still available).
@@ -21,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `unitControl.getBlock` now also returns the floor of the tile.
+- (Breaking) `control.color` now gets RGBA data as an input instead of individual RGB values.
 - Changed the equality of stores. They are now treated as equal if they have the same runtime name.
 
 ### Fixed
