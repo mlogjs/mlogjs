@@ -39,6 +39,9 @@ export class UnitControl extends ObjectValue {
           named: "options",
           args: ["x", "y", "radius"],
         },
+        unbind: {
+          args: [],
+        },
       },
       handler(scope, overload, out, ...args) {
         let result: IValue | null = null;
@@ -53,9 +56,13 @@ export class UnitControl extends ObjectValue {
               scope,
               extractDestrucuringOut(out, 1)
             );
+            const outFloor = StoreValue.from(
+              scope,
+              extractDestrucuringOut(out, 2)
+            );
 
-            result = ObjectValue.fromArray([outType, outBuilding]);
-            extraArgs = [outType, outBuilding, new LiteralValue(0)];
+            result = ObjectValue.fromArray([outType, outBuilding, outFloor]);
+            extraArgs = [outType, outBuilding, outFloor];
             break;
           }
           case "within": {

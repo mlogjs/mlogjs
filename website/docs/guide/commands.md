@@ -57,6 +57,16 @@ Nothing is drawn until `drawFlush` is called.
   draw.color(255, 255, 255, 128);
   ```
 
+- #### `draw.col`
+
+  Sets the color for the next drawing operations.
+
+  Uses compressed rgba data from `packColor`.
+
+  ```js
+  draw.col(packColor(1, 1, 1, 1));
+  ```
+
 - #### `draw.stroke`
 
   Sets the width of the next lines to be drawn.
@@ -293,12 +303,10 @@ Contains the multiple variants of the `control` instruction
 
   Sets the color of an illuminator.
 
-  The RGB values must be within the range: [0, 255].
-
   ```js
   const illuminator = getBuilding("illuminator1");
 
-  control.color(illuminator, 10, 150, 210);
+  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
   ```
 
 ### `radar`
@@ -672,7 +680,7 @@ Controls the unit bound to the processor
   Makes the unit bound to this processor get data about a block at the given position
 
   ```js
-  const [type, building] = unitControl.getBlock(10, 20);
+  const [type, building, floor] = unitControl.getBlock(10, 20);
 
   // do something with the results
   ```
@@ -687,6 +695,14 @@ Controls the unit bound to the processor
     y: 20,
     radius: 5,
   });
+  ```
+
+- #### `unitControl.unbind`
+
+  Frees the unit from the control of the processor, making it resume its regular AI.
+
+  ```js
+  unitControl.unbind();
   ```
 
 ### `unitRadar`

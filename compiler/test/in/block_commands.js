@@ -15,7 +15,7 @@ drawFlush();
 
 const block = getLink(1);
 
-control.color(illuminator, 10, 50, 9);
+control.color(illuminator, packColor(0.04, 0.2, 0.04, 1));
 
 control.enabled(block, false);
 

@@ -3,16 +3,18 @@ ucontrol approach 0 0 5
 ucontrol boost 1
 ucontrol build 0 0 @router 0
 ucontrol flag 123
-ucontrol getBlock 0 0 &_ &_ 0
+ucontrol getBlock 0 0 &_ &_ &_
 ucontrol idle
 ucontrol itemDrop @air 100
 ucontrol itemTake shard1 @copper 10
-ucontrol within 1 2 10 isWithin:12:6 0
-print isWithin:12:6
-ucontrol getBlock 10 20 type:15:7 building:15:13 0
-print type:15:7
-print building:15:13
-ulocate building core 0 @copper coreX:19:16 coreY:19:23 coreFound:19:5 core:19:30
-ulocate ore core true @lead oreX:23:15 oreY:23:21 oreFound:23:5 &_
-ulocate damaged core true @copper dX:24:13 dY:24:17 dFound:24:5 dBuilding:24:21
-ulocate spawn core true @copper sX:25:13 sY:25:17 sFound:25:5 sBuilding:25:21
+ucontrol unbind
+ucontrol within 1 2 10 isWithin:13:6 0
+print isWithin:13:6
+ucontrol getBlock 10 20 type:16:7 building:16:13 floor:16:23
+print type:16:7
+print building:16:13
+print floor:16:23
+ulocate building core 0 @copper coreX:20:16 coreY:20:23 coreFound:20:5 core:20:30
+ulocate ore core true @lead oreX:24:15 oreY:24:21 oreFound:24:5 &_
+ulocate damaged core true @copper dX:25:13 dY:25:17 dFound:25:5 dBuilding:25:21
+ulocate spawn core true @copper sX:26:13 sY:26:17 sFound:26:5 sBuilding:26:21

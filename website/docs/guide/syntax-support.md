@@ -231,15 +231,20 @@ available on the mlog runtime. They are listed bellow:
 - `radToDeg` - The convertion ratio for radians to degrees.
 - `abs` - Absolute value of a number
 - `angle` - Angle of a vector in degrees
+- `acos` - The arc cosine of a number, in degrees.
+- `asin` - The arc sine of a number, in degrees.
+- `atan` - The arc tangent of a number, in degrees.
 - `ceil` - Rounds the number to the closest bigger integer
 - `cos` - Cosine of an angle in degrees
 - `floor` - Rounds the number to the closest smaller integer
+- `idiv` - Integer part of the division of two numbers.
 - `len` - Length of a vector
 - `log` - Natural logarithm of a number
 - `log10` - Base 10 logarithm of a number
 - `max` - Returns the biggest of two values
 - `min` - Returns the smallest of two values
 - `noise` - 2D simplex noise
+- `pow` - Takes a number to a given power (same as the `**` operator).
 - `rand` - Random number between 0 (inclusive) and the specified number (exclusive)
 - `sin` - Sine of an angle in degrees
 - `sqrt` - Square root of a number
