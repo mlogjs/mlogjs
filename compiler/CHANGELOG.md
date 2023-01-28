@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Error messages now include information about the type of the variables.
 - `unitControl.getBlock` now also returns the floor of the tile.
 - (Breaking) `control.color` now gets RGBA data as an input instead of individual RGB values.
 - Changed the equality of stores. They are now treated as equal if they have the same runtime name.
