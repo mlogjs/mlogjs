@@ -29,4 +29,12 @@ export class MacroFunction<
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
+
+  debugString(): string {
+    return "MacroFunction";
+  }
+
+  toString(): string {
+    return '"[macro MacroFunction]"';
+  }
 }

@@ -41,16 +41,26 @@ class MemoryEntry extends BaseValue {
       ],
     ];
   }
+
+  debugString(): string {
+    return "MemoryEntry";
+  }
+
+  toString(): string {
+    return '"[macro MemoryEntry]"';
+  }
 }
 
 class MemoryMacro extends ObjectValue {
   constructor(public cell: SenseableValue, size: LiteralValue) {
     super({
       $get: new MacroFunction((scope, out, prop: IValue) => {
-        if (prop instanceof LiteralValue && !prop.isNumber())
+        if (prop instanceof LiteralValue && !prop.isNumber()) {
           throw new CompilerError(
-            `Invalid memory object property: "${prop.data}"`
+            `The member [${prop.debugString()}] is not present in [${this.debugString()}]`
           );
+        }
+
         const entry = new MemoryEntry(scope, this, prop);
         if (out) return entry.eval(scope, out);
 
@@ -61,27 +71,25 @@ class MemoryMacro extends ObjectValue {
     });
   }
 
+  debugString(): string {
+    return `Memory("${this.cell.toString()}")`;
+  }
+
   toString() {
-    return this.cell.toString();
+    return '"[macro Memory]"';
   }
 }
 
-export class MemoryBuilder extends ObjectValue {
+export class MemoryBuilder extends MacroFunction {
   constructor() {
-    super({
-      $call: new MacroFunction(
-        (scope, out, cell: IValue, size: IValue = new LiteralValue(64)) => {
-          if (!(cell instanceof SenseableValue))
-            throw new CompilerError("Memory cell must be a senseable value.");
+    super((scope, out, cell: IValue, size: IValue = new LiteralValue(64)) => {
+      if (!(cell instanceof SenseableValue))
+        throw new CompilerError("Memory cell must be a senseable value.");
 
-          if (!(size instanceof LiteralValue && size.isNumber()))
-            throw new CompilerError(
-              "The memory size must be a number literal."
-            );
+      if (!(size instanceof LiteralValue && size.isNumber()))
+        throw new CompilerError("The memory size must be a number literal.");
 
-          return [new MemoryMacro(cell, size), []];
-        }
-      ),
+      return [new MemoryMacro(cell, size), []];
     });
   }
 }

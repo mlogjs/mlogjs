@@ -56,7 +56,7 @@ export class DynamicArray extends ObjectValue {
     public scope: IScope,
     public name: string,
     public values: IValue[],
-    dynamic: boolean
+    public dynamic: boolean
   ) {
     const getterName = `${name}.&gtemp`;
     const setterName = `${name}.&stemp`;
@@ -336,6 +336,16 @@ export class DynamicArray extends ObjectValue {
     pipeInsts(last["="](this.scope, new LiteralValue(null)), inst);
     inst.push(new SetCounterInstruction(this.returnTemp));
   }
+
+  debugString() {
+    const id = this.dynamic ? "DynamicArray" : "MutableArray";
+    return `${id}("${this.name}")`;
+  }
+
+  toString() {
+    const id = this.dynamic ? "DynamicArray" : "MutableArray";
+    return `"[macro ${id}]"`;
+  }
 }
 
 class DynamicArrayEntry extends BaseValue {
@@ -524,6 +534,16 @@ class DynamicArrayEntry extends BaseValue {
     if (!this.failAddress) inst.push(new AddressResolver(failAddress));
 
     return [value, inst];
+  }
+
+  debugString() {
+    const name = this.array.dynamic ? "DynamicArray" : "MutableArray";
+    return `${name}Entry`;
+  }
+
+  toString() {
+    const name = this.array.dynamic ? "DynamicArray" : "MutableArray";
+    return `"[macro ${name}Entry]"`;
   }
 }
 

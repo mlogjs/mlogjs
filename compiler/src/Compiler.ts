@@ -130,7 +130,11 @@ export class Compiler {
   handleEval(scope: IScope, node: es.Node, out?: TEOutput): TValueInstructions {
     const [res, inst] = this.handle(scope, node, undefined, out);
 
-    if (!res) throw new CompilerError("Cannot eval null", node);
+    if (!res)
+      throw new CompilerError(
+        `This node (${node.type}) does not return a value`,
+        node
+      );
 
     const [evaluated, evaluatedInst] = res.eval(scope, out);
     const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];

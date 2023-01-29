@@ -237,7 +237,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions {
     this.ensureInit();
     if (args.length !== this.paramNames.length)
-      throw new CompilerError("Cannot call: argument count not matching.");
+      throw new CompilerError(
+        `Cannot call: expected ${this.paramNames.length} arguments but got: ${args.length}`
+      );
     const inlineCall = this.inlineCall(scope, args, out);
     hideRedundantJumps(inlineCall[1]);
     const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
@@ -263,6 +265,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.ensureInit();
     if (this.inline || this.tryingInline) return;
     return this.paramValues;
+  }
+
+  debugString(): string {
+    return `FunctionValue("${this.name}")`;
+  }
+
+  toString() {
+    return '"[macro FunctionValue]"';
   }
 }
 

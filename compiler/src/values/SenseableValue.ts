@@ -25,11 +25,9 @@ const senseableProps = ["controller"];
  * that is not possible with object macros.
  *
  * Note that these values are constant by default, so make sure
- * to set that field to `false` if you want them to be assignable. Example:
+ * to set that field to `EMutability.mutable` if you want them to be assignable. Example:
  * ```
- * const value = assign(new SenseableValue(scope), {
- *   mutability: EMutability.mutable
- * })
+ * const value = new SenseableValue(name, EMutability.mutable);
  * ```
  */
 export class SenseableValue extends StoreValue {
@@ -74,6 +72,12 @@ export class SenseableValue extends StoreValue {
       const temp = SenseableValue.from(scope, out, mutability);
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
-    throw new CompilerError(`Cannot sense "${prop}" property`);
+    throw new CompilerError(
+      `The property [${prop.debugString()}] cannot be sensed`
+    );
+  }
+
+  debugString(): string {
+    return `SenseableValue("${this.name}")`;
   }
 }

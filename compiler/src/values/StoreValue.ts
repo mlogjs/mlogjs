@@ -41,14 +41,18 @@ export class StoreValue extends BaseValue implements IValue {
       this.mutability !== EMutability.mutable &&
       this.mutability !== EMutability.init
     )
-      throw new CompilerError(`Cannot assign to immutable store '${this}'.`);
+      throw new CompilerError(
+        `Cannot assign to immutable value: [${this.debugString()}].`
+      );
 
     if (compareStores(this, value)) return [this, []];
 
     const [evalValue, evalInst] = value.eval(scope, this);
 
     if (evalValue.macro)
-      throw new CompilerError("Cannot assign a macro to a store");
+      throw new CompilerError(
+        `Cannot assign a macro to a store (attempted to assign [${evalValue.debugString()}] to [${this.debugString()}])`
+      );
 
     return [this, [...evalInst, new SetInstruction(this, evalValue)]];
   }
@@ -75,6 +79,10 @@ export class StoreValue extends BaseValue implements IValue {
 
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
+  }
+
+  debugString(): string {
+    return `StoreValue("${this.name}")`;
   }
 
   toString() {

@@ -10,4 +10,12 @@ export class LazyValue extends VoidValue {
     super();
     this.eval = evalutate;
   }
+
+  debugString(): string {
+    return "LazyValue";
+  }
+
+  toString(): string {
+    return '"[macro LazyValue]"';
+  }
 }

@@ -151,7 +151,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
             // so we don't have to do string checks
             if (
               !(e instanceof CompilerError) ||
-              !e.message.includes("undefined member")
+              !e.message.includes("is not present in")
             )
               throw e;
           }
@@ -274,5 +274,13 @@ class DeclarationValue extends VoidValue {
     inst: IInstruction[]
   ): TValueInstructions<IValue | null> {
     return this.c.handle(this.scope, this.node, () => this.handle(init, inst));
+  }
+
+  debugString(): string {
+    return "DeclarationValue";
+  }
+
+  toString() {
+    return '"[macro DeclarationValue]"';
   }
 }
