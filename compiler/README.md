@@ -46,7 +46,7 @@ mlogjs hello.js
 
 ## Contribute
 
-Having trouble? [Ask for help on discord](https://discord.gg/DxXkqsWx)
+Having trouble? [Ask for help on discord](https://discord.gg/2VudfNUp)
 or [open an issue](https://github.com/mlogjs/mlogjs/issues/new)
 
 Help and suggestions are welcomed!

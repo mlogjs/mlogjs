@@ -26,7 +26,7 @@ const config: UserConfig = {
             text: "Examples",
             link: "https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples",
           },
-          { text: "Discord", link: "https://discord.gg/xjJFpERd" },
+          { text: "Discord", link: "https://discord.gg/2VudfNUp" },
         ],
       },
     ],
@@ -56,7 +56,7 @@ const config: UserConfig = {
 
     socialLinks: [
       { icon: "github", link: "https://github.com/mlogjs/mlogjs" },
-      { icon: "discord", link: "https://discord.gg/xjJFpERd" },
+      { icon: "discord", link: "https://discord.gg/2VudfNUp" },
     ],
   },
   markdown: {
