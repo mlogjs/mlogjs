@@ -14,7 +14,6 @@ export type TDestructuringMembers = Map<
       get: () => TValueInstructions,
       propExists: () => boolean
     ): TValueInstructions<IValue | null>;
-    default?(): TValueInstructions;
   }
 >;
 
