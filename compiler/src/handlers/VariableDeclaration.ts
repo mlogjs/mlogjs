@@ -213,7 +213,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
     members.set(keyInst[0], {
       value: value.out,
       handler(get, propExists) {
-        const [init, inst] = c.handle(scope, propValue, () => {
+        const [init, inst] = c.handle(scope, prop, () => {
           let [init, initInst] =
             propExists() || !value.defaultInit
               ? get()
