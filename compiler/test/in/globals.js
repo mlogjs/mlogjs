@@ -19,7 +19,7 @@ print(
 print(
   Teams.blue,
   Teams.crux,
-  Teams.delerict,
+  Teams.derelict,
   Teams.green,
   Teams.malis,
   Teams.sharded

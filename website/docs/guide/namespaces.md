@@ -37,7 +37,7 @@ Allows you to access processor variables.
 
 Contais the base game teams
 
-- `delerict`
+- `derelict`
 - `sharded`
 - `crux`
 - `malis`

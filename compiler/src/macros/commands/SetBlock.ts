@@ -23,7 +23,7 @@ export class SetBlock extends ObjectValue {
               to,
               x,
               y,
-              team ?? "@delerict",
+              team ?? "@derelict",
               rotation ?? "0"
             ),
           ],

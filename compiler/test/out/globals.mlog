@@ -11,7 +11,7 @@ print @thisy
 print @unit
 print @blue
 print @crux
-print @delerict
+print @derelict
 print @green
 print @malis
 print @sharded

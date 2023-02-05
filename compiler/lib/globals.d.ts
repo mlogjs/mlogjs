@@ -70,7 +70,7 @@ declare const Vars: Vars;
 /** Contains the base game teams. */
 declare namespace Teams {
   /** The gray team. */
-  const delerict: unique symbol;
+  const derelict: unique symbol;
   /** The yellow team. */
   const sharded: unique symbol;
   /** The red team. */
@@ -91,7 +91,7 @@ declare namespace Teams {
   const blue: unique symbol;
 }
 
-type TeamSymbol = typeof Teams[keyof typeof Teams];
+type TeamSymbol = (typeof Teams)[keyof typeof Teams];
 
 declare namespace Items {
   const copper: unique symbol;
@@ -118,7 +118,7 @@ declare namespace Items {
   const dormantCyst: unique symbol;
 }
 
-type ItemSymbol = typeof Items[keyof typeof Items];
+type ItemSymbol = (typeof Items)[keyof typeof Items];
 
 declare namespace Liquids {
   const water: unique symbol;
@@ -134,7 +134,7 @@ declare namespace Liquids {
   const cyanogen: unique symbol;
 }
 
-type LiquidSymbol = typeof Liquids[keyof typeof Liquids];
+type LiquidSymbol = (typeof Liquids)[keyof typeof Liquids];
 
 declare namespace Units {
   const dagger: unique symbol;
@@ -200,7 +200,7 @@ declare namespace Units {
   const assemblyDrone: unique symbol;
 }
 
-type UnitSymbol = typeof Units[keyof typeof Units];
+type UnitSymbol = (typeof Units)[keyof typeof Units];
 
 declare namespace LAccess {
   const totalItems: unique symbol;
