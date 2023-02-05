@@ -23,6 +23,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `unitBind` now also accepts an unit object as a parameter.
 - Error messages now include information about the type of the variables.
 - `unitControl.getBlock` now also returns the floor of the tile.
 - (Breaking) `control.color` now gets RGBA data as an input instead of individual RGB values.

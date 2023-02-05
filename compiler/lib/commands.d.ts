@@ -509,6 +509,11 @@ declare global {
   /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
    *
+   * If an unit symbol is received, the processor will pick a random
+   * unit of the given type.
+   *
+   * If an unit object is received, the processor will bind to the unit.
+   *
    *  ```js
    *  unitBind(Units.flare);
    *
@@ -518,7 +523,7 @@ declare global {
    *  printFlush();
    *  ```
    */
-  function unitBind(type: UnitSymbol): void;
+  function unitBind(unit: UnitSymbol | BasicUnit): void;
 
   namespace unitControl {
     /**

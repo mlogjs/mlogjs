@@ -5,11 +5,11 @@ import { CompilerError } from "../../CompilerError";
 
 export class UnitBind extends MacroFunction<null> {
   constructor() {
-    super((scope, out, type) => {
-      if (!(type instanceof StoreValue))
-        throw new CompilerError("The unitBind type must be a store");
+    super((scope, out, unit) => {
+      if (!(unit instanceof StoreValue))
+        throw new CompilerError("The unitBind unit must be a store");
 
-      return [null, [new InstructionBase("ubind", type)]];
+      return [null, [new InstructionBase("ubind", unit)]];
     });
   }
 }
