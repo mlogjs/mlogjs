@@ -57,11 +57,6 @@ export class BaseValue extends VoidValue implements IValue {
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    if (this instanceof LiteralValue) {
-      if (this.data === null) return other.eval(scope, out);
-      return [this, []];
-    }
-
     const result = SenseableValue.from(scope, out, EMutability.mutable);
 
     const [left, leftInst] = this.eval(scope, result);

@@ -96,6 +96,12 @@ export class ObjectValue extends VoidValue {
     return $call.call(scope, args, out);
   }
 
+  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    const $ = this.data["$??"];
+    if ($) return $.call(scope, [other], out);
+    return [this, []];
+  }
+
   debugString(): string {
     if (this.name) return `ObjectValue("${this.name}")`;
     return "ObjectValue";
@@ -107,6 +113,7 @@ export class ObjectValue extends VoidValue {
 }
 
 for (const op of leftRightOperators) {
+  if (op === "??") continue;
   ObjectValue.prototype[op] = function (
     this: ObjectValue,
     scope: IScope,

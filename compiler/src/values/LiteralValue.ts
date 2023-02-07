@@ -65,6 +65,11 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     return this.data;
   }
 
+  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    if (this.data === null) return other.eval(scope, out);
+    return [this, []];
+  }
+
   typeof(): TValueInstructions {
     return [new LiteralValue("literal"), []];
   }
