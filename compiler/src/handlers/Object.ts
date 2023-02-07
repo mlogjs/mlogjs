@@ -138,14 +138,7 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
             pipeInsts(value["="](scope, inst[0]), inst[1]);
             return inst;
           }
-
-          const inst: IInstruction[] = [];
-          const evaluated = pipeInsts(
-            value.right.eval(scope, value.left),
-            inst
-          );
-          const result = pipeInsts(value.left["="](scope, evaluated), inst);
-          return [result, inst];
+          return value["="](scope, new LiteralValue(null));
         });
       },
     });
@@ -188,11 +181,11 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
             const output = pipeInsts(value["="](scope, input), inst);
             return [output, inst];
           }
-          const evaluated = pipeInsts(
-            value.right.eval(scope, value.left),
+
+          const result = pipeInsts(
+            value["="](scope, new LiteralValue(null)),
             inst
           );
-          const result = pipeInsts(value.left["="](scope, evaluated), inst);
           return [result, inst];
         });
       },
