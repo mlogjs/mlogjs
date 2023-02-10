@@ -59,18 +59,24 @@ export class BaseValue extends VoidValue implements IValue {
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
     const result = SenseableValue.from(scope, out, EMutability.mutable);
 
-    const [left, leftInst] = this.eval(scope, result);
-    const [right, rightInst] = other.eval(scope, result);
-
     const nullLiteral = new LiteralValue(null);
     const endAdress = new LiteralValue(null);
+    const [left, leftInst] = this.eval(scope, result);
+    const [right, rightInst] = other.eval(scope, result);
+    const [test, testInst] = this["==="](scope, nullLiteral);
 
     return [
       result,
       [
         ...leftInst,
         ...result["="](scope, left)[1],
-        new JumpInstruction(endAdress, EJumpKind.NotEqual, result, nullLiteral),
+        ...testInst,
+        new JumpInstruction(
+          endAdress,
+          EJumpKind.Equal,
+          test,
+          new LiteralValue(0)
+        ),
         ...rightInst,
         ...result["="](scope, right)[1],
         new AddressResolver(endAdress),

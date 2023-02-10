@@ -5,35 +5,37 @@ set array:1:6->3 null
 set array:1:6->4 1
 set n:36:19 1
 set &rcalculate:36:0 8
-jump 94 always
+jump 102 always
 set &t0 &fcalculate:36:0
 set a:10:24 null
 jump 16 lessThan &t0 0
 jump 16 greaterThan &t0 4
 set array:1:6.&rt 15
 op mul &t2 &t0 2
-op add @counter 99 &t2
+op add @counter 107 &t2
 set a:10:24 array:1:6.&gtemp
-jump 21 notEqual a:10:24 null
+op strictEqual &t3 a:10:24 null
+jump 22 equal &t3 0
 set n:36:19 2
-set &rcalculate:36:0 20
-jump 94 always
+set &rcalculate:36:0 21
+jump 102 always
 set a:10:24 &fcalculate:36:0
 set n:36:19 3
-set &rcalculate:36:0 24
-jump 94 always
+set &rcalculate:36:0 25
+jump 102 always
 set &t1 &fcalculate:36:0
 set b:10:58 null
-jump 32 lessThan &t1 0
-jump 32 greaterThan &t1 4
-set array:1:6.&rt 31
-op mul &t3 &t1 2
-op add @counter 99 &t3
+jump 33 lessThan &t1 0
+jump 33 greaterThan &t1 4
+set array:1:6.&rt 32
+op mul &t4 &t1 2
+op add @counter 107 &t4
 set b:10:58 array:1:6.&gtemp
-jump 37 notEqual b:10:58 null
+op strictEqual &t5 b:10:58 null
+jump 39 equal &t5 0
 set n:36:19 4
-set &rcalculate:36:0 36
-jump 94 always
+set &rcalculate:36:0 38
+jump 102 always
 set b:10:58 &fcalculate:36:0
 print "a: "
 print a:10:24
@@ -41,55 +43,61 @@ print ", b: "
 print b:10:58
 print "\n"
 sensor x:25:22 @unit @x
-jump 45 notEqual x:25:22 null
+op strictEqual &t0:printPoint:25:0 x:25:22 null
+jump 48 equal &t0:printPoint:25:0 0
 set x:25:22 0
 sensor y:25:29 @unit @y
-jump 48 notEqual y:25:29 null
+op strictEqual &t1:printPoint:25:0 y:25:29 null
+jump 52 equal &t1:printPoint:25:0 0
 set y:25:29 x:25:22
-set &rprintPoint:25:0 50
-jump 109 always
+set &rprintPoint:25:0 54
+jump 117 always
 set x:25:22 @thisx
-jump 53 notEqual x:25:22 null
+op strictEqual &t2:printPoint:25:0 @thisx null
+jump 58 equal &t2:printPoint:25:0 0
 set x:25:22 0
 set y:25:29 @thisy
-jump 56 notEqual y:25:29 null
+op strictEqual &t3:printPoint:25:0 @thisy null
+jump 62 equal &t3:printPoint:25:0 0
 set y:25:29 x:25:22
-set &rprintPoint:25:0 58
-jump 109 always
+set &rprintPoint:25:0 64
+jump 117 always
 set n:36:19 1
-set &rcalculate:36:0 61
-jump 94 always
+set &rcalculate:36:0 67
+jump 102 always
 set &t0:printOtherPoint:29:0 &fcalculate:36:0
 set x:30:18 null
-jump 69 lessThan &t0:printOtherPoint:29:0 0
-jump 69 greaterThan &t0:printOtherPoint:29:0 4
-set array:1:6.&rt 68
-op mul &t4 &t0:printOtherPoint:29:0 2
-op add @counter 99 &t4
+jump 75 lessThan &t0:printOtherPoint:29:0 0
+jump 75 greaterThan &t0:printOtherPoint:29:0 4
+set array:1:6.&rt 74
+op mul &t6 &t0:printOtherPoint:29:0 2
+op add @counter 107 &t6
 set x:30:18 array:1:6.&gtemp
-jump 74 notEqual x:30:18 null
+op strictEqual &t2:printOtherPoint:29:0 x:30:18 null
+jump 81 equal &t2:printOtherPoint:29:0 0
 set n:36:19 2
-set &rcalculate:36:0 73
-jump 94 always
+set &rcalculate:36:0 80
+jump 102 always
 set x:30:18 &fcalculate:36:0
 set n:36:19 3
-set &rcalculate:36:0 77
-jump 94 always
+set &rcalculate:36:0 84
+jump 102 always
 set &t1:printOtherPoint:29:0 &fcalculate:36:0
 set y:31:18 null
-jump 85 lessThan &t1:printOtherPoint:29:0 0
-jump 85 greaterThan &t1:printOtherPoint:29:0 4
-set array:1:6.&rt 84
-op mul &t5 &t1:printOtherPoint:29:0 2
-op add @counter 99 &t5
+jump 92 lessThan &t1:printOtherPoint:29:0 0
+jump 92 greaterThan &t1:printOtherPoint:29:0 4
+set array:1:6.&rt 91
+op mul &t7 &t1:printOtherPoint:29:0 2
+op add @counter 107 &t7
 set y:31:18 array:1:6.&gtemp
-jump 90 notEqual y:31:18 null
+op strictEqual &t3:printOtherPoint:29:0 y:31:18 null
+jump 98 equal &t3:printOtherPoint:29:0 0
 set n:36:19 4
-set &rcalculate:36:0 89
-jump 94 always
+set &rcalculate:36:0 97
+jump 102 always
 set y:31:18 &fcalculate:36:0
-set &rprintOtherPoint:29:0 92
-jump 116 always
+set &rprintOtherPoint:29:0 100
+jump 124 always
 printflush message1
 end
 print "calculating "
