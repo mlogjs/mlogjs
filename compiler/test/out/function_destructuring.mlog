@@ -1,0 +1,123 @@
+set array:1:6->0 5
+set array:1:6->1 null
+set array:1:6->2 3
+set array:1:6->3 null
+set array:1:6->4 1
+set n:36:19 1
+set &rcalculate:36:0 8
+jump 94 always
+set &t0 &fcalculate:36:0
+set a:10:24 null
+jump 16 lessThan &t0 0
+jump 16 greaterThan &t0 4
+set array:1:6.&rt 15
+op mul &t2 &t0 2
+op add @counter 99 &t2
+set a:10:24 array:1:6.&gtemp
+jump 21 notEqual a:10:24 null
+set n:36:19 2
+set &rcalculate:36:0 20
+jump 94 always
+set a:10:24 &fcalculate:36:0
+set n:36:19 3
+set &rcalculate:36:0 24
+jump 94 always
+set &t1 &fcalculate:36:0
+set b:10:58 null
+jump 32 lessThan &t1 0
+jump 32 greaterThan &t1 4
+set array:1:6.&rt 31
+op mul &t3 &t1 2
+op add @counter 99 &t3
+set b:10:58 array:1:6.&gtemp
+jump 37 notEqual b:10:58 null
+set n:36:19 4
+set &rcalculate:36:0 36
+jump 94 always
+set b:10:58 &fcalculate:36:0
+print "a: "
+print a:10:24
+print ", b: "
+print b:10:58
+print "\n"
+sensor x:25:22 @unit @x
+jump 45 notEqual x:25:22 null
+set x:25:22 0
+sensor y:25:29 @unit @y
+jump 48 notEqual y:25:29 null
+set y:25:29 x:25:22
+set &rprintPoint:25:0 50
+jump 109 always
+set x:25:22 @thisx
+jump 53 notEqual x:25:22 null
+set x:25:22 0
+set y:25:29 @thisy
+jump 56 notEqual y:25:29 null
+set y:25:29 x:25:22
+set &rprintPoint:25:0 58
+jump 109 always
+set n:36:19 1
+set &rcalculate:36:0 61
+jump 94 always
+set &t0:printOtherPoint:29:0 &fcalculate:36:0
+set x:30:18 null
+jump 69 lessThan &t0:printOtherPoint:29:0 0
+jump 69 greaterThan &t0:printOtherPoint:29:0 4
+set array:1:6.&rt 68
+op mul &t4 &t0:printOtherPoint:29:0 2
+op add @counter 99 &t4
+set x:30:18 array:1:6.&gtemp
+jump 74 notEqual x:30:18 null
+set n:36:19 2
+set &rcalculate:36:0 73
+jump 94 always
+set x:30:18 &fcalculate:36:0
+set n:36:19 3
+set &rcalculate:36:0 77
+jump 94 always
+set &t1:printOtherPoint:29:0 &fcalculate:36:0
+set y:31:18 null
+jump 85 lessThan &t1:printOtherPoint:29:0 0
+jump 85 greaterThan &t1:printOtherPoint:29:0 4
+set array:1:6.&rt 84
+op mul &t5 &t1:printOtherPoint:29:0 2
+op add @counter 99 &t5
+set y:31:18 array:1:6.&gtemp
+jump 90 notEqual y:31:18 null
+set n:36:19 4
+set &rcalculate:36:0 89
+jump 94 always
+set y:31:18 &fcalculate:36:0
+set &rprintOtherPoint:29:0 92
+jump 116 always
+printflush message1
+end
+print "calculating "
+print n:36:19
+print "\n"
+set &fcalculate:36:0 n:36:19
+set @counter &rcalculate:36:0
+set array:1:6.&gtemp array:1:6->0
+set @counter array:1:6.&rt
+set array:1:6.&gtemp array:1:6->1
+set @counter array:1:6.&rt
+set array:1:6.&gtemp array:1:6->2
+set @counter array:1:6.&rt
+set array:1:6.&gtemp array:1:6->3
+set @counter array:1:6.&rt
+set array:1:6.&gtemp array:1:6->4
+set @counter array:1:6.&rt
+print "Point("
+print x:25:22
+print ", "
+print y:25:29
+print ")\n"
+set &fprintPoint:25:0 null
+set @counter &rprintPoint:25:0
+print "OtherPoint("
+print x:30:18
+print ", "
+print y:31:18
+print ")\n"
+set &fprintOtherPoint:29:0 null
+set @counter &rprintOtherPoint:29:0
