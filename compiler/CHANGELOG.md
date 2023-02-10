@@ -33,6 +33,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed the type `Vars.unit.boosting` being `number` instead of `boolean`.
 - Fixed order of operations in destructuring assignments.
 - Fixed typo on `Teams.derelict` (was `Teams.delerict`).
 - Fixed the internal implementations of `Math.sin`, `Math.cos` and `Math.tan`.

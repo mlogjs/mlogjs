@@ -93,7 +93,7 @@ declare global {
 
   interface Boosted
     extends WithSymbols<{
-      readonly boosting: number;
+      readonly boosting: boolean;
     }> {}
 
   interface Mining
