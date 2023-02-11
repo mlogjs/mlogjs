@@ -131,6 +131,38 @@ Behavior:
   }
   ```
 
+- Functions can have default parameter values:
+
+  ```js
+  // works
+  print(volume(10));
+  printFlush();
+
+  function volume(x, y = x, z = x) {
+    return x * y * z;
+  }
+  ```
+
+- Functions can destructure their arguments:
+
+  ```js
+  // works
+  const router = getBuilding("router1");
+
+  printPoint(router);
+  printPoint({ x: Vars.thisx, y: Vars.thisy });
+  print`distance: ${distance([router.x, router.y], [Vars.thisx, Vars.thisy])}`;
+  printFlush();
+
+  function printPoint({ x, y }) {
+    print`Point(${x}, ${y})\n`;
+  }
+
+  function distance([ax, ay], [bx, by]) {
+    return Math.len(ax - bx, ay - by);
+  }
+  ```
+
 Limitations:
 
 - Functions can only be bound to constants
@@ -141,7 +173,6 @@ Limitations:
 - No support for generators
 - No support for `async`/`await`
 - No support for spread syntax
-- No support for destructuring syntax
 - No support for declaring functions that take tagged template strings.
 
 ### For loops
@@ -281,9 +312,9 @@ Limitations:
 - No short-circuiting support
 - These expressions cannot return anything other than a boolean
 
-### Null coalescing operator
+### Nullish coalescing operator
 
-The null coalescing operator (`??`) allows you to lazily evaluated the right side
+The nullish coalescing operator (`??`) allows you to lazily evaluated the right side
 of the expression when the left side is `undefined`.
 
 ```js
@@ -376,12 +407,18 @@ Behavior:
 - Assigns each destructured expression in the declaration order
 - Destructuring expressions CAN be nested.
 
-```js
-const [found, x, y, { totalItems }] = unitLocate.building({
-  group: "core",
-  enemy: false,
-});
-```
+  ```js
+  const [found, x, y, { totalItems }] = unitLocate.building({
+    group: "core",
+    enemy: false,
+  });
+  ```
+
+- Destructuring expressions can have default values.
+
+  ```js
+  const { firstItem = Items.graphite } = Vars.unit;
+  ```
 
 Limitations:
 
@@ -394,25 +431,6 @@ Limitations:
   [a, b] = [b, a];
   ```
 
-  :::
-
-- There is no support for default values inside destructuring assignments/declarations.
-
-  ::: warning
-
-  This doesn't work
-
-  ```js
-  const { firstItem = Items.copper } = building;
-  ```
-
-  :::
-  ::: info
-  This happens because this feature _should_ only assign the default value if the object
-  does not have the wanted key, but this can't be safely done on the compiler side because it
-  doesn't know whether the object has such property, and cheking for `null`
-  is not a viable option because returning `null` does not necessarily mean
-  that the property doesn't exist.
   :::
 
 ## Typescript
