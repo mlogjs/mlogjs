@@ -80,4 +80,11 @@ export class SenseableValue extends StoreValue {
   debugString(): string {
     return `SenseableValue("${this.name}")`;
   }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    return (
+      (prop instanceof LiteralValue && prop.isString()) ||
+      prop instanceof StoreValue
+    );
+  }
 }

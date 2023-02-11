@@ -455,7 +455,7 @@ declare global {
      * }
      * ```
      */
-    function unit(index: number): UnitSymbol | null;
+    function unit(index: number): UnitSymbol | undefined;
 
     /**
      * Looks up an item symbol by it's index on the content registry.
@@ -469,7 +469,7 @@ declare global {
      * }
      * ```
      */
-    function item(index: number): ItemSymbol | null;
+    function item(index: number): ItemSymbol | undefined;
 
     /**
      * Looks up a liquid symbol by it's index on the content registry.
@@ -483,7 +483,7 @@ declare global {
      * }
      * ```
      */
-    function liquid(index: number): LiquidSymbol | null;
+    function liquid(index: number): LiquidSymbol | undefined;
   }
 
   /**
@@ -710,9 +710,9 @@ declare global {
       x: number,
       y: number
     ): [
-      type: BlockSymbol | null,
-      building: T | null,
-      floor: EnvBlockSymbol | OreSymbol | null
+      type: BlockSymbol | undefined,
+      building: T | undefined,
+      floor: EnvBlockSymbol | OreSymbol | undefined
     ];
 
     /**
@@ -891,11 +891,11 @@ declare global {
     /** Gets the block type on the give location. `Blocks.air` if there is no block. */
     function block(x: number, y: number): BlockSymbol;
 
-    /** Gets the building on the given location. `null` if there is no building. */
+    /** Gets the building on the given location. `undefined` if there is no building. */
     function building<T extends BasicBuilding = AnyBuilding>(
       x: number,
       y: number
-    ): T | null;
+    ): T | undefined;
   }
 
   /**  Sets block data on a given location. World processor ONLY.  */

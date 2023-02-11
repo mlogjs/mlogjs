@@ -874,12 +874,12 @@ Gets block data from the map. Available ONLY for world processors.
 
 - #### `getBlock.building`
 
-  Gets the building on the given location. `null` if there is no building.
+  Gets the building on the given location. `undefined` if there is no building.
 
   ```js
   const building = getBlock.building(10, 20);
 
-  if (building != null) {
+  if (building != undefined) {
     print("found ", building, "");
   } else {
     print("no building found");

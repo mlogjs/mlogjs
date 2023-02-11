@@ -17,21 +17,23 @@ print offset:8:6
 print 10
 print "it's false"
 set &t1 offset:8:6
-jump 21 notEqual &t1 null
+op strictEqual &t2 offset:8:6 null
+jump 22 equal &t2 0
 set &t1 "offset is null?"
-print "null is null"
+print "undefined is null"
 print &t1
 print "preserved"
-op rand &t2 1
-jump 28 lessThanEq &t2 0.5
+op rand &t3 1
+jump 29 lessThanEq &t3 0.5
 set item:22:4 null
-jump 29 always
+jump 30 always
 set item:22:4 @beryllium
-jump 31 notEqual item:22:4 null
+op strictEqual &t4 item:22:4 null
+jump 33 equal &t4 0
 set item:22:4 @copper
-op rand &t3 65536
-op not &t4 &t3
-print &t4
-op strictEqual &t5 item:22:4 @copper
-op equal &t6 &t5 0
+op rand &t5 65536
+op not &t6 &t5
 print &t6
+op strictEqual &t7 item:22:4 @copper
+op equal &t8 &t7 0
+print &t8

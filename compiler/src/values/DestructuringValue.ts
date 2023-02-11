@@ -10,7 +10,11 @@ export type TDestructuringMembers = Map<
     /**
      * Handles the input value, is responsible for the assignment.
      */
-    handler(get: () => TValueInstructions): TValueInstructions<IValue | null>;
+    handler(
+      get: () => TValueInstructions,
+      propExists: () => boolean,
+      scope: IScope
+    ): TValueInstructions<IValue | null>;
   }
 >;
 
@@ -48,7 +52,11 @@ export class DestructuringValue extends VoidValue {
 
     for (const [key, { value, handler }] of this.members) {
       pipeInsts(
-        handler(() => right.get(scope, key, value)),
+        handler(
+          () => right.get(scope, key, value),
+          () => right.hasProperty(scope, key),
+          scope
+        ),
         inst
       );
     }

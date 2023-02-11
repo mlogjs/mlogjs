@@ -23,7 +23,7 @@ declare global {
         readonly [I in keyof typeof Items]: number;
       } & {
         readonly totalItems: number;
-        readonly firstItem: ItemSymbol | null;
+        readonly firstItem?: ItemSymbol;
         readonly itemCapacity: number;
       }
     > {}
@@ -93,7 +93,7 @@ declare global {
 
   interface Boosted
     extends WithSymbols<{
-      readonly boosting: number;
+      readonly boosting: boolean;
     }> {}
 
   interface Mining
@@ -120,13 +120,13 @@ declare global {
 
   interface Nameable
     extends WithSymbols<{
-      readonly name: string | null;
+      readonly name?: string;
     }> {}
 
   interface PayloadHolder
     extends WithSymbols<{
       readonly payloadCount: number;
-      readonly payloadType: symbol | null;
+      readonly payloadType?: symbol;
     }> {}
 
   interface WithEnable
@@ -134,7 +134,7 @@ declare global {
       enabled: boolean;
     }> {}
   interface WithConfig<
-    T extends symbol | number | null = symbol | null
+    T extends symbol | number | undefined = symbol | undefined
   > extends WithSymbols<{
       readonly config: T;
     }> {}

@@ -52,10 +52,22 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
       );
     return [method.apply(this, [scope]), []];
   }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    if (this.isString() && prop instanceof LiteralValue && prop.isString())
+      return Object.prototype.hasOwnProperty.call(literalMethods, prop.data);
+    return false;
+  }
+
   get num() {
     if (this.data === null) return 0;
     if (typeof this.data === "string") return 1;
     return this.data;
+  }
+
+  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+    if (this.data === null) return other.eval(scope, out);
+    return [this, []];
   }
 
   typeof(): TValueInstructions {

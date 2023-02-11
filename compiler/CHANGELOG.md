@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for default destructuring values.
 - Added support for the `draw.col` command overload.
 - Added support for the `unitControl.unbind` command overload.
 - Added the `Math.asin`, `Math.acos` and `Math.atan` methods.
@@ -23,6 +24,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- (Breaking) `undefined` replaced `null` as the nullish value in the compiler.
 - `unitBind` now also accepts an unit object as a parameter.
 - Error messages now include information about the type of the variables.
 - `unitControl.getBlock` now also returns the floor of the tile.
@@ -31,6 +33,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed the `??` operator using normal inequality instead of strict inequality.
+- Fixed the type of `Vars.unit.boosting` being `number` instead of `boolean`.
+- Fixed the order of operations in destructuring assignments.
 - Fixed typo on `Teams.derelict` (was `Teams.delerict`).
 - Fixed the internal implementations of `Math.sin`, `Math.cos` and `Math.tan`.
 - Fixed logical expressions creating unnecessary temp values.

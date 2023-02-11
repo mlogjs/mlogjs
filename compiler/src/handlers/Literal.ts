@@ -1,3 +1,4 @@
+import { CompilerError } from "../CompilerError";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
 
@@ -10,7 +11,11 @@ const Literal: THandler = (
 export const NumericLiteral = Literal;
 export const StringLiteral = Literal;
 
-export const NullLiteral: THandler = () => [new LiteralValue(null), []];
+export const NullLiteral: THandler = () => {
+  throw new CompilerError(
+    "`null` is no longer supported, use `undefined` instead"
+  );
+};
 
 export const BooleanLiteral: THandler = (
   _c,

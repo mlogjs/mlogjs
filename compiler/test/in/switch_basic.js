@@ -50,7 +50,7 @@ function matchItem(n) {
     case 16:
       return Items.pyratite;
     default:
-      return null;
+      return undefined;
   }
 }
 

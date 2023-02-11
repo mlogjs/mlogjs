@@ -20,7 +20,7 @@ import {
   TValueInstructions,
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
-import { pipeInsts } from "../utils";
+import { discardedName, pipeInsts } from "../utils";
 import { JumpOutValue } from "./JumpOutValue";
 
 export class BaseValue extends VoidValue implements IValue {
@@ -57,25 +57,26 @@ export class BaseValue extends VoidValue implements IValue {
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    if (this instanceof LiteralValue) {
-      if (this.data === null) return other.eval(scope, out);
-      return [this, []];
-    }
-
     const result = SenseableValue.from(scope, out, EMutability.mutable);
-
-    const [left, leftInst] = this.eval(scope, result);
-    const [right, rightInst] = other.eval(scope, result);
 
     const nullLiteral = new LiteralValue(null);
     const endAdress = new LiteralValue(null);
+    const [left, leftInst] = this.eval(scope, result);
+    const [right, rightInst] = other.eval(scope, result);
+    const [test, testInst] = this["==="](scope, nullLiteral);
 
     return [
       result,
       [
         ...leftInst,
         ...result["="](scope, left)[1],
-        new JumpInstruction(endAdress, EJumpKind.NotEqual, result, nullLiteral),
+        ...testInst,
+        new JumpInstruction(
+          endAdress,
+          EJumpKind.Equal,
+          test,
+          new LiteralValue(0)
+        ),
         ...rightInst,
         ...result["="](scope, right)[1],
         new AddressResolver(endAdress),
@@ -168,12 +169,12 @@ for (const key of updateOperators) {
     out?: TEOutput
   ): TValueInstructions {
     let [ret, inst] = this.eval(scope);
-    if (!prefix) {
-      const temp = StoreValue.out(scope, out);
-      const tempValue = pipeInsts(temp["="](scope, ret), inst);
-      ret = tempValue;
+    if (!prefix && out !== discardedName) {
+      const temp = StoreValue.from(scope, out);
+      ret = pipeInsts(temp["="](scope, ret), inst);
     }
     const kind = key === "++" ? "+=" : "-=";
-    return [ret, [...inst, ...this[kind](scope, new LiteralValue(1))[1]]];
+    pipeInsts(this[kind](scope, new LiteralValue(1)), inst);
+    return [ret, inst];
   };
 }
