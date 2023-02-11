@@ -75,7 +75,7 @@ export class ObjectValue extends VoidValue {
         this.data,
         prop.data
       );
-      if (hasMember) return hasMember;
+      return hasMember;
     }
 
     return false;
