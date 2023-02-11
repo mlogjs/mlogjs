@@ -262,12 +262,9 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions {
     this.ensureInit();
-    if (
-      args.length < this.minimumArgumentCount ||
-      args.length > this.maximumArgumentCount
-    ) {
-      const min = this.minimumArgumentCount;
-      const max = this.maximumArgumentCount;
+    const min = this.minimumArgumentCount;
+    const max = this.maximumArgumentCount;
+    if (args.length < min || args.length > max) {
       if (min !== max)
         throw new CompilerError(
           `Cannot call: expected ${min}-${max} arguments but got: ${args.length}`
