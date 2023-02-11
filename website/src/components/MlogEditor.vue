@@ -20,7 +20,7 @@ const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
 
 loader.config({
   paths: {
-    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.34.1/min/vs",
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.35.0/min/vs",
   },
 });
 
