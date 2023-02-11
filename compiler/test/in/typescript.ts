@@ -18,6 +18,6 @@ let foo = getVar<number | symbol | undefined>("@unknown");
 
 let bar = foo as number;
 
-let baz = foo as symbol;
+let baz = foo satisfies unknown;
 
 let last = foo!;
