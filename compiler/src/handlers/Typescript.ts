@@ -1,14 +1,15 @@
 import { CompilerError } from "../CompilerError";
-import { es, THandler, TValueInstructions } from "../types";
+import { es, IValue, THandler, TValueInstructions } from "../types";
 import { nodeName } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 const TypeCastExpression: THandler = (
   c,
   scope,
-  node: es.TSAsExpression | es.TSTypeAssertion
+  node: es.TSAsExpression | es.TSTypeAssertion,
+  out
 ) => {
-  return c.handle(scope, node.expression) as TValueInstructions;
+  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
 };
 
 export const TSAsExpression = TypeCastExpression;
@@ -72,7 +73,15 @@ export const TSEnumDeclaration: THandler<null> = (
 export const TSNonNullExpression: THandler = (
   c,
   scope,
-  node: es.TSNonNullExpression
+  node: es.TSNonNullExpression,
+  out
 ) => {
-  return c.handle(scope, node.expression) as TValueInstructions;
+  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
 };
+
+export const TSSatisfiesExpression: THandler<IValue | null> = (
+  c,
+  scope,
+  node: es.TSSatisfiesExpression,
+  out
+) => c.handle(scope, node.expression, undefined, out);
