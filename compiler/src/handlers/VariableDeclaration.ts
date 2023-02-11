@@ -141,7 +141,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
 
     members.set(new LiteralValue(i), {
       value: value.out,
-      handler(get, propExists) {
+      handler(get, propExists, scope) {
         const [init, inst] = c.handle(scope, element, () => {
           let [init, initInst] = propExists()
             ? get()
@@ -212,7 +212,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
 
     members.set(keyInst[0], {
       value: value.out,
-      handler(get, propExists) {
+      handler(get, propExists, scope) {
         const [init, inst] = c.handle(scope, prop, () => {
           let [init, initInst] =
             propExists() || !value.defaultInit

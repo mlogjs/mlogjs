@@ -12,7 +12,8 @@ export type TDestructuringMembers = Map<
      */
     handler(
       get: () => TValueInstructions,
-      propExists: () => boolean
+      propExists: () => boolean,
+      scope: IScope
     ): TValueInstructions<IValue | null>;
   }
 >;
@@ -53,7 +54,8 @@ export class DestructuringValue extends VoidValue {
       pipeInsts(
         handler(
           () => right.get(scope, key, value),
-          () => right.hasProperty(scope, key)
+          () => right.hasProperty(scope, key),
+          scope
         ),
         inst
       );

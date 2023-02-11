@@ -359,20 +359,17 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
           members.set(key, {
             value: hasDefault ? value.left : value,
-            handler: (get, propExists) => {
-              return this.c.handle(this.childScope, prop, () => {
+            handler: (get, propExists, scope) => {
+              return this.c.handle(scope, prop, () => {
                 const inst = [...propInst];
                 if (propExists() || !hasDefault) {
                   const input = pipeInsts(get(), inst);
                   // assigns the output to the target value
-                  const output = pipeInsts(
-                    value["="](this.childScope, input),
-                    inst
-                  );
+                  const output = pipeInsts(value["="](scope, input), inst);
                   return [output, inst];
                 }
                 const result = pipeInsts(
-                  value["="](this.childScope, new LiteralValue(null)),
+                  value["="](scope, new LiteralValue(null)),
                   inst
                 );
                 return [result, inst];
@@ -402,16 +399,16 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
           this.destructuringKeyData.set(key, { inst: [], value });
           members.set(key, {
             value: hasDefault ? value.left : value,
-            handler: (get, propExists) => {
-              return this.c.handle(this.childScope, element, () => {
+            handler: (get, propExists, scope) => {
+              return this.c.handle(scope, element, () => {
                 if (propExists() || !hasDefault) {
                   const inst = get();
                   // assigns the output to the target value
-                  pipeInsts(value["="](this.childScope, inst[0]), inst[1]);
+                  pipeInsts(value["="](scope, inst[0]), inst[1]);
                   return inst;
                 }
 
-                return value["="](this.childScope, new LiteralValue(null));
+                return value["="](scope, new LiteralValue(null));
               });
             },
           });
