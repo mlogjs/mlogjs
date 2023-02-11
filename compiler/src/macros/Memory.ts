@@ -59,10 +59,6 @@ class MemoryMacro extends ObjectValue {
     });
   }
 
-  debugString(): string {
-    return `Memory("${this.cell.toString()}")`;
-  }
-
   get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
     if (super.hasProperty(scope, key)) return super.get(scope, key, out);
 
@@ -84,6 +80,10 @@ class MemoryMacro extends ObjectValue {
     )
       return true;
     return super.hasProperty(scope, prop);
+  }
+
+  debugString(): string {
+    return `Memory("${this.cell.toString()}")`;
   }
 
   toString() {
