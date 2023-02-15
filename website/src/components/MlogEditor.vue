@@ -13,6 +13,7 @@ import { registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
 import { useMediaQuery } from "../composables/useMediaQuery";
+import { usePaneSizes } from "../composables/usePaneSizes";
 
 const { isDark } = useData();
 
@@ -39,6 +40,7 @@ const optionsRef = shallowRef<CompilerOptions>({
   sourcemap: true,
 });
 
+const [sizes, handlePaneResize] = usePaneSizes();
 const code = ref(localStorage.getItem("code") ?? "");
 const editorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
 const outEditorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
@@ -87,8 +89,9 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
       class="default-theme"
       :horizontal="horizontal"
       style="height: var(--wrapper-height); width: 100vw"
+      @resized="handlePaneResize"
     >
-      <Pane size="70">
+      <Pane :size="sizes[0]">
         <Editor
           language="typescript"
           v-model:value="code"
@@ -96,9 +99,10 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
           :options="editorOptions"
           @before-mount="beforeMount"
           @mount="onMount"
+          :save-view-state="true"
         ></Editor>
       </Pane>
-      <Pane size="30">
+      <Pane :size="sizes[1]">
         <Editor
           language="mlog"
           :theme="theme"
