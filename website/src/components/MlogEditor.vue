@@ -122,6 +122,9 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
   background-color: gray;
   border-color: gray;
 }
+.editor-wrapper :deep(.splitpanes__pane) {
+  background-color: transparent;
+}
 .editor-wrapper :deep(.selection-highlighted) {
   background-color: hsla(203, 100%, 60%, 0.3);
 }
