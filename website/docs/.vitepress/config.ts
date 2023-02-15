@@ -26,6 +26,10 @@ const config: UserConfig = {
             text: "Examples",
             link: "https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples",
           },
+          {
+            text: "Changelog",
+            link: "https://github.com/mlogjs/mlogjs/blob/main/compiler/CHANGELOG.md",
+          },
           { text: "Discord", link: "https://discord.gg/2VudfNUp" },
         ],
       },
