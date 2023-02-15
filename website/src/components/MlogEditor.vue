@@ -60,8 +60,11 @@ const horizontal = useMediaQuery("(max-width: 800px)");
 function beforeMount(monaco: Monaco) {
   const defaults = monaco.languages.typescript.typescriptDefaults;
   defaults.setCompilerOptions({
-    noLib: true,
+    allowJs: true,
     allowNonTsExtensions: true,
+    checkJs: true,
+    noLib: true,
+    noEmit: true,
     target: monaco.languages.typescript.ScriptTarget.ESNext,
   });
   for (const [name, content] of lib) {
