@@ -1,9 +1,8 @@
 # Supported javascript/typescript syntax
 
-Since there drastic differences bewteen the browser environment and
+Since there are drastic differences bewteen the browser environment and
 the mlog runtime on mindustry, not all of the existent javascript
-features are supported. Bellow are lists containing the most significant supported and
-unsupported features, along with some that could be supported in the future.
+features are supported. Bellow is a list containing the most significant supported features.
 
 ## Javascript
 
