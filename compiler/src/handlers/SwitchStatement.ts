@@ -5,7 +5,14 @@ import {
   JumpInstruction,
   SetCounterInstruction,
 } from "../instructions";
-import { EInstIntent, EMutability, es, IInstruction, THandler } from "../types";
+import {
+  EInstIntent,
+  EMutability,
+  es,
+  IInstruction,
+  IScope,
+  THandler,
+} from "../types";
 import { lazy, usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -31,7 +38,9 @@ export const SwitchStatement: THandler<null> = (
   let onlyConstantTests = true;
 
   for (const scase of node.cases) {
-    const bodyInst = lazy(() => c.handleMany(innerScope, scase.consequent)[1]);
+    const bodyInst = lazy(
+      () => c.handleMany(createCaseScope(innerScope), scase.consequent)[1]
+    );
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
@@ -147,4 +156,13 @@ function usesEndLine(
 ) {
   if (endLine.bonds.includes(defaultJump.address)) return true;
   return usesAddressResolver(endLine, inst);
+}
+
+function createCaseScope(scope: IScope) {
+  // prevents the operation cache from propagating
+  // but also allows the case to declare variables
+  // that can be used by other cases
+  const child = scope.createScope();
+  child.data = scope.data;
+  return child;
 }

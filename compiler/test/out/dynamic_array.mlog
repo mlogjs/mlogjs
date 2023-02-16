@@ -104,25 +104,25 @@ print "removed: "
 print &t7
 print "\n"
 jump 125 always
-op add &t10 -1 arr:1:6.&len
-set &t11 null
-jump 114 lessThan &t10 0
-jump 114 greaterThan &t10 4
+op add &t6 -1 arr:1:6.&len
+set &t7 null
+jump 114 lessThan &t6 0
+jump 114 greaterThan &t6 4
 set arr:1:6.&rt 113
-op mul &t12 &t10 2
-op add @counter 150 &t12
-set &t11 arr:1:6.&gtemp
+op mul &t8 &t6 2
+op add @counter 150 &t8
+set &t7 arr:1:6.&gtemp
 print "removed: "
-print &t11
+print &t7
 print "\n"
-op sub &t13 arr:1:6.&len 1
-jump 125 lessThan &t13 0
-jump 125 greaterThan &t13 4
+op sub &t9 arr:1:6.&len 1
+jump 125 lessThan &t9 0
+jump 125 greaterThan &t9 4
 set arr:1:6.&stemp null
 set arr:1:6.&rt 124
-op mul &t14 &t13 2
-op add @counter 160 &t14
-set arr:1:6.&len &t13
+op mul &t10 &t9 2
+op add @counter 160 &t10
+set arr:1:6.&len &t9
 op add &t6 counter:13:4 1
 op mod counter:13:4 &t6 4
 set i:50:11 0

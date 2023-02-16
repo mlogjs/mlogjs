@@ -1,0 +1,21 @@
+op rand x:1:6 10
+op rand &t0 2
+jump 5 lessThanEq &t0 1
+set y:2:6 1
+jump 6 always
+set y:2:6 2
+jump 9 strictEqual y:2:6 1
+jump 15 strictEqual y:2:6 2
+jump 20 always
+op add &t1 x:1:6 y:2:6
+op sub &t2 x:1:6 y:2:6
+print &t1
+print " > "
+print &t2
+jump 20 always
+op sub &t1 x:1:6 y:2:6
+op add &t2 x:1:6 y:2:6
+print &t1
+print " < "
+print &t2
+printflush message1
