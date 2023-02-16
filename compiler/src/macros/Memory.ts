@@ -1,5 +1,11 @@
 import { InstructionBase } from "../instructions";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import {
+  EMutability,
+  IScope,
+  IValue,
+  TEOutput,
+  TValueInstructions,
+} from "../types";
 import {
   BaseValue,
   LiteralValue,
@@ -9,6 +15,7 @@ import {
 } from "../values";
 import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "./Function";
+import { extractOutName } from "../utils";
 
 class MemoryEntry extends BaseValue {
   macro = true;
@@ -52,7 +59,7 @@ class MemoryEntry extends BaseValue {
 }
 
 class MemoryMacro extends ObjectValue {
-  constructor(public cell: SenseableValue, size: LiteralValue) {
+  constructor(public cell: SenseableValue, size: LiteralValue | StoreValue) {
     super({
       length: size,
       size,
@@ -97,10 +104,23 @@ export class MemoryBuilder extends MacroFunction {
       if (!(cell instanceof SenseableValue))
         throw new CompilerError("Memory cell must be a senseable value.");
 
-      if (!(size instanceof LiteralValue && size.isNumber()))
-        throw new CompilerError("The memory size must be a number literal.");
+      if (
+        !(size instanceof LiteralValue && size.isNumber()) &&
+        !(size instanceof StoreValue)
+      )
+        throw new CompilerError(
+          "The memory size must be a number literal or a store."
+        );
 
-      return [new MemoryMacro(cell, size), []];
+      if (size.mutability === EMutability.constant) {
+        return [new MemoryMacro(cell, size), []];
+      }
+
+      const name = extractOutName(out) ?? scope.makeTempName();
+      const store = new StoreValue(`${name}.&len`);
+      const [, inst] = store["="](scope, size);
+      store.mutability = EMutability.constant;
+      return [new MemoryMacro(cell, store), inst];
     });
   }
 }
