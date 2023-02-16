@@ -25,6 +25,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Memory` macros can now be created with a dynamic `length` value.
 - (Breaking) `undefined` replaced `null` as the nullish value in the compiler.
 - `unitBind` now also accepts an unit object as a parameter.
 - Error messages now include information about the type of the variables.
