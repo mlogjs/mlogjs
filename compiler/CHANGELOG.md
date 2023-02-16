@@ -34,6 +34,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed cached operations propagating across the cases of a `switch`.
 - Fixed the `??` operator using normal inequality instead of strict inequality.
 - Fixed the type of `Vars.unit.boosting` being `number` instead of `boolean`.
 - Fixed the order of operations in destructuring assignments.
