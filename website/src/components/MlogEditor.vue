@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, shallowRef } from "vue";
+import { computed, provide, ref, shallowRef, watch } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 // resolved by vite, check the config.ts file
 import { Splitpanes, Pane } from "splitpanes";
@@ -13,7 +13,12 @@ import { registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
 import { useMediaQuery } from "../composables/useMediaQuery";
+import SideBar from "./SideBar.vue";
 import { usePaneSizes } from "../composables/usePaneSizes";
+import {
+  useFileSaver,
+  usePersistentFiles,
+} from "../composables/usePersistentFiles";
 
 const { isDark } = useData();
 
@@ -41,9 +46,15 @@ const optionsRef = shallowRef<CompilerOptions>({
 });
 
 const [sizes, handlePaneResize] = usePaneSizes();
-const code = ref(localStorage.getItem("code") ?? "");
+const code = ref("");
+
 const editorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
 const outEditorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
+const persistentFiles = usePersistentFiles(editorRef, outEditorRef);
+provide("virtual-fs", persistentFiles);
+const { currentFile } = persistentFiles;
+useFileSaver(currentFile, code);
+
 const { monacoRef } = useMonaco();
 const [compiledRef, sourcemapsRef] = useCompiler({
   code,
@@ -59,10 +70,22 @@ useSourceMapping({
 });
 const horizontal = useMediaQuery("(max-width: 800px)");
 
+watch(currentFile, file => {
+  if (!monacoRef.value || !file) return;
+  const defaults = monacoRef.value.languages.typescript.typescriptDefaults;
+  const options = defaults.getCompilerOptions();
+  const isJs = file.name.endsWith(".js");
+  if (!!options.allowJs !== isJs) {
+    defaults.setCompilerOptions({
+      ...options,
+      allowJs: isJs,
+    });
+  }
+});
+
 function beforeMount(monaco: Monaco) {
   const defaults = monaco.languages.typescript.typescriptDefaults;
   defaults.setCompilerOptions({
-    allowJs: true,
     allowNonTsExtensions: true,
     checkJs: true,
     noLib: true,
@@ -81,6 +104,22 @@ function onMount(editor: monaco.editor.IStandaloneCodeEditor) {
 function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
   outEditorRef.value = editor;
 }
+
+function copyToClipboard() {
+  const text = compiledRef.value;
+  if ("clipboard" in navigator) {
+    navigator.clipboard.writeText(text);
+    return;
+  }
+  const textArea = document.createElement("textarea");
+  textArea.style.display = "none";
+  textArea.value = text;
+  document.body.appendChild(textArea);
+  textArea.focus();
+  textArea.select();
+  document.execCommand("copy");
+  document.body.removeChild(textArea);
+}
 </script>
 
 <template>
@@ -88,10 +127,14 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
     <Splitpanes
       class="default-theme"
       :horizontal="horizontal"
+      :push-other-panes="false"
       style="height: var(--wrapper-height); width: 100vw"
       @resized="handlePaneResize"
     >
       <Pane :size="sizes[0]">
+        <SideBar :copy-to-clipboard="copyToClipboard" />
+      </Pane>
+      <Pane :size="sizes[1]">
         <Editor
           language="typescript"
           v-model:value="code"
@@ -99,10 +142,9 @@ function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
           :options="editorOptions"
           @before-mount="beforeMount"
           @mount="onMount"
-          :save-view-state="true"
         ></Editor>
       </Pane>
-      <Pane :size="sizes[1]">
+      <Pane :size="sizes[2]">
         <Editor
           language="mlog"
           :theme="theme"

@@ -22,7 +22,7 @@ function getSavedSizes(): number[] {
 
     // ensures that the the saved config is compatible
     // with the amount of existing panes
-    if (value.length == 2) return value;
+    if (value.length == 3) return value;
   }
-  return [70, 30];
+  return [15, 55, 30];
 }
