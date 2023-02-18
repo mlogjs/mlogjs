@@ -30,15 +30,15 @@ export function usePersistentFiles(
       const [first] = listedFiles;
       await first.load();
       currentFile.value = first;
+      files.value = listedFiles;
     } else {
       const file = new PersistentFile("example.ts", {
         content: localStorage.getItem("code") ?? "",
       });
       await file.save();
       currentFile.value = file;
-      files.value.push(file);
+      files.value = [file];
     }
-    files.value = listedFiles;
   }
 
   async function addFile(data: FileData): Promise<PersistentFile> {
