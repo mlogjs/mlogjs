@@ -32,7 +32,7 @@ export function usePersistentFiles(
       currentFile.value = first;
       files.value = listedFiles;
     } else {
-      const file = new PersistentFile("example.ts", {
+      const file = new PersistentFile("script.ts", {
         content: localStorage.getItem("code") ?? "",
       });
       await file.save();
