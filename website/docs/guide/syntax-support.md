@@ -33,6 +33,11 @@ Behavior:
   end
   ```
 
+  ::: tip
+  It is heavily recommended to declare variables with `const` whenever possible,
+  as that gives the compiler more opportunities to optimize the generated code.
+  :::
+
 - `var` behaves the same as `let` (see limitations)
 
 Limitations:
