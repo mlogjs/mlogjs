@@ -32,7 +32,11 @@ export function useSourceMapping({
 
     const inputListener = outEditor.onDidChangeCursorSelection(e => {
       outputCollection.clear();
-      if (!sourcemaps || e.reason !== monaco.editor.CursorChangeReason.Explicit)
+
+      if (
+        !sourcemaps ||
+        e.reason === monaco.editor.CursorChangeReason.ContentFlush
+      )
         return;
 
       const [firstSelection, decorations] = getInputDecorations(
@@ -49,7 +53,11 @@ export function useSourceMapping({
 
     const outputListener = editor.onDidChangeCursorSelection(e => {
       inputCollection.clear();
-      if (!sourcemaps || e.reason !== monaco.editor.CursorChangeReason.Explicit)
+
+      if (
+        !sourcemaps ||
+        e.reason === monaco.editor.CursorChangeReason.ContentFlush
+      )
         return;
 
       const [revealedLine, decorations] = getOutputDecorations(
