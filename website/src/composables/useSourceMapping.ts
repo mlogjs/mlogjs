@@ -32,7 +32,8 @@ export function useSourceMapping({
 
     const inputListener = outEditor.onDidChangeCursorSelection(e => {
       outputCollection.clear();
-      if (!sourcemaps) return;
+      if (!sourcemaps || e.reason !== monaco.editor.CursorChangeReason.Explicit)
+        return;
 
       const [firstSelection, decorations] = getInputDecorations(
         monaco,
@@ -41,17 +42,15 @@ export function useSourceMapping({
       );
       inputCollection.set(decorations);
 
-      if (
-        firstSelection &&
-        e.reason === monaco.editor.CursorChangeReason.Explicit
-      ) {
+      if (firstSelection) {
         editor.revealLineInCenter(firstSelection.start.line);
       }
     });
 
     const outputListener = editor.onDidChangeCursorSelection(e => {
       inputCollection.clear();
-      if (!sourcemaps) return;
+      if (!sourcemaps || e.reason !== monaco.editor.CursorChangeReason.Explicit)
+        return;
 
       const [revealedLine, decorations] = getOutputDecorations(
         monaco,
@@ -60,10 +59,7 @@ export function useSourceMapping({
       );
 
       outputCollection.set(decorations);
-      if (
-        revealedLine &&
-        e.reason === monaco.editor.CursorChangeReason.Explicit
-      ) {
+      if (revealedLine) {
         outEditor.revealLineInCenter(revealedLine);
       }
     });
