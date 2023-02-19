@@ -2,6 +2,7 @@ import type { editor } from "monaco-editor";
 import type { SourceLocation } from "../compiler/types";
 import { watchEffect, type ShallowRef } from "vue";
 import type { Monaco } from "../util";
+import type * as monaco from "monaco-editor";
 
 type Sourcemaps = SourceLocation[];
 
@@ -32,6 +33,7 @@ export function useSourceMapping({
 
     const inputListener = outEditor.onDidChangeCursorSelection(e => {
       outputCollection.clear();
+      clearEditorSelection(monaco, editor);
 
       if (
         !sourcemaps ||
@@ -53,6 +55,7 @@ export function useSourceMapping({
 
     const outputListener = editor.onDidChangeCursorSelection(e => {
       inputCollection.clear();
+      clearEditorSelection(monaco, outEditor);
 
       if (
         !sourcemaps ||
@@ -184,4 +187,13 @@ function getOutputDecorations(
     }
   }
   return [revealedLine, decorations];
+}
+
+function clearEditorSelection(
+  monaco: Monaco,
+  editor: monaco.editor.IStandaloneCodeEditor
+) {
+  const position = editor.getPosition();
+  if (!position) return;
+  editor.setSelection(monaco.Range.fromPositions(position));
 }
