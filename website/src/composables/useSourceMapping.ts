@@ -12,7 +12,7 @@ interface Params {
   monacoRef: ShallowRef<Monaco | null>;
 }
 
-const inlineClassName = "selection-highlighted";
+const className = "selection-highlighted";
 
 export function useSourceMapping({
   editorRef,
@@ -90,7 +90,7 @@ function getInputDecorations(
     if (!source) continue;
     decorations.push({
       options: {
-        inlineClassName,
+        className,
       },
       range: new monaco.Range(
         source.start.line,
@@ -142,7 +142,7 @@ function getOutputDecorations(
       revealedLine ??= i + 1;
       decorations.push({
         options: {
-          inlineClassName,
+          className,
           isWholeLine: true,
         },
         range: new monaco.Range(i + 1, 1, i + 1, 1),
@@ -172,7 +172,7 @@ function getOutputDecorations(
     for (const [i] of outerSources) {
       decorations.push({
         options: {
-          inlineClassName,
+          className,
           isWholeLine: true,
         },
         range: new monaco.Range(i + 1, 1, i + 1, 1),
