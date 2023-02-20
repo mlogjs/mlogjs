@@ -9,7 +9,7 @@ import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
 import type { Monaco } from "../util";
-import { registerMlogLang } from "../mlog/lang";
+import { configureMlogLang, registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
 import { useMediaQuery } from "../composables/useMediaQuery";
@@ -103,6 +103,7 @@ function onMount(editor: monaco.editor.IStandaloneCodeEditor) {
 }
 function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
   outEditorRef.value = editor;
+  configureMlogLang(monacoRef.value!, editor);
 }
 
 function copyToClipboard() {
