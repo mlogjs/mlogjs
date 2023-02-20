@@ -56,7 +56,6 @@ export function useCompiler({
     if (subscribed) {
       compiledRef.value = content;
       sourcemapsRef.value = sourcemaps;
-      localStorage.setItem("code", code.value);
       monaco.editor.setModelMarkers(model, "mlogjs", markers);
     }
   });

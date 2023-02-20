@@ -14,6 +14,7 @@ const dbData = {
 };
 
 const lastOpenFileKey = "last-open-file";
+const legacyCodeKey = "code";
 const debounceSaveDelay = 1000;
 
 export function usePersistentFiles(
@@ -42,11 +43,12 @@ export function usePersistentFiles(
       files.value = listedFiles;
     } else {
       const file = new PersistentFile("script.ts", {
-        content: localStorage.getItem("code") ?? "",
+        content: localStorage.getItem(legacyCodeKey) ?? "",
       });
       await file.save();
       currentFile.value = file;
       files.value = [file];
+      localStorage.removeItem(legacyCodeKey);
     }
   }
 
