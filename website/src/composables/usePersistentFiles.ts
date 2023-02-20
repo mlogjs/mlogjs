@@ -13,6 +13,7 @@ const dbData = {
   filesStoreName: "files",
 };
 
+const lastOpenFileKey = "last-open-file";
 const debounceSaveDelay = 1000;
 
 export function usePersistentFiles(
@@ -24,10 +25,18 @@ export function usePersistentFiles(
 
   fetchFiles();
 
+  watch([currentFile, files], ([file]) => {
+    if (!file) return;
+    localStorage.setItem(lastOpenFileKey, file.name);
+  });
+
   async function fetchFiles() {
     const listedFiles = await getAllFiles();
+    const selectedFileName = localStorage.getItem(lastOpenFileKey);
     if (listedFiles.length > 0) {
-      const [first] = listedFiles;
+      const first =
+        listedFiles.find(file => file.name === selectedFileName) ??
+        listedFiles[0];
       await first.load();
       currentFile.value = first;
       files.value = listedFiles;
