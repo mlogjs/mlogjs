@@ -47,14 +47,16 @@ end
 
 ## `concat`
 
-Allows you to concatenate a series of constant strings.
+Concatenates a list of constant literal values.
 
 ```js
-const programVersion = "2";
-const programName = "special-program";
-const fullName = concat(programName, "-v", programVersion);
+const name = "example";
 
-// ...
+// works with normal arguments
+const before = concat("before_", name);
+
+// works with tagged template strings
+const after = concat`after_${name}`;
 ```
 
 ## `asm`
