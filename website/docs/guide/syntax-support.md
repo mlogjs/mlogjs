@@ -352,7 +352,7 @@ Behavior:
 
 ### Object/array literals
 
-Objects and arrays are [compile time constants](/guide/data-types#objects), which means that the values they hold can be mutated but not reassigned.
+Objects and arrays are [compile time constants](/guide/data-types#objects), which means that the values they hold cannot be reassigned.
 
 Their most common use case is scoping data in a convenient way.
 
