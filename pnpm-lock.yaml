@@ -6,11 +6,9 @@ importers:
     specifiers:
       prettier: ^2.8.3
       typescript: ^4.9.4
-      vite: ^4.0.4
     devDependencies:
       prettier: 2.8.3
       typescript: 4.9.4
-      vite: 4.0.4
 
   compiler:
     specifiers:
@@ -64,6 +62,7 @@ importers:
       mlogjs: workspace:^
       monaco-editor: ^0.35.0
       splitpanes: ^3.1.5
+      vite: ^4.1.4
       vitepress: 1.0.0-alpha.48
       vue: ^3.2.45
     dependencies:
@@ -73,6 +72,7 @@ importers:
       splitpanes: 3.1.5
     devDependencies:
       '@types/node': 16.18.10
+      vite: 4.1.4_@types+node@16.18.10
       vitepress: 1.0.0-alpha.48_@types+node@16.18.10
       vue: 3.2.45
 
@@ -4379,39 +4379,6 @@ packages:
     dependencies:
       spdx-correct: 3.1.1
       spdx-expression-parse: 3.0.1
-    dev: true
-
-  /vite/4.0.4:
-    resolution: {integrity: sha512-xevPU7M8FU0i/80DMR+YhgrzR5KS2ORy1B4xcX/cXLsvnUWvfHuqMmVU6N0YiJ4JWGRJJsLCgjEzKjG9/GKoSw==}
-    engines: {node: ^14.18.0 || >=16.0.0}
-    hasBin: true
-    peerDependencies:
-      '@types/node': '>= 14'
-      less: '*'
-      sass: '*'
-      stylus: '*'
-      sugarss: '*'
-      terser: ^5.4.0
-    peerDependenciesMeta:
-      '@types/node':
-        optional: true
-      less:
-        optional: true
-      sass:
-        optional: true
-      stylus:
-        optional: true
-      sugarss:
-        optional: true
-      terser:
-        optional: true
-    dependencies:
-      esbuild: 0.16.17
-      postcss: 8.4.21
-      resolve: 1.22.1
-      rollup: 3.10.0
-    optionalDependencies:
-      fsevents: 2.3.2
     dev: true
 
   /vite/4.1.4_@types+node@16.18.10:
