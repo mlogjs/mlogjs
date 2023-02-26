@@ -1,3 +1,4 @@
+import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
 
@@ -65,6 +66,13 @@ const config: UserConfig = {
   },
   markdown: {
     theme: "dark-plus",
+    languages: [
+      {
+        id: "mlog",
+        scopeName: "source.mlog",
+        path: path.resolve(__dirname, "./langs/mlog.tmLanguage.json"),
+      },
+    ],
   },
   lastUpdated: true,
   head: [

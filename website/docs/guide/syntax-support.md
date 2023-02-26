@@ -23,7 +23,7 @@ Behavior:
   printFlush(c);
   ```
 
-  ```
+  ```mlog
   print "string"
   print " is a string"
   print "\n"

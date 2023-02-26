@@ -38,7 +38,7 @@ const foo = getVar("@foo");
 
 always produces:
 
-```
+```mlog
 set foo:1:6 @foo
 end
 ```
