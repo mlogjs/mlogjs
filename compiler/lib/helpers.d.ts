@@ -20,8 +20,24 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
   name: string
 ): T;
 
-/** Concatenates a list of constant strings */
-declare function concat(...strings: string[]): string;
+/**
+ * Concatenates a list of constant literal values.
+ *
+ * ```js
+ * const name = "example";
+ *
+ * // works with normal arguments
+ * const before = concat("before_", name);
+ *
+ * // works with tagged template strings
+ * const after = concat`after_${name}`;
+ * ```
+ */
+declare function concat(
+  ...args:
+    | (string | number | undefined)[]
+    | [TemplateStringsArray, ...(string | number | undefined)[]]
+): string;
 
 /**
  * Inlines raw mlog code. Variables and expressions can be placed inside.
