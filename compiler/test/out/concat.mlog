@@ -1,2 +1,3 @@
 print "first part and second part and third part"
+print "first part and second part and third part"
 printflush message1
