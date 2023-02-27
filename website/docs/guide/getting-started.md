@@ -42,12 +42,12 @@ This section assumes that you are familiar with the following concepts:
 If you want to edit your scripts in your preferred editor you can install
 the compiler locally by running the command bellow.
 
-```
+```shell
 npm i -g mlogjs
 ```
 
 Then you will be able to compile your scripts with the `mlogjs` command:
 
-```
+```shell
 mlogjs my_script.js
 ```
