@@ -19,6 +19,7 @@ import {
   useFileSaver,
   usePersistentFiles,
 } from "../composables/usePersistentFiles";
+import { useEditorSettings } from "../composables/useEditorSettings";
 
 const { isDark } = useData();
 
@@ -40,10 +41,16 @@ const outEditorOptions: EditorOptions = {
   lineNumbers: n => `${n - 1}`,
 };
 
-const optionsRef = shallowRef<CompilerOptions>({
-  compactNames: false,
+const settings = useEditorSettings();
+provide("editor-settings", settings);
+
+const optionsRef = computed<CompilerOptions>(() => ({
+  ...settings.value.mlogjs,
   sourcemap: true,
-});
+}));
+const typescriptSettingsRef = computed(() => ({
+  ...settings.value.typescript,
+}));
 
 const [sizes, handlePaneResize] = usePaneSizes();
 const code = ref("");
@@ -70,17 +77,16 @@ useSourceMapping({
 });
 const horizontal = useMediaQuery("(max-width: 800px)");
 
-watch(currentFile, file => {
+watch([currentFile, typescriptSettingsRef], ([file, typescript]) => {
   if (!monacoRef.value || !file) return;
   const defaults = monacoRef.value.languages.typescript.typescriptDefaults;
   const options = defaults.getCompilerOptions();
   const isJs = file.name.endsWith(".js");
-  if (!!options.allowJs !== isJs) {
-    defaults.setCompilerOptions({
-      ...options,
-      allowJs: isJs,
-    });
-  }
+  defaults.setCompilerOptions({
+    ...options,
+    ...typescript,
+    allowJs: isJs,
+  });
 });
 
 function beforeMount(monaco: Monaco) {
@@ -91,10 +97,11 @@ function beforeMount(monaco: Monaco) {
     noLib: true,
     noEmit: true,
     target: monaco.languages.typescript.ScriptTarget.ESNext,
+    ...typescriptSettingsRef.value,
   });
-  for (const [name, content] of lib) {
-    defaults.addExtraLib(content, name);
-  }
+  defaults.setExtraLibs(
+    lib.map(([name, content]) => ({ content, filePath: name }))
+  );
   registerMlogLang(monaco);
 }
 

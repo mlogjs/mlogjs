@@ -1,5 +1,6 @@
 <script setup lang="ts">
-import { inject } from "vue";
+import { inject, ref } from "vue";
+import type { EditorSettingsRef } from "../composables/useEditorSettings";
 import type {
   PersistentFile,
   usePersistentFiles,
@@ -7,7 +8,9 @@ import type {
 import AddIcon from "../icons/AddIcon.vue";
 import ClippyIcon from "../icons/ClippyIcon.vue";
 import EditIcon from "../icons/EditIcon.vue";
+import SettingsGearIcon from "../icons/SettingsGearIcon.vue";
 import TrashIcon from "../icons/TrashIcon.vue";
+import SettingsDialog from "./SettingsDialog.vue";
 
 const { copyToClipboard } = defineProps<{
   copyToClipboard: () => void;
@@ -21,6 +24,9 @@ const {
   removeFile,
   renameFile,
 } = inject<ReturnType<typeof usePersistentFiles>>("virtual-fs")!;
+const settings = inject<EditorSettingsRef>("editor-settings")!;
+
+const dialogRef = ref<InstanceType<typeof SettingsDialog>>();
 
 async function createFile() {
   const input = prompt(
@@ -44,6 +50,10 @@ async function deleteFile(file: PersistentFile) {
   if (files.value.length == 1) {
     alert("There must be at least one file");
     return;
+  }
+  if (settings.value.editor.confirmFileDeletion) {
+    const result = confirm("Are you sure yout want to delete this file?");
+    if (!result) return;
   }
 
   await removeFile(file);
@@ -71,6 +81,9 @@ async function rename(file: PersistentFile) {
     <div class="bar-actions">
       <button @click="createFile" title="Create a new file">
         <AddIcon />
+      </button>
+      <button @click="dialogRef?.openDialog()" title="Open the editor settings">
+        <SettingsGearIcon />
       </button>
       <button @click="copyToClipboard" title="Copy output to clipboard">
         <ClippyIcon />
@@ -105,6 +118,7 @@ async function rename(file: PersistentFile) {
       </li>
     </ul>
   </div>
+  <SettingsDialog ref="dialogRef"></SettingsDialog>
 </template>
 
 <style scoped>
