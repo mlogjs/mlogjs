@@ -2,8 +2,8 @@ draw.clear(0, 0, 0);
 
 // draw the hour markers
 for (let i = 0; i <= 330; i += 30) {
-  let x = Math.sin(i) * 40;
-  let y = Math.cos(i) * 40;
+  const x = Math.sin(i) * 40;
+  const y = Math.cos(i) * 40;
 
   draw.color(75, 75, 75, 255);
   draw.line({
