@@ -704,7 +704,10 @@ Controls the unit bound to the processor
 
 - #### `unitControl.unbind`
 
-  Frees the unit from the control of the processor, making it resume its regular AI.
+  Resets the AI of the unit.
+
+  Calling `unbind` does not actually unbind the unit from the processor,
+  it just makes the unit resume its natural behavior.
 
   ```js
   unitControl.unbind();
