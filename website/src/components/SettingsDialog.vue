@@ -112,7 +112,7 @@ function onClose() {
           </li>
         </ul>
       </article>
-      <button type="submit" @click="onClose">Close</button>
+      <button class="save" type="submit" @click="onClose">Save</button>
     </form>
   </dialog>
 </template>
@@ -139,5 +139,12 @@ article {
 label {
   display: flex;
   justify-content: space-between;
+}
+
+button.save {
+  width: 100%;
+  text-align: center;
+  background-color: var(--vp-c-bg-elv);
+  border-radius: 0.5em;
 }
 </style>
