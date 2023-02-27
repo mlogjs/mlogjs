@@ -67,6 +67,6 @@ MIT
 
 [npm]: https://www.npmjs.com/package/mlogjs
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
-[docs]: https://mlogjs.netlify.app
-[unreleased docs]: https://mlogjs.github.io/mlogjs/
+[docs]: https://mlogjs.github.io/mlogjs/
+[unreleased docs]: https://mlogjs.netlify.app
 [discord]: https://discord.gg/SvgjCtZnR5
