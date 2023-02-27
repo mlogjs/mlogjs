@@ -2,16 +2,16 @@ draw clear 0 0 0
 set i:4:9 0
 jump 17 greaterThan i:4:9 330
 op sin &t0 i:4:9
-op mul x:5:6 &t0 40
+op mul x:5:8 &t0 40
 op cos &t1 i:4:9
-op mul y:6:6 &t1 40
+op mul y:6:8 &t1 40
 draw color 75 75 75 255
-op mul &t2 x:5:6 0.8
+op mul &t2 x:5:8 0.8
 op add &t3 &t2 40
-op mul &t4 y:6:6 0.8
+op mul &t4 y:6:8 0.8
 op add &t5 &t4 40
-op add &t6 x:5:6 40
-op add &t7 y:6:6 40
+op add &t6 x:5:8 40
+op add &t7 y:6:8 40
 draw line &t3 &t5 &t6 &t7
 op add i:4:9 i:4:9 30
 jump 2 always
