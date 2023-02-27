@@ -18,7 +18,7 @@ const config: UserConfig = {
       pattern: "https://github.com/mlogjs/mlogjs/tree/main/website/docs/:path",
     },
     nav: [
-      { text: "Guide", link: "/guide/" },
+      { text: "Guide", link: "/guide/getting-started" },
       { text: "Editor", link: "/editor" },
       {
         text: "Resources",
