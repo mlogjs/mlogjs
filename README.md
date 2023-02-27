@@ -48,6 +48,10 @@ mlogjs hello.js
 
 You can find other usage examples [here](https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples).
 
+## Changelog
+
+Changes for each release are documented in the [CHANGELOG](https://github.com/mlogjs/mlogjs/blob/main/compiler/CHANGELOG.md).
+
 ## Contribute
 
 Having trouble? [Ask for help on discord](https://discord.gg/2VudfNUp)
