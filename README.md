@@ -44,6 +44,10 @@ printFlush();
 mlogjs hello.js
 ```
 
+## Examples
+
+You can find other usage examples [here](https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples).
+
 ## Contribute
 
 Having trouble? [Ask for help on discord](https://discord.gg/2VudfNUp)
