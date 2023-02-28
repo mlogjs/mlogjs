@@ -230,7 +230,7 @@ before trying to get a link. This can be done by using `Vars.links`.
 
 ```js
 if (index < Vars.links) {
-  let myBlock = getLink(index);
+  const myBlock = getLink(index);
   // ...
 }
 ```
@@ -375,7 +375,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.blockCount) {
-    let blockKind = lookup.block(index);
+    const blockKind = lookup.block(index);
   }
   ```
 
@@ -387,7 +387,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.unitCount) {
-    let unitKind = lookup.unit(index);
+    const unitKind = lookup.unit(index);
   }
   ```
 
@@ -399,7 +399,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.itemCount) {
-    let itemKind = lookup.item(index);
+    const itemKind = lookup.item(index);
   }
   ```
 
@@ -411,7 +411,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.liquidCount) {
-    let liquidKind = lookup.liquid(index);
+    const liquidKind = lookup.liquid(index);
   }
   ```
 

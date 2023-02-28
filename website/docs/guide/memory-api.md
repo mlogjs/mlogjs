@@ -35,7 +35,7 @@ if (mem[0] == 0) {
   mem[0] = 1;
   print("Processor initialized");
 } else {
-  let runs = mem[1];
+  const runs = mem[1];
   print`This code has run ${runs} time(s)`;
   mem[1]++;
 }

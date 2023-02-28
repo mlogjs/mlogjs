@@ -302,7 +302,7 @@ Another caution you must take is that differently from regular javascript, these
 //
 // second: the final value will be a boolean, not
 // whathever object getSomething returns
-let foo = isEnabled && getSomething();
+const foo = isEnabled && getSomething();
 ```
 
 :::

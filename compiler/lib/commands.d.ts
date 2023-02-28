@@ -268,7 +268,7 @@ declare global {
    * Example:
    * ```js
    * if(index < Vars.links) {
-   *   let myBlock = getLink(index)
+   *   const myBlock = getLink(index)
    *   // ...
    * }
    * ```
@@ -405,12 +405,12 @@ declare global {
    *
    * Example:
    *  ```ts
-   *  let myBuilding = getBuilding("container1");
+   *  const myBuilding = getBuilding("container1");
    *
    *  // typescript annotation, you can use jsdoc comments on
    *  // regular javascript
-   *  let myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
-   *  let result = sensor(myCustomSymbol, myBuilding);
+   *  const myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
+   *  const result = sensor(myCustomSymbol, myBuilding);
    *  ```
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
@@ -437,7 +437,7 @@ declare global {
      * Example:
      * ```js
      * if(index < Vars.blockCount) {
-     *   let blockKind = lookup.block(index);
+     *   const blockKind = lookup.block(index);
      * }
      * ```
      */
@@ -451,7 +451,7 @@ declare global {
      * Example:
      * ```js
      * if(index < Vars.unitCount) {
-     *   let unitKind = lookup.unit(index);
+     *   const unitKind = lookup.unit(index);
      * }
      * ```
      */
@@ -465,7 +465,7 @@ declare global {
      * Example:
      * ```js
      * if(index < Vars.itemCount) {
-     *   let itemKind = lookup.item(index);
+     *   const itemKind = lookup.item(index);
      * }
      * ```
      */
@@ -479,7 +479,7 @@ declare global {
      * Example:
      * ```js
      * if(index < Vars.liquidCount) {
-     *   let liquidKind = lookup.liquid(index);
+     *   const liquidKind = lookup.liquid(index);
      * }
      * ```
      */
