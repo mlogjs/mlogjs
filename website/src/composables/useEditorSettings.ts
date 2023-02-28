@@ -1,6 +1,6 @@
 import type * as mlogs from "mlogjs";
 import type * as monaco from "monaco-editor";
-import { ref, watch, watchEffect, type Ref } from "vue";
+import { ref, type Ref } from "vue";
 export interface EditorSettings {
   mlogjs: Pick<mlogs.CompilerOptions, "compactNames">;
   typescript: Required<

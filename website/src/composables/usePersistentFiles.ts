@@ -1,4 +1,4 @@
-import { ref, shallowRef, watch, type Ref, type ShallowRef } from "vue";
+import { shallowRef, watch, type Ref, type ShallowRef } from "vue";
 import { debounce } from "../util";
 import type * as monaco from "monaco-editor";
 export interface FileData {
