@@ -8,6 +8,7 @@
     "module": "ESNext",
     "moduleResolution": "Node",
     "noImplicitThis": true,
+    "noUnusedLocals": true,
     "preserveValueImports": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
