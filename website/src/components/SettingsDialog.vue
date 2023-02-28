@@ -6,7 +6,6 @@ import {
 } from "../composables/useEditorSettings";
 
 const dialogRef = ref<HTMLDialogElement>();
-const shouldMount = ref(false);
 const settings = inject<EditorSettingsRef>("editor-settings")!;
 
 defineExpose({
@@ -14,7 +13,6 @@ defineExpose({
 });
 
 function openDialog() {
-  shouldMount.value = true;
   dialogRef.value?.showModal();
 }
 function onClose() {
