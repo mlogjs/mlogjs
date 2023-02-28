@@ -1,33 +1,25 @@
 <script setup lang="ts">
 import { inject, ref } from "vue";
-import type { EditorSettingsRef } from "../composables/useEditorSettings";
-import type {
-  PersistentFile,
-  usePersistentFiles,
-} from "../composables/usePersistentFiles";
+import type { usePersistentFiles } from "../composables/usePersistentFiles";
 import AddIcon from "../icons/AddIcon.vue";
 import ClippyIcon from "../icons/ClippyIcon.vue";
-import EditIcon from "../icons/EditIcon.vue";
+import FileCode from "../icons/FileCodeIcon.vue";
 import SettingsGearIcon from "../icons/SettingsGearIcon.vue";
-import TrashIcon from "../icons/TrashIcon.vue";
 import SettingsDialog from "./SettingsDialog.vue";
+import FileMenu from "./FileMenu.vue";
+import { useMediaQuery } from "../composables/useMediaQuery";
 
 const { copyToClipboard } = defineProps<{
   copyToClipboard: () => void;
 }>();
 
-const {
-  currentFile,
-  files,
-  addFile,
-  changeCurrentFile,
-  removeFile,
-  renameFile,
-} = inject<ReturnType<typeof usePersistentFiles>>("virtual-fs")!;
-const settings = inject<EditorSettingsRef>("editor-settings")!;
+const { files, addFile } =
+  inject<ReturnType<typeof usePersistentFiles>>("virtual-fs")!;
 
-const dialogRef = ref<InstanceType<typeof SettingsDialog>>();
+const settingsDialogRef = ref<InstanceType<typeof SettingsDialog>>();
+const fileDialogRef = ref<HTMLDialogElement>();
 
+const isMobileLayout = useMediaQuery("(max-width: 800px)");
 async function createFile() {
   const input = prompt(
     "Enter the name of the file. Put an extension (.js or .ts) to specify the language."
@@ -46,34 +38,6 @@ async function createFile() {
     content: "",
   });
 }
-async function deleteFile(file: PersistentFile) {
-  if (files.value.length == 1) {
-    alert("There must be at least one file");
-    return;
-  }
-  if (settings.value.editor.confirmFileDeletion) {
-    const result = confirm("Are you sure yout want to delete this file?");
-    if (!result) return;
-  }
-
-  await removeFile(file);
-}
-async function rename(file: PersistentFile) {
-  const input = prompt(
-    "Enter the name of the file. Put an extension (.js or .ts) to specify the language."
-  );
-  if (!input) return;
-
-  const extensionRegex = /\.[^.]+$/;
-  const name = extensionRegex.test(input) ? input : `${input}.ts`;
-
-  if (files.value.find(file => file.name == name)) {
-    alert("A file with this name already exists.");
-    return;
-  }
-
-  await renameFile(file, name);
-}
 </script>
 
 <template>
@@ -82,7 +46,17 @@ async function rename(file: PersistentFile) {
       <button @click="createFile" title="Create a new file">
         <AddIcon />
       </button>
-      <button @click="dialogRef?.openDialog()" title="Open the editor settings">
+      <button
+        v-if="isMobileLayout"
+        @click="fileDialogRef?.showModal()"
+        title="Open the file menu"
+      >
+        <FileCode />
+      </button>
+      <button
+        @click="settingsDialogRef?.openDialog()"
+        title="Open the editor settings"
+      >
         <SettingsGearIcon />
       </button>
       <button @click="copyToClipboard" title="Copy output to clipboard">
@@ -90,35 +64,12 @@ async function rename(file: PersistentFile) {
       </button>
     </div>
 
-    <ul>
-      <li v-for="file in files">
-        <button
-          class="file"
-          :class="{ active: file === currentFile }"
-          @click="() => changeCurrentFile(file)"
-        >
-          <span>
-            {{ file.name }}
-          </span>
-          <div class="file-actions">
-            <button
-              @click.stop="() => rename(file)"
-              title="Change the file name"
-            >
-              <EditIcon />
-            </button>
-            <button
-              @click.stop="() => deleteFile(file)"
-              title="Delete the file"
-            >
-              <TrashIcon />
-            </button>
-          </div>
-        </button>
-      </li>
-    </ul>
+    <FileMenu v-if="!isMobileLayout" />
+    <dialog v-else ref="fileDialogRef" @click="() => fileDialogRef?.close()">
+      <FileMenu />
+    </dialog>
   </div>
-  <SettingsDialog ref="dialogRef"></SettingsDialog>
+  <SettingsDialog ref="settingsDialogRef" />
 </template>
 
 <style scoped>
@@ -134,35 +85,9 @@ div.bar-actions {
   display: flex;
   justify-content: space-around;
 }
-button.file {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  width: 100%;
-  padding: 0 1.5em;
-}
-button.file.active {
-  background-color: var(--vp-c-divider);
-}
-
-.file span {
-  text-align: start;
-  overflow: hidden;
-  white-space: nowrap;
-  text-overflow: ellipsis;
-}
-
-div.file-actions {
-  position: relative;
-  display: flex;
-  flex-direction: row;
-  gap: 1em;
-}
-
-ul {
-  box-sizing: border-box;
-  height: calc(var(--wrapper-height) - 1.5em);
-  overflow-y: auto;
-  overflow-x: hidden;
+dialog {
+  background-color: var(--vp-c-bg);
+  border-radius: 1em;
+  border-color: var(--vp-c-border);
 }
 </style>
