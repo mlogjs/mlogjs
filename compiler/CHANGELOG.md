@@ -9,6 +9,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for custom online editor settings.
+- Added support for a "goto" action for jump instructions in the online editor (<kbd>ctrl</kbd> + <kbd>click</kbd>).
+- Added support for multi-file editing to the online editor.
 - Added support for `concat` calls with tagged template literals.
 - Added support for the typescript `satisfies` keyword.
 - Added support for default destructuring values.
