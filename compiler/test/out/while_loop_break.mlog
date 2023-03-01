@@ -1,8 +1,7 @@
 set i:1:4 0
-jump 7 greaterThanEq i:1:4 100
+jump 6 greaterThanEq i:1:4 100
 op rand &t0 1
-jump 5 lessThanEq &t0 0.5
-jump 7 always
+jump 6 greaterThan &t0 0.5
 op add i:1:4 i:1:4 1
 jump 1 always
 end
