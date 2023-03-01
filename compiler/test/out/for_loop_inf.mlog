@@ -1,5 +1,4 @@
 set i:1:9 0
-jump 5 equal 1 0
 print i:1:9
 op add i:1:9 i:1:9 1
 jump 1 always
