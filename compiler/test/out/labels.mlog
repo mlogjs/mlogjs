@@ -1,12 +1,11 @@
 set i:1:16 0
-jump 18 greaterThanEq i:1:16 3
+jump 17 greaterThanEq i:1:16 3
 set j:2:11 0
-jump 16 greaterThanEq j:2:11 3
+jump 15 greaterThanEq j:2:11 3
 op equal &t0 i:1:16 1
 op equal &t1 j:2:11 1
 op land &t2 &t0 &t1
-jump 9 equal &t2 0
-jump 16 always
+jump 15 equal &t2 1
 print "i = "
 print i:1:16
 print ", j = "
@@ -17,13 +16,11 @@ jump 3 always
 op add i:1:16 i:1:16 1
 jump 1 always
 set i:9:4 0
-jump 28 greaterThanEq i:9:4 100
+jump 25 greaterThanEq i:9:4 100
 set j:12:6 0
-jump 23 notEqual i:9:4 j:12:6
-jump 28 always
-jump 25 greaterThanEq i:9:4 j:12:6
-jump 27 always
+jump 25 equal i:9:4 j:12:6
+jump 24 lessThan i:9:4 j:12:6
 op add j:12:6 j:12:6 1
-jump 21 lessThan j:12:6 100
-jump 19 always
+jump 20 lessThan j:12:6 100
+jump 18 always
 end

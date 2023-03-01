@@ -1,6 +1,16 @@
+import { Compiler } from "../Compiler";
 import { JumpInstruction, AddressResolver } from "../instructions";
 import { EJumpKind } from "../instructions";
-import { THandler, es, IInstruction, EInstIntent } from "../types";
+import {
+  THandler,
+  es,
+  IInstruction,
+  EInstIntent,
+  IScope,
+  IBindableValue,
+  TValueInstructions,
+  IValue,
+} from "../types";
 import { pipeInsts, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
@@ -8,7 +18,8 @@ import { JumpOutValue } from "../values/JumpOutValue";
 export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
   const inst: IInstruction[] = [];
   const endIfAddr = new LiteralValue(null);
-  const testOut = new JumpOutValue(node, endIfAddr, false);
+  const testOut = createJumpOut(c, scope, node, endIfAddr);
+  const mergedJumps = testOut.whenTrue;
 
   const test = pipeInsts(c.handleEval(scope, node.test, testOut), inst);
 
@@ -18,7 +29,9 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
     return [null, []];
   }
 
-  const consequent = withAlwaysRuns(c.handle(scope, node.consequent), false);
+  const consequent: TValueInstructions<IValue | null> = !mergedJumps
+    ? withAlwaysRuns(c.handle(scope, node.consequent), false)
+    : [null, []];
 
   inst.push(...JumpInstruction.or(test, testOut), ...consequent[1]);
 
@@ -26,7 +39,7 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
     inst.push(new AddressResolver(endIfAddr));
   } else {
     const endElseAddr = new LiteralValue(null);
-    const needsJump = !endsWithControlFlow(consequent[1]);
+    const needsJump = !endsWithControlFlow(consequent[1]) && !mergedJumps;
 
     if (needsJump)
       inst.push(new JumpInstruction(endElseAddr, EJumpKind.Always));
@@ -54,4 +67,25 @@ function endsWithControlFlow(inst: IInstruction[]) {
     return instruction.intent !== EInstIntent.none;
   }
   return false;
+}
+
+function createJumpOut(
+  c: Compiler,
+  scope: IScope,
+  node: es.IfStatement,
+  endIfAddr: IBindableValue<number | null>
+) {
+  const jumpNode = asMergeableJumpNode(node.consequent);
+  if (!jumpNode) return new JumpOutValue(node, endIfAddr, false);
+  const jump = c.handle(scope, jumpNode)[1][0] as JumpInstruction;
+  return new JumpOutValue(node, jump.address, true);
+}
+
+function asMergeableJumpNode(
+  body: es.Statement
+): es.BreakStatement | es.ContinueStatement | undefined {
+  if (body.type === "ContinueStatement" || body.type === "BreakStatement")
+    return body;
+  if (body.type !== "BlockStatement") return undefined;
+  return asMergeableJumpNode(body.body[0]);
 }
