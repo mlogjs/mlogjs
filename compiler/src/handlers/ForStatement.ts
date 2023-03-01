@@ -49,7 +49,7 @@ export const ForStatement: THandler<null> = (
       beforeEndLine,
       ...updateLines,
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
-      endLoopLine,
+      ...(isInfiniteLoop ? [] : [endLoopLine]),
     ],
   ];
 };
