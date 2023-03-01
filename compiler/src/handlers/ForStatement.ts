@@ -33,18 +33,23 @@ export const ForStatement: THandler<null> = (
     beforeEndLine.bindContinue(parentScope);
   }
 
+  if (test instanceof LiteralValue && !test.data) {
+    return [null, [...initInst]];
+  }
+  const isInfiniteLoop = test instanceof LiteralValue;
+
   return [
     null,
     [
       ...initInst,
       startLoopLine,
       ...testLines,
-      ...JumpInstruction.or(test, testOut),
+      ...(isInfiniteLoop ? [] : JumpInstruction.or(test, testOut)),
       ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
       beforeEndLine,
       ...updateLines,
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
-      endLoopLine,
+      ...(isInfiniteLoop ? [] : [endLoopLine]),
     ],
   ];
 };
