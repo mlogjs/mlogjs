@@ -11,7 +11,11 @@ export const WhileStatement: THandler<null> = (
 ) => {
   const startLoopAddr = new LiteralValue(null);
   const endLoopAddr = new LiteralValue(null);
-  const testOut = new JumpOutValue(node, endLoopAddr, false);
+
+  const hasEmptyBody = isEmptyBody(node.body);
+  const testOut = hasEmptyBody
+    ? new JumpOutValue(node, startLoopAddr, true)
+    : new JumpOutValue(node, endLoopAddr, false);
 
   const [test, testLines] = c.handleEval(scope, node.test, testOut);
 
@@ -47,8 +51,9 @@ export const WhileStatement: THandler<null> = (
       ...testLines,
       ...JumpInstruction.or(test, testOut),
       ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
-      new JumpInstruction(startLoopAddr, EJumpKind.Always),
-      endLoopLine,
+      ...(hasEmptyBody
+        ? []
+        : [new JumpInstruction(startLoopAddr, EJumpKind.Always), endLoopLine]),
     ],
   ];
 };
@@ -100,3 +105,10 @@ export const DoWhileStatement: THandler<null> = (
     ],
   ];
 };
+
+function isEmptyBody(node: es.Statement) {
+  if (node.type === "EmptyStatement") return true;
+  if (node.type === "BlockStatement") return node.body.length === 0;
+
+  return false;
+}
