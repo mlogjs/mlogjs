@@ -25,91 +25,73 @@ function onClose() {
       <header>
         <h2>Settings</h2>
       </header>
-      <article>
-        <h3>Editor</h3>
-        <ul>
-          <li>
-            <label>
-              Confirm file deletion
-              <input
-                type="checkbox"
-                name="editor-confirm-file-deletion"
-                v-model="settings.editor.confirmFileDeletion"
-              />
-            </label>
-          </li>
-        </ul>
-      </article>
-      <article>
-        <h3>MlogJS</h3>
-        <ul>
-          <li>
-            <label>
-              Compact names
-              <input
-                type="checkbox"
-                name="mlogjs-compact-names"
-                v-model="settings.mlogjs.compactNames"
-              />
-            </label>
-          </li>
-        </ul>
-      </article>
-      <article>
-        <h3>Typescript</h3>
-        <ul>
-          <li>
-            <label>
-              No implicit any
-              <input
-                type="checkbox"
-                name="ts-no-implicit-any"
-                v-model="settings.typescript.noImplicitAny"
-              />
-            </label>
-          </li>
-          <li>
-            <label>
-              No unused locals
-              <input
-                type="checkbox"
-                name="ts-no-unused-locals"
-                v-model="settings.typescript.noUnusedLocals"
-              />
-            </label>
-          </li>
-          <li>
-            <label>
-              No unused parameters
-              <input
-                type="checkbox"
-                name="ts-no-unused-parameters"
-                v-model="settings.typescript.noUnusedParameters"
-              />
-            </label>
-          </li>
-          <li>
-            <label>
-              Strict
-              <input
-                type="checkbox"
-                name="ts-strict"
-                v-model="settings.typescript.strict"
-              />
-            </label>
-          </li>
-          <li>
-            <label>
-              Strict null checks
-              <input
-                type="checkbox"
-                name="ts-strict-null-checks"
-                v-model="settings.typescript.strictNullChecks"
-              />
-            </label>
-          </li>
-        </ul>
-      </article>
+      <fieldset>
+        <legend>Editor</legend>
+        <label>
+          Confirm file deletion
+          <input
+            type="checkbox"
+            name="editor-confirm-file-deletion"
+            v-model="settings.editor.confirmFileDeletion"
+          />
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>MlogJS</legend>
+        <label>
+          Compact names
+          <input
+            type="checkbox"
+            name="mlogjs-compact-names"
+            v-model="settings.mlogjs.compactNames"
+          />
+        </label>
+      </fieldset>
+
+      <fieldset>
+        <legend>Typescript</legend>
+        <label>
+          No implicit any
+          <input
+            type="checkbox"
+            name="ts-no-implicit-any"
+            v-model="settings.typescript.noImplicitAny"
+          />
+        </label>
+        <label>
+          No unused locals
+          <input
+            type="checkbox"
+            name="ts-no-unused-locals"
+            v-model="settings.typescript.noUnusedLocals"
+          />
+        </label>
+        <label>
+          No unused parameters
+          <input
+            type="checkbox"
+            name="ts-no-unused-parameters"
+            v-model="settings.typescript.noUnusedParameters"
+          />
+        </label>
+        <label>
+          Strict
+          <input
+            type="checkbox"
+            name="ts-strict"
+            v-model="settings.typescript.strict"
+          />
+        </label>
+        <label>
+          Strict null checks
+          <input
+            type="checkbox"
+            name="ts-strict-null-checks"
+            v-model="settings.typescript.strictNullChecks"
+          />
+        </label>
+      </fieldset>
       <button class="save" type="submit" @click="onClose">Save</button>
     </form>
   </dialog>
@@ -122,16 +104,12 @@ dialog {
   border-color: var(--vp-c-border);
 }
 
-h3 {
-  border-bottom: 1px solid var(--vp-c-border);
-  margin-bottom: 0.5em;
-}
-
-article {
+fieldset {
   border: 2px solid var(--vp-c-border);
   border-radius: 0.5rem;
   margin: 0.5em 0;
   padding: 1em;
+  padding-top: 0.5em;
 }
 
 label {
