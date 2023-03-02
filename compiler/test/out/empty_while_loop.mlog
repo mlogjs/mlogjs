@@ -1,0 +1,17 @@
+radar player any any distance scatter1 1 unit:5:6
+sensor &t0 unit:5:6 @x
+op sub &t1 &t0 @thisx
+sensor &t2 unit:5:6 @y
+op sub &t3 &t2 @thisy
+op len &t4 &t1 &t3
+jump 9 lessThanEq &t4 5
+print "waiting..."
+printflush message1
+sensor &t5 unit:5:6 @x
+op sub &t6 &t5 @thisx
+sensor &t7 unit:5:6 @y
+op sub &t8 &t7 @thisy
+op len &t9 &t6 &t8
+jump 9 greaterThan &t9 5
+print "the player is near the processor"
+printflush message1
