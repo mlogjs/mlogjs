@@ -1,0 +1,34 @@
+{
+  "name": "mlog",
+  "scopeName": "source.mlog",
+  "patterns": [
+    {
+      "match": "^(jump|end|wait|stop)",
+      "name": "keyword.control"
+    },
+    {
+      "match": "^\\w+",
+      "name": "keyword"
+    },
+    {
+      "match": "@[a-zA-Z-_]+",
+      "name": "variable"
+    },
+    {
+      "match": "(\\w+:)?\\d+:\\d+",
+      "name": "variable.parameter"
+    },
+    {
+      "match": "&[a-zA-Z0-9:]+",
+      "name": "variable.language"
+    },
+    {
+      "match": "\\b[\\-+]?\\d+(\\.\\d+)?\\b",
+      "name": "constant.numeric"
+    },
+    {
+      "match": "\"(?:\\\\.|[^\"\\\\])*\"",
+      "name": "string.quoted.double"
+    }
+  ]
+}

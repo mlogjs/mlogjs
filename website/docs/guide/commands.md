@@ -230,7 +230,7 @@ before trying to get a link. This can be done by using `Vars.links`.
 
 ```js
 if (index < Vars.links) {
-  let myBlock = getLink(index);
+  const myBlock = getLink(index);
   // ...
 }
 ```
@@ -375,7 +375,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.blockCount) {
-    let blockKind = lookup.block(index);
+    const blockKind = lookup.block(index);
   }
   ```
 
@@ -387,7 +387,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.unitCount) {
-    let unitKind = lookup.unit(index);
+    const unitKind = lookup.unit(index);
   }
   ```
 
@@ -399,7 +399,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.itemCount) {
-    let itemKind = lookup.item(index);
+    const itemKind = lookup.item(index);
   }
   ```
 
@@ -411,7 +411,7 @@ Looks up content symbols by their index.
 
   ```js
   if (index < Vars.liquidCount) {
-    let liquidKind = lookup.liquid(index);
+    const liquidKind = lookup.liquid(index);
   }
   ```
 
@@ -468,7 +468,7 @@ stopScript();
 
 Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
 
-If an unit symbol is received, the processor will pick a random
+If an unit symbol is received, the processor will pick an
 unit of the given type.
 
 If an unit object is received, the processor will bind to the unit.
@@ -704,7 +704,10 @@ Controls the unit bound to the processor
 
 - #### `unitControl.unbind`
 
-  Frees the unit from the control of the processor, making it resume its regular AI.
+  Resets the AI of the unit.
+
+  Calling `unbind` does not actually unbind the unit from the processor,
+  it just makes the unit resume its natural behavior.
 
   ```js
   unitControl.unbind();

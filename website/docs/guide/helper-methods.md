@@ -23,7 +23,7 @@ Allows you to access symbols or variables that are not available through the [na
 const building = getBuilding("container1");
 const customSymbol = getVar("@awesome-mod-symbol");
 
-let value = sensor(customSymbol, building);
+const value = sensor(customSymbol, building);
 
 // do somthing after
 ```
@@ -38,7 +38,7 @@ const foo = getVar("@foo");
 
 always produces:
 
-```
+```mlog
 set foo:1:6 @foo
 end
 ```

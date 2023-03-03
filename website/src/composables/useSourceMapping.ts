@@ -12,7 +12,7 @@ interface Params {
   monacoRef: ShallowRef<Monaco | null>;
 }
 
-const inlineClassName = "selection-highlighted";
+const className = "selection-highlighted";
 
 export function useSourceMapping({
   editorRef,
@@ -32,7 +32,12 @@ export function useSourceMapping({
 
     const inputListener = outEditor.onDidChangeCursorSelection(e => {
       outputCollection.clear();
-      if (!sourcemaps) return;
+
+      if (
+        !sourcemaps ||
+        e.reason === monaco.editor.CursorChangeReason.ContentFlush
+      )
+        return;
 
       const [firstSelection, decorations] = getInputDecorations(
         monaco,
@@ -41,17 +46,19 @@ export function useSourceMapping({
       );
       inputCollection.set(decorations);
 
-      if (
-        firstSelection &&
-        e.reason === monaco.editor.CursorChangeReason.Explicit
-      ) {
+      if (firstSelection) {
         editor.revealLineInCenter(firstSelection.start.line);
       }
     });
 
     const outputListener = editor.onDidChangeCursorSelection(e => {
       inputCollection.clear();
-      if (!sourcemaps) return;
+
+      if (
+        !sourcemaps ||
+        e.reason === monaco.editor.CursorChangeReason.ContentFlush
+      )
+        return;
 
       const [revealedLine, decorations] = getOutputDecorations(
         monaco,
@@ -60,10 +67,7 @@ export function useSourceMapping({
       );
 
       outputCollection.set(decorations);
-      if (
-        revealedLine &&
-        e.reason === monaco.editor.CursorChangeReason.Explicit
-      ) {
+      if (revealedLine) {
         outEditor.revealLineInCenter(revealedLine);
       }
     });
@@ -90,7 +94,7 @@ function getInputDecorations(
     if (!source) continue;
     decorations.push({
       options: {
-        inlineClassName,
+        className,
       },
       range: new monaco.Range(
         source.start.line,
@@ -142,7 +146,7 @@ function getOutputDecorations(
       revealedLine ??= i + 1;
       decorations.push({
         options: {
-          inlineClassName,
+          className,
           isWholeLine: true,
         },
         range: new monaco.Range(i + 1, 1, i + 1, 1),
@@ -172,7 +176,7 @@ function getOutputDecorations(
     for (const [i] of outerSources) {
       decorations.push({
         options: {
-          inlineClassName,
+          className,
           isWholeLine: true,
         },
         range: new monaco.Range(i + 1, 1, i + 1, 1),

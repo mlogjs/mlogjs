@@ -1,3 +1,4 @@
+import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
 
@@ -17,7 +18,7 @@ const config: UserConfig = {
       pattern: "https://github.com/mlogjs/mlogjs/tree/main/website/docs/:path",
     },
     nav: [
-      { text: "Guide", link: "/guide/" },
+      { text: "Guide", link: "/guide/getting-started" },
       { text: "Editor", link: "/editor" },
       {
         text: "Resources",
@@ -25,6 +26,10 @@ const config: UserConfig = {
           {
             text: "Examples",
             link: "https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples",
+          },
+          {
+            text: "Changelog",
+            link: "https://github.com/mlogjs/mlogjs/blob/main/compiler/CHANGELOG.md",
           },
           { text: "Discord", link: "https://discord.gg/2VudfNUp" },
         ],
@@ -61,6 +66,13 @@ const config: UserConfig = {
   },
   markdown: {
     theme: "dark-plus",
+    languages: [
+      {
+        id: "mlog",
+        scopeName: "source.mlog",
+        path: path.resolve(__dirname, "./langs/mlog.tmLanguage.json"),
+      },
+    ],
   },
   lastUpdated: true,
   head: [

@@ -22,7 +22,7 @@ npm install -g typescript
 To get the autocompletion and type checking features from your IDE you can run the
 following command on an empty directory:
 
-```bash
+```shell
 mlogjs setup --tsconfig
 ```
 

@@ -44,6 +44,14 @@ printFlush();
 mlogjs hello.js
 ```
 
+## Examples
+
+You can find other usage examples [here](https://github.com/mlogjs/mlogjs/tree/main/compiler/test/examples).
+
+## Changelog
+
+Changes for each release are documented in the [CHANGELOG](https://github.com/mlogjs/mlogjs/blob/main/compiler/CHANGELOG.md).
+
 ## Contribute
 
 Having trouble? [Ask for help on discord](https://discord.gg/2VudfNUp)
@@ -59,6 +67,6 @@ MIT
 
 [npm]: https://www.npmjs.com/package/mlogjs
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
-[docs]: https://mlogjs.netlify.app
-[unreleased docs]: https://mlogjs.github.io/mlogjs/
+[docs]: https://mlogjs.github.io/mlogjs/
+[unreleased docs]: https://mlogjs.netlify.app
 [discord]: https://discord.gg/SvgjCtZnR5

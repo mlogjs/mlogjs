@@ -66,8 +66,8 @@ while (true) {
     ballX += ballVX;
     ballY += ballVY;
     // precompute end points
-    let ballXEnd = ballX + ballSize;
-    let ballYEnd = ballY + ballSize;
+    const ballXEnd = ballX + ballSize;
+    const ballYEnd = ballY + ballSize;
 
     // handle ball-wall collision
     if (ballX < 0 || ballXEnd > size) ballVX *= -1;

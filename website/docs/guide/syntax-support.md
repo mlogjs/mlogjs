@@ -1,9 +1,8 @@
 # Supported javascript/typescript syntax
 
-Since there drastic differences bewteen the browser environment and
+Since there are drastic differences bewteen the browser environment and
 the mlog runtime on mindustry, not all of the existent javascript
-features are supported. Bellow are lists containing the most significant supported and
-unsupported features, along with some that could be supported in the future.
+features are supported. Bellow is a list containing the most significant supported features.
 
 ## Javascript
 
@@ -24,7 +23,7 @@ Behavior:
   printFlush(c);
   ```
 
-  ```
+  ```mlog
   print "string"
   print " is a string"
   print "\n"
@@ -33,6 +32,11 @@ Behavior:
   printflush message1
   end
   ```
+
+  ::: tip
+  It is heavily recommended to declare variables with `const` whenever possible,
+  as that gives the compiler more opportunities to optimize the generated code.
+  :::
 
 - `var` behaves the same as `let` (see limitations)
 
@@ -298,7 +302,7 @@ Another caution you must take is that differently from regular javascript, these
 //
 // second: the final value will be a boolean, not
 // whathever object getSomething returns
-let foo = isEnabled && getSomething();
+const foo = isEnabled && getSomething();
 ```
 
 :::
@@ -348,7 +352,7 @@ Behavior:
 
 ### Object/array literals
 
-Objects and arrays are [compile time constants](/guide/data-types#objects), which means that the values they hold can be mutated but not reassigned.
+Objects and arrays are [compile time constants](/guide/data-types#objects), which means that the values they hold cannot be reassigned.
 
 Their most common use case is scoping data in a convenient way.
 

@@ -1,4 +1,4 @@
-import { onMounted, onUnmounted, ref, type Ref } from "vue";
+import { onMounted, onUnmounted, ref } from "vue";
 
 export function useMediaQuery(query: string) {
   const media = window.matchMedia(query);
