@@ -36,4 +36,4 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
           git commit -m "[actions] build website"
-          git push origin ci -f
+          git push origin HEAD:ci -f
