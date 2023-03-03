@@ -1,6 +1,12 @@
 name: pages-publish
 on:
   workflow_dispatch:
+    inputs:
+      ref:
+        description: Branch, tag or SHA to checkout
+        required: false
+        type: string
+        default: null
   release:
     types: [published]
 
@@ -9,6 +15,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
+        with:
+          ref: ${{ github.event.inputs.ref }}
       - uses: actions/setup-node@v3
         with:
           node-version: 16.x
