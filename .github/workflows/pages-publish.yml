@@ -29,9 +29,13 @@ jobs:
       - run: pnpm -C compiler coverage
       - run: pnpm -C compiler build
       - run: pnpm -C website build
+      - run: pnpm -C website docs:copy
       - name: Deploy
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           folder: website/docs/.vitepress/dist
           branch: ci
+          git-config-name: github-actions[bot]
+          git-config-email: 41898282+github-actions[bot]@users.noreply.github.com
           target-folder: docs
+          single-commit: true
