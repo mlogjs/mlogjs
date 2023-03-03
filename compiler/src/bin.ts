@@ -27,14 +27,11 @@ yargs(hideBin(process.argv))
         });
     },
     argv => {
-      const parentFolderName = "/compiler";
+      // this approach depends on the fact that the
+      // output bin.cjs file is one folder bellow the package folder
       const currentPath = __dirname.replace(/\\/g, "/");
-
-      const parent = currentPath.slice(
-        0,
-        currentPath.lastIndexOf(parentFolderName)
-      );
-      const libPath = join(parent, "compiler/lib");
+      const parent = currentPath.split("/").slice(0, -1).join("/");
+      const libPath = join(parent, "lib");
       const dir = resolve(process.cwd(), argv.dir);
       const target = join(dir, "lib");
       cpSync(libPath, target, {
