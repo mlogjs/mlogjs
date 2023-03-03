@@ -13,7 +13,7 @@ on:
 permissions:
   contents: write
 jobs:
-  build-and-deploy:
+  build:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -30,10 +30,20 @@ jobs:
       - run: pnpm -C compiler build
       - run: pnpm -C website build
       - run: pnpm -C website docs:copy
+      - name: Upload Artifact
+        uses: actions/upload-pages-artifact@v1
+        with:
+          path: docs
+  deploy:
+    needs: build
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
       - name: Deploy
-        run: |
-          git add -f compiler/dist docs
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "[actions] build website"
-          git push origin HEAD:ci -f
+        id: deployment
+        uses: actions/deploy-pages@v1
