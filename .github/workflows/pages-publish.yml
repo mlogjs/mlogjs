@@ -10,8 +10,10 @@ on:
   release:
     types: [published]
 
+permissions:
+  contents: write
 jobs:
-  ci:
+  build-and-deploy:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
@@ -27,10 +29,9 @@ jobs:
       - run: pnpm -C compiler coverage
       - run: pnpm -C compiler build
       - run: pnpm -C website build
-      - run: pnpm -C website docs:copy
-      - run: |
-          git add -f compiler/dist docs
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git commit -m "[actions] build website"
-          git push origin main:ci -f
+      - name: Deploy
+        uses: JamesIves/github-pages-deploy-action@v4
+        with:
+          folder: website/docs/.vitepress/dist
+          branch: ci
+          target-folder: docs
