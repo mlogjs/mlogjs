@@ -18,6 +18,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C compiler/test exec tsc #typecheck tests
       - run: pnpm -C compiler coverage
-      - run: pnpm -C compiler publish --access public
+      - run: pnpm -C compiler publish
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_PUBLISH_AUTH_TOKEN }}
