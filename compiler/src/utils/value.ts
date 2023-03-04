@@ -38,7 +38,7 @@ export function extractDestrucuringOut(
   out: TEOutput | undefined,
   field: string | number
 ) {
-  if (out === discardedName) return out;
+  if (isDiscardedOut(out)) return discardedName;
   if (!(out instanceof DestructuringValue)) return;
   return out.fields[field] ?? discardedName;
 }
@@ -146,4 +146,10 @@ export function assertObjectFields(
   }
 
   return result;
+}
+
+export function isDiscardedOut(out: TEOutput | undefined) {
+  if (!out) return false;
+  if (typeof out === "string") return out === discardedName;
+  return out.name === discardedName;
 }

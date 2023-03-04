@@ -1,7 +1,7 @@
 import {
   assertIsArrayMacro,
   counterName,
-  discardedName,
+  isDiscardedOut,
   pipeInsts,
 } from "../utils";
 import { CompilerError } from "../CompilerError";
@@ -165,7 +165,7 @@ export class DynamicArray extends ObjectValue {
 
               const nullLiteral = new LiteralValue(null);
 
-              const hasOut = out !== discardedName;
+              const hasOut = !isDiscardedOut(out);
 
               const result = hasOut
                 ? pipeInsts(entry.eval(scope, out), inst)
@@ -186,7 +186,7 @@ export class DynamicArray extends ObjectValue {
                 assertBounds(index, 0, values.length - 1);
               }
               const checked = scope.checkIndexes;
-              const hasOut = out !== discardedName;
+              const hasOut = !isDiscardedOut(out);
               const { returnTemp } = this;
               const inst: IInstruction[] = [];
               let result: IValue = new LiteralValue(null);
