@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [0.5.0]
+
 ### Added
 
 - Added support for custom online editor settings.
@@ -374,7 +376,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - First version.
 
-[unreleased]: https://github.com/mlogjs/mlogjs/compare/v0.4.10...HEAD
+[unreleased]: https://github.com/mlogjs/mlogjs/compare/v0.5.0...HEAD
+[0.5.0]: https://github.com/mlogjs/mlogjs/compare/v0.4.10...v0.5.0
 [0.4.10]: https://github.com/mlogjs/mlogjs/compare/v0.4.9...v0.4.10
 [0.4.9]: https://github.com/mlogjs/mlogjs/compare/v0.4.8...v0.4.9
 [0.4.8]: https://github.com/mlogjs/mlogjs/compare/v0.4.7...v0.4.8
