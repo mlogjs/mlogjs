@@ -36,8 +36,11 @@ export class BaseValue extends VoidValue implements IValue {
     ];
   }
   "u+"(scope: IScope, out?: TEOutput): TValueInstructions {
-    // TODO: should it return 0 + this ?
-    return this.eval(scope, out);
+    const inst: IInstruction[] = [];
+    const value = pipeInsts(this.eval(scope), inst);
+    const zero = new LiteralValue(0);
+    const result = pipeInsts(zero["+"](scope, value, out), inst);
+    return [result, inst];
   }
 
   "!"(scope: IScope, out?: TEOutput): TValueInstructions {
