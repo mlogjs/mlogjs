@@ -85,12 +85,8 @@ export const AssignmentExpression: THandler = (
         ];
 
   const [op, opInst] = left[node.operator](scope, right);
-  // the cache has been reset inside
-  // the handler if op is equal to left or leftOutput
-  if (node.operator !== "=" || (op != left && op != leftOutput)) {
-    scope.clearDependentCache(left);
-    scope.clearDependentCache(leftOutput);
-  }
+  scope.clearDependentCache(left);
+  scope.clearDependentCache(leftOutput);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
