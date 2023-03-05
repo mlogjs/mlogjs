@@ -57,7 +57,7 @@ export const LogicalExpression: THandler = (
     c.handleEval(scope, node.right, out)
   );
 
-  const [left, leftInst] = c.handleEval(scope, node.left);
+  const [left, leftInst] = c.handleValue(scope, node.left);
   const [result, resultInst] = left["??"](scope, other, out);
   return [result, [...leftInst, ...resultInst]];
 };
