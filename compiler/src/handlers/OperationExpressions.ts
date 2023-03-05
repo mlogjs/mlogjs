@@ -71,12 +71,13 @@ export const AssignmentExpression: THandler = (
 ) => {
   const [left, leftInst] = c.handleValue(scope, node.left);
 
+  const leftOutput = left.toOut();
   const [right, rightInst] =
     node.operator !== "??="
       ? c.handleEval(
           scope,
           node.right,
-          node.operator === "=" ? left.toOut() : undefined
+          node.operator === "=" ? leftOutput : undefined
         )
       : [
           new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
@@ -84,7 +85,12 @@ export const AssignmentExpression: THandler = (
         ];
 
   const [op, opInst] = left[node.operator](scope, right);
-  scope.clearDependentCache(left);
+  // the cache has been reset inside
+  // the handler if op is equal to left or leftOutput
+  if (node.operator !== "=" || (op != left && op != leftOutput)) {
+    scope.clearDependentCache(left);
+    scope.clearDependentCache(leftOutput);
+  }
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
