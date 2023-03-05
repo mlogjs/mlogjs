@@ -7,6 +7,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- The `fill` method of dynamic arrays is no longer inlined.
+- The temporary getter and setter values of dynamic arrays have been renamed to be more readable.
+
+### Fixed
+
+- Fixed the `concat` function having inconsistent behavior.
+- Fixed the unary plus operator not converting values to numbers.
+- Fixed using the `??=` operator on a dynamic array entry computing the value twice.
+- Fixed unecessary temp values being created when writing to dynamic arrays.
+- Fixed empty if statement blocks throwing an error.
+- Fixed handling of truthy values in `do` `while` loop conditions.
+
 ## [0.5.0] - 2023-03-04
 
 ### Added
