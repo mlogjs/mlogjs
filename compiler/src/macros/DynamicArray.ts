@@ -60,8 +60,8 @@ export class DynamicArray extends ObjectValue {
     public values: IValue[],
     public dynamic: boolean
   ) {
-    const getterName = `${name}.&gtemp`;
-    const setterName = `${name}.&stemp`;
+    const getterName = `${name}.&read`;
+    const setterName = `${name}.&write`;
     const returnName = `${name}.&rt`;
     const lengthName = getLengthName(name);
     const lengthStore = new StoreValue(lengthName);

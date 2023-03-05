@@ -23,7 +23,7 @@ jump 26 greaterThan &t3 4
 set arr:1:6.&rt 25
 op mul &t5 &t3 2
 op add @counter 152 &t5
-set &t4 arr:1:6.&gtemp
+set &t4 arr:1:6.&read
 print index:6:6
 print ": "
 print &t4
@@ -37,7 +37,7 @@ jump 46 greaterThan i:18:13 5
 op rand &t6 20
 op add &t7 &t6 1
 op floor &t8 &t7
-op pow arr:1:6.&stemp &t8 2
+op pow arr:1:6.&write &t8 2
 set arr:1:6.&rt 43
 op mul &t9 arr:1:6.&len 2
 op add @counter 162 &t9
@@ -58,7 +58,7 @@ jump 64 greaterThanEq &t7 arr:1:6.&len
 set arr:1:6.&rt 60
 op mul &t8 &t7 2
 op add @counter 152 &t8
-set number:26:14 arr:1:6.&gtemp
+set number:26:14 arr:1:6.&read
 set arr:1:6.&rt 63
 op add @counter 146 &t7
 op sub arr:1:6.&len arr:1:6.&len 1
@@ -74,7 +74,7 @@ jump 77 greaterThan index:32:14 4
 set arr:1:6.&rt 76
 op mul &t7 index:32:14 2
 op add @counter 152 &t7
-set number:33:14 arr:1:6.&gtemp
+set number:33:14 arr:1:6.&read
 jump 82 lessThan index:32:14 0
 jump 82 greaterThanEq index:32:14 arr:1:6.&len
 set arr:1:6.&rt 81
@@ -91,8 +91,8 @@ jump 99 greaterThan &t6 4
 set arr:1:6.&rt 93
 op mul &t8 &t6 2
 op add @counter 152 &t8
-set &t7 arr:1:6.&gtemp
-set arr:1:6.&stemp null
+set &t7 arr:1:6.&read
+set arr:1:6.&write null
 set arr:1:6.&rt 98
 op mul &t9 &t6 2
 op add @counter 162 &t9
@@ -108,14 +108,14 @@ jump 111 greaterThan &t6 4
 set arr:1:6.&rt 110
 op mul &t8 &t6 2
 op add @counter 152 &t8
-set &t7 arr:1:6.&gtemp
+set &t7 arr:1:6.&read
 print "removed: "
 print &t7
 print "\n"
 op sub &t9 arr:1:6.&len 1
 jump 122 lessThan &t9 0
 jump 122 greaterThan &t9 4
-set arr:1:6.&stemp null
+set arr:1:6.&write null
 set arr:1:6.&rt 121
 op mul &t10 &t9 2
 op add @counter 162 &t10
@@ -130,7 +130,7 @@ jump 133 greaterThan i:50:11 4
 set arr:1:6.&rt 132
 op mul &t7 i:50:11 2
 op add @counter 152 &t7
-set &t6 arr:1:6.&gtemp
+set &t6 arr:1:6.&read
 print &t6
 print "\n"
 op add i:50:11 i:50:11 1
@@ -150,23 +150,23 @@ set arr:1:6->2 arr:1:6->3
 set arr:1:6->3 arr:1:6->4
 set arr:1:6->4 null
 set @counter arr:1:6.&rt
-set arr:1:6.&gtemp arr:1:6->0
+set arr:1:6.&read arr:1:6->0
 set @counter arr:1:6.&rt
-set arr:1:6.&gtemp arr:1:6->1
+set arr:1:6.&read arr:1:6->1
 set @counter arr:1:6.&rt
-set arr:1:6.&gtemp arr:1:6->2
+set arr:1:6.&read arr:1:6->2
 set @counter arr:1:6.&rt
-set arr:1:6.&gtemp arr:1:6->3
+set arr:1:6.&read arr:1:6->3
 set @counter arr:1:6.&rt
-set arr:1:6.&gtemp arr:1:6->4
+set arr:1:6.&read arr:1:6->4
 set @counter arr:1:6.&rt
-set arr:1:6->0 arr:1:6.&stemp
+set arr:1:6->0 arr:1:6.&write
 set @counter arr:1:6.&rt
-set arr:1:6->1 arr:1:6.&stemp
+set arr:1:6->1 arr:1:6.&write
 set @counter arr:1:6.&rt
-set arr:1:6->2 arr:1:6.&stemp
+set arr:1:6->2 arr:1:6.&write
 set @counter arr:1:6.&rt
-set arr:1:6->3 arr:1:6.&stemp
+set arr:1:6->3 arr:1:6.&write
 set @counter arr:1:6.&rt
-set arr:1:6->4 arr:1:6.&stemp
+set arr:1:6->4 arr:1:6.&write
 set @counter arr:1:6.&rt
