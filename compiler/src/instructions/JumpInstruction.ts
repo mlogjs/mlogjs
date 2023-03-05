@@ -33,9 +33,9 @@ export class JumpInstruction extends InstructionBase {
     return [
       new JumpInstruction(
         out.address,
-        EJumpKind.Equal,
+        out.whenTrue ? EJumpKind.NotEqual : EJumpKind.Equal,
         test,
-        new LiteralValue(+out.whenTrue)
+        new LiteralValue(0)
       ),
     ];
   }

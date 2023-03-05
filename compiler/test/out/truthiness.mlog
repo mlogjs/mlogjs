@@ -1,0 +1,9 @@
+set counter:1:4 10
+jump 4 equal counter:1:4 0
+print counter:1:4
+print " is a truthy value\n"
+print counter:1:4
+print "\n"
+op sub counter:1:4 counter:1:4 1
+jump 4 notEqual counter:1:4 0
+printflush message1
