@@ -132,17 +132,20 @@ export class DynamicArray extends ObjectValue {
       ...(dynamic
         ? {
             length: new StoreValue(lengthName, EMutability.readonly),
-            push: new MacroFunction((scope, out, item) => {
-              const checked = scope.checkIndexes;
-              const entry = new DynamicArrayEntry({
-                scope,
-                array: this,
-                index: lengthStore,
-                checked,
-              });
-              const [, inst] = entry["="](scope, item);
-              return [new LiteralValue(null), inst];
-            }),
+            push: new MacroFunction(
+              (scope, out, item) => {
+                const checked = scope.checkIndexes;
+                const entry = new DynamicArrayEntry({
+                  scope,
+                  array: this,
+                  index: lengthStore,
+                  checked,
+                });
+                const [, inst] = entry["="](scope, item);
+                return [new LiteralValue(null), inst];
+              },
+              [setterName]
+            ),
             pop: new MacroFunction((scope, out) => {
               const checked = scope.checkIndexes;
               const inst: IInstruction[] = [];
