@@ -69,11 +69,7 @@ export const AssignmentExpression: THandler = (
     operator: AssignementOperator;
   }
 ) => {
-  const [left, leftInst] = c.handle(scope, node.left);
-  if (!left)
-    throw new CompilerError(
-      "The left side of this assignment expression does not resolve to a value"
-    );
+  const [left, leftInst] = c.handleValue(scope, node.left);
 
   const [right, rightInst] =
     node.operator !== "??="
@@ -118,11 +114,10 @@ export const UpdateExpression: THandler = (
   { argument, operator, prefix }: es.UpdateExpression,
   out
 ) => {
-  const [arg, argInst] = c.handle(scope, argument);
+  const [arg, argInst] = c.handleValue(scope, argument);
 
-  if (arg) scope.clearDependentCache(arg);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [op, opInst] = arg![operator](scope, prefix, out);
+  scope.clearDependentCache(arg);
+  const [op, opInst] = arg[operator](scope, prefix, out);
   return [op, [...argInst, ...opInst]];
 };
 
