@@ -155,7 +155,11 @@ for (const k in assignmentToBinary) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    const [opValue, opInst] = this[assignmentToBinary[op]](scope, value, this);
+    const [opValue, opInst] = this[assignmentToBinary[op]](
+      scope,
+      value,
+      this.toOut()
+    );
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
   };

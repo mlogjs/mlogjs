@@ -70,21 +70,25 @@ export const AssignmentExpression: THandler = (
   }
 ) => {
   const [left, leftInst] = c.handle(scope, node.left);
+  if (!left)
+    throw new CompilerError(
+      "The left side of this assignment expression does not resolve to a value"
+    );
+
   const [right, rightInst] =
     node.operator !== "??="
       ? c.handleEval(
           scope,
           node.right,
-          node.operator === "=" && left ? left : undefined
+          node.operator === "=" ? left.toOut() : undefined
         )
       : [
           new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
           [],
         ];
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [op, opInst] = left![node.operator](scope, right);
-  if (left) scope.clearDependentCache(left);
+  const [op, opInst] = left[node.operator](scope, right);
+  scope.clearDependentCache(left);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 

@@ -129,7 +129,7 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
       );
 
     members.set(new LiteralValue(i), {
-      value: hasDefault ? value.left : value,
+      value: value.toOut(),
       handler(get, propExists, scope) {
         return c.handle(scope, element, () => {
           if (propExists() || !hasDefault) {
@@ -171,7 +171,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
       );
 
     members.set(key, {
-      value: hasDefault ? value.left : value,
+      value: value.toOut(),
       handler(get, propExists, scope) {
         return c.handle(scope, prop, () => {
           const inst = keyInst;

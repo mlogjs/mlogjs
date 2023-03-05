@@ -16,10 +16,17 @@ export class AssignmentValue extends VoidValue {
 
   "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
     const inst: IInstruction[] = [];
-    const input = pipeInsts(value["??"](scope, this.right, this.left), inst);
+    const input = pipeInsts(
+      value["??"](scope, this.right, this.left.toOut()),
+      inst
+    );
     const output = pipeInsts(this.left["="](scope, input, out), inst);
 
     return [output, inst];
+  }
+
+  toOut(): IValue {
+    return this.left.toOut();
   }
 
   debugString(): string {

@@ -107,9 +107,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     for (let i = 0; i < this.params.length; i++) {
       const value = this.unwrapParameter(this.params[i]);
       this.paramValues.push(value);
-      this.paramOuts.push(
-        value instanceof AssignmentValue ? value.left : value
-      );
+      this.paramOuts.push(value.toOut());
 
       if (!(value instanceof AssignmentValue))
         this.minimumArgumentCount = i + 1;
@@ -358,7 +356,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
           this.destructuringKeyData.set(key, { inst: propInst, value });
 
           members.set(key, {
-            value: hasDefault ? value.left : value,
+            value: value.toOut(),
             handler: (get, propExists, scope) => {
               return this.c.handle(scope, prop, () => {
                 const inst = [...propInst];
@@ -398,7 +396,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
           this.destructuringKeyData.set(key, { inst: [], value });
           members.set(key, {
-            value: hasDefault ? value.left : value,
+            value: value.toOut(),
             handler: (get, propExists, scope) => {
               return this.c.handle(scope, element, () => {
                 if (propExists() || !hasDefault) {

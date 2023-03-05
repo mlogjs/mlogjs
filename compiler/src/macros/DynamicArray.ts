@@ -544,6 +544,10 @@ class DynamicArrayEntry extends BaseValue {
     return [value, inst];
   }
 
+  toOut(): IValue {
+    return this.array.setterTemp;
+  }
+
   debugString() {
     const name = this.array.dynamic ? "DynamicArray" : "MutableArray";
     return `${name}Entry`;
