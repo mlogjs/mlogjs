@@ -46,11 +46,13 @@ export class DynamicArray extends ObjectValue {
   getterAddr: LiteralValue<number | null>;
   setterAddr: LiteralValue<number | null>;
   removeAtAddr: LiteralValue<number | null>;
+  fillAddr: LiteralValue<number | null>;
   lengthStore?: StoreValue;
 
   bundledSetter = false;
   bundledGetter = false;
   bundledRemoveAt = false;
+  bundledFill = false;
 
   constructor(
     public scope: IScope,
@@ -65,23 +67,28 @@ export class DynamicArray extends ObjectValue {
     const lengthStore = new StoreValue(lengthName);
     const sizeValue = new LiteralValue(values.length);
     super({
-      // array[index]
+      fill: new MacroFunction(
+        (scope, out, value) => {
+          if (!value) throw new CompilerError("Missing argument: value");
+          this.initFill();
+          const inst: IInstruction[] = [];
 
-      fill: new MacroFunction((scope, out, value) => {
-        const inst: IInstruction[] = [];
+          const returnAddress = new LiteralValue(null);
+          pipeInsts(values[0]["="](scope, value), inst);
+          pipeInsts(this.returnTemp["="](scope, returnAddress), inst);
+          inst.push(new JumpInstruction(this.fillAddr, EJumpKind.Always));
+          inst.push(new AddressResolver(returnAddress));
+          if (this.lengthStore) {
+            pipeInsts(
+              this.lengthStore["="](scope, new LiteralValue(values.length)),
+              inst
+            );
+          }
 
-        for (let i = 0; i < values.length; i++) {
-          pipeInsts(values[i]["="](scope, value), inst);
-        }
-        if (this.lengthStore) {
-          pipeInsts(
-            this.lengthStore["="](scope, new LiteralValue(values.length)),
-            inst
-          );
-        }
-
-        return [null, inst];
-      }),
+          return [null, inst];
+        },
+        [values[0]]
+      ),
 
       at: new MacroFunction((scope, out, index) => {
         const inst: IInstruction[] = [];
@@ -271,6 +278,7 @@ export class DynamicArray extends ObjectValue {
     this.getterAddr = new LiteralValue(null);
     this.setterAddr = new LiteralValue(null);
     this.removeAtAddr = new LiteralValue(null);
+    this.fillAddr = new LiteralValue(null);
   }
 
   get(scope: IScope, index: IValue, out?: TEOutput): TValueInstructions {
@@ -345,6 +353,22 @@ export class DynamicArray extends ObjectValue {
     }
     const last = this.values[this.values.length - 1];
     pipeInsts(last["="](this.scope, new LiteralValue(null)), inst);
+    inst.push(new SetCounterInstruction(this.returnTemp));
+  }
+
+  initFill() {
+    if (this.bundledFill) return;
+    this.bundledFill = true;
+
+    const { inst } = this.scope;
+    inst.push(new AddressResolver(this.fillAddr));
+
+    const firstValue = this.values[0];
+    for (let i = 1; i < this.values.length; i++) {
+      const value = this.values[i];
+      pipeInsts(value["="](this.scope, firstValue), inst);
+    }
+
     inst.push(new SetCounterInstruction(this.returnTemp));
   }
 
