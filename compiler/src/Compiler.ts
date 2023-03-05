@@ -127,15 +127,24 @@ export class Compiler {
     }
   }
 
-  handleEval(scope: IScope, node: es.Node, out?: TEOutput): TValueInstructions {
-    const [res, inst] = this.handle(scope, node, undefined, out);
-
-    if (!res)
+  /** Handles the node and asserts that it resolves to a value. */
+  handleValue(
+    scope: IScope,
+    node: es.Node,
+    handler = this.handlers[node.type],
+    out?: TEOutput
+  ): TValueInstructions {
+    const result = this.handle(scope, node, handler, out);
+    if (!result[0])
       throw new CompilerError(
-        `This node (${node.type}) does not return a value`,
+        `This node (${node.type}) did not return a value`,
         node
       );
+    return result as TValueInstructions;
+  }
 
+  handleEval(scope: IScope, node: es.Node, out?: TEOutput): TValueInstructions {
+    const [res, inst] = this.handleValue(scope, node, undefined, out);
     const [evaluated, evaluatedInst] = res.eval(scope, out);
     const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
 

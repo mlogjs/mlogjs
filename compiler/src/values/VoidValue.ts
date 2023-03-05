@@ -42,6 +42,10 @@ export class VoidValue implements IValue {
 
   postCall(_scope: IScope): void {}
 
+  toOut(): IValue {
+    return this;
+  }
+
   debugString(): string {
     return "VoidValue";
   }

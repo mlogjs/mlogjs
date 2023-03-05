@@ -89,7 +89,7 @@ jump 56 always
 op lessThan &t15 ballY:35:6 0
 op equal &t16 brickCount:40:6 0
 op or &t17 &t15 &t16
-jump 94 equal &t17 1
+jump 94 notEqual &t17 0
 drawflush display1
 jump 16 always
 jump 1 always

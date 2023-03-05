@@ -4,15 +4,14 @@ set units:1:6->2 @gamma
 set units:1:6->3 @flare
 set units:1:6->1 @mono
 set units:1:6->0 @dagger
-set units:1:6->1 @dagger
-set units:1:6->2 @dagger
-set units:1:6->3 @dagger
+set units:1:6.&rt 8
+jump 26 always
 op rand &t0 4
 op floor &t1 &t0
-set units:1:6.&stemp @navanax
-set units:1:6.&rt 15
+set units:1:6.&write @navanax
+set units:1:6.&rt 14
 op mul &t2 &t1 2
-op add @counter 27 &t2
+op add @counter 30 &t2
 print "\n"
 print units:1:6->0
 print "\n"
@@ -25,11 +24,15 @@ print "\n"
 printflush message1
 wait 0.5
 end
-set units:1:6->0 units:1:6.&stemp
+set units:1:6->1 units:1:6->0
+set units:1:6->2 units:1:6->0
+set units:1:6->3 units:1:6->0
 set @counter units:1:6.&rt
-set units:1:6->1 units:1:6.&stemp
+set units:1:6->0 units:1:6.&write
 set @counter units:1:6.&rt
-set units:1:6->2 units:1:6.&stemp
+set units:1:6->1 units:1:6.&write
 set @counter units:1:6.&rt
-set units:1:6->3 units:1:6.&stemp
+set units:1:6->2 units:1:6.&write
+set @counter units:1:6.&rt
+set units:1:6->3 units:1:6.&write
 set @counter units:1:6.&rt

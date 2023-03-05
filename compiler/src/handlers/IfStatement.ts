@@ -86,6 +86,7 @@ function asMergeableJumpNode(
 ): es.BreakStatement | es.ContinueStatement | undefined {
   if (body.type === "ContinueStatement" || body.type === "BreakStatement")
     return body;
-  if (body.type !== "BlockStatement") return undefined;
+  if (body.type !== "BlockStatement") return;
+  if (body.body.length == 0) return;
   return asMergeableJumpNode(body.body[0]);
 }

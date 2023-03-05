@@ -10,7 +10,10 @@ export class Concat extends MacroFunction {
       const [first] = values;
       if (!isTemplateObjectArray(first)) {
         assertLiterals(values, "Concat arguments must be all literal values");
-        return [new LiteralValue(values.map(v => v.data).join("")), []];
+        let text = "";
+        for (const value of values) text += value.data;
+
+        return [new LiteralValue(text), []];
       }
 
       let text = "";

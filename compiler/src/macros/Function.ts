@@ -19,7 +19,7 @@ export class MacroFunction<
   macro = true;
   mutability = EMutability.constant;
   fn: TFunction<RT>;
-  constructor(fn: TFunction<RT>) {
+  constructor(fn: TFunction<RT>, public paramOuts?: TEOutput[]) {
     super();
     this.fn = fn;
   }
@@ -28,6 +28,13 @@ export class MacroFunction<
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
+  }
+
+  preCall(
+    _scope: IScope,
+    _out?: TEOutput | undefined
+  ): readonly TEOutput[] | undefined {
+    return this.paramOuts;
   }
 
   debugString(): string {

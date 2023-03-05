@@ -283,6 +283,12 @@ export interface IValue extends IValueOperators {
 
   /** The string representation of `this` in error messages. */
   debugString(): string;
+
+  /**
+   * Allows some values to choose alternative representations
+   * when they are used as operation outputs.
+   */
+  toOut(): IValue;
 }
 /** Helper type that is used in some typescript assertions */
 export interface INamedValue extends IValue {

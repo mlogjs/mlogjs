@@ -5,7 +5,7 @@ jump 15 greaterThanEq j:2:11 3
 op equal &t0 i:1:16 1
 op equal &t1 j:2:11 1
 op land &t2 &t0 &t1
-jump 15 equal &t2 1
+jump 15 notEqual &t2 0
 print "i = "
 print i:1:16
 print ", j = "

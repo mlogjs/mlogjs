@@ -20,7 +20,7 @@ import {
   TValueInstructions,
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
-import { discardedName, pipeInsts } from "../utils";
+import { isDiscardedOut, pipeInsts } from "../utils";
 import { JumpOutValue } from "./JumpOutValue";
 
 export class BaseValue extends VoidValue implements IValue {
@@ -36,8 +36,11 @@ export class BaseValue extends VoidValue implements IValue {
     ];
   }
   "u+"(scope: IScope, out?: TEOutput): TValueInstructions {
-    // TODO: should it return 0 + this ?
-    return this.eval(scope, out);
+    const inst: IInstruction[] = [];
+    const value = pipeInsts(this.eval(scope), inst);
+    const zero = new LiteralValue(0);
+    const result = pipeInsts(zero["+"](scope, value, out), inst);
+    return [result, inst];
   }
 
   "!"(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -63,7 +66,7 @@ export class BaseValue extends VoidValue implements IValue {
     const endAdress = new LiteralValue(null);
     const [left, leftInst] = this.eval(scope, result);
     const [right, rightInst] = other.eval(scope, result);
-    const [test, testInst] = this["==="](scope, nullLiteral);
+    const [test, testInst] = left["==="](scope, nullLiteral);
 
     return [
       result,
@@ -155,7 +158,11 @@ for (const k in assignmentToBinary) {
     scope: IScope,
     value: IValue
   ): TValueInstructions {
-    const [opValue, opInst] = this[assignmentToBinary[op]](scope, value, this);
+    const [opValue, opInst] = this[assignmentToBinary[op]](
+      scope,
+      value,
+      this.toOut()
+    );
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
   };
@@ -169,9 +176,10 @@ for (const key of updateOperators) {
     out?: TEOutput
   ): TValueInstructions {
     let [ret, inst] = this.eval(scope);
-    if (!prefix && out !== discardedName) {
+    if (!prefix && !isDiscardedOut(out)) {
       const temp = StoreValue.from(scope, out);
-      ret = pipeInsts(temp["="](scope, ret), inst);
+      pipeInsts(temp["="](scope, ret), inst);
+      ret = temp;
     }
     const kind = key === "++" ? "+=" : "-=";
     pipeInsts(this[kind](scope, new LiteralValue(1)), inst);

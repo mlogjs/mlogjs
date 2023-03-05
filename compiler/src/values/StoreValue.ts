@@ -54,7 +54,7 @@ export class StoreValue extends BaseValue implements IValue {
         `Cannot assign a macro to a store (attempted to assign [${evalValue.debugString()}] to [${this.debugString()}])`
       );
 
-    return [this, [...evalInst, new SetInstruction(this, evalValue)]];
+    return [evalValue, [...evalInst, new SetInstruction(this, evalValue)]];
   }
 
   "=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {

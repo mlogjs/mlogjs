@@ -119,17 +119,11 @@ export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
   for (let i = 0; i < node.elements.length; i++) {
     const element = node.elements[i];
     if (!element) continue;
-    const value = pipeInsts(c.handle(scope, element), inst);
+    const value = pipeInsts(c.handleValue(scope, element), inst);
     const hasDefault = value instanceof AssignmentValue;
 
-    if (!value)
-      throw new CompilerError(
-        "Destructuring element must resolve to a value",
-        element
-      );
-
     members.set(new LiteralValue(i), {
-      value: hasDefault ? value.left : value,
+      value: value.toOut(),
       handler(get, propExists, scope) {
         return c.handle(scope, element, () => {
           if (propExists() || !hasDefault) {
@@ -161,17 +155,11 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
         ? [new LiteralValue(propKey.name), []]
         : c.handleEval(scope, propKey);
 
-    const value = pipeInsts(c.handle(scope, prop.value), inst);
+    const value = pipeInsts(c.handleValue(scope, prop.value), inst);
     const hasDefault = value instanceof AssignmentValue;
 
-    if (!value)
-      throw new CompilerError(
-        "Destructuring member must resolve to a value",
-        prop.value
-      );
-
     members.set(key, {
-      value: hasDefault ? value.left : value,
+      value: value.toOut(),
       handler(get, propExists, scope) {
         return c.handle(scope, prop, () => {
           const inst = keyInst;
@@ -207,12 +195,7 @@ export const AssignmentPattern: THandler<IValue> = (
   scope,
   node: es.AssignmentPattern
 ) => {
-  const [left, inst] = c.handle(scope, node.left);
-  if (!left)
-    throw new CompilerError(
-      "Left side of assignment pattern could not be resolved",
-      node.left
-    );
+  const [left, inst] = c.handleValue(scope, node.left);
   const right = new LazyValue((_, out) => c.handleEval(scope, node.right, out));
 
   return [new AssignmentValue(left, right), inst];

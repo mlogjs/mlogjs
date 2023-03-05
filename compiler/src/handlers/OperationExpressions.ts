@@ -57,7 +57,7 @@ export const LogicalExpression: THandler = (
     c.handleEval(scope, node.right, out)
   );
 
-  const [left, leftInst] = c.handleEval(scope, node.left);
+  const [left, leftInst] = c.handleValue(scope, node.left);
   const [result, resultInst] = left["??"](scope, other, out);
   return [result, [...leftInst, ...resultInst]];
 };
@@ -69,22 +69,24 @@ export const AssignmentExpression: THandler = (
     operator: AssignementOperator;
   }
 ) => {
-  const [left, leftInst] = c.handle(scope, node.left);
+  const [left, leftInst] = c.handleValue(scope, node.left);
+
+  const leftOutput = left.toOut();
   const [right, rightInst] =
     node.operator !== "??="
       ? c.handleEval(
           scope,
           node.right,
-          node.operator === "=" && left ? left : undefined
+          node.operator === "=" ? leftOutput : undefined
         )
       : [
           new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
           [],
         ];
 
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [op, opInst] = left![node.operator](scope, right);
-  if (left) scope.clearDependentCache(left);
+  const [op, opInst] = left[node.operator](scope, right);
+  scope.clearDependentCache(left);
+  scope.clearDependentCache(leftOutput);
   return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
@@ -114,11 +116,10 @@ export const UpdateExpression: THandler = (
   { argument, operator, prefix }: es.UpdateExpression,
   out
 ) => {
-  const [arg, argInst] = c.handle(scope, argument);
+  const [arg, argInst] = c.handleValue(scope, argument);
 
-  if (arg) scope.clearDependentCache(arg);
-  // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-  const [op, opInst] = arg![operator](scope, prefix, out);
+  scope.clearDependentCache(arg);
+  const [op, opInst] = arg[operator](scope, prefix, out);
   return [op, [...argInst, ...opInst]];
 };
 

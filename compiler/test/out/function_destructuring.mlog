@@ -13,7 +13,7 @@ jump 16 greaterThan &t0 4
 set array:1:6.&rt 15
 op mul &t2 &t0 2
 op add @counter 107 &t2
-set a:10:24 array:1:6.&gtemp
+set a:10:24 array:1:6.&read
 op strictEqual &t3 a:10:24 null
 jump 22 equal &t3 0
 set n:36:19 2
@@ -30,7 +30,7 @@ jump 33 greaterThan &t1 4
 set array:1:6.&rt 32
 op mul &t4 &t1 2
 op add @counter 107 &t4
-set b:10:58 array:1:6.&gtemp
+set b:10:58 array:1:6.&read
 op strictEqual &t5 b:10:58 null
 jump 39 equal &t5 0
 set n:36:19 4
@@ -72,7 +72,7 @@ jump 75 greaterThan &t0:printOtherPoint:29:0 4
 set array:1:6.&rt 74
 op mul &t10 &t0:printOtherPoint:29:0 2
 op add @counter 107 &t10
-set x:30:18 array:1:6.&gtemp
+set x:30:18 array:1:6.&read
 op strictEqual &t11 x:30:18 null
 jump 81 equal &t11 0
 set n:36:19 2
@@ -89,7 +89,7 @@ jump 92 greaterThan &t1:printOtherPoint:29:0 4
 set array:1:6.&rt 91
 op mul &t12 &t1:printOtherPoint:29:0 2
 op add @counter 107 &t12
-set y:31:18 array:1:6.&gtemp
+set y:31:18 array:1:6.&read
 op strictEqual &t13 y:31:18 null
 jump 98 equal &t13 0
 set n:36:19 4
@@ -105,15 +105,15 @@ print n:36:19
 print "\n"
 set &fcalculate:36:0 n:36:19
 set @counter &rcalculate:36:0
-set array:1:6.&gtemp array:1:6->0
+set array:1:6.&read array:1:6->0
 set @counter array:1:6.&rt
-set array:1:6.&gtemp array:1:6->1
+set array:1:6.&read array:1:6->1
 set @counter array:1:6.&rt
-set array:1:6.&gtemp array:1:6->2
+set array:1:6.&read array:1:6->2
 set @counter array:1:6.&rt
-set array:1:6.&gtemp array:1:6->3
+set array:1:6.&read array:1:6->3
 set @counter array:1:6.&rt
-set array:1:6.&gtemp array:1:6->4
+set array:1:6.&read array:1:6->4
 set @counter array:1:6.&rt
 print "Point("
 print x:25:22
