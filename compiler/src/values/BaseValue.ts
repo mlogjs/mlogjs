@@ -171,7 +171,8 @@ for (const key of updateOperators) {
     let [ret, inst] = this.eval(scope);
     if (!prefix && !isDiscardedOut(out)) {
       const temp = StoreValue.from(scope, out);
-      ret = pipeInsts(temp["="](scope, ret), inst);
+      pipeInsts(temp["="](scope, ret), inst);
+      ret = temp;
     }
     const kind = key === "++" ? "+=" : "-=";
     pipeInsts(this[kind](scope, new LiteralValue(1)), inst);
