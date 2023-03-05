@@ -20,6 +20,8 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
   name: string
 ): T;
 
+type ConcatLiteral = string | number | boolean | undefined;
+
 /**
  * Concatenates a list of constant literal values.
  *
@@ -34,9 +36,7 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
  * ```
  */
 declare function concat(
-  ...args:
-    | (string | number | undefined)[]
-    | [TemplateStringsArray, ...(string | number | undefined)[]]
+  ...args: ConcatLiteral[] | [TemplateStringsArray, ...ConcatLiteral[]]
 ): string;
 
 /**

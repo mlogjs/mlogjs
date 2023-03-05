@@ -1,3 +1,9 @@
 print "first part and second part and third part"
+print "\n"
 print "first part and second part and third part"
+print "\n"
+print "0 null 0"
+print "\n"
+print "0 null 0"
+print "\n"
 printflush message1
