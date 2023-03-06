@@ -560,6 +560,8 @@ declare global {
 
     /**
      * Makes the unit bound to this processor move to the enemy spawn
+     *
+     * @deprecated This command is no longer available in mindustry v7.
      */
     function pathfind(): void;
 

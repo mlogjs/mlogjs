@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Deprecated
+
+- Deprecated the `unitControl.pathfind` command, as it is not available in the latest game version.
+
 ## [0.5.1] - 2023-03-05
 
 ### Changed

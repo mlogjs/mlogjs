@@ -533,14 +533,6 @@ Controls the unit bound to the processor
   unitControl.boost(true);
   ```
 
-- #### `unitControl.pathfind`
-
-  Makes the unit bound to this processor move to the enemy spawn
-
-  ```js
-  unitControl.pathfind();
-  ```
-
 - #### `unitControl.target`
 
   Makes the unit bound to this processor shoot/aim at the given position
