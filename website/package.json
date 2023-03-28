@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^16.18.10",
+    "@types/node": "^16.18.21",
     "vite": "^4.2.1",
     "vitepress": "1.0.0-alpha.49",
     "vue": "^3.2.47"
