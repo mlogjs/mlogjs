@@ -39,6 +39,7 @@
     "yargs": "^17.7.1"
   },
   "devDependencies": {
+    "@rollup/plugin-alias": "^4.0.3",
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^16.18.21",

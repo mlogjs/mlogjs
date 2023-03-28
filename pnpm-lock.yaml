@@ -14,6 +14,7 @@ importers:
     specifiers:
       '@babel/parser': ^7.21.3
       '@babel/types': ^7.21.3
+      '@rollup/plugin-alias': ^4.0.3
       '@rollup/plugin-typescript': ^11.0.0
       '@types/jest': ^29.5.0
       '@types/node': ^16.18.21
@@ -37,6 +38,7 @@ importers:
       cli-highlight: 2.1.11
       yargs: 17.7.1
     devDependencies:
+      '@rollup/plugin-alias': 4.0.3_rollup@3.20.2
       '@rollup/plugin-typescript': 11.0.0_b72j35qsjh4lu3mgicjyqmc4ve
       '@types/jest': 29.5.0
       '@types/node': 16.18.21
@@ -1177,6 +1179,19 @@ packages:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.13.0
+    dev: true
+
+  /@rollup/plugin-alias/4.0.3_rollup@3.20.2:
+    resolution: {integrity: sha512-ZuDWE1q4PQDhvm/zc5Prun8sBpLJy41DMptYrS6MhAy9s9kL/doN1613BWfEchGVfKxzliJ3BjbOPizXX38DbQ==}
+    engines: {node: '>=14.0.0'}
+    peerDependencies:
+      rollup: ^1.20.0||^2.0.0||^3.0.0
+    peerDependenciesMeta:
+      rollup:
+        optional: true
+    dependencies:
+      rollup: 3.20.2
+      slash: 4.0.0
     dev: true
 
   /@rollup/plugin-typescript/11.0.0_b72j35qsjh4lu3mgicjyqmc4ve:
@@ -3576,6 +3591,11 @@ packages:
   /slash/3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
+    dev: true
+
+  /slash/4.0.0:
+    resolution: {integrity: sha512-3dOsAHXXUkQTpOYcoAxLIorMTp4gIQr5IW3iVb7A7lFIp0VHhnynm9izx6TssdrIcVIESAlVjtnO2K8bg+Coew==}
+    engines: {node: '>=12'}
     dev: true
 
   /source-map-js/1.0.2:
