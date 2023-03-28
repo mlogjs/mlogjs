@@ -17,7 +17,7 @@ importers:
       '@rollup/plugin-typescript': ^11.0.0
       '@types/jest': ^29.5.0
       '@types/node': ^16.18.10
-      '@types/yargs': ^17.0.19
+      '@types/yargs': ^17.0.24
       '@typescript-eslint/eslint-plugin': ^5.57.0
       '@typescript-eslint/parser': ^5.57.0
       chalk: ^4.1.2
@@ -29,18 +29,18 @@ importers:
       ts-node: ^10.9.1
       tslib: ^2.5.0
       typescript: '*'
-      yargs: ^17.6.2
+      yargs: ^17.7.1
     dependencies:
       '@babel/parser': 7.21.3
       '@babel/types': 7.21.3
       chalk: 4.1.2
       cli-highlight: 2.1.11
-      yargs: 17.6.2
+      yargs: 17.7.1
     devDependencies:
       '@rollup/plugin-typescript': 11.0.0_dulkvq4zhwi4qrnyelybt7l6bq
       '@types/jest': 29.5.0
       '@types/node': 16.18.10
-      '@types/yargs': 17.0.19
+      '@types/yargs': 17.0.24
       '@typescript-eslint/eslint-plugin': 5.57.0_p7xo4zbf6rlx7pmjonhlydeowm
       '@typescript-eslint/parser': 5.57.0_j4766f7ecgqbon3u7zlxn5zszu
       eslint: 8.36.0
@@ -1076,7 +1076,7 @@ packages:
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
       '@types/node': 16.18.10
-      '@types/yargs': 17.0.19
+      '@types/yargs': 17.0.24
       chalk: 4.1.2
     dev: true
 
@@ -1088,7 +1088,7 @@ packages:
       '@types/istanbul-lib-coverage': 2.0.4
       '@types/istanbul-reports': 3.0.1
       '@types/node': 16.18.10
-      '@types/yargs': 17.0.19
+      '@types/yargs': 17.0.24
       chalk: 4.1.2
     dev: true
 
@@ -1342,12 +1342,6 @@ packages:
 
   /@types/yargs-parser/21.0.0:
     resolution: {integrity: sha512-iO9ZQHkZxHn4mSakYV0vFHAVDyEOIJQrV2uZ06HxEPcx+mt8swXoZHIbaaJ2crJYFfErySgktuTZ3BeLz+XmFA==}
-    dev: true
-
-  /@types/yargs/17.0.19:
-    resolution: {integrity: sha512-cAx3qamwaYX9R0fzOIZAlFpo4A+1uBVCxqpKz9D26uTF4srRXaGTTsikQmaotCtNdbhzyUH7ft6p9ktz9s6UNQ==}
-    dependencies:
-      '@types/yargs-parser': 21.0.0
     dev: true
 
   /@types/yargs/17.0.24:
@@ -4207,19 +4201,6 @@ packages:
       yargs-parser: 20.2.9
     dev: false
 
-  /yargs/17.6.2:
-    resolution: {integrity: sha512-1/9UrdHjDZc0eOU0HxOHoS78C69UD3JRMvzlJ7S79S2nTaWRA/whGCTV8o9e/N/1Va9YIV7Q4sOxD8VV4pCWOw==}
-    engines: {node: '>=12'}
-    dependencies:
-      cliui: 8.0.1
-      escalade: 3.1.1
-      get-caller-file: 2.0.5
-      require-directory: 2.1.1
-      string-width: 4.2.3
-      y18n: 5.0.8
-      yargs-parser: 21.1.1
-    dev: false
-
   /yargs/17.7.1:
     resolution: {integrity: sha512-cwiTb08Xuv5fqF4AovYacTFNxk62th7LKJ6BL9IGUpTJrWoU7/7WdQGTP2SjKf1dUNBGzDd28p/Yfs/GI6JrLw==}
     engines: {node: '>=12'}
@@ -4231,7 +4212,6 @@ packages:
       string-width: 4.2.3
       y18n: 5.0.8
       yargs-parser: 21.1.1
-    dev: true
 
   /yn/3.1.1:
     resolution: {integrity: sha512-Ux4ygGWsu2c7isFWe8Yu1YluJmqVhxqK2cLXNQA5AcC3QfbGNpM7fu0Y8b/z16pXLnFxZYvWhd3fhBY9DLmC6Q==}

@@ -36,13 +36,13 @@
     "@babel/types": "^7.21.3",
     "chalk": "^4.1.2",
     "cli-highlight": "^2.1.11",
-    "yargs": "^17.6.2"
+    "yargs": "^17.7.1"
   },
   "devDependencies": {
     "@rollup/plugin-typescript": "^11.0.0",
     "@types/jest": "^29.5.0",
     "@types/node": "^16.18.10",
-    "@types/yargs": "^17.0.19",
+    "@types/yargs": "^17.0.24",
     "@typescript-eslint/eslint-plugin": "^5.57.0",
     "@typescript-eslint/parser": "^5.57.0",
     "eslint": "^8.36.0",
