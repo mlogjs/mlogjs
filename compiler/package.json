@@ -32,8 +32,8 @@
     "node": ">=16"
   },
   "dependencies": {
-    "@babel/parser": "^7.20.7",
-    "@babel/types": "^7.20.7",
+    "@babel/parser": "^7.21.3",
+    "@babel/types": "^7.21.3",
     "chalk": "^4.1.2",
     "cli-highlight": "^2.1.11",
     "yargs": "^17.6.2"
