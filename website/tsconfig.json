@@ -2,19 +2,17 @@
   "compilerOptions": {
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "importsNotUsedAsValues": "error",
-    "isolatedModules": true,
     "jsx": "preserve",
     "module": "ESNext",
     "moduleResolution": "Node",
     "noImplicitThis": true,
     "noUnusedLocals": true,
-    "preserveValueImports": true,
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": true,
     "target": "ESNext",
-    "useDefineForClassFields": true
+    "useDefineForClassFields": true,
+    "verbatimModuleSyntax": true
   },
   "include": ["./", "./*", "./docs/.vitepress/**/*"]
 }
