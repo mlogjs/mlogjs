@@ -53,7 +53,7 @@ importers:
 
   website:
     specifiers:
-      '@guolao/vue-monaco-editor': ^1.1.0
+      '@guolao/vue-monaco-editor': ^1.1.2
       '@types/node': ^16.18.10
       mlogjs: workspace:^
       monaco-editor: ^0.36.1
@@ -62,7 +62,7 @@ importers:
       vitepress: 1.0.0-alpha.49
       vue: ^3.2.47
     dependencies:
-      '@guolao/vue-monaco-editor': 1.1.0_dqevvltg34lerci64dmdxwakiy
+      '@guolao/vue-monaco-editor': 1.1.2_dqevvltg34lerci64dmdxwakiy
       mlogjs: link:../compiler
       monaco-editor: 0.36.1
       splitpanes: 3.1.5
@@ -801,8 +801,8 @@ packages:
     engines: {node: ^12.22.0 || ^14.17.0 || >=16.0.0}
     dev: true
 
-  /@guolao/vue-monaco-editor/1.1.0_dqevvltg34lerci64dmdxwakiy:
-    resolution: {integrity: sha512-DFtxA8vEP4euP3R4+jisfmY7qfmweUc1M/FxnE2vB8ZzJwX9lz58KNvP0qHg8VPYszk7nvU3kSJjDVOIZeqCgA==}
+  /@guolao/vue-monaco-editor/1.1.2_dqevvltg34lerci64dmdxwakiy:
+    resolution: {integrity: sha512-V/NGyaBce3rzWMKA4eJpwudFRiEMhW+qPzV/X/F5RBhnI2IP3wYlV51m9Sp7H41SrrC2CXWHNpjAI/PmmbR4/g==}
     peerDependencies:
       '@vue/composition-api': ^1.7.1
       monaco-editor: ^0.35.0
