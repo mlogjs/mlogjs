@@ -16,7 +16,7 @@
     "@types/node": "^16.18.10",
     "vite": "^4.2.1",
     "vitepress": "1.0.0-alpha.49",
-    "vue": "^3.2.45"
+    "vue": "^3.2.47"
   },
   "dependencies": {
     "@guolao/vue-monaco-editor": "^1.1.0",
