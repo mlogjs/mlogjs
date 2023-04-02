@@ -6,7 +6,7 @@ import {
   LogicalOperator,
   orderIndependentOperators,
 } from "../operators";
-import { THandler, es, IInstruction } from "../types";
+import { THandler, es, IInstruction, EMutability } from "../types";
 import { discardedName, pipeInsts } from "../utils";
 import { LazyValue, LiteralValue, StoreValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
@@ -57,8 +57,18 @@ export const LogicalExpression: THandler = (
     c.handleEval(scope, node.right, out)
   );
 
-  const [left, leftInst] = c.handleValue(scope, node.left);
-  const [result, resultInst] = left["??"](scope, other, out);
+  const [left, leftInst] = c.handleEval(scope, node.left, out);
+
+  // patch for situations where `left` is a temporary value and `out` is `undefined`
+  // since `out` is undefined there is potential for up to three temp values
+  // to be created. So to prevent that we will try to reuse `left` as an out value
+  // whenever possible
+  const resultOut =
+    left instanceof StoreValue && left.temporary
+      ? new StoreValue(left.name, EMutability.mutable, { temporary: true })
+      : out;
+
+  const [result, resultInst] = left["??"](scope, other, resultOut);
   return [result, [...leftInst, ...resultInst]];
 };
 
