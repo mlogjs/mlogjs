@@ -6,7 +6,6 @@ There are a total of five different data types:
 
 - Literal
 - Store
-- Senseable
 - Function
 - Object
 
@@ -23,20 +22,15 @@ typeof a === "literal"; // true
 
 ## Store
 
-Store values are the registers in the game inside a processor. They are mutable.
+Store values are the registers in the game inside a processor.
+
+You can also "sense" their properties as if they were fields.
 
 ```js
 let a = 123; // is a store number
 let b = "string"; // is a store string
 typeof b === "store"; // true
-```
 
-## Senseable
-
-Senseable values are a special type of store that can have its properties "sensed"
-by accessing it in a member syntax.
-
-```js
 const building = getBuilding("conveyor1");
 print(building.ammo); // results in a sensor instruction followed by a print instruction
 
