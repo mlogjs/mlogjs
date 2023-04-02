@@ -95,6 +95,8 @@ export interface IScope {
    * This field is mutable.
    */
   checkIndexes: boolean;
+  /** Tells values to use short circuiting on their logical operators.  */
+  shortCircuitOperators: boolean;
   /**
    * Creates a new scope that has `this` as it's parent.
    */
