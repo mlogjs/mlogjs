@@ -11,6 +11,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Store values are now senseable.
 
+### Fixed
+
+- Fixed the `??` operator generating more temporary values than necessary.
+
 ## [0.5.2] - 2023-03-05
 
 ### Deprecated
