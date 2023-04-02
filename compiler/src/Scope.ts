@@ -24,7 +24,6 @@ export class Scope implements IScope {
   constructor(
     values: Record<string, IValue | null>,
     public parent: IScope | null = null,
-    public stacked = false,
     public ntemp = 0,
     public name = "",
     public inst: IInstruction[] = [],
@@ -37,7 +36,6 @@ export class Scope implements IScope {
     const scope = new Scope(
       { ...this.data },
       this.parent,
-      this.stacked,
       this.ntemp,
       this.name,
       this.inst,
@@ -57,8 +55,8 @@ export class Scope implements IScope {
     scope.parent = this;
     return scope;
   }
-  createFunction(name: string, stacked = this.stacked): IScope {
-    return new Scope({}, this, stacked, 0, name, this.inst);
+  createFunction(name: string): IScope {
+    return new Scope({}, this, 0, name, this.inst);
   }
   has(identifier: string): boolean {
     if (identifier in this.data) return true;
