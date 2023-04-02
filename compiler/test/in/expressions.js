@@ -25,3 +25,7 @@ item ??= Items.copper;
 
 print(~Math.rand(2 ** 16));
 print(item !== Items.copper);
+
+// make sure that the ?? operator doesn't generate
+// more temp values than necessary
+print(Vars.unit.ammo ?? Vars.unit.ammoCapacity);
