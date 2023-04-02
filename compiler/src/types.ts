@@ -252,10 +252,14 @@ export enum EMutability {
    * but it's still not safe from mutations coming from the runtime.
    */
   readonly,
-  /** Constant values, won't change during execution */
+  /** Compile-time constants.*/
   constant,
   /** An immutable value that hasn't been initialized yet */
   init,
+  /** A value unknown at compile-time
+   * that will not change after initialization
+   */
+  immutable,
 }
 
 export interface IValue extends IValueOperators {

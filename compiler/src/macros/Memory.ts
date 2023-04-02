@@ -106,14 +106,17 @@ export class MemoryBuilder extends MacroFunction {
           "The memory size must be a number literal or a store."
         );
 
-      if (size.mutability === EMutability.constant) {
+      if (
+        size.mutability === EMutability.constant ||
+        size.mutability === EMutability.immutable
+      ) {
         return [new MemoryMacro(cell, size), []];
       }
 
       const name = extractOutName(out) ?? scope.makeTempName();
       const store = new StoreValue(`${name}.&len`);
       const [, inst] = store["="](scope, size);
-      store.mutability = EMutability.constant;
+      store.mutability = EMutability.immutable;
       return [new MemoryMacro(cell, store), inst];
     });
   }
