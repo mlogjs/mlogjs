@@ -38,3 +38,8 @@ print &t7
 op strictEqual &t8 item:22:4 @copper
 op equal &t9 &t8 0
 print &t9
+sensor &t10 @unit @ammo
+op strictEqual &t11 &t10 null
+jump 44 equal &t11 0
+sensor &t10 @unit @ammoCapacity
+print &t10
