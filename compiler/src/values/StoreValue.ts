@@ -17,20 +17,31 @@ import { camelToDashCase, itemNames } from "../utils";
  * Stores are mutable by default.
  */
 export class StoreValue extends BaseValue implements IValue {
-  constructor(public name: string, public mutability = EMutability.mutable) {
+  temporary: boolean;
+  constructor(
+    public name: string,
+    public mutability = EMutability.mutable,
+    { temporary = false }: Partial<Pick<StoreValue, "temporary">> = {}
+  ) {
     super();
+    this.temporary = temporary;
   }
 
   static from(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
     if (out instanceof StoreValue) return out;
-    const name = typeof out === "string" ? out : scope.makeTempName();
+    const hasName = typeof out === "string";
+    const name = hasName ? out : scope.makeTempName();
 
-    return new StoreValue(name, mutability);
+    return new StoreValue(name, mutability, {
+      temporary: !hasName,
+    });
   }
 
   static out(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
     if (!out || typeof out === "string") {
-      return new StoreValue(out ?? scope.makeTempName(), mutability);
+      return new StoreValue(out ?? scope.makeTempName(), mutability, {
+        temporary: !out,
+      });
     }
     return out;
   }
