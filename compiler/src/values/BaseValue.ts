@@ -12,14 +12,13 @@ import {
   updateOperators,
 } from "../operators";
 import {
-  EMutability,
   IInstruction,
   IScope,
   IValue,
   TEOutput,
   TValueInstructions,
 } from "../types";
-import { LiteralValue, VoidValue, StoreValue, SenseableValue } from ".";
+import { LiteralValue, VoidValue, StoreValue } from ".";
 import { isDiscardedOut, pipeInsts } from "../utils";
 import { JumpOutValue } from "./JumpOutValue";
 
@@ -60,7 +59,7 @@ export class BaseValue extends VoidValue implements IValue {
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
   "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    const result = SenseableValue.from(scope, out, EMutability.mutable);
+    const result = StoreValue.from(scope, out);
 
     const nullLiteral = new LiteralValue(null);
     const endAdress = new LiteralValue(null);

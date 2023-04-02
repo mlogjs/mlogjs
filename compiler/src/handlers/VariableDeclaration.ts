@@ -3,7 +3,7 @@ import {
   LazyValue,
   LiteralValue,
   ObjectValue,
-  SenseableValue,
+  StoreValue,
   TDestructuringMembers,
   VoidValue,
 } from "../values";
@@ -85,7 +85,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
-  const out = new SenseableValue(
+  const out = new StoreValue(
     name,
     kind === "const" ? EMutability.init : EMutability.mutable
   );

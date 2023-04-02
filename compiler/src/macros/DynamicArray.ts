@@ -24,13 +24,7 @@ import {
   TValueInstructions,
 } from "../types";
 import { extractOutName } from "../utils";
-import {
-  BaseValue,
-  LiteralValue,
-  ObjectValue,
-  SenseableValue,
-  StoreValue,
-} from "../values";
+import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
 /**
@@ -40,8 +34,8 @@ import { MacroFunction } from "./Function";
 const itemSize = 2;
 
 export class DynamicArray extends ObjectValue {
-  getterTemp: SenseableValue;
-  setterTemp: SenseableValue;
+  getterTemp: StoreValue;
+  setterTemp: StoreValue;
   returnTemp: StoreValue;
   getterAddr: LiteralValue<number | null>;
   setterAddr: LiteralValue<number | null>;
@@ -270,8 +264,8 @@ export class DynamicArray extends ObjectValue {
     this.name = name;
     this.values = values;
 
-    this.getterTemp = new SenseableValue(getterName, EMutability.mutable);
-    this.setterTemp = new SenseableValue(setterName, EMutability.mutable);
+    this.getterTemp = new StoreValue(getterName);
+    this.setterTemp = new StoreValue(setterName);
     this.returnTemp = new StoreValue(returnName);
     if (dynamic) this.lengthStore = lengthStore;
 
@@ -439,7 +433,7 @@ class DynamicArrayEntry extends BaseValue {
         ? out
         : out
         ? getterTemp
-        : SenseableValue.from(scope, undefined, EMutability.mutable);
+        : StoreValue.from(scope);
 
     // used in checked mode, jumps to this address
     // if the index is out of bounds
@@ -606,7 +600,7 @@ export class DynamicArrayConstructor extends MacroFunction {
       }
 
       for (let i = 0; i < length; i++) {
-        values.push(new SenseableValue(`${name}->${i}`, EMutability.mutable));
+        values.push(new StoreValue(`${name}->${i}`));
       }
 
       if (init instanceof ObjectValue) {

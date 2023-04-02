@@ -1,7 +1,6 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { EMutability } from "../../types";
-import { SenseableValue, StoreValue } from "../../values";
+import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 export class Sensor extends MacroFunction {
@@ -10,10 +9,10 @@ export class Sensor extends MacroFunction {
       if (!(property instanceof StoreValue))
         throw new CompilerError("The sensor property must be a store");
 
-      if (!(target instanceof SenseableValue))
-        throw new CompilerError("The sensor target must be a senseable value");
+      if (!(target instanceof StoreValue))
+        throw new CompilerError("The sensor target must be a store value");
 
-      const temp = SenseableValue.from(scope, out, EMutability.readonly);
+      const temp = StoreValue.from(scope, out);
 
       return [temp, [new InstructionBase("sensor", temp, target, property)]];
     });

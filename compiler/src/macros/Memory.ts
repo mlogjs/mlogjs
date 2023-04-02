@@ -6,13 +6,7 @@ import {
   TEOutput,
   TValueInstructions,
 } from "../types";
-import {
-  BaseValue,
-  LiteralValue,
-  ObjectValue,
-  SenseableValue,
-  StoreValue,
-} from "../values";
+import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "./Function";
 import { extractOutName } from "../utils";
@@ -59,7 +53,7 @@ class MemoryEntry extends BaseValue {
 }
 
 class MemoryMacro extends ObjectValue {
-  constructor(public cell: SenseableValue, size: LiteralValue | StoreValue) {
+  constructor(public cell: StoreValue, size: LiteralValue | StoreValue) {
     super({
       length: size,
       size,
@@ -101,8 +95,8 @@ class MemoryMacro extends ObjectValue {
 export class MemoryBuilder extends MacroFunction {
   constructor() {
     super((scope, out, cell: IValue, size: IValue = new LiteralValue(64)) => {
-      if (!(cell instanceof SenseableValue))
-        throw new CompilerError("Memory cell must be a senseable value.");
+      if (!(cell instanceof StoreValue))
+        throw new CompilerError("Memory cell must be a store value.");
 
       if (
         !(size instanceof LiteralValue && size.isNumber()) &&

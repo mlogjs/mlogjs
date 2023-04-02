@@ -1,6 +1,6 @@
 import { BaseValue, LiteralValue } from ".";
 import { CompilerError } from "../CompilerError";
-import { SetInstruction } from "../instructions";
+import { InstructionBase, SetInstruction } from "../instructions";
 import {
   EMutability,
   IScope,
@@ -8,10 +8,13 @@ import {
   TEOutput,
   TValueInstructions,
 } from "../types";
+import { camelToDashCase, itemNames } from "../utils";
 
 /**
  * `StoreValue` represents values unknown at compile time,
- * mostly used with mutable variables and temporary values
+ * mostly used with mutable variables and temporary values.
+ *
+ * Stores are mutable by default.
  */
 export class StoreValue extends BaseValue implements IValue {
   constructor(public name: string, public mutability = EMutability.mutable) {
@@ -79,6 +82,36 @@ export class StoreValue extends BaseValue implements IValue {
 
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
+  }
+
+  get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    const mutability = EMutability.readonly;
+    if (prop instanceof LiteralValue && prop.isString()) {
+      const name = itemNames.includes(prop.data)
+        ? camelToDashCase(prop.data)
+        : prop.data;
+
+      const result = StoreValue.from(scope, out, mutability);
+
+      return [
+        result,
+        [new InstructionBase("sensor", result, this, `@${name}`)],
+      ];
+    }
+    if (prop instanceof StoreValue) {
+      const temp = StoreValue.from(scope, out, mutability);
+      return [temp, [new InstructionBase("sensor", temp, this, prop)]];
+    }
+    throw new CompilerError(
+      `The property [${prop.debugString()}] cannot be sensed`
+    );
+  }
+
+  hasProperty(scope: IScope, prop: IValue): boolean {
+    return (
+      (prop instanceof LiteralValue && prop.isString()) ||
+      prop instanceof StoreValue
+    );
   }
 
   debugString(): string {

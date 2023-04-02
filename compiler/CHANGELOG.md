@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Changed
+
+- Store values are now senseable.
+
 ## [0.5.2] - 2023-03-05
 
 ### Deprecated

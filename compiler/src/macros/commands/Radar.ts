@@ -1,8 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { LiteralValue, SenseableValue, StoreValue } from "../../values";
+import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { EMutability } from "../../types";
 import {
   assertIsArrayMacro,
   assertIsObjectMacro,
@@ -34,8 +33,8 @@ export class Radar extends MacroFunction {
       assertIsObjectMacro(options, "The radar options");
 
       const { building, filters, order, sort } = options.data;
-      if (!(building instanceof SenseableValue))
-        throw new CompilerError("The building must a senseable value");
+      if (!(building instanceof StoreValue))
+        throw new CompilerError("The building must a store value");
 
       assertIsArrayMacro(filters, "filters");
 
@@ -59,7 +58,7 @@ export class Radar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = SenseableValue.from(scope, out, EMutability.constant);
+      const outUnit = StoreValue.from(scope, out);
       return [
         outUnit,
         [

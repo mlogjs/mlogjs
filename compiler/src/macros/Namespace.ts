@@ -10,7 +10,6 @@ import {
   IObjectValueData,
   LiteralValue,
   ObjectValue,
-  SenseableValue,
   StoreValue,
 } from "../values";
 import { CompilerError } from "../CompilerError";
@@ -54,8 +53,8 @@ export class VarsNamespace extends NamespaceMacro {
   constructor() {
     super();
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
-      unit: new SenseableValue("@unit"),
-      this: new SenseableValue("@this"),
+      unit: new StoreValue("@unit", EMutability.constant),
+      this: new StoreValue("@this", EMutability.constant),
     });
   }
 }

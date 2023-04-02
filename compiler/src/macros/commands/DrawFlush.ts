@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { IValue } from "../../types";
-import { SenseableValue } from "../../values";
+import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 const defaultTargetName = "display1";
@@ -12,10 +12,8 @@ export class DrawFlush extends MacroFunction<null> {
       if (!target)
         return [null, [new InstructionBase("drawflush", defaultTargetName)]];
 
-      if (!(target instanceof SenseableValue))
-        throw new CompilerError(
-          "The drawflush target must be a senseable value"
-        );
+      if (!(target instanceof StoreValue))
+        throw new CompilerError("The drawflush target must be a store value");
       return [null, [new InstructionBase("drawflush", target)]];
     });
   }

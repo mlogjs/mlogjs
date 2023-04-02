@@ -1,11 +1,6 @@
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
-import {
-  LiteralValue,
-  ObjectValue,
-  SenseableValue,
-  StoreValue,
-} from "../../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { assertLiteralOneOf } from "../../utils";
 import { createOverloadNamespace } from "../util";
 import { CompilerError } from "../../CompilerError";
@@ -43,7 +38,7 @@ export class UnitLocate extends ObjectValue {
 
         const outX = StoreValue.from(scope, extractDestrucuringOut(out, 1));
         const outY = StoreValue.from(scope, extractDestrucuringOut(out, 2));
-        const outBuilding = SenseableValue.from(
+        const outBuilding = StoreValue.from(
           scope,
           overload === "ore" ? discardedName : extractDestrucuringOut(out, 3)
         );
