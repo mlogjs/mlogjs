@@ -1,7 +1,6 @@
-import { SenseableValue } from "./values";
+import { StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
-  EMutability,
   IFunctionValue,
   IInstruction,
   INamedValue,
@@ -9,7 +8,7 @@ import {
   IValue,
 } from "./types";
 import { CompilerError } from "./CompilerError";
-import { assign, internalPrefix } from "./utils";
+import { internalPrefix } from "./utils";
 
 export class Scope implements IScope {
   data: Record<string, IValue | null>;
@@ -83,10 +82,8 @@ export class Scope implements IScope {
     this.data[name] = value;
     return value;
   }
-  make(identifier: string, name: string): SenseableValue {
-    const value = assign(new SenseableValue(name), {
-      mutability: EMutability.mutable,
-    });
+  make(identifier: string, name: string): StoreValue {
+    const value = new StoreValue(name);
     return this.set(identifier, value);
   }
   makeTempName(): string {

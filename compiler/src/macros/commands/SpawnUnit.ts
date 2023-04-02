@@ -1,7 +1,6 @@
 import { InstructionBase } from "../../instructions";
-import { EMutability } from "../../types";
 import { assertIsObjectMacro, assertIsRuntimeValue } from "../../utils";
-import { SenseableValue } from "../../values";
+import { StoreValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 export class SpawnUnit extends MacroFunction {
@@ -16,7 +15,7 @@ export class SpawnUnit extends MacroFunction {
       assertIsRuntimeValue(y, "y");
       assertIsRuntimeValue(team, "team");
 
-      const output = SenseableValue.from(scope, out, EMutability.constant);
+      const output = StoreValue.from(scope, out);
 
       return [
         output,

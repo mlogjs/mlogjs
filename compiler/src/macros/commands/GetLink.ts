@@ -1,7 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { EMutability, IValue } from "../../types";
-import { LiteralValue, SenseableValue, StoreValue } from "../../values";
+import { IValue } from "../../types";
+import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 export class GetLink extends MacroFunction {
@@ -14,7 +14,7 @@ export class GetLink extends MacroFunction {
         throw new CompilerError(
           "The getlink index must be a number literal or a store"
         );
-      const outBuild = SenseableValue.from(scope, out, EMutability.constant);
+      const outBuild = StoreValue.from(scope, out);
       return [outBuild, [new InstructionBase("getlink", outBuild, index)]];
     });
   }

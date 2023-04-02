@@ -1,12 +1,7 @@
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { extractDestrucuringOut } from "../../utils";
-import {
-  LiteralValue,
-  ObjectValue,
-  SenseableValue,
-  StoreValue,
-} from "../../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class UnitControl extends ObjectValue {
@@ -52,7 +47,7 @@ export class UnitControl extends ObjectValue {
               scope,
               extractDestrucuringOut(out, 0)
             );
-            const outBuilding = SenseableValue.from(
+            const outBuilding = StoreValue.from(
               scope,
               extractDestrucuringOut(out, 1)
             );

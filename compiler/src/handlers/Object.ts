@@ -8,7 +8,7 @@ import {
   LazyValue,
   LiteralValue,
   ObjectValue,
-  SenseableValue,
+  StoreValue,
   TDestructuringMembers,
 } from "../values";
 
@@ -87,7 +87,7 @@ export const MemberExpression: THandler = (
     return [got, [...objInst, ...propInst, ...gotInst]];
   }
 
-  const temp = SenseableValue.out(scope, out);
+  const temp = StoreValue.out(scope, out);
 
   const objOut = new DestructuringValue(
     new Map([

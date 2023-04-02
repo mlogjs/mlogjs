@@ -28,7 +28,6 @@ import {
 import { LiteralValue } from "./LiteralValue";
 import { StoreValue } from "./StoreValue";
 import { VoidValue } from "./VoidValue";
-import { SenseableValue } from "./SenseableValue";
 import { LazyValue } from "./LazyValue";
 import { AssignmentValue } from "./AssignmentValue";
 import {
@@ -42,7 +41,7 @@ export type TFunctionValueInitParams = (childScope: IScope) => {
 };
 
 type FunctionParam = es.Function["params"][number];
-type TParamValue = SenseableValue | AssignmentValue | DestructuringValue;
+type TParamValue = StoreValue | AssignmentValue | DestructuringValue;
 
 export class FunctionValue extends VoidValue implements IFunctionValue {
   name: string;
@@ -63,7 +62,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private maximumArgumentCount = 0;
   private inst!: IInstruction[];
   private addr!: LiteralValue<number | null>;
-  private temp!: SenseableValue;
+  private temp!: StoreValue;
   private ret!: StoreValue;
   private inline!: boolean;
   private tryingInline!: boolean;
@@ -122,10 +121,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.initScope();
 
     this.addr = new LiteralValue(null);
-    this.temp = new SenseableValue(
-      `${internalPrefix}f${this.name}`,
-      EMutability.mutable
-    );
+    this.temp = new StoreValue(`${internalPrefix}f${this.name}`);
     this.ret = new StoreValue(`${internalPrefix}r${this.name}`);
     this.inst = [
       new AddressResolver(this.addr),
@@ -172,9 +168,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     // the value will be stored somewhere
     // no need to save it in a temporary variable
-    const temp = out
-      ? this.temp
-      : SenseableValue.from(scope, undefined, EMutability.mutable);
+    const temp = out ? this.temp : StoreValue.from(scope);
 
     const inst: IInstruction[] = this.paramValues
       .map(
@@ -221,11 +215,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     out?: TEOutput
   ): TValueInstructions {
     // create return value
-    this.inlineTemp = SenseableValue.from(
-      this.childScope,
-      out,
-      EMutability.mutable
-    );
+    this.inlineTemp = StoreValue.from(this.childScope, out);
 
     // make a copy of the function scope
     const fnScope = this.childScope.copy();
@@ -311,7 +301,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     switch (param.type) {
       case "Identifier": {
         const name = nodeName(param, !this.c.compactNames && param.name);
-        const value = new SenseableValue(name, EMutability.mutable);
+        const value = new StoreValue(name);
         this.childScope.set(param.name, value);
         this.paramNames.set(value, param.name);
 
@@ -425,7 +415,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     param: TParamValue,
     value: IValue = new LiteralValue(null)
   ): IInstruction[] {
-    if (param instanceof SenseableValue) {
+    if (param instanceof StoreValue) {
       const name = this.paramNames.get(param) as string;
       scope.hardSet(name, value);
       return [];

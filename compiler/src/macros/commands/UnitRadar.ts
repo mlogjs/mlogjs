@@ -1,9 +1,8 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { LiteralValue, SenseableValue, StoreValue } from "../../values";
+import { LiteralValue, StoreValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
 import { CompilerError } from "../../CompilerError";
-import { EMutability } from "../../types";
 import {
   assertIsArrayMacro,
   assertIsObjectMacro,
@@ -39,7 +38,7 @@ export class UnitRadar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = SenseableValue.from(scope, out, EMutability.constant);
+      const outUnit = StoreValue.from(scope, out);
 
       return [
         outUnit,
