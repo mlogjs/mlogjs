@@ -6,7 +6,15 @@ import {
   LogicalOperator,
   orderIndependentOperators,
 } from "../operators";
-import { THandler, es, IInstruction, EMutability } from "../types";
+import {
+  THandler,
+  es,
+  IInstruction,
+  EMutability,
+  IValue,
+  TEOutput,
+  TLineRef,
+} from "../types";
 import { discardedName, pipeInsts } from "../utils";
 import { LazyValue, LiteralValue, StoreValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
@@ -49,28 +57,107 @@ export const LogicalExpression: THandler = (
   c,
   scope,
   node: es.LogicalExpression,
-  out
+  out,
+  arg?: {
+    onNonNullishAddress?: TLineRef;
+    onFalsyAddress?: TLineRef;
+    onTruthyAddress?: TLineRef;
+  }
 ) => {
-  if (node.operator !== "??") return LRExpression(c, scope, node, out, null);
+  type THandlerArg = typeof arg;
 
-  const other = new LazyValue((scope, out) =>
-    c.handleEval(scope, node.right, out)
+  let leftNodeArg: THandlerArg;
+  let rightNodeArg: THandlerArg;
+  let operatorAddress: TLineRef;
+  let afterRightAddress: TLineRef | undefined;
+  let beforeRightAddress: TLineRef | undefined;
+
+  switch (node.operator) {
+    case "||": {
+      const {
+        onFalsyAddress = new LiteralValue(null),
+        onTruthyAddress = new LiteralValue(null),
+      } = arg ?? {};
+      leftNodeArg = {
+        onTruthyAddress,
+        onFalsyAddress,
+      };
+      rightNodeArg = { onTruthyAddress };
+      operatorAddress = onTruthyAddress;
+      if (!arg?.onFalsyAddress) beforeRightAddress = onFalsyAddress;
+      if (!arg?.onTruthyAddress) afterRightAddress = onTruthyAddress;
+      break;
+    }
+    case "&&": {
+      const {
+        onFalsyAddress = new LiteralValue(null),
+        onTruthyAddress = new LiteralValue(null),
+      } = arg ?? {};
+      leftNodeArg = { onTruthyAddress, onFalsyAddress };
+      rightNodeArg = { onFalsyAddress };
+      operatorAddress = onFalsyAddress;
+      if (!arg?.onTruthyAddress) beforeRightAddress = onTruthyAddress;
+      if (!arg?.onFalsyAddress) afterRightAddress = onFalsyAddress;
+      break;
+    }
+    case "??": {
+      const { onNonNullishAddress = new LiteralValue(null) } = arg ?? {};
+      leftNodeArg = {
+        onNonNullishAddress,
+        onTruthyAddress: onNonNullishAddress,
+      };
+      rightNodeArg = {
+        onNonNullishAddress,
+        onTruthyAddress: onNonNullishAddress,
+      };
+      operatorAddress = onNonNullishAddress;
+      if (!arg?.onNonNullishAddress) afterRightAddress = onNonNullishAddress;
+      break;
+    }
+  }
+
+  const other = new LazyValue((scope, out) => {
+    const [value, inst] = c.handleEval(
+      scope,
+      node.right,
+      out,
+      node.right.type === "LogicalExpression" ? rightNodeArg : undefined
+    );
+    if (!beforeRightAddress) return [value, inst];
+    return [value, [new AddressResolver(beforeRightAddress), ...inst]];
+  });
+
+  const [left, leftInst] = c.handleEval(
+    scope,
+    node.left,
+    out,
+    node.left.type === "LogicalExpression" ? leftNodeArg : undefined
   );
-
-  const [left, leftInst] = c.handleEval(scope, node.left, out);
 
   // patch for situations where `left` is a temporary value and `out` is `undefined`
   // since `out` is undefined there is potential for up to three temp values
   // to be created. So to prevent that we will try to reuse `left` as an out value
   // whenever possible
-  const resultOut =
-    left instanceof StoreValue && left.temporary
-      ? new StoreValue(left.name, EMutability.mutable, { temporary: true })
-      : out;
+  const resultOut = reuseTemporaryValue(left, out);
 
-  const [result, resultInst] = left["??"](scope, other, resultOut);
-  return [result, [...leftInst, ...resultInst]];
+  const [result, resultInst] = left[node.operator](
+    scope,
+    other,
+    resultOut,
+    operatorAddress
+  );
+
+  return [
+    result,
+    [
+      ...leftInst,
+      ...resultInst,
+      ...(afterRightAddress ? [new AddressResolver(afterRightAddress)] : []),
+    ],
+  ];
 };
+
+const logicalAssignmentOperators: AssignementOperator[] = ["??=", "||=", "&&="];
 
 export const AssignmentExpression: THandler = (
   c,
@@ -82,17 +169,13 @@ export const AssignmentExpression: THandler = (
   const [left, leftInst] = c.handleValue(scope, node.left);
 
   const leftOutput = left.toOut();
-  const [right, rightInst] =
-    node.operator !== "??="
-      ? c.handleEval(
-          scope,
-          node.right,
-          node.operator === "=" ? leftOutput : undefined
-        )
-      : [
-          new LazyValue((scope, out) => c.handleEval(scope, node.right, out)),
-          [],
-        ];
+  const [right, rightInst] = !logicalAssignmentOperators.includes(node.operator)
+    ? c.handleEval(
+        scope,
+        node.right,
+        node.operator === "=" ? leftOutput : undefined
+      )
+    : [new LazyValue((scope, out) => c.handleEval(scope, node.right, out)), []];
 
   const [op, opInst] = left[node.operator](scope, right);
   scope.clearDependentCache(left);
@@ -192,3 +275,11 @@ export const SequenceExpression: THandler = (
 
   return [value, inst];
 };
+
+function reuseTemporaryValue(value: IValue, out?: TEOutput) {
+  if (value instanceof StoreValue && value.temporary)
+    return new StoreValue(value.name, EMutability.mutable, {
+      temporary: true,
+    });
+  return out;
+}

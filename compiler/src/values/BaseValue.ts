@@ -16,6 +16,7 @@ import {
   IScope,
   IValue,
   TEOutput,
+  TLineRef,
   TValueInstructions,
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue } from ".";
@@ -58,11 +59,16 @@ export class BaseValue extends VoidValue implements IValue {
 
   // requires special handling
   // the handler should give an object value to allow the lazy evaluation
-  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
+  "??"(
+    scope: IScope,
+    other: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions {
     const result = StoreValue.from(scope, out);
 
     const nullLiteral = new LiteralValue(null);
-    const endAdress = new LiteralValue(null);
+    const targetAddress = endAddress ?? new LiteralValue(null);
     const [left, leftInst] = this.eval(scope, result);
     const [right, rightInst] = other.eval(scope, result);
     const [test, testInst] = left["==="](scope, nullLiteral);
@@ -74,14 +80,14 @@ export class BaseValue extends VoidValue implements IValue {
         ...result["="](scope, left)[1],
         ...testInst,
         new JumpInstruction(
-          endAdress,
+          targetAddress,
           EJumpKind.Equal,
           test,
           new LiteralValue(0)
         ),
         ...rightInst,
         ...result["="](scope, right)[1],
-        new AddressResolver(endAdress),
+        ...(endAddress ? [] : [new AddressResolver(targetAddress)]),
       ],
     ];
   }
@@ -98,12 +104,74 @@ export class BaseValue extends VoidValue implements IValue {
 
     return [result, [...equalInst, ...resultInst]];
   }
+
+  "&&"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions {
+    const temp = StoreValue.from(scope, out);
+    const [left, leftInst] = this.eval(scope, temp);
+    const [right, rightInst] = value.eval(scope, temp);
+
+    const targetAddress = endAddress ?? new LiteralValue(null);
+    return [
+      temp,
+      [
+        ...leftInst,
+        ...temp["="](scope, left)[1],
+        new JumpInstruction(
+          targetAddress,
+          EJumpKind.Equal,
+          left,
+          new LiteralValue(0)
+        ),
+        ...rightInst,
+        ...temp["="](scope, right)[1],
+        ...(endAddress ? [] : [new AddressResolver(targetAddress)]),
+      ],
+    ];
+  }
+
+  "||"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions {
+    const temp = StoreValue.from(scope, out);
+    const [left, leftInst] = this.eval(scope, temp);
+    const [right, rightInst] = value.eval(scope, temp);
+
+    const targetAddress = endAddress ?? new LiteralValue(null);
+
+    return [
+      temp,
+      [
+        ...leftInst,
+        ...temp["="](scope, left)[1],
+        new JumpInstruction(
+          targetAddress,
+          EJumpKind.NotEqual,
+          left,
+          new LiteralValue(0)
+        ),
+        ...rightInst,
+        ...temp["="](scope, right)[1],
+        ...(endAddress ? [] : [new AddressResolver(targetAddress)]),
+      ],
+    ];
+  }
 }
 
-for (const key in operatorMap) {
+for (const k in operatorMap) {
   type K = keyof typeof operatorMap;
-  const kind = operatorMap[key as K];
-  BaseValue.prototype[key as K] = function (
+  const key = k as K;
+  if (key === "&&" || key == "||") continue;
+
+  const kind = operatorMap[key];
+  BaseValue.prototype[key] = function (
     this: BaseValue,
     scope: IScope,
     value: IValue,

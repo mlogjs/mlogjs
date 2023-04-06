@@ -206,9 +206,24 @@ export interface IValueOperators {
   "|"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   instanceof(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   in(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "??"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "||"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&&"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
+  "??"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
+  "||"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
   "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   "*="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
