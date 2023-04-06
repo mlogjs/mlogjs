@@ -7,9 +7,9 @@ import {
   IInstruction,
   EInstIntent,
   IScope,
-  IBindableValue,
   TValueInstructions,
   IValue,
+  TLineRef,
 } from "../types";
 import { pipeInsts, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
@@ -73,7 +73,7 @@ function createJumpOut(
   c: Compiler,
   scope: IScope,
   node: es.IfStatement,
-  endIfAddr: IBindableValue<number | null>
+  endIfAddr: TLineRef
 ) {
   const jumpNode = asMergeableJumpNode(node.consequent);
   if (!jumpNode) return new JumpOutValue(node, endIfAddr, false);

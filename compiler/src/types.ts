@@ -302,6 +302,7 @@ export interface IBindableValue<T extends TLiteral | null = TLiteral>
   extends IValue {
   data: T;
 }
+export type TLineRef = IBindableValue<number | null>;
 
 export interface IFunctionValue extends IValue {
   return(

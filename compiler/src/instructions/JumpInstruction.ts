@@ -1,4 +1,4 @@
-import { IBindableValue, IValue } from "../types";
+import { IValue, TLineRef } from "../types";
 import { LiteralValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
 import { InstructionBase } from "./InstructionBase";
@@ -16,7 +16,7 @@ export enum EJumpKind {
 
 export class JumpInstruction extends InstructionBase {
   constructor(
-    public address: IBindableValue<number | null>,
+    public address: TLineRef,
     kind: EJumpKind,
     left: IValue | null = null,
     right: IValue | null = null
