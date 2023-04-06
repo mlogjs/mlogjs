@@ -18,8 +18,6 @@ import { appendSourceLocations, hideRedundantJumps, pipeInsts } from "./utils";
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
 export interface CompilerOptions {
-  stackName?: string;
-
   /** Wether the compiler should preserve or compact variable and function names*/
   compactNames?: boolean;
 
@@ -28,18 +26,14 @@ export interface CompilerOptions {
 
 export class Compiler {
   protected stackName?: string;
-  protected usingStack: boolean;
   protected handlers: THandlerMap = handlers;
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
 
   constructor({
-    stackName,
     compactNames = false,
     sourcemap = false,
   }: CompilerOptions = {}) {
-    this.usingStack = !!stackName;
-    this.stackName = stackName;
     this.compactNames = compactNames;
     this.sourcemap = sourcemap;
   }
