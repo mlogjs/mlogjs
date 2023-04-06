@@ -12,6 +12,12 @@ import { internalPrefix } from "./utils";
 
 export class Scope implements IScope {
   data: Record<string, IValue | null>;
+  parent: IScope | null;
+  ntemp: number;
+  name: string;
+  inst: IInstruction[];
+  operationCache: Record<string, IValue>;
+  cacheDependencies: Record<string, string[]>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
@@ -21,27 +27,41 @@ export class Scope implements IScope {
   // set by the compiler options
   shortCircuitOperators = true;
 
-  constructor(
-    values: Record<string, IValue | null>,
-    public parent: IScope | null = null,
-    public ntemp = 0,
-    public name = "",
-    public inst: IInstruction[] = [],
-    public operationCache: Record<string, IValue> = {},
-    public cacheDependencies: Record<string, string[]> = {}
-  ) {
-    this.data = values;
+  constructor({
+    data = {},
+    parent = null,
+    ntemp = 0,
+    name = "",
+    inst = [],
+    operationCache = {},
+    cacheDependencies = {},
+  }: Partial<
+    Pick<
+      IScope,
+      | "data"
+      | "parent"
+      | "ntemp"
+      | "name"
+      | "inst"
+      | "operationCache"
+      | "cacheDependencies"
+    >
+  > = {}) {
+    this.data = data;
+    this.parent = parent;
+    this.ntemp = ntemp;
+    this.name = name;
+    this.inst = inst;
+    this.operationCache = operationCache;
+    this.cacheDependencies = cacheDependencies;
   }
   copy(): IScope {
-    const scope = new Scope(
-      { ...this.data },
-      this.parent,
-      this.ntemp,
-      this.name,
-      this.inst,
-      { ...this.operationCache },
-      { ...this.cacheDependencies }
-    );
+    const scope = new Scope({
+      ...this,
+      data: { ...this.data },
+      operationCache: { ...this.operationCache },
+      cacheDependencies: { ...this.cacheDependencies },
+    });
     scope.break = this.break;
     scope.continue = this.continue;
     scope.function = this.function;
@@ -56,7 +76,13 @@ export class Scope implements IScope {
     return scope;
   }
   createFunction(name: string): IScope {
-    return new Scope({}, this, 0, name, this.inst);
+    return new Scope({
+      data: {},
+      parent: this,
+      ntemp: 0,
+      name,
+      inst: this.inst,
+    });
   }
   has(identifier: string): boolean {
     if (identifier in this.data) return true;
