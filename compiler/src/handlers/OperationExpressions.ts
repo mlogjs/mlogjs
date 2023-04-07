@@ -64,6 +64,11 @@ export const LogicalExpression: THandler = (
     onTruthyAddress?: TLineRef;
   }
 ) => {
+  // TODO: these expressions can be optimized
+  // to skip some jump checks inside if statements.
+  // Remove this comment if this optimization is
+  // really not necessary
+
   type THandlerArg = typeof arg;
 
   let leftNodeArg: THandlerArg;
