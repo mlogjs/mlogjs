@@ -2,7 +2,7 @@ import "./globals";
 
 type LogicSymbols = typeof Items & typeof Liquids & typeof LAccess;
 
-type WithSymbols<T extends Record<string, unknown>> = T & {
+export type WithSymbols<T extends Record<string, unknown>> = T & {
   readonly [K in keyof (LogicSymbols | T) as LogicSymbols[K]]: T[K];
 };
 
@@ -126,7 +126,7 @@ declare global {
   interface PayloadHolder
     extends WithSymbols<{
       readonly payloadCount: number;
-      readonly payloadType?: symbol;
+      readonly payloadType?: UnitSymbol | BlockSymbol;
     }> {}
 
   interface WithEnable
