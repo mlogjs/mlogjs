@@ -95,7 +95,7 @@ const config: UserConfig = {
     plugins: [
       rawResolver(),
       SearchPlugin({
-        tokenize: "forward",
+        tokenize: "reverse",
       }),
     ],
   },
