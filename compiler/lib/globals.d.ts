@@ -650,22 +650,22 @@ interface Blocks
   extends BuildingSymbolTable,
     EnvBlockSymbolTable,
     OreSymbolTable {
-  readonly block1: unique symbol;
-  readonly block2: unique symbol;
-  readonly block3: unique symbol;
-  readonly block4: unique symbol;
-  readonly block5: unique symbol;
-  readonly block6: unique symbol;
-  readonly block7: unique symbol;
-  readonly block8: unique symbol;
-  readonly block9: unique symbol;
-  readonly block10: unique symbol;
-  readonly block11: unique symbol;
-  readonly block12: unique symbol;
-  readonly block13: unique symbol;
-  readonly block14: unique symbol;
-  readonly block15: unique symbol;
-  readonly block16: unique symbol;
+  readonly build1: unique symbol;
+  readonly build2: unique symbol;
+  readonly build3: unique symbol;
+  readonly build4: unique symbol;
+  readonly build5: unique symbol;
+  readonly build6: unique symbol;
+  readonly build7: unique symbol;
+  readonly build8: unique symbol;
+  readonly build9: unique symbol;
+  readonly build10: unique symbol;
+  readonly build11: unique symbol;
+  readonly build12: unique symbol;
+  readonly build13: unique symbol;
+  readonly build14: unique symbol;
+  readonly build15: unique symbol;
+  readonly build16: unique symbol;
 }
 
 type BlockSymbol = Blocks[keyof Blocks];
