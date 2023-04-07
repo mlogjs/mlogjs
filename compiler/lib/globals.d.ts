@@ -459,7 +459,7 @@ interface BuildingSymbolTable {
   readonly reinforcedPayloadConveyor: unique symbol;
   readonly reinforcedPayloadRouter: unique symbol;
   readonly payloadMassDriver: unique symbol;
-  readonly payloadPropulsionTower: unique symbol;
+  readonly largePayloadMassDriver: unique symbol;
   readonly smallDeconstructor: unique symbol;
   readonly deconstructor: unique symbol;
   readonly constructor: unique symbol;
@@ -488,8 +488,10 @@ interface BuildingSymbolTable {
   readonly logicDisplay: unique symbol;
   readonly largeLogicDisplay: unique symbol;
   readonly canvas: unique symbol;
+  readonly reinforcedMessage: unique symbol;
   readonly worldProcessor: unique symbol;
   readonly worldCell: unique symbol;
+  readonly worldMessage: unique symbol;
 }
 
 type BuildingSymbol = Blocks[keyof BuildingSymbolTable];
@@ -647,7 +649,24 @@ type OreSymbol = Blocks[keyof OreSymbolTable];
 interface Blocks
   extends BuildingSymbolTable,
     EnvBlockSymbolTable,
-    OreSymbolTable {}
+    OreSymbolTable {
+  readonly block1: unique symbol;
+  readonly block2: unique symbol;
+  readonly block3: unique symbol;
+  readonly block4: unique symbol;
+  readonly block5: unique symbol;
+  readonly block6: unique symbol;
+  readonly block7: unique symbol;
+  readonly block8: unique symbol;
+  readonly block9: unique symbol;
+  readonly block10: unique symbol;
+  readonly block11: unique symbol;
+  readonly block12: unique symbol;
+  readonly block13: unique symbol;
+  readonly block14: unique symbol;
+  readonly block15: unique symbol;
+  readonly block16: unique symbol;
+}
 
 type BlockSymbol = Blocks[keyof Blocks];
 declare const Blocks: Blocks;
