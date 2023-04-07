@@ -2,8 +2,12 @@ op rand &t0 10
 op greaterThan a:1:6 &t0 5
 op rand &t1 10
 op greaterThan b:2:6 &t1 5
-op land c:3:6 a:1:6 b:2:6
-op or d:4:6 a:1:6 b:2:6
+set c:3:6 a:1:6
+jump 7 equal a:1:6 0
+set c:3:6 b:2:6
+set d:4:6 a:1:6
+jump 10 notEqual a:1:6 0
+set d:4:6 b:2:6
 print "\na: "
 print a:1:6
 print "\nb: "

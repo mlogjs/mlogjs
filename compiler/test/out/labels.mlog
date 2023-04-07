@@ -3,9 +3,9 @@ jump 17 greaterThanEq i:1:16 3
 set j:2:11 0
 jump 15 greaterThanEq j:2:11 3
 op equal &t0 i:1:16 1
-op equal &t1 j:2:11 1
-op land &t2 &t0 &t1
-jump 15 notEqual &t2 0
+jump 7 equal &t0 0
+op equal &t0 j:2:11 1
+jump 15 notEqual &t0 0
 print "i = "
 print i:1:16
 print ", j = "

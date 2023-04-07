@@ -1,9 +1,9 @@
 set i:1:9 0
 jump 9 greaterThanEq i:1:9 100
 op greaterThan &t0 i:1:9 40
-op lessThan &t1 i:1:9 60
-op land &t2 &t0 &t1
-jump 7 notEqual &t2 0
+jump 5 equal &t0 0
+op lessThan &t0 i:1:9 60
+jump 7 notEqual &t0 0
 print i:1:9
 op add i:1:9 i:1:9 1
 jump 1 always
