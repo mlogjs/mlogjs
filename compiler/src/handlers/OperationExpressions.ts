@@ -71,6 +71,12 @@ export const LogicalExpression: THandler = (
 
   type THandlerArg = typeof arg;
 
+  // patch to prevent the jump out value
+  // from being double-used later in the handler
+  if (out instanceof JumpOutValue) {
+    out = StoreValue.from(scope);
+  }
+
   let leftNodeArg: THandlerArg;
   let rightNodeArg: THandlerArg;
   let operatorAddress: TLineRef;
