@@ -46,3 +46,15 @@ export type TUnitEffect =
   | "boss"
   | "shocked"
   | "blasted";
+
+export type TSetPropSymbol =
+  | ItemSymbol
+  | LiquidSymbol
+  | (typeof LAccess)[
+      | "x"
+      | "y"
+      | "rotation"
+      | "team"
+      | "health"
+      | "totalPower"
+      | "payloadType"];
