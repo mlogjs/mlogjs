@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added the `setProp` command (`setprop` instruction).
+
 ### Changed
 
 - Store values are now senseable.

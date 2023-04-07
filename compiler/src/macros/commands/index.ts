@@ -28,3 +28,4 @@ export * from "./SetRate";
 export * from "./Fetch";
 export * from "./GetFlag";
 export * from "./SetFlag";
+export * from "./SetProp";

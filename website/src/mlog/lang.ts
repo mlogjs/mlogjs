@@ -40,6 +40,7 @@ export function registerMlogLang(monaco: Monaco) {
       "fetch",
       "getflag",
       "setflag",
+      "setprop",
     ],
     flowInst: ["jump", "end", "wait", "stop"],
     operator: [
