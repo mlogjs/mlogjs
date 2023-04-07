@@ -126,7 +126,7 @@ declare global {
   interface PayloadHolder
     extends WithSymbols<{
       readonly payloadCount: number;
-      readonly payloadType?: symbol;
+      readonly payloadType?: UnitSymbol | BlockSymbol;
     }> {}
 
   interface WithEnable
