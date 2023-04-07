@@ -1,0 +1,114 @@
+sensor result:4:4 @unit @firstItem
+op strictEqual &t0 result:4:4 null
+jump 7 equal &t0 0
+sensor result:4:4 @unit @type
+op strictEqual &t1 result:4:4 null
+jump 7 equal &t1 0
+set result:4:4 @radToDeg
+sensor result:4:4 @unit @firstItem
+op strictEqual &t0 result:4:4 null
+jump 14 equal &t0 0
+sensor result:4:4 @unit @type
+op strictEqual &t1 result:4:4 null
+jump 14 equal &t1 0
+set result:4:4 @radToDeg
+op rand &t2 1
+op strictEqual &t3 &t2 null
+jump 21 equal &t3 0
+op rand &t2 2
+op strictEqual &t4 &t2 null
+jump 21 equal &t4 0
+op rand &t2 3
+print &t2
+op rand &t5 1
+jump 27 notEqual &t5 0
+op rand &t5 2
+jump 27 notEqual &t5 0
+op rand &t5 3
+print &t5
+op rand &t6 1
+jump 33 equal &t6 0
+op rand &t6 2
+jump 33 equal &t6 0
+op rand &t6 3
+print &t6
+op rand &t7 1
+jump 39 notEqual &t7 0
+op rand &t7 2
+jump 39 equal &t7 0
+op rand &t7 3
+print &t7
+op rand &t8 1
+jump 44 equal &t8 0
+op rand &t8 2
+jump 45 notEqual &t8 0
+op rand &t8 3
+print &t8
+op rand &t9 1
+jump 50 notEqual &t9 0
+op rand &t9 2
+jump 53 equal &t9 0
+op rand &t9 3
+jump 53 notEqual &t9 0
+op rand &t9 4
+print &t9
+op rand &t10 1
+op strictEqual &t11 &t10 null
+jump 58 equal &t11 0
+op rand &t10 2
+jump 60 notEqual &t10 0
+op rand &t10 3
+print &t10
+op rand &t12 1
+jump 72 equal &t12 0
+op rand &t12 2
+op strictEqual &t13 &t12 null
+jump 70 equal &t13 0
+op rand &t12 3
+op strictEqual &t14 &t12 null
+jump 70 equal &t14 0
+op rand &t12 4
+jump 72 equal &t12 0
+op rand &t12 5
+print &t12
+op rand &t15 1
+jump 76 equal &t15 0
+op rand &t15 2
+op strictEqual &t16 &t15 null
+jump 81 equal &t16 0
+op rand &t15 3
+jump 81 notEqual &t15 0
+op rand &t15 4
+print &t15
+op rand &t17 1
+jump 90 notEqual &t17 0
+op rand &t17 2
+op strictEqual &t18 &t17 null
+jump 90 equal &t18 0
+op rand &t17 3
+jump 90 equal &t17 0
+op rand &t17 4
+print &t17
+op rand &t19 1
+op strictEqual &t20 &t19 null
+jump 95 equal &t20 0
+op rand &t19 2
+jump 99 notEqual &t19 0
+op rand &t19 3
+jump 99 notEqual &t19 0
+op rand &t19 4
+print &t19
+op rand b:34:4 1
+jump 103 notEqual b:34:4 0
+op rand b:34:4 2
+jump 105 equal b:34:4 0
+op rand b:34:4 3
+jump 109 notEqual b:34:4 0
+op rand b:34:4 3
+jump 109 notEqual b:34:4 0
+op rand b:34:4 4
+jump 113 notEqual b:34:4 0
+op rand b:34:4 3
+jump 113 notEqual b:34:4 0
+op rand b:34:4 4
+end
