@@ -289,9 +289,9 @@ Check out the [online editor](/editor) to see how each one works!
 
 ### Logical operators
 
-The logical operators `&&` ("and") and `or` ("or") are supported, and behave the same as in regular javascript.
+The logical operators `&&` ("and") and `||` ("or") are supported, and behave in the same way as in regular javascript.
 
-Both [`and`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation) and [`or`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR#short-circuit_evaluation) **short-circuit**.
+Both [`&&`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation) and [`||`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR#short-circuit_evaluation) **short-circuit**.
 
 ```js
 // foo is either false
@@ -336,7 +336,7 @@ printFlush();
 
 Behavior:
 
-- Unlike the [logical operators](#logical-operators) it evaluates each return value lazily.
+- It evaluates each return value lazily according to the test condition.
 
 ### Object/array literals
 
