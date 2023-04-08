@@ -24,8 +24,6 @@ export class Scope implements IScope {
   label?: string;
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
-  // set by the compiler options
-  shortCircuitOperators = true;
 
   constructor({
     data = {},
