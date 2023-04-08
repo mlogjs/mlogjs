@@ -11,7 +11,7 @@
       "name": "keyword"
     },
     {
-      "match": "@[a-zA-Z-_]+",
+      "match": "@[a-zA-Z-_0-9]+",
       "name": "variable"
     },
     {
