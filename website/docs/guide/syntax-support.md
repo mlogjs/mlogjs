@@ -289,32 +289,20 @@ Check out the [online editor](/editor) to see how each one works!
 
 ### Logical operators
 
-The logical operators `&&` (and) and `||` (or) are supported, although they DO NOT short-circuit. See [What is short-circuiting?](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation)
+The logical operators `&&` ("and") and `or` ("or") are supported, and behave the same as in regular javascript.
 
-::: warning
-
-Another caution you must take is that differently from regular javascript, these operators will ALWAYS return boolean values, which means that code like this will not work.
+Both [`and`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_AND#short-circuit_evaluation) and [`or`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Logical_OR#short-circuit_evaluation) **short-circuit**.
 
 ```js
-// WARNING: does not work
-// first: both expressions are evaluated because there is no
-// short circuiting
-//
-// second: the final value will be a boolean, not
-// whathever object getSomething returns
+// foo is either false
+// or the output of getSomething()
 const foo = isEnabled && getSomething();
 ```
 
-:::
-
 Behavior:
 
-- The operators evaluate all of the expressions and return a boolean value
-
-Limitations:
-
-- No short-circuiting support
-- These expressions cannot return anything other than a boolean
+- `&&`: evaluate the expression on the left and return it if it's falsy, else evaluate and return the expression on the right.
+- `||`: evaluate the expression on the left and return it if it's truthy, else evaluate and return the expression on the right.
 
 ### Nullish coalescing operator
 
