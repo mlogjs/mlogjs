@@ -1260,7 +1260,7 @@ declare global {
 
   /** Sets a property of a building or unit. World processor ONLY.*/
   function setProp<
-    Target extends BasicUnit | BasicBuilding,
-    K extends TSettablePropSymbol & keyof Target
-  >(property: K, target: Target, value: TSettablePropMap[K]): void;
+    T extends BasicUnit | BasicBuilding,
+    K extends TSettablePropSymbol<T>
+  >(property: K, target: T, value: TSettablePropMap<T>[K]): void;
 }
