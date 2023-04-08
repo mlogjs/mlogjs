@@ -17,13 +17,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronized the block symbol table with the game's.
 - Store values are now senseable.
 
-### Fixed
-
-- Fixed the `??` operator generating more temporary values than necessary.
-
 ### Removed
 
 - Removed support for the `unitControl.pathfind` command.
+
+### Fixed
+
+- Fixed the `??` operator generating more temporary values than necessary.
 
 ## [0.5.2] - 2023-03-05
 
@@ -100,7 +100,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Added operation caching for arithmethic operators and Math functions.
 
-### FIxed
+### Fixed
 
 - Fixed empty `if` statements having their jumps unduly removed.
 
