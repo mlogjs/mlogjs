@@ -30,54 +30,54 @@ op add ballY:35:6 ballY:35:6 ballVY:37:6
 op add ballXEnd:69:10 ballX:34:6 5
 op add ballYEnd:70:10 ballY:35:6 5
 op lessThan &t4 ballX:34:6 0
-op greaterThan &t5 ballXEnd:69:10 176
-op or &t6 &t4 &t5
-jump 36 equal &t6 0
+jump 34 notEqual &t4 0
+op greaterThan &t4 ballXEnd:69:10 176
+jump 36 equal &t4 0
 op mul ballVX:36:6 ballVX:36:6 -1
 jump 38 lessThanEq ballYEnd:70:10 176
 op mul ballVY:37:6 ballVY:37:6 -1
-op greaterThan &t7 ballXEnd:69:10 paddleX:31:6
-op add &t8 paddleX:31:6 paddleWidth:30:6
-op lessThan &t9 ballX:34:6 &t8
-op land &t10 &t7 &t9
-op greaterThan &t11 ballYEnd:70:10 10
-op land &t12 &t10 &t11
-op lessThan &t13 ballY:35:6 15
-op land &t14 &t12 &t13
-jump 54 equal &t14 0
+op greaterThan &t5 ballXEnd:69:10 paddleX:31:6
+jump 46 equal &t5 0
+op add &t6 paddleX:31:6 paddleWidth:30:6
+op lessThan &t5 ballX:34:6 &t6
+jump 46 equal &t5 0
+op greaterThan &t5 ballYEnd:70:10 10
+jump 46 equal &t5 0
+op lessThan &t5 ballY:35:6 15
+jump 54 equal &t5 0
 op mul ballVY:37:6 ballVY:37:6 -1.1
-op add &t15 ballX:34:6 2.5
-op sub &t16 &t15 paddleX:31:6
-op add &t17 &t16 &t0
-op div &t18 &t17 10
-op add ballVX:36:6 ballVX:36:6 &t18
+op add &t7 ballX:34:6 2.5
+op sub &t8 &t7 paddleX:31:6
+op add &t9 &t8 &t0
+op div &t10 &t9 10
+op add ballVX:36:6 ballVX:36:6 &t10
 op sub paddleWidth:30:6 paddleWidth:30:6 1
 set brickPtr:89:8 0
 set y:90:13 126
 jump 88 lessThanEq y:90:13 106
 set x:91:15 1
 jump 86 greaterThanEq x:91:15 176
-read &t15 bank1 brickPtr:89:8
-jump 83 notEqual &t15 1
+read &t7 bank1 brickPtr:89:8
+jump 83 notEqual &t7 1
 draw rect x:91:15 y:90:13 57.666666666666664 9
-op greaterThan &t16 ballXEnd:69:10 x:91:15
-op add &t17 x:91:15 58.666666666666664
-op lessThan &t18 ballX:34:6 &t17
-op land &t19 &t16 &t18
-op greaterThan &t20 ballYEnd:70:10 y:90:13
-op land &t21 &t19 &t20
-op add &t22 y:90:13 10
-op lessThan &t23 ballY:35:6 &t22
-op land &t24 &t21 &t23
-jump 83 equal &t24 0
+op greaterThan &t8 ballXEnd:69:10 x:91:15
+jump 71 equal &t8 0
+op add &t9 x:91:15 58.666666666666664
+op lessThan &t8 ballX:34:6 &t9
+jump 71 equal &t8 0
+op greaterThan &t8 ballYEnd:70:10 y:90:13
+jump 71 equal &t8 0
+op add &t10 y:90:13 10
+op lessThan &t8 ballY:35:6 &t10
+jump 83 equal &t8 0
 write 0 bank1 brickPtr:89:8
 op sub brickCount:40:6 brickCount:40:6 1
-op sub &t25 x:91:15 4
-op greaterThan &t26 ballX:34:6 &t25
-op add &t27 x:91:15 62.666666666666664
-op lessThan &t28 ballX:34:6 &t27
-op land &t29 &t26 &t28
-jump 82 equal &t29 0
+op sub &t12 x:91:15 4
+op greaterThan &t11 ballX:34:6 &t12
+jump 79 equal &t11 0
+op add &t13 x:91:15 62.666666666666664
+op lessThan &t11 ballX:34:6 &t13
+jump 82 equal &t11 0
 op mul ballVY:37:6 ballVY:37:6 -1
 jump 83 always
 op mul ballVX:36:6 ballVX:36:6 -1
@@ -86,10 +86,10 @@ op add x:91:15 x:91:15 58.666666666666664
 jump 58 always
 op sub y:90:13 y:90:13 10
 jump 56 always
-op lessThan &t15 ballY:35:6 0
-op equal &t16 brickCount:40:6 0
-op or &t17 &t15 &t16
-jump 94 notEqual &t17 0
+op lessThan &t7 ballY:35:6 0
+jump 91 notEqual &t7 0
+op equal &t7 brickCount:40:6 0
+jump 94 notEqual &t7 0
 drawflush display1
 jump 16 always
 jump 1 always

@@ -3,10 +3,10 @@ import { EJumpKind, JumpInstruction } from "../instructions";
 import { BinaryOperator } from "../operators";
 import {
   es,
-  IBindableValue,
   IScope,
   IValue,
   TEOutput,
+  TLineRef,
   TValueInstructions,
 } from "../types";
 import { VoidValue } from "./VoidValue";
@@ -39,7 +39,7 @@ export class JumpOutValue extends VoidValue {
 
   constructor(
     public node: es.Node,
-    public address: IBindableValue<number | null>,
+    public address: TLineRef,
     public whenTrue: boolean
   ) {
     super();

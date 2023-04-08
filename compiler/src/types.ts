@@ -204,9 +204,24 @@ export interface IValueOperators {
   "|"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   instanceof(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   in(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "??"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "||"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
+  "&&"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
+  "??"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
+  "||"(
+    scope: IScope,
+    value: IValue,
+    out?: TEOutput,
+    endAddress?: TLineRef
+  ): TValueInstructions;
   "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   "*="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
@@ -300,6 +315,7 @@ export interface IBindableValue<T extends TLiteral | null = TLiteral>
   extends IValue {
   data: T;
 }
+export type TLineRef = IBindableValue<number | null>;
 
 export interface IFunctionValue extends IValue {
   return(

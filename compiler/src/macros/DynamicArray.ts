@@ -16,11 +16,11 @@ import {
 } from "../instructions";
 import {
   EMutability,
-  IBindableValue,
   IInstruction,
   IScope,
   IValue,
   TEOutput,
+  TLineRef,
   TValueInstructions,
 } from "../types";
 import { extractOutName } from "../utils";
@@ -384,7 +384,7 @@ class DynamicArrayEntry extends BaseValue {
   index: IValue | LiteralValue<number>;
   checked: boolean;
   newLength?: IValue;
-  failAddress?: IBindableValue<number | null>;
+  failAddress?: TLineRef;
   upperBound?: JumpInstruction;
   constructor({
     array,

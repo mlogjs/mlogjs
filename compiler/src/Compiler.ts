@@ -18,8 +18,6 @@ import { appendSourceLocations, hideRedundantJumps, pipeInsts } from "./utils";
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
 export interface CompilerOptions {
-  stackName?: string;
-
   /** Wether the compiler should preserve or compact variable and function names*/
   compactNames?: boolean;
 
@@ -28,18 +26,14 @@ export interface CompilerOptions {
 
 export class Compiler {
   protected stackName?: string;
-  protected usingStack: boolean;
   protected handlers: THandlerMap = handlers;
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
 
   constructor({
-    stackName,
     compactNames = false,
     sourcemap = false,
   }: CompilerOptions = {}) {
-    this.usingStack = !!stackName;
-    this.stackName = stackName;
     this.compactNames = compactNames;
     this.sourcemap = sourcemap;
   }
@@ -112,11 +106,12 @@ export class Compiler {
     scope: IScope,
     node: es.Node,
     handler = this.handlers[node.type],
-    out?: TEOutput
+    out?: TEOutput,
+    arg?: unknown
   ): TValueInstructions<IValue | null> {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      const result = handler(this, scope, node, out, null);
+      const result = handler(this, scope, node, out, arg);
       if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {
@@ -132,9 +127,10 @@ export class Compiler {
     scope: IScope,
     node: es.Node,
     handler = this.handlers[node.type],
-    out?: TEOutput
+    out?: TEOutput,
+    arg?: unknown
   ): TValueInstructions {
-    const result = this.handle(scope, node, handler, out);
+    const result = this.handle(scope, node, handler, out, arg);
     if (!result[0])
       throw new CompilerError(
         `This node (${node.type}) did not return a value`,
@@ -143,8 +139,13 @@ export class Compiler {
     return result as TValueInstructions;
   }
 
-  handleEval(scope: IScope, node: es.Node, out?: TEOutput): TValueInstructions {
-    const [res, inst] = this.handleValue(scope, node, undefined, out);
+  handleEval(
+    scope: IScope,
+    node: es.Node,
+    out?: TEOutput,
+    arg?: unknown
+  ): TValueInstructions {
+    const [res, inst] = this.handleValue(scope, node, undefined, out, arg);
     const [evaluated, evaluatedInst] = res.eval(scope, out);
     const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
 

@@ -9,16 +9,16 @@ op add x:4:4 x:4:4 vx:6:4
 op add y:5:4 y:5:4 vy:7:4
 op add vy:7:4 vy:7:4 -1
 op lessThan &t1 x:4:4 0
+jump 14 notEqual &t1 0
 op add &t2 x:4:4 5
-op greaterThan &t3 &t2 176
-op or &t4 &t1 &t3
-jump 16 equal &t4 0
+op greaterThan &t1 &t2 176
+jump 16 equal &t1 0
 op div vx:6:4 vx:6:4 -1.1
-op lessThan &t5 y:5:4 0
-op add &t6 y:5:4 5
-op greaterThan &t7 &t6 176
-op or &t8 &t5 &t7
-jump 22 equal &t8 0
+op lessThan &t3 y:5:4 0
+jump 20 notEqual &t3 0
+op add &t4 y:5:4 5
+op greaterThan &t3 &t4 176
+jump 22 equal &t3 0
 op div vy:7:4 vy:7:4 -1.1
 draw clear 0 0 0
 draw rect x:4:4 y:5:4 5 5

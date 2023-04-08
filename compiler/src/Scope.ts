@@ -12,6 +12,12 @@ import { internalPrefix } from "./utils";
 
 export class Scope implements IScope {
   data: Record<string, IValue | null>;
+  parent: IScope | null;
+  ntemp: number;
+  name: string;
+  inst: IInstruction[];
+  operationCache: Record<string, IValue>;
+  cacheDependencies: Record<string, string[]>;
   break!: AddressResolver;
   continue!: AddressResolver;
   function!: IFunctionValue;
@@ -19,29 +25,41 @@ export class Scope implements IScope {
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
 
-  constructor(
-    values: Record<string, IValue | null>,
-    public parent: IScope | null = null,
-    public stacked = false,
-    public ntemp = 0,
-    public name = "",
-    public inst: IInstruction[] = [],
-    public operationCache: Record<string, IValue> = {},
-    public cacheDependencies: Record<string, string[]> = {}
-  ) {
-    this.data = values;
+  constructor({
+    data = {},
+    parent = null,
+    ntemp = 0,
+    name = "",
+    inst = [],
+    operationCache = {},
+    cacheDependencies = {},
+  }: Partial<
+    Pick<
+      IScope,
+      | "data"
+      | "parent"
+      | "ntemp"
+      | "name"
+      | "inst"
+      | "operationCache"
+      | "cacheDependencies"
+    >
+  > = {}) {
+    this.data = data;
+    this.parent = parent;
+    this.ntemp = ntemp;
+    this.name = name;
+    this.inst = inst;
+    this.operationCache = operationCache;
+    this.cacheDependencies = cacheDependencies;
   }
   copy(): IScope {
-    const scope = new Scope(
-      { ...this.data },
-      this.parent,
-      this.stacked,
-      this.ntemp,
-      this.name,
-      this.inst,
-      { ...this.operationCache },
-      { ...this.cacheDependencies }
-    );
+    const scope = new Scope({
+      ...this,
+      data: { ...this.data },
+      operationCache: { ...this.operationCache },
+      cacheDependencies: { ...this.cacheDependencies },
+    });
     scope.break = this.break;
     scope.continue = this.continue;
     scope.function = this.function;
@@ -55,8 +73,14 @@ export class Scope implements IScope {
     scope.parent = this;
     return scope;
   }
-  createFunction(name: string, stacked = this.stacked): IScope {
-    return new Scope({}, this, stacked, 0, name, this.inst);
+  createFunction(name: string): IScope {
+    return new Scope({
+      data: {},
+      parent: this,
+      ntemp: 0,
+      name,
+      inst: this.inst,
+    });
   }
   has(identifier: string): boolean {
     if (identifier in this.data) return true;

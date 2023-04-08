@@ -13,8 +13,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
-- Store values are now senseable.
+- Logical operators are now able to short-circuit.
 - Synchronized the block symbol table with the game's.
+- Store values are now senseable.
 
 ### Fixed
 
