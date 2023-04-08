@@ -56,3 +56,18 @@ switch (a) {
   default:
     print("default");
 }
+
+// test falltrough detection with other stuff
+
+switch (a) {
+  case 0:
+    print("first");
+    endScript();
+  case 1:
+    print("second");
+    stopScript();
+  case 3:
+    print("third");
+  default:
+    print("default");
+}
