@@ -5,20 +5,27 @@ import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 const validEffects = [
+  "none",
   "burning",
   "freezing",
   "unmoving",
+  "slow",
   "wet",
+  "muddy",
   "melting",
   "sapped",
-  "electrified",
-  "spore-slowed",
   "tarred",
   "overdrive",
   "overclock",
-  "boss",
+  "shielded",
   "shocked",
   "blasted",
+  "corroded",
+  "boss",
+  "spore-slowed",
+  "disarmed",
+  "electrified",
+  "invincible",
 ] as const;
 
 export class ApplyStatus extends ObjectValue {
