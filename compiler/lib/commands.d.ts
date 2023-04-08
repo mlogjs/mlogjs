@@ -1,5 +1,7 @@
 import "./kind";
 import {
+  TSettablePropMap,
+  TSettablePropSymbol,
   TRadarFilter,
   TRadarSort,
   TUnitEffect,
@@ -1255,4 +1257,10 @@ declare global {
 
   /** Sets a global flag. World processor ONLY. */
   function setFlag(flag: string, value: boolean): void;
+
+  /** Sets a property of a building or unit. World processor ONLY.*/
+  function setProp<
+    Target extends BasicUnit | BasicBuilding,
+    K extends TSettablePropSymbol & keyof Target
+  >(property: K, target: Target, value: TSettablePropMap[K]): void;
 }

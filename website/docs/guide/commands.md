@@ -1402,3 +1402,12 @@ Sets a global flag.
 ```js
 setFlag("foo", true);
 ```
+
+### `setProp`
+
+Sets a property of a building or unit.
+
+```js
+const router = fetch.build(Teams.sharded, 0, Blocks.router);
+setProp(LAccess.team, router, Teams.derelict);
+```

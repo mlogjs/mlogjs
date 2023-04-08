@@ -1,3 +1,5 @@
+import { WithSymbols } from "./traits";
+
 export type TRadarFilter =
   | "any"
   | "enemy"
@@ -46,3 +48,21 @@ export type TUnitEffect =
   | "boss"
   | "shocked"
   | "blasted";
+
+export type TSettablePropSymbol = Extract<keyof TSettablePropMap, symbol>;
+export type TSettablePropMap = WithSymbols<
+  {
+    [P in
+      | keyof typeof Items
+      | keyof typeof Liquids
+      | "x"
+      | "y"
+      | "rotation"
+      | "health"
+      | "totalPower"
+      | "flag"]: number;
+  } & {
+    team: TeamSymbol | number;
+    payloadType?: UnitSymbol | BuildingSymbol;
+  }
+>;

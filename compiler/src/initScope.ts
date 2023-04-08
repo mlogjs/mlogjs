@@ -74,4 +74,5 @@ export function initScope(scope: IScope) {
   scope.hardSet("fetch", new commands.Fetch());
   scope.hardSet("getFlag", new commands.GetFlag());
   scope.hardSet("setFlag", new commands.SetFlag());
+  scope.hardSet("setProp", new commands.SetProp());
 }
