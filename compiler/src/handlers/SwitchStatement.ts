@@ -1,10 +1,4 @@
-import {
-  AddressResolver,
-  BreakInstruction,
-  EJumpKind,
-  JumpInstruction,
-  SetCounterInstruction,
-} from "../instructions";
+import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import {
   EInstIntent,
   EMutability,
@@ -44,7 +38,7 @@ export const SwitchStatement: THandler<null> = (
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
 
-    const canFallInto = !endsWithoutFalltrough(inst, endLine);
+    const canFallInto = !endsWithoutFalltrough(inst);
     let includeJump = !constantCase;
     const includeBody = !constantCase || canFallInto;
 
@@ -82,7 +76,7 @@ export const SwitchStatement: THandler<null> = (
         if (
           noFallInto &&
           onlyConstantTests &&
-          (isLastCase || endsWithoutFalltrough(bodyInst(), endLine))
+          (isLastCase || endsWithoutFalltrough(bodyInst()))
         ) {
           return [null, [...bodyInst(), endLine]];
         }
@@ -125,7 +119,7 @@ export const SwitchStatement: THandler<null> = (
   ];
 };
 
-function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
+function endsWithoutFalltrough(inst: IInstruction[]) {
   if (inst.length === 0) return true;
   for (let i = inst.length - 1; i >= 0; i--) {
     const instruction = inst[i];
@@ -139,12 +133,7 @@ function endsWithoutFalltrough(inst: IInstruction[], endLine: AddressResolver) {
     if (instruction instanceof AddressResolver) return false;
     if (instruction.hidden) continue;
 
-    return (
-      instruction instanceof SetCounterInstruction ||
-      instruction.intent === EInstIntent.return ||
-      (instruction instanceof BreakInstruction &&
-        endLine.bonds.includes(instruction.address))
-    );
+    return instruction.intent !== EInstIntent.none;
   }
   return false;
 }
