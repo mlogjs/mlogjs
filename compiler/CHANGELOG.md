@@ -21,6 +21,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Fixed the `??` operator generating more temporary values than necessary.
 
+### Removed
+
+- Removed support for the `unitControl.pathfind` command.
+
 ## [0.5.2] - 2023-03-05
 
 ### Deprecated
