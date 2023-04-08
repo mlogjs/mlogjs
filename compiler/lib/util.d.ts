@@ -34,21 +34,28 @@ export type TUnitLocateBuildingGroup =
   | "battery"
   | "reactor";
 
-export type TUnitEffect =
+export type TStatusEffect =
   | "burning"
   | "freezing"
   | "unmoving"
+  | "slow"
   | "wet"
+  | "muddy"
   | "melting"
   | "sapped"
-  | "electrified"
-  | "spore-slowed"
   | "tarred"
-  | "overdrive"
   | "overclock"
-  | "boss"
+  | "shielded"
   | "shocked"
-  | "blasted";
+  | "blasted"
+  | "corroded"
+  | "spore-slowed"
+  | "disarmed"
+  | "electrified"
+  | "invincible"
+  | TPermanentStatusEffect;
+
+export type TPermanentStatusEffect = "boss" | "overdrive";
 
 type CommonSettableProps = {
   [P in keyof typeof Items | keyof typeof Liquids]: number;

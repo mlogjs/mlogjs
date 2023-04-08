@@ -4,8 +4,9 @@ import {
   TSettablePropSymbol,
   TRadarFilter,
   TRadarSort,
-  TUnitEffect,
   TUnitLocateBuildingGroup,
+  TStatusEffect,
+  TPermanentStatusEffect,
 } from "./util";
 declare global {
   /**
@@ -941,17 +942,17 @@ declare global {
      * The only status effects that don't require a duration are `overdrive` and `boss`.
      */
     function apply(
-      status: Exclude<TUnitEffect, "overdrive" | "boss">,
+      status: Exclude<TStatusEffect, TPermanentStatusEffect>,
       unit: BasicUnit,
       duration: number
     ): void;
 
-    function apply(status: "overdrive" | "boss", unit: BasicUnit): void;
+    function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
 
     /**
      * Removes a status effect to the given unit.
      */
-    function clear(status: TUnitEffect, unit: BasicUnit): void;
+    function clear(status: TStatusEffect, unit: BasicUnit): void;
   }
 
   /**
