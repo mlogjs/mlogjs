@@ -13,4 +13,6 @@ jump 14 always
 print "dynamic b"
 jump 15 always
 print "one"
+print "second"
+stop
 end
