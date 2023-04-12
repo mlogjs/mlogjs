@@ -1,6 +1,6 @@
 import { AddressResolver, JumpInstruction, EJumpKind } from "../instructions";
 import { es, THandler } from "../types";
-import { discardedName, withAlwaysRuns } from "../utils";
+import { discardedName, usesAddressResolver, withAlwaysRuns } from "../utils";
 import { LiteralValue } from "../values";
 import { JumpOutValue } from "../values/JumpOutValue";
 
@@ -38,6 +38,7 @@ export const ForStatement: THandler<null> = (
   }
   const isInfiniteLoop = test instanceof LiteralValue;
 
+  const [, bodyLines] = withAlwaysRuns(c.handle(scope, node.body), false);
   return [
     null,
     [
@@ -45,11 +46,13 @@ export const ForStatement: THandler<null> = (
       startLoopLine,
       ...testLines,
       ...(isInfiniteLoop ? [] : JumpInstruction.or(test, testOut)),
-      ...withAlwaysRuns(c.handle(scope, node.body), false)[1],
+      ...bodyLines,
       beforeEndLine,
       ...updateLines,
       new JumpInstruction(startLoopAddr, EJumpKind.Always),
-      ...(isInfiniteLoop ? [] : [endLoopLine]),
+      ...(isInfiniteLoop && !usesAddressResolver(endLoopLine, bodyLines)
+        ? []
+        : [endLoopLine]),
     ],
   ];
 };
