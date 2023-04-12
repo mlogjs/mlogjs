@@ -1,0 +1,5 @@
+set i:1:9 0
+jump 4 greaterThan i:1:9 10
+op add i:1:9 i:1:9 1
+jump 1 always
+end
