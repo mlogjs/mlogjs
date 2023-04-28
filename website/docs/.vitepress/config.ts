@@ -1,7 +1,6 @@
 import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
-import { SearchPlugin } from "vitepress-plugin-search";
 
 const base = process.env.BASE ?? "/mlogjs/";
 
@@ -13,6 +12,9 @@ const config: UserConfig = {
   base,
 
   themeConfig: {
+    search: {
+      provider: "local",
+    },
     logo: "/logo.png",
     outline: [2, 3],
     editLink: {
@@ -92,12 +94,7 @@ const config: UserConfig = {
         allow: ["../../node_modules", "../../compiler"],
       },
     },
-    plugins: [
-      rawResolver(),
-      SearchPlugin({
-        tokenize: "reverse",
-      }),
-    ],
+    plugins: [rawResolver()],
   },
 };
 
