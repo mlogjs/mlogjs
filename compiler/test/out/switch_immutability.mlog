@@ -1,0 +1,7 @@
+op rand a:1:6 10
+jump 3 strictEqual 2 a:1:6
+jump 5 always
+print "is a"
+jump 6 always
+print "is b"
+end
