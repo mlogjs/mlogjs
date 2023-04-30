@@ -98,7 +98,11 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
     handler(init, inst) {
       if (kind === "const" && !init)
         throw new CompilerError("Constants must be initialized.", node);
-      if (kind === "const" && init?.mutability === EMutability.constant) {
+      if (
+        kind === "const" &&
+        (init?.mutability === EMutability.constant ||
+          init?.mutability === EMutability.immutable)
+      ) {
         scope.set(identifier, init);
         return [null, inst];
       } else {
@@ -112,7 +116,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
             );
           pipeInsts(value["="](scope, init), inst);
         }
-        if (kind === "const") value.mutability = EMutability.constant;
+        if (kind === "const") value.mutability = EMutability.immutable;
         return [null, inst];
       }
     },

@@ -1,5 +1,5 @@
 import { InstructionBase } from "../../instructions";
-import { EMutability, IValue } from "../../types";
+import { IValue } from "../../types";
 import { ObjectValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -17,7 +17,7 @@ export class Fetch extends ObjectValue {
         buildCount: { args: ["team", "block"] },
       },
       handler(scope, overload, out, team, ...rest) {
-        const output = StoreValue.from(scope, out, EMutability.constant);
+        const output = StoreValue.from(scope, out);
 
         const params: (IValue | string)[] = ["0", "@conveyor"];
 
