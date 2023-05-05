@@ -53,7 +53,7 @@ export class VarsNamespace extends NamespaceMacro {
   constructor() {
     super();
     Object.assign<IObjectValueData, IObjectValueData>(this.data, {
-      unit: new StoreValue("@unit", EMutability.constant),
+      unit: new StoreValue("@unit", EMutability.readonly),
       this: new StoreValue("@this", EMutability.constant),
     });
   }
