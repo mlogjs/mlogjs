@@ -13,6 +13,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- `Vars.unit` is now treated as a mutable readonly value.
 - Expanded the list of supported status effects for the `applyStatus` command.
 - Logical operators are now able to short-circuit.
 - Synchronized the block symbol table with the game's.

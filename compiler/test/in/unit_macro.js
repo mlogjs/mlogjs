@@ -1,7 +1,6 @@
 // Doing this is needed because typescript
 // will otherwise infer the type of Vars.unit to be never
-const unit = Vars.unit;
-if (unit == undefined) {
+if (Vars.unit == undefined) {
   unitBind(Units.flare);
 }
 print("ammo: ", Vars.unit.ammo, "\n");
