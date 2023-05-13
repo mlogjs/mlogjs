@@ -525,6 +525,29 @@ Controls the unit bound to the processor
   });
   ```
 
+- #### `untiControl.pathfind`
+
+  Makes the unit bound to this processor move to the given location.
+
+  Uses the unit's pathfinding algorithm to decide how to
+  reach the desired location instead of blidly going in a straight line.
+
+  ```js
+  // makes flares follow the player's cursor
+  const turret = getBuilding("foreshadow1");
+
+  const player = radar({
+    building: turret,
+    filters: ["player", "any", "any"],
+    order: true,
+    sort: "distance",
+  });
+
+  unitBind(Units.flare);
+
+  unitControl.pathfind(player.shootX, player.shootY);
+  ```
+
 - #### `unitControl.boost`
 
   Whether the unit bound to this processor should be boosted (floating).

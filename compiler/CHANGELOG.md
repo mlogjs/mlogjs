@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for the new version of `ucontrol pathfind` (`unitControl.pathfind`).
 - Added the `setProp` command (`setprop` instruction).
 
 ### Changed
