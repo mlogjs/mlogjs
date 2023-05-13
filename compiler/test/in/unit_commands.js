@@ -1,5 +1,6 @@
 unitBind(Units.flare);
 unitControl.approach({ x: 0, y: 0, radius: 5 });
+unitControl.pathfind(0, 0);
 unitControl.boost(true);
 unitControl.build({ x: 0, y: 0, block: Blocks.router, rotation: 0 });
 unitControl.flag(123);
