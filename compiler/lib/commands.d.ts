@@ -541,7 +541,13 @@ declare global {
     function stop(): void;
 
     /**
-     * Makes the unit bound to this processor move to the given position
+     * Makes the unit bound to this processor move to the given position.
+     *
+     * The unit tends to move in a straight line to the target location,
+     * which doesn't work in situations where the unit encounters an obstacle
+     * (such as a dagger trying to get past a wall).
+     *
+     * For those scenarios it's better to use `unitControl.pathfind`.
      */
     function move(x: number, y: number): void;
 
@@ -555,6 +561,14 @@ declare global {
       /** How distant to the position the unit can be */
       radius: number;
     }): void;
+
+    /**
+     * Makes the unit bound to this processor move to the given location.
+     *
+     * Uses the unit's pathfinding algorithm to decide how to
+     * reach the desired location instead of blidly going in a straight line.
+     */
+    function pathfind(x: number, y: number): void;
 
     /**
      * Whether the unit bound to this processor should be boosted (floating)
