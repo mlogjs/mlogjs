@@ -15,7 +15,7 @@ export class LazyValue extends VoidValue {
     return "LazyValue";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro LazyValue]"';
   }
 }

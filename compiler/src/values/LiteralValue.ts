@@ -34,12 +34,12 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   constructor(data: T) {
     super();
     this.data = data;
-    this.name = this.toString();
+    this.name = this.toMlogString();
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-  toString() {
+  toMlogString() {
     return JSON.stringify(this.data);
   }
   get(scope: IScope, name: IValue): TValueInstructions {
@@ -83,7 +83,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   }
 
   debugString(): string {
-    return this.toString();
+    return this.toMlogString();
   }
 }
 

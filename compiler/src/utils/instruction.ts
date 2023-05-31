@@ -72,3 +72,11 @@ export function usesAddressResolver(
   }
   return false;
 }
+
+export function formatInstructionArgs(
+  args: (IValue | string | null)[]
+): string[] {
+  return args
+    .filter((value): value is IValue | string => !!value)
+    .map(value => (typeof value === "string" ? value : value.toMlogString()));
+}

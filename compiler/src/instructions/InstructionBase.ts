@@ -1,5 +1,6 @@
 import { SourceLocation } from "@babel/types";
 import { EInstIntent, IInstruction, IValue } from "../types";
+import { formatInstructionArgs } from "../utils";
 
 export class InstructionBase implements IInstruction {
   intent = EInstIntent.none;
@@ -22,6 +23,6 @@ export class InstructionBase implements IInstruction {
   }
   resolve(_i: number) {}
   toString() {
-    return this.args.filter(arg => arg).join(" ");
+    return formatInstructionArgs(this.args).join(" ");
   }
 }

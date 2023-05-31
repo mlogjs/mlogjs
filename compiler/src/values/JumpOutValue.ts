@@ -81,7 +81,7 @@ export class JumpOutValue extends VoidValue {
     return "JumpOutValue";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro JumpOutValue]"';
   }
 }

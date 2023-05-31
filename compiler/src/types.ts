@@ -303,6 +303,9 @@ export interface IValue extends IValueOperators {
   /** The string representation of `this` in error messages. */
   debugString(): string;
 
+  /** The string representation of `this` in the generated mlog code. */
+  toMlogString(): string;
+
   /**
    * Allows some values to choose alternative representations
    * when they are used as operation outputs.

@@ -41,7 +41,7 @@ export class MacroFunction<
     return "MacroFunction";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro MacroFunction]"';
   }
 }

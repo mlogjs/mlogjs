@@ -129,7 +129,7 @@ export class StoreValue extends BaseValue implements IValue {
     return `StoreValue("${this.name}")`;
   }
 
-  toString() {
+  toMlogString() {
     return this.name;
   }
 }
