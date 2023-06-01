@@ -107,7 +107,7 @@ export class ObjectValue extends VoidValue {
     return "ObjectValue";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro ObjectValue]"';
   }
 }

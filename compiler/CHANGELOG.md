@@ -26,6 +26,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed escaping of double quotes in string literals.
+- Fixed escaping of backslashes in string literals.
 - Fixed `break` statements not working inside infinite `for` loops.
 - Fixed the fallthrough detection of `case`s in a `switch`.
 - Fixed the `??` operator generating more temporary values than necessary.

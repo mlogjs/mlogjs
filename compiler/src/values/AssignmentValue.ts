@@ -33,7 +33,7 @@ export class AssignmentValue extends VoidValue {
     return "AssignmentValue";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro AssignmentValue]"';
   }
 }

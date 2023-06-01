@@ -293,7 +293,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     return `FunctionValue("${this.name}")`;
   }
 
-  toString() {
+  toMlogString() {
     return '"[macro FunctionValue]"';
   }
 

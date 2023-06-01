@@ -34,13 +34,22 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   constructor(data: T) {
     super();
     this.data = data;
-    this.name = this.toString();
+    this.name = JSON.stringify(this.data);
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
   }
-  toString() {
-    return JSON.stringify(this.data);
+  toMlogString() {
+    const { data } = this;
+    if (typeof data !== "string") return JSON.stringify(data);
+
+    // this special handling is required because of
+    // how mindustry parses string literals in logic statements
+
+    // replace double quotes by two single quotes before
+    // forming the json string
+    // (there is no way to escape a " character)
+    return JSON.stringify(data.replace(/"/g, "''")).replace(/\\\\/g, "\\"); // "unescape" backslashes
   }
   get(scope: IScope, name: IValue): TValueInstructions {
     if (!(name instanceof LiteralValue && name.isString()))
@@ -83,7 +92,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   }
 
   debugString(): string {
-    return this.toString();
+    return this.toMlogString();
   }
 }
 

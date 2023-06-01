@@ -310,7 +310,7 @@ class DeclarationValue extends VoidValue {
     return "DeclarationValue";
   }
 
-  toString() {
+  toMlogString() {
     return '"[macro DeclarationValue]"';
   }
 }

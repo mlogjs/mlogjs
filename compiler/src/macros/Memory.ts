@@ -47,7 +47,7 @@ class MemoryEntry extends BaseValue {
     return "MemoryEntry";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro MemoryEntry]"';
   }
 }
@@ -84,10 +84,10 @@ class MemoryMacro extends ObjectValue {
   }
 
   debugString(): string {
-    return `Memory("${this.cell.toString()}")`;
+    return `Memory("${this.cell.toMlogString()}")`;
   }
 
-  toString() {
+  toMlogString() {
     return '"[macro Memory]"';
   }
 }

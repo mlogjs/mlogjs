@@ -50,7 +50,7 @@ export class VoidValue implements IValue {
     return "VoidValue";
   }
 
-  toString(): string {
+  toMlogString(): string {
     return '"[macro VoidValue]"';
   }
 }

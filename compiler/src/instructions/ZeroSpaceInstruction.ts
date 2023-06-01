@@ -1,7 +1,8 @@
+import { formatInstructionArgs } from "../utils";
 import { InstructionBase } from "./InstructionBase";
 
 export class ZeroSpaceInstruction extends InstructionBase {
   toString() {
-    return this.args.join("");
+    return formatInstructionArgs(this.args).join("");
   }
 }
