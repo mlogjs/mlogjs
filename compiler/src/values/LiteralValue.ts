@@ -55,7 +55,10 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     if (!(name instanceof LiteralValue && name.isString()))
       return super.get(scope, name);
     const method = literalMethods[name.data];
-    if (!method)
+    if (
+      !method ||
+      !Object.prototype.hasOwnProperty.call(literalMethods, name.data)
+    )
       throw new CompilerError(
         `The member [${name.debugString()}] does not exist on literal values.`
       );

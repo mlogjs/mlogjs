@@ -26,6 +26,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed calling `toString` in a literal value not having the correct error message.
 - Fixed escaping of double quotes in string literals.
 - Fixed escaping of backslashes in string literals.
 - Fixed `break` statements not working inside infinite `for` loops.
