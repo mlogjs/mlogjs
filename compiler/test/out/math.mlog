@@ -20,27 +20,29 @@ op acos &_ a:1:4
 op atan &_ a:1:4
 op idiv &_ a:1:4 2
 op pow &_ a:1:4 2
-set temp:27:4 0
-set temp:27:4 20
-set temp:27:4 10.5
-set temp:27:4 62.300527191945
-set temp:27:4 22.588713996153036
-op noise temp:27:4 10.5 20
-set temp:27:4 10.5
-set temp:27:4 2.3513752571634776
-set temp:27:4 1.021189299069938
-set temp:27:4 0.18223552549214747
-set temp:27:4 0.9832549075639546
-set temp:27:4 0.18533904493153439
-set temp:27:4 10
-set temp:27:4 11
-set temp:27:4 3.24037034920393
-op rand temp:27:4 10.5
-set temp:27:4 null
-set temp:27:4 null
-set temp:27:4 84.5596679689945
-set temp:27:4 2
-set temp:27:4 512
+op angleDiff &_ a:1:4 -5
+set temp:28:4 0
+set temp:28:4 20
+set temp:28:4 10.5
+set temp:28:4 62.300527191945
+set temp:28:4 22.588713996153036
+op noise temp:28:4 10.5 20
+set temp:28:4 10.5
+set temp:28:4 2.3513752571634776
+set temp:28:4 1.021189299069938
+set temp:28:4 0.18223552549214747
+set temp:28:4 0.9832549075639546
+set temp:28:4 0.18533904493153439
+set temp:28:4 10
+set temp:28:4 11
+set temp:28:4 3.24037034920393
+op rand temp:28:4 10.5
+set temp:28:4 null
+set temp:28:4 null
+set temp:28:4 84.5596679689945
+set temp:28:4 2
+set temp:28:4 512
+set temp:28:4 45
 print "\n"
 print @pi
 print "\n"
