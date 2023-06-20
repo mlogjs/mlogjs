@@ -12,6 +12,7 @@ import { MacroFunction } from "./Function";
 
 const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
 const toDegrees = (radians: number) => (radians * 180) / Math.PI;
+const mod = (f: number, n: number) => ((f % n) + n) % n;
 
 const mathOperations: Record<
   string,
@@ -22,6 +23,14 @@ const mathOperations: Record<
   angle: (x, y) => {
     const angle = toDegrees(Math.atan2(y!, x));
     return angle < 0 ? angle + 360 : angle;
+  },
+  angleDiff: (x, y) => {
+    const a = mod(x, 360);
+    const b = mod(y!, 360);
+    return Math.min(
+      a - b < 0 ? a - b + 360 : a - b,
+      b - a < 0 ? b - a + 360 : b - a
+    );
   },
   len: (a, b) => Math.sqrt(a ** 2 + b! ** 2),
   noise: null,
