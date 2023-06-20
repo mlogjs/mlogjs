@@ -101,6 +101,13 @@ interface Math {
   angle(a: number, b: number): number;
 
   /**
+   * Returns the absolute distance between two angles in degrees.
+   * @param a
+   * @param b
+   */
+  angleDiff(a: number, b: number): number;
+
+  /**
    * Returns the length of a vector
    * @param a
    * @param b

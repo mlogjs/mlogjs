@@ -20,6 +20,7 @@ Math.acos(a);
 Math.atan(a);
 Math.idiv(a, 2);
 Math.pow(a, 2);
+Math.angleDiff(a, -5);
 
 // compile time evaluation
 
@@ -45,6 +46,7 @@ temp = Math.acos(10.5);
 temp = Math.atan(10.5);
 temp = Math.idiv(5, 2);
 temp = Math.pow(2, 9);
+temp = Math.angleDiff(10, -35);
 
 print`
 ${Math.PI}
