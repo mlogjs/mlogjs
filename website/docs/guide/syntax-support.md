@@ -266,6 +266,7 @@ available on the mlog runtime. They are listed bellow:
 - `radToDeg` - The convertion ratio for radians to degrees.
 - `abs` - Absolute value of a number
 - `angle` - Angle of a vector in degrees
+- `angleDiff` - Absolute distance between two angles in degrees.
 - `acos` - The arc cosine of a number, in degrees.
 - `asin` - The arc sine of a number, in degrees.
 - `atan` - The arc tangent of a number, in degrees.
