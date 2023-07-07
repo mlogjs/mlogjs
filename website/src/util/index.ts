@@ -15,7 +15,7 @@ export function debounce<Args extends unknown[]>(
 }
 
 export function toEditorPath(path: string) {
-  return `${editorFSPrefix}://${path}`;
+  return `file:///editor/${path}`;
 }
 
 export function parseExtraLibs(lib: [string, string][]) {
@@ -23,5 +23,6 @@ export function parseExtraLibs(lib: [string, string][]) {
     content,
     filePath: toEditorPath(name.split("/compiler/")[1]),
   }));
+  console.log(libs.map(lib => lib.filePath));
   return libs;
 }
