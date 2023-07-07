@@ -17,8 +17,20 @@ declare function getVar<T>(name: string): T;
  * @param name
  */
 declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
-  name: string
+  name: string,
 ): T;
+
+/**
+ * Returns a record of all the buildings linked to this processor.
+ *
+ * ```js
+ * const { switch1: toggle, cell1 } = getBuildings();
+ * ```
+ */
+declare function getBuildings<T extends BasicBuilding = AnyBuilding>(): Record<
+  string,
+  T
+>;
 
 type ConcatLiteral = string | number | boolean | undefined;
 
