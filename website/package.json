@@ -13,7 +13,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@types/node": "^18.16.1",
+    "@types/node": "^18.16.19",
     "flexsearch": "^0.7.31",
     "markdown-it": "^13.0.1",
     "vite": "^4.4.2",
