@@ -8,7 +8,7 @@ import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
-import type { Monaco } from "../util";
+import { parseExtraLibs, type Monaco } from "../util";
 import { configureMlogLang, registerMlogLang } from "../mlog/lang";
 import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
@@ -99,9 +99,7 @@ function beforeMount(monaco: Monaco) {
     target: monaco.languages.typescript.ScriptTarget.ESNext,
     ...typescriptSettingsRef.value,
   });
-  defaults.setExtraLibs(
-    lib.map(([name, content]) => ({ content, filePath: name }))
-  );
+  defaults.setExtraLibs(parseExtraLibs(lib));
   registerMlogLang(monaco);
 }
 

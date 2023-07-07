@@ -33,7 +33,7 @@ export function rawResolver(): PluginOption {
       const items: File[] = files.map(([path, content]) => {
         this.addWatchFile(path);
         watchedFiles.set(path.replace(/\\/g, "/"), id);
-        return [relative(root, path), content];
+        return [relative(root, path).replace(/\\/g, "/"), content];
       });
 
       return "export default " + JSON.stringify(items);
