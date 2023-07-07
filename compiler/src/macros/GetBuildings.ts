@@ -36,6 +36,6 @@ class BuildingsMacro extends ObjectValue {
 
 function isKeyBuildingName(key: IValue): key is LiteralValue<string> {
   if (!(key instanceof LiteralValue) || !key.isString()) return false;
-  const regex = /^\w+\d*$/;
+  const regex = /^\w+$/;
   return regex.test(key.data);
 }
