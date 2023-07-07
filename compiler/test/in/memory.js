@@ -1,5 +1,4 @@
-const bank = getBuilding("bank1");
-const message = getBuilding("message1");
+const { bank1: bank, message1: message } = getBuildings();
 
 const mem = new Memory(bank, 512); // tell the compiler the size of the memory unit. 64 by default
 print("Expecting ", mem.length, " bytes to be available");
