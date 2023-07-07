@@ -54,7 +54,7 @@ Changes for each release are documented in the [CHANGELOG](https://github.com/ml
 
 ## Contribute
 
-Having trouble? [Ask for help on discord](https://discord.gg/2VudfNUp)
+Having trouble? [Ask for help on discord](https://discord.gg/SvgjCtZnR5)
 or [open an issue](https://github.com/mlogjs/mlogjs/issues/new)
 
 Help and suggestions are welcomed!
@@ -69,4 +69,4 @@ MIT
 [ci]: https://github.com/mlogjs/mlogjs/actions/workflows/ci.yml
 [docs]: https://mlogjs.github.io/mlogjs/
 [unreleased docs]: https://mlogjs.netlify.app
-[discord]: https://discord.gg/SvgjCtZnR5
+[discord]: https://discord.gg/98KWSSUPVj

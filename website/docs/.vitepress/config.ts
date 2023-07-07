@@ -34,7 +34,7 @@ const config: UserConfig = {
             text: "Changelog",
             link: "https://github.com/mlogjs/mlogjs/blob/main/compiler/CHANGELOG.md",
           },
-          { text: "Discord", link: "https://discord.gg/2VudfNUp" },
+          { text: "Discord", link: "https://discord.gg/98KWSSUPVj" },
         ],
       },
     ],
@@ -64,7 +64,7 @@ const config: UserConfig = {
 
     socialLinks: [
       { icon: "github", link: "https://github.com/mlogjs/mlogjs" },
-      { icon: "discord", link: "https://discord.gg/2VudfNUp" },
+      { icon: "discord", link: "https://discord.gg/98KWSSUPVj" },
     ],
   },
   markdown: {
