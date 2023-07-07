@@ -28,7 +28,7 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
  * ```
  */
 declare function getBuildings<T extends BasicBuilding = AnyBuilding>(): Record<
-  string,
+  `${keyof Blocks}${1 | 2 | 3 | 4 | 5 | 6 | 7 | 8 | 9}` | (string & {}),
   T
 >;
 
