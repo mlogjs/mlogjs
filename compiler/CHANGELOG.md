@@ -27,6 +27,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed the online editor parsing declaration files multiple times.
 - Fixed missing field declarations on units and buildings.
 - Fixed calling `toString` in a literal value not having the correct error message.
 - Fixed escaping of double quotes in string literals.
