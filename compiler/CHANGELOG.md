@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added the `getBuildings` helper function.
 - Added support for the `anglediff` operation (at `Math.angleDiff`).
 - Added support for the new version of `ucontrol pathfind` (`unitControl.pathfind`).
 - Added the `setProp` command (`setprop` instruction).
