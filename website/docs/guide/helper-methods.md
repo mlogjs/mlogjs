@@ -15,6 +15,17 @@ this allows the compiler to optimize the code by treating constants created
 that way as aliases.
 :::
 
+## `getBuildings`
+
+Returns a record of all the buildings linked to this processor.
+
+The use of this function is preferred if you are assigning
+buildings to multiple variables at once.
+
+```js
+const { switch1: toggle, cell1 } = getBuildings();
+```
+
 ## `getVar`
 
 Allows you to access symbols or variables that are not available through the [namespaces](/guide/namespaces).

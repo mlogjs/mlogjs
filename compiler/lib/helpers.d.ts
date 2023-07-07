@@ -23,6 +23,9 @@ declare function getBuilding<T extends BasicBuilding = AnyBuilding>(
 /**
  * Returns a record of all the buildings linked to this processor.
  *
+ * The use of this function is preferred if you are assigning
+ * buildings to multiple variables at once.
+ *
  * ```js
  * const { switch1: toggle, cell1 } = getBuildings();
  * ```
