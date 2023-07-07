@@ -1,0 +1,7 @@
+sensor &t0 sorter1 @config
+sensor &t1 sorter2 @config
+print "sorter1: "
+print &t0
+print "\nsorter2: "
+print &t1
+print "\n"
