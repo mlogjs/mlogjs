@@ -15,7 +15,7 @@ importers:
       '@babel/parser': ^7.22.7
       '@babel/types': ^7.22.5
       '@rollup/plugin-alias': ^5.0.0
-      '@rollup/plugin-typescript': ^11.1.0
+      '@rollup/plugin-typescript': ^11.1.2
       '@types/jest': ^29.5.2
       '@types/node': ^18.16.1
       '@types/yargs': ^17.0.24
@@ -25,7 +25,7 @@ importers:
       cli-highlight: ^2.1.11
       eslint: ^8.44.0
       jest: ^29.6.1
-      rollup: ^3.21.0
+      rollup: ^3.26.2
       ts-jest: ^29.1.1
       ts-node: ^10.9.1
       tslib: ^2.6.0
@@ -38,8 +38,8 @@ importers:
       cli-highlight: 2.1.11
       yargs: 17.7.2
     devDependencies:
-      '@rollup/plugin-alias': 5.0.0_rollup@3.21.0
-      '@rollup/plugin-typescript': 11.1.0_lbcxtdac5o4coou5e3tk2gwzje
+      '@rollup/plugin-alias': 5.0.0_rollup@3.26.2
+      '@rollup/plugin-typescript': 11.1.2_6xjso5fzkipbfbexv7pui6f654
       '@types/jest': 29.5.2
       '@types/node': 18.16.1
       '@types/yargs': 17.0.24
@@ -47,7 +47,7 @@ importers:
       '@typescript-eslint/parser': 5.61.0_iqf7tbmerllfqanu4l3d6aqdn4
       eslint: 8.44.0
       jest: 29.6.1_bo27lw6r6phopwmq6ftttruhxu
-      rollup: 3.21.0
+      rollup: 3.26.2
       ts-jest: 29.1.1_i6gtp52dwlhvyn32a6bohskwlu
       ts-node: 10.9.1_rf26hdvtbvet76enq6ynfzm5cu
       tslib: 2.6.0
@@ -1175,7 +1175,7 @@ packages:
       fastq: 1.15.0
     dev: true
 
-  /@rollup/plugin-alias/5.0.0_rollup@3.21.0:
+  /@rollup/plugin-alias/5.0.0_rollup@3.26.2:
     resolution: {integrity: sha512-l9hY5chSCjuFRPsnRm16twWBiSApl2uYFLsepQYwtBuAxNMQ/1dJqADld40P0Jkqm65GRTLy/AC6hnpVebtLsA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1184,12 +1184,12 @@ packages:
       rollup:
         optional: true
     dependencies:
-      rollup: 3.21.0
+      rollup: 3.26.2
       slash: 4.0.0
     dev: true
 
-  /@rollup/plugin-typescript/11.1.0_lbcxtdac5o4coou5e3tk2gwzje:
-    resolution: {integrity: sha512-86flrfE+bSHB69znnTV6kVjkncs2LBMhcTCyxWgRxLyfXfQrxg4UwlAqENnjrrxnSNS/XKCDJCl8EkdFJVHOxw==}
+  /@rollup/plugin-typescript/11.1.2_6xjso5fzkipbfbexv7pui6f654:
+    resolution: {integrity: sha512-0ghSOCMcA7fl1JM+0gYRf+Q/HWyg+zg7/gDSc+fRLmlJWcW5K1I+CLRzaRhXf4Y3DRyPnnDo4M2ktw+a6JcDEg==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
       rollup: ^2.14.0||^3.0.0
@@ -1201,14 +1201,14 @@ packages:
       tslib:
         optional: true
     dependencies:
-      '@rollup/pluginutils': 5.0.2_rollup@3.21.0
+      '@rollup/pluginutils': 5.0.2_rollup@3.26.2
       resolve: 1.22.2
-      rollup: 3.21.0
+      rollup: 3.26.2
       tslib: 2.6.0
       typescript: 5.1.6
     dev: true
 
-  /@rollup/pluginutils/5.0.2_rollup@3.21.0:
+  /@rollup/pluginutils/5.0.2_rollup@3.26.2:
     resolution: {integrity: sha512-pTd9rIsP92h+B6wWwFbW8RkZv4hiR/xKsqre4SIuAOaOEQRxi0lqLke9k2/7WegC85GgUs9pjmOjCUi3In4vwA==}
     engines: {node: '>=14.0.0'}
     peerDependencies:
@@ -1220,7 +1220,7 @@ packages:
       '@types/estree': 1.0.1
       estree-walker: 2.0.2
       picomatch: 2.3.1
-      rollup: 3.21.0
+      rollup: 3.26.2
     dev: true
 
   /@sinclair/typebox/0.27.8:
@@ -2545,8 +2545,8 @@ packages:
     resolution: {integrity: sha512-zz06S8t0ozoDXMG+ube26zeCTNXcKIPJZJi8hBrF4idCLms4CG9QtK7qBl1boi5ODzFpjswb5JPmHCbMpjaYzg==}
     dev: true
 
-  /is-core-module/2.12.0:
-    resolution: {integrity: sha512-RECHCBCd/viahWmwj6enj19sKbHfJrddi/6cBDsNTKbNq0f7VeaUkBo60BqzvPqo/W54ChS62Z5qyun7cfOMqQ==}
+  /is-core-module/2.12.1:
+    resolution: {integrity: sha512-Q4ZuBAe2FUsKtyQJoQHlvP8OvBERxO3jEmy1I7hcRXcJBGGHFh/aJBswbXuS9sgrDH2QUO8ilkwNPHvHMd8clg==}
     dependencies:
       has: 1.0.3
     dev: true
@@ -3543,7 +3543,7 @@ packages:
     resolution: {integrity: sha512-Sb+mjNHOULsBv818T40qSPeRiuWLyaGMa5ewydRLFimneixmVy2zdivRl+AF6jaYPC8ERxGDmFSiqui6SfPd+g==}
     hasBin: true
     dependencies:
-      is-core-module: 2.12.0
+      is-core-module: 2.12.1
       path-parse: 1.0.7
       supports-preserve-symlinks-flag: 1.0.0
     dev: true
@@ -3558,14 +3558,6 @@ packages:
     hasBin: true
     dependencies:
       glob: 7.2.3
-    dev: true
-
-  /rollup/3.21.0:
-    resolution: {integrity: sha512-ANPhVcyeHvYdQMUyCbczy33nbLzI7RzrBje4uvNiTDJGIMtlKoOStmympwr9OtS1LZxiDmE2wvxHyVhoLtf1KQ==}
-    engines: {node: '>=14.18.0', npm: '>=8.0.0'}
-    hasBin: true
-    optionalDependencies:
-      fsevents: 2.3.2
     dev: true
 
   /rollup/3.26.2:
