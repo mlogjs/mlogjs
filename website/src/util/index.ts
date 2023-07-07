@@ -14,10 +14,14 @@ export function debounce<Args extends unknown[]>(
   };
 }
 
+export function toEditorPath(path: string) {
+  return `${editorFSPrefix}://${path}`;
+}
+
 export function parseExtraLibs(lib: [string, string][]) {
   const libs = lib.map(([name, content]) => ({
     content,
-    filePath: `${editorFSPrefix}://${name.split("/compiler/")[1]}`,
+    filePath: toEditorPath(name.split("/compiler/")[1]),
   }));
   return libs;
 }
