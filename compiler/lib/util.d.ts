@@ -95,6 +95,8 @@ export type TLogicLinkNames<T extends string> =
  * - If the name is a single uppercase letter followed by lowercase letters,
  * return the name in lowercase form.
  * - Else, remove one letter from the beggining and repeat the process.
+ *
+ * Based on [the mindustry source code](https://github.com/Anuken/Mindustry/blob/93daa7a5dcc3fac9e5f40c3375e9f57ae4720ff4/core/src/mindustry/world/blocks/logic/LogicBlock.java#L103-L115).
  */
 export type TLogicLinkName<T extends string> = T extends `${infer First}Large`
   ? TLogicLinkName<First>
