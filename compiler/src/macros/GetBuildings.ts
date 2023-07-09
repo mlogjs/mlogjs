@@ -27,7 +27,7 @@ class BuildingsMacro extends ObjectValue {
 
     if (!isKeyBuildingName(key)) {
       throw new CompilerError(
-        `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
+        `[${key.debugString()}] is not a valid building name`,
       );
     }
     return [new StoreValue(key.data, EMutability.constant), []];
