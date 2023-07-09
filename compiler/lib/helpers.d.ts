@@ -20,7 +20,9 @@ declare global {
    * @param name
    */
 
-  function getBuilding<T extends BasicBuilding = AnyBuilding>(name: string): T;
+  function getBuilding<T extends BasicBuilding = AnyBuilding>(
+    name: TLogicLinkNames<keyof BuildingSymbolTable> | (string & {}),
+  ): T;
 
   /**
    * Returns a record of all the buildings linked to this processor.
