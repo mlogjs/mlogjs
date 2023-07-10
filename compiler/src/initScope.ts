@@ -2,6 +2,7 @@ import {
   commands,
   Concat,
   DynamicArrayConstructor,
+  GetBuildings,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
@@ -30,6 +31,7 @@ export function initScope(scope: IScope) {
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
+  scope.hardSet("getBuildings", new GetBuildings());
   scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
   scope.hardSet("concat", new Concat());
   scope.hardSet("asm", new Asm());
