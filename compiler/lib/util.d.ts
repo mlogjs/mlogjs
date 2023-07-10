@@ -90,21 +90,20 @@ export type TLogicLinkNames<T extends string> =
  * Converts a the name of a block into it's logic link variant.
  *
  * The transformation happens as follows:
- * - Remove the "Large" at the end of the name.
  * - If the name is all lowercase, return it.
  * - If the name is a single uppercase letter followed by lowercase letters,
  * return the name in lowercase form.
- * - Else, remove one letter from the beggining and repeat the process.
+ * - If the name has "Large" at the end, remove it and try again.
+ * - Else, remove one letter from the beggining and try again.
  *
  * Based on [the mindustry source code](https://github.com/Anuken/Mindustry/blob/93daa7a5dcc3fac9e5f40c3375e9f57ae4720ff4/core/src/mindustry/world/blocks/logic/LogicBlock.java#L103-L115).
  */
-export type TLogicLinkName<T extends string> = T extends `${infer First}Large`
-  ? TLogicLinkName<First>
-  : T extends Lowercase<string>
+export type TLogicLinkName<T extends string> = T extends Lowercase<string>
   ? T
-  : T extends `${infer FirstChar extends Uppercase<string>}${infer Rest extends
-      Lowercase<string>}`
-  ? `${Lowercase<FirstChar>}${Rest}`
+  : T extends `${Uppercase<string>}${Lowercase<string>}`
+  ? Lowercase<T>
+  : T extends `${infer Begin}Large`
+  ? TLogicLinkName<Begin>
   : T extends `${string}${infer Rest}`
   ? TLogicLinkName<Rest>
   : never;
