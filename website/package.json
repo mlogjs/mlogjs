@@ -7,7 +7,7 @@
     "dev": "vitepress dev docs",
     "build": "vitepress build docs",
     "serve": "vitepress serve docs",
-    "docs:copy": "mkdir -p ../docs && cp -r docs/.vitepress/dist/. ../docs"
+    "docs:copy": "node docs_copy.js"
   },
   "keywords": [],
   "author": "",
