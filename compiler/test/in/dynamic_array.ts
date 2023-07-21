@@ -12,7 +12,6 @@ wait(2);
 const counterLimit = 4;
 let counter = 0;
 
-// eslint-disable-next-line no-constant-condition
 while (true) {
   if (arr.length == 0) {
     for (let i = 1; i <= arr.size; i++) {

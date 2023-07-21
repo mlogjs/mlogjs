@@ -2,3 +2,4 @@
 *.cjs
 *.mjs
 *.d.ts
+compiler/test
