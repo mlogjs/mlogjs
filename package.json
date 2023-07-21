@@ -3,6 +3,10 @@
     "website",
     "compiler"
   ],
+  "scripts": {
+    "lint": "eslint .",
+    "check-formatting": "prettier --check ."
+  },
   "packageManager": "pnpm@7.14.1",
   "devDependencies": {
     "@typescript-eslint/eslint-plugin": "^5.61.0",

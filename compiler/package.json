@@ -12,7 +12,6 @@
     "build:dev": "rollup -c --environment DEV",
     "dev": "ts-node src/bin",
     "test": "jest",
-    "lint": "eslint src/**/*.ts",
     "coverage": "jest --coverage",
     "start": "pnpm run build && pnpm i -g . && mlogjs",
     "prepublishOnly": "pnpm run build"

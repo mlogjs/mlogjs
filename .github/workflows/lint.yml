@@ -16,4 +16,5 @@ jobs:
           node-version: 16.x
       - uses: pnpm/action-setup@v2
       - run: pnpm install --frozen-lockfile
-      - run: pnpm -C compiler lint
+      - run: pnpm lint
+      - run: pnpm check-formatting
