@@ -9,6 +9,7 @@ import {
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
   name?: string;
   mutability = EMutability.mutable;
@@ -56,6 +57,7 @@ export class VoidValue implements IValue {
 }
 
 // tells typescript that VoidValue implements value
+// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export interface VoidValue extends IValueOperators {}
 
 for (const key of operators) {
