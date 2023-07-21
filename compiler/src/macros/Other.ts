@@ -21,13 +21,13 @@ export class Concat extends MacroFunction {
       const [, ...interpolated] = values;
       assertLiterals(
         interpolated,
-        "Interpolated values in concat must be literals"
+        "Interpolated values in concat must be literals",
       );
 
       for (let i = 0; i < values.length; i++) {
         const [string] = first.get(
           scope,
-          new LiteralValue(i)
+          new LiteralValue(i),
         ) as TValueInstructions<LiteralValue>;
 
         text += string.data;
@@ -41,7 +41,7 @@ export class Concat extends MacroFunction {
 
 function assertLiterals(
   values: IValue[],
-  message: string
+  message: string,
 ): asserts values is LiteralValue[] {
   for (const value of values) {
     if (!(value instanceof LiteralValue)) throw new CompilerError(message);

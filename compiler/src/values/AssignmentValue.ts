@@ -9,7 +9,10 @@ import { pipeInsts } from "../utils";
 import { VoidValue } from "./VoidValue";
 
 export class AssignmentValue extends VoidValue {
-  constructor(public left: IValue, public right: IValue) {
+  constructor(
+    public left: IValue,
+    public right: IValue,
+  ) {
     super();
     this.name = left.name;
   }
@@ -18,7 +21,7 @@ export class AssignmentValue extends VoidValue {
     const inst: IInstruction[] = [];
     const input = pipeInsts(
       value["??"](scope, this.right, this.left.toOut()),
-      inst
+      inst,
     );
     const output = pipeInsts(this.left["="](scope, input, out), inst);
 

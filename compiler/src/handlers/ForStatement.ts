@@ -7,7 +7,7 @@ import { JumpOutValue } from "../values/JumpOutValue";
 export const ForStatement: THandler<null> = (
   c,
   parentScope,
-  node: es.ForStatement
+  node: es.ForStatement,
 ) => {
   const startLoopAddr = new LiteralValue(null);
   // continue statements jump here to run the loop update lines

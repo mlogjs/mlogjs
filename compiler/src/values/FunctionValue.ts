@@ -134,14 +134,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
         assign(new SetCounterInstruction(this.ret), {
           intent: EInstIntent.return,
           intentSource: this,
-        })
+        }),
       );
     }
   }
 
   private normalReturn(
     scope: IScope,
-    arg: IValue | null
+    arg: IValue | null,
   ): TValueInstructions<null> {
     const inst: IInstruction[] = [];
     if (arg) {
@@ -160,7 +160,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private normalCall(
     scope: IScope,
     args: IValue[],
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions {
     if (!this.bundled) this.childScope.inst.push(...this.inst);
     this.bundled = true;
@@ -172,7 +172,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
     const inst: IInstruction[] = this.paramValues
       .map(
-        (param, i) => param["="](scope, args[i] ?? new LiteralValue(null))[1]
+        (param, i) => param["="](scope, args[i] ?? new LiteralValue(null))[1],
       )
       .reduce((s, c) => s.concat(c), [])
       .concat(
@@ -180,7 +180,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
         new JumpInstruction(this.addr, EJumpKind.Always),
         new AddressResolver(callAddressLiteral),
         // ensures that functions can be called multiple times inside expressions
-        ...temp["="](scope, this.temp)[1]
+        ...temp["="](scope, this.temp)[1],
       );
 
     return [temp, inst];
@@ -188,11 +188,11 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   private inlineReturn(
     scope: IScope,
-    arg: IValue | null
+    arg: IValue | null,
   ): TValueInstructions<null> {
     if (!this.inlineEnd)
       throw new CompilerError(
-        "Error during inline attempt: missing inline end adress"
+        "Error during inline attempt: missing inline end adress",
       );
 
     const inst: IInstruction[] = [];
@@ -212,7 +212,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private inlineCall(
     scope: IScope,
     args: IValue[],
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions {
     // create return value
     this.inlineTemp = StoreValue.from(this.childScope, out);
@@ -225,7 +225,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     // hard set variables within the function scope
     for (let i = 0; i < this.paramValues.length; i++) {
       inst.push(
-        ...this.hardSetParameter(fnScope, this.paramValues[i], args[i])
+        ...this.hardSetParameter(fnScope, this.paramValues[i], args[i]),
       );
     }
 
@@ -238,7 +238,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       i =>
         i.alwaysRuns &&
         i.intent === EInstIntent.return &&
-        i.intentSource === this
+        i.intentSource === this,
     );
     if (returnIndex !== -1) inst = inst.slice(0, returnIndex + 1);
 
@@ -255,10 +255,10 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     if (args.length < min || args.length > max) {
       if (min !== max)
         throw new CompilerError(
-          `Cannot call: expected ${min}-${max} arguments but got: ${args.length}`
+          `Cannot call: expected ${min}-${max} arguments but got: ${args.length}`,
         );
       throw new CompilerError(
-        `Cannot call: expected ${min} arguments but got: ${args.length}`
+        `Cannot call: expected ${min} arguments but got: ${args.length}`,
       );
     }
     validateParameters(args, this.paramValues);
@@ -313,7 +313,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
         const [rightValue, rightInst] = this.c.handleEval(
           this.childScope,
           param.right,
-          left
+          left,
         );
         const right = new LazyValue(scope => {
           if (this.inline || this.tryingInline) {
@@ -338,7 +338,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
               ? new LiteralValue(propKey.name)
               : pipeInsts(
                   this.c.handleEval(this.childScope, propKey),
-                  propInst
+                  propInst,
                 );
 
           const value = this.unwrapParameter(propValue as FunctionParam);
@@ -358,7 +358,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
                 }
                 const result = pipeInsts(
                   value["="](scope, new LiteralValue(null)),
-                  inst
+                  inst,
                 );
                 return [result, inst];
               });
@@ -379,7 +379,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
           if (!value)
             throw new CompilerError(
               "Destructuring element must resolve to a value",
-              element
+              element,
             );
 
           const key = new LiteralValue(i);
@@ -405,7 +405,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       }
       default:
         throw new CompilerError(
-          `Unsupported function parameter type: ${param.type}`
+          `Unsupported function parameter type: ${param.type}`,
         );
     }
   }
@@ -413,7 +413,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private hardSetParameter(
     scope: IScope,
     param: TParamValue,
-    value: IValue = new LiteralValue(null)
+    value: IValue = new LiteralValue(null),
   ): IInstruction[] {
     if (param instanceof StoreValue) {
       const name = this.paramNames.get(param) as string;
@@ -425,7 +425,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
       const [result, inst] = value["??"](scope, param.right, param.left);
 
       inst.push(
-        ...this.hardSetParameter(scope, param.left as TParamValue, result)
+        ...this.hardSetParameter(scope, param.left as TParamValue, result),
       );
 
       return inst;
@@ -479,7 +479,7 @@ function validateParameters(args: IValue[], params: IValue[]) {
       param.left.macro
     ) {
       throw new CompilerError(
-        "Cannot pass a store to a function parameter that has a macro as a default value."
+        "Cannot pass a store to a function parameter that has a macro as a default value.",
       );
     }
   }

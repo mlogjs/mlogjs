@@ -33,7 +33,7 @@ export class ObjectValue extends VoidValue {
 
   static fromArray(
     items: IObjectValueData[keyof IObjectValueData][],
-    initialData?: IObjectValueData
+    initialData?: IObjectValueData,
   ): ObjectValue {
     const data: IObjectValueData = {
       ...initialData,
@@ -64,7 +64,7 @@ export class ObjectValue extends VoidValue {
     const { $get } = this.data;
     if (!$get)
       throw new CompilerError(
-        `The member [${key.debugString()}] is not present in [${this.debugString()}]`
+        `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
       );
     return $get.call(scope, [key], out);
   }
@@ -73,7 +73,7 @@ export class ObjectValue extends VoidValue {
     if (prop instanceof LiteralValue && (prop.isNumber() || prop.isString())) {
       const hasMember = Object.prototype.hasOwnProperty.call(
         this.data,
-        prop.data
+        prop.data,
       );
       return hasMember;
     }
@@ -89,7 +89,7 @@ export class ObjectValue extends VoidValue {
   call(
     scope: IScope,
     args: IValue[],
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions<IValue | null> {
     const { $call } = this.data;
     if (!$call) return super.call(scope, args, out);
@@ -118,7 +118,7 @@ for (const op of leftRightOperators) {
     this: ObjectValue,
     scope: IScope,
     value: IValue,
-    out?: TEOutput
+    out?: TEOutput,
   ) {
     const $ = this.data[`$${op}`];
     if (!$) return VoidValue.prototype[op].apply(this, [scope, value, out]);
@@ -140,7 +140,7 @@ for (const op of updateOperators) {
     this: ObjectValue,
     scope: IScope,
     prefix: boolean,
-    out?: TEOutput
+    out?: TEOutput,
   ) {
     const $ = this.data[`$${op}`];
     if (!$) return VoidValue.prototype[op].apply(this, [scope, prefix, out]);

@@ -22,7 +22,7 @@ const fileDialogRef = ref<HTMLDialogElement>();
 const isMobileLayout = useMediaQuery("(max-width: 800px)");
 async function createFile() {
   const input = prompt(
-    "Enter the name of the file. Put an extension (.js or .ts) to specify the language."
+    "Enter the name of the file. Put an extension (.js or .ts) to specify the language.",
   );
   if (!input) return;
 

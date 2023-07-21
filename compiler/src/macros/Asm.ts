@@ -16,7 +16,7 @@ export class Asm extends MacroFunction<null> {
       for (let i = 0; i < values.length; i++) {
         const [item] = stringsArray.get(scope, new LiteralValue(i)) as [
           LiteralValue<string>,
-          never
+          never,
         ];
 
         args.push(item.data);
@@ -27,7 +27,7 @@ export class Asm extends MacroFunction<null> {
 
       const [tail] = stringsArray.get(
         scope,
-        new LiteralValue(length.data - 1)
+        new LiteralValue(length.data - 1),
       ) as [LiteralValue<string>, never];
       args.push(tail.data);
 

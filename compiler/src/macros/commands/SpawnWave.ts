@@ -11,7 +11,7 @@ export class SpawnWave extends MacroFunction<null> {
         (natural.data !== 1 && natural.data !== 0)
       )
         throw new CompilerError(
-          "The 'natural' argument must be a boolean literal"
+          "The 'natural' argument must be a boolean literal",
         );
       return [
         null,
@@ -20,7 +20,7 @@ export class SpawnWave extends MacroFunction<null> {
             "spawnwave",
             x ?? "10",
             y ?? "10",
-            String(!!natural.data)
+            String(!!natural.data),
           ),
         ],
       ];

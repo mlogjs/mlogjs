@@ -7,7 +7,7 @@ import { JumpOutValue } from "../values/JumpOutValue";
 export const WhileStatement: THandler<null> = (
   c,
   scope,
-  node: es.WhileStatement
+  node: es.WhileStatement,
 ) => {
   const startLoopAddr = new LiteralValue(null);
   const endLoopAddr = new LiteralValue(null);
@@ -21,7 +21,7 @@ export const WhileStatement: THandler<null> = (
 
   const childScope = scope.createScope();
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
-    childScope
+    childScope,
   );
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
@@ -61,7 +61,7 @@ export const WhileStatement: THandler<null> = (
 export const DoWhileStatement: THandler<null> = (
   c,
   scope,
-  node: es.DoWhileStatement
+  node: es.DoWhileStatement,
 ) => {
   const startLoopAddr = new LiteralValue(null);
   const endLoopAddr = new LiteralValue(null);
@@ -71,7 +71,7 @@ export const DoWhileStatement: THandler<null> = (
 
   const childScope = scope.createScope();
   const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
-    childScope
+    childScope,
   );
   const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 

@@ -7,7 +7,7 @@ const TypeCastExpression: THandler = (
   c,
   scope,
   node: es.TSAsExpression | es.TSTypeAssertion,
-  out
+  out,
 ) => {
   return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
 };
@@ -25,11 +25,11 @@ export const TSTypeAliasDeclaration = IgnoredHandler;
 export const TSEnumDeclaration: THandler<null> = (
   c,
   scope,
-  node: es.TSEnumDeclaration
+  node: es.TSEnumDeclaration,
 ) => {
   if (!node.const)
     throw new CompilerError(
-      "All enums must be declared with the const keyword before enum"
+      "All enums must be declared with the const keyword before enum",
     );
   let counter = 0;
   let lastType: "string" | "number" = "number";
@@ -47,7 +47,7 @@ export const TSEnumDeclaration: THandler<null> = (
     if (!(value instanceof LiteralValue))
       throw new CompilerError(
         "Enum members must contain literal values",
-        member
+        member,
       );
 
     if (value.isNumber()) {
@@ -74,7 +74,7 @@ export const TSNonNullExpression: THandler = (
   c,
   scope,
   node: es.TSNonNullExpression,
-  out
+  out,
 ) => {
   return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
 };
@@ -83,5 +83,5 @@ export const TSSatisfiesExpression: THandler<IValue | null> = (
   c,
   scope,
   node: es.TSSatisfiesExpression,
-  out
+  out,
 ) => c.handle(scope, node.expression, undefined, out);

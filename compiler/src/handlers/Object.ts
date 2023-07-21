@@ -16,7 +16,7 @@ export const ObjectExpression: THandler = (
   c,
   scope,
   node: es.ObjectExpression,
-  out
+  out,
 ) => {
   const data: IObjectValueData = {};
   const inst: IInstruction[] = [];
@@ -48,7 +48,7 @@ export const ArrayExpression: THandler = (
   c,
   scope,
   node: es.ArrayExpression,
-  out
+  out,
 ) => {
   const items: (IValue | undefined)[] = [];
   const inst: IInstruction[] = [];
@@ -59,7 +59,7 @@ export const ArrayExpression: THandler = (
     }
     const value = pipeInsts(
       c.handleEval(scope, element, extractDestrucuringOut(out, i)),
-      inst
+      inst,
     );
     items.push(value);
   });
@@ -71,7 +71,7 @@ export const MemberExpression: THandler = (
   scope,
   node: es.MemberExpression,
   out,
-  optional = false
+  optional = false,
 ) => {
   const [prop, propInst] = node.computed
     ? c.handleEval(scope, node.property)
@@ -101,7 +101,7 @@ export const MemberExpression: THandler = (
           },
         },
       ],
-    ])
+    ]),
   );
 
   const [obj, objInst] = c.handleEval(scope, node.object, objOut);
@@ -172,7 +172,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
 
           const result = pipeInsts(
             value["="](scope, new LiteralValue(null)),
-            inst
+            inst,
           );
           return [result, inst];
         });
@@ -187,13 +187,13 @@ export const OptionalMemberExpression: THandler = (
   c,
   scope,
   node: es.OptionalMemberExpression,
-  out
+  out,
 ) => MemberExpression(c, scope, node, out, true);
 
 export const AssignmentPattern: THandler<IValue> = (
   c,
   scope,
-  node: es.AssignmentPattern
+  node: es.AssignmentPattern,
 ) => {
   const [left, inst] = c.handleValue(scope, node.left);
   const right = new LazyValue((_, out) => c.handleEval(scope, node.right, out));

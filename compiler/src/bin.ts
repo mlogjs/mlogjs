@@ -54,7 +54,7 @@ yargs(hideBin(process.argv))
         exclude: ["node_modules"],
       };
       writeFileSync(tsconfigPath, JSON.stringify(json, null, "\t"));
-    }
+    },
   )
   .command(
     "$0 [path] [out]",
@@ -98,7 +98,7 @@ yargs(hideBin(process.argv))
 
         const lines = code.split("\n");
         console.log(
-          chalk.cyanBright([resolve(path), start.line, start.column].join(":"))
+          chalk.cyanBright([resolve(path), start.line, start.column].join(":")),
         );
         for (
           let i = Math.max(start.line - 3, 0);
@@ -110,7 +110,7 @@ yargs(hideBin(process.argv))
           const head = chalk.gray(`${n} | `.padStart(6, " "));
           console.log(head + highlight(lines[i], { language: "js" }));
           console.log(
-            chalk.red(" ".repeat(6 + start.column) + "^ " + error.message)
+            chalk.red(" ".repeat(6 + start.column) + "^ " + error.message),
           );
         }
 
@@ -118,9 +118,9 @@ yargs(hideBin(process.argv))
       }
       writeFileSync(out, output);
       console.log(
-        `Success: Compiled ${path}. Your compiled code is at ${out}.`
+        `Success: Compiled ${path}. Your compiled code is at ${out}.`,
       );
-    }
+    },
   )
   .help()
   .scriptName("mlogjs")

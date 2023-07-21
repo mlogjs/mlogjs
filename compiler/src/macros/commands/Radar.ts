@@ -70,7 +70,7 @@ export class Radar extends MacroFunction {
             sort.data,
             building,
             order,
-            outUnit
+            outUnit,
           ),
         ],
       ];

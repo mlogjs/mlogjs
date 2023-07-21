@@ -27,7 +27,7 @@ export const LRExpression: THandler = (
     right: es.Node;
     operator: BinaryOperator | LogicalOperator;
   },
-  out
+  out,
 ) => {
   const [left, leftInst] = c.handleEval(scope, node.left);
   const [right, rightInst] = c.handleEval(scope, node.right);
@@ -62,7 +62,7 @@ export const LogicalExpression: THandler = (
     onNonNullishAddress?: TLineRef;
     onFalsyAddress?: TLineRef;
     onTruthyAddress?: TLineRef;
-  }
+  },
 ) => {
   // TODO: these expressions can be optimized
   // to skip some jump checks inside if statements.
@@ -132,7 +132,7 @@ export const LogicalExpression: THandler = (
       scope,
       node.right,
       out,
-      node.right.type === "LogicalExpression" ? rightNodeArg : undefined
+      node.right.type === "LogicalExpression" ? rightNodeArg : undefined,
     );
     if (!beforeRightAddress) return [value, inst];
     return [value, [new AddressResolver(beforeRightAddress), ...inst]];
@@ -142,7 +142,7 @@ export const LogicalExpression: THandler = (
     scope,
     node.left,
     out,
-    node.left.type === "LogicalExpression" ? leftNodeArg : undefined
+    node.left.type === "LogicalExpression" ? leftNodeArg : undefined,
   );
 
   // patch for situations where `left` is a temporary value and `out` is `undefined`
@@ -155,7 +155,7 @@ export const LogicalExpression: THandler = (
     scope,
     other,
     resultOut,
-    operatorAddress
+    operatorAddress,
   );
 
   return [
@@ -175,7 +175,7 @@ export const AssignmentExpression: THandler = (
   scope,
   node: es.AssignmentExpression & {
     operator: AssignementOperator;
-  }
+  },
 ) => {
   const [left, leftInst] = c.handleValue(scope, node.left);
 
@@ -184,7 +184,7 @@ export const AssignmentExpression: THandler = (
     ? c.handleEval(
         scope,
         node.right,
-        node.operator === "=" ? leftOutput : undefined
+        node.operator === "=" ? leftOutput : undefined,
       )
     : [new LazyValue((scope, out) => c.handleEval(scope, node.right, out)), []];
 
@@ -198,7 +198,7 @@ export const UnaryExpression: THandler = (
   c,
   scope,
   { argument, operator }: es.UnaryExpression,
-  out
+  out,
 ) => {
   const [arg, argInst] = c.handleEval(scope, argument);
 
@@ -218,7 +218,7 @@ export const UpdateExpression: THandler = (
   c,
   scope,
   { argument, operator, prefix }: es.UpdateExpression,
-  out
+  out,
 ) => {
   const [arg, argInst] = c.handleValue(scope, argument);
 
@@ -231,7 +231,7 @@ export const ConditionalExpression: THandler = (
   c,
   scope,
   node: es.ConditionalExpression,
-  out
+  out,
 ) => {
   const alternateStartAdress = new LiteralValue(null);
   const endExpressionAdress = new LiteralValue(null);
@@ -269,7 +269,7 @@ export const SequenceExpression: THandler = (
   c,
   scope,
   node: es.SequenceExpression,
-  out
+  out,
 ) => {
   const { expressions } = node;
   const inst: IInstruction[] = [];
@@ -281,7 +281,7 @@ export const SequenceExpression: THandler = (
 
   const value = pipeInsts(
     c.handleEval(scope, expressions[expressions.length - 1], out),
-    inst
+    inst,
   );
 
   return [value, inst];

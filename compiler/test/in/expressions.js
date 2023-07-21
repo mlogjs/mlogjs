@@ -16,7 +16,7 @@ print(1 + 1 != 2 ? "huh, true" : "it's false");
 print(
   undefined ?? "undefined is null",
   offset ?? "offset is null?",
-  "preserved" ?? "should not appear"
+  "preserved" ?? "should not appear",
 );
 
 let item = Math.rand(1) > 0.5 ? undefined : Items.beryllium;

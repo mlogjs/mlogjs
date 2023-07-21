@@ -22,7 +22,7 @@ export class Control extends ObjectValue {
         handler(scope, overload, out, ...args) {
           return [null, [new InstructionBase("control", overload, ...args)]];
         },
-      })
+      }),
     );
   }
 }

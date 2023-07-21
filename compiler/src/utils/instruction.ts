@@ -3,7 +3,7 @@ import { es, IInstruction, IValue, TValueInstructions } from "../types";
 
 export function appendSourceLocations<T extends IValue | null>(
   valueInst: TValueInstructions<T>,
-  node: es.Node
+  node: es.Node,
 ): TValueInstructions<T> {
   for (const inst of valueInst[1]) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -14,7 +14,7 @@ export function appendSourceLocations<T extends IValue | null>(
 
 export function withAlwaysRuns<T extends IValue | null>(
   valueInst: TValueInstructions<T>,
-  value: boolean
+  value: boolean,
 ) {
   valueInst[1].forEach(inst => (inst.alwaysRuns = value));
   return valueInst;
@@ -52,7 +52,7 @@ export function hideRedundantJumps(inst: IInstruction[]) {
 /** A helper that appends the instructions from `value` into `inst` and returns it's `IValue` instance */
 export function pipeInsts<T extends IValue | null>(
   value: TValueInstructions<T>,
-  inst: IInstruction[]
+  inst: IInstruction[],
 ): T {
   inst.push(...value[1]);
   return value[0];
@@ -60,7 +60,7 @@ export function pipeInsts<T extends IValue | null>(
 
 export function usesAddressResolver(
   resolver: AddressResolver,
-  instructions: IInstruction[]
+  instructions: IInstruction[],
 ) {
   for (let i = 0; i < instructions.length; i++) {
     const inst = instructions[i];
@@ -74,7 +74,7 @@ export function usesAddressResolver(
 }
 
 export function formatInstructionArgs(
-  args: (IValue | string | null)[]
+  args: (IValue | string | null)[],
 ): string[] {
   return args
     .filter((value): value is IValue | string => !!value)

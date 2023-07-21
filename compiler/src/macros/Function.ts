@@ -14,12 +14,15 @@ type TFunction<T extends IValue | null> = (
 ) => TValueInstructions<T>;
 
 export class MacroFunction<
-  RT extends IValue | null = IValue
+  RT extends IValue | null = IValue,
 > extends VoidValue {
   macro = true;
   mutability = EMutability.constant;
   fn: TFunction<RT>;
-  constructor(fn: TFunction<RT>, public paramOuts?: TEOutput[]) {
+  constructor(
+    fn: TFunction<RT>,
+    public paramOuts?: TEOutput[],
+  ) {
     super();
     this.fn = fn;
   }
@@ -32,7 +35,7 @@ export class MacroFunction<
 
   preCall(
     _scope: IScope,
-    _out?: TEOutput | undefined
+    _out?: TEOutput | undefined,
   ): readonly TEOutput[] | undefined {
     return this.paramOuts;
   }

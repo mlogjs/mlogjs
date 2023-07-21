@@ -42,7 +42,7 @@ export function useSourceMapping({
       const [firstSelection, decorations] = getInputDecorations(
         monaco,
         e,
-        sourcemaps
+        sourcemaps,
       );
       inputCollection.set(decorations);
 
@@ -63,7 +63,7 @@ export function useSourceMapping({
       const [revealedLine, decorations] = getOutputDecorations(
         monaco,
         e,
-        sourcemaps
+        sourcemaps,
       );
 
       outputCollection.set(decorations);
@@ -83,7 +83,7 @@ export function useSourceMapping({
 function getInputDecorations(
   monaco: Monaco,
   e: editor.ICursorSelectionChangedEvent,
-  sourcemaps: Sourcemaps
+  sourcemaps: Sourcemaps,
 ): [SourceLocation | undefined, editor.IModelDeltaDecoration[]] {
   const { startLineNumber, endLineNumber } = e.selection;
   const decorations: editor.IModelDeltaDecoration[] = [];
@@ -100,7 +100,7 @@ function getInputDecorations(
         source.start.line,
         source.start.column + 1,
         source.end.line,
-        source.end.column + 1
+        source.end.column + 1,
       ),
     });
   }
@@ -111,7 +111,7 @@ function getInputDecorations(
 function getOutputDecorations(
   monaco: Monaco,
   e: editor.ICursorSelectionChangedEvent,
-  sourcemaps: Sourcemaps
+  sourcemaps: Sourcemaps,
 ): [number | undefined, editor.IModelDeltaDecoration[]] {
   const { startLineNumber, startColumn, endLineNumber, endColumn } =
     e.selection;
@@ -120,7 +120,7 @@ function getOutputDecorations(
     startLineNumber,
     startColumn,
     endLineNumber,
-    endColumn
+    endColumn,
   );
 
   const decorations: editor.IModelDeltaDecoration[] = [];
@@ -139,7 +139,7 @@ function getOutputDecorations(
       source.start.line,
       source.start.column + 1,
       source.end.line,
-      source.end.column + 1
+      source.end.column + 1,
     );
 
     if (selectionRange.containsRange(sourceRange)) {
@@ -160,7 +160,7 @@ function getOutputDecorations(
           outer.start.line,
           outer.start.column + 1,
           outer.end.line,
-          outer.end.column + 1
+          outer.end.column + 1,
         );
         if (outerRange.equalsRange(sourceRange)) {
           outerSources.push([i, source]);

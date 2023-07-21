@@ -13,7 +13,7 @@ import { LiteralValue } from "../values";
 export const SwitchStatement: THandler<null> = (
   c,
   scope,
-  node: es.SwitchStatement
+  node: es.SwitchStatement,
 ) => {
   const innerScope = scope.createScope();
 
@@ -33,7 +33,7 @@ export const SwitchStatement: THandler<null> = (
 
   for (const scase of node.cases) {
     const bodyInst = lazy(
-      () => c.handleMany(createCaseScope(innerScope), scase.consequent)[1]
+      () => c.handleMany(createCaseScope(innerScope), scase.consequent)[1],
     );
     const bodyAdress = new LiteralValue(null);
     const bodyLine = new AddressResolver(bodyAdress);
@@ -141,7 +141,7 @@ function endsWithoutFalltrough(inst: IInstruction[]) {
 function usesEndLine(
   endLine: AddressResolver,
   inst: IInstruction[],
-  defaultJump: JumpInstruction
+  defaultJump: JumpInstruction,
 ) {
   if (endLine.bonds.includes(defaultJump.address)) return true;
   return usesAddressResolver(endLine, inst);

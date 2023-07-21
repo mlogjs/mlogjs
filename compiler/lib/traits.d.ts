@@ -134,7 +134,7 @@ declare global {
       enabled: boolean;
     }> {}
   interface WithConfig<
-    T extends symbol | number | undefined = symbol | undefined
+    T extends symbol | number | undefined = symbol | undefined,
   > extends WithSymbols<{
       readonly config: T;
     }> {}

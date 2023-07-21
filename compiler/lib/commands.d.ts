@@ -632,7 +632,7 @@ declare global {
      */
     function itemDrop(
       target: BasicBuilding | typeof Blocks.air,
-      amount: number
+      amount: number,
     ): void;
 
     /**
@@ -654,7 +654,7 @@ declare global {
     function itemTake(
       target: BasicBuilding,
       item: ItemSymbol,
-      amount: number
+      amount: number,
     ): void;
 
     /**
@@ -720,11 +720,11 @@ declare global {
      */
     function getBlock<T extends BasicBuilding = AnyBuilding>(
       x: number,
-      y: number
+      y: number,
     ): [
       type: BlockSymbol | undefined,
       building: T | undefined,
-      floor: EnvBlockSymbol | OreSymbol | undefined
+      floor: EnvBlockSymbol | OreSymbol | undefined,
     ];
 
     /**
@@ -781,7 +781,7 @@ declare global {
      *  ```
      */
     function ore(
-      ore: ItemSymbol
+      ore: ItemSymbol,
     ): [found: false] | [found: true, x: number, y: number];
 
     /**
@@ -911,7 +911,7 @@ declare global {
     /** Gets the building on the given location. `undefined` if there is no building. */
     function building<T extends BasicBuilding = AnyBuilding>(
       x: number,
-      y: number
+      y: number,
     ): T | undefined;
   }
 
@@ -958,7 +958,7 @@ declare global {
     function apply(
       status: Exclude<TStatusEffect, TPermanentStatusEffect>,
       unit: BasicUnit,
-      duration: number
+      duration: number,
     ): void;
 
     function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
@@ -1153,7 +1153,7 @@ declare global {
      */
     function unit<T extends BasicUnit = AnyUnit>(
       team: TeamSymbol,
-      index: number
+      index: number,
     ): T;
     /**
      *  Gets the amount of units existing on a given team.
@@ -1184,7 +1184,7 @@ declare global {
      */
     function player<T extends BasicUnit = AnyUnit>(
       team: TeamSymbol,
-      index: number
+      index: number,
     ): T;
     /**
      * Gets the amount of players existing on a given team.
@@ -1243,7 +1243,7 @@ declare global {
     function build<T extends BasicBuilding = AnyBuilding>(
       team: TeamSymbol,
       index: number,
-      block: BuildingSymbol
+      block: BuildingSymbol,
     ): T;
     /**
      * Gets the amount of buildings existing on a given team.
@@ -1269,6 +1269,6 @@ declare global {
   /** Sets a property of a building or unit. World processor ONLY.*/
   function setProp<
     T extends BasicUnit | BasicBuilding,
-    K extends TSettablePropSymbol<T>
+    K extends TSettablePropSymbol<T>,
   >(property: K, target: T, value: TSettablePropMap<T>[K]): void;
 }

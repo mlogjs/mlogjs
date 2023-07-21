@@ -21,7 +21,7 @@ export class StoreValue extends BaseValue implements IValue {
   constructor(
     public name: string,
     public mutability = EMutability.mutable,
-    { temporary = false }: Partial<Pick<StoreValue, "temporary">> = {}
+    { temporary = false }: Partial<Pick<StoreValue, "temporary">> = {},
   ) {
     super();
     this.temporary = temporary;
@@ -56,7 +56,7 @@ export class StoreValue extends BaseValue implements IValue {
       this.mutability !== EMutability.init
     )
       throw new CompilerError(
-        `Cannot assign to immutable value: [${this.debugString()}].`
+        `Cannot assign to immutable value: [${this.debugString()}].`,
       );
 
     if (compareStores(this, value)) return [this, []];
@@ -65,7 +65,7 @@ export class StoreValue extends BaseValue implements IValue {
 
     if (evalValue.macro)
       throw new CompilerError(
-        `Cannot assign a macro to a store (attempted to assign [${evalValue.debugString()}] to [${this.debugString()}])`
+        `Cannot assign a macro to a store (attempted to assign [${evalValue.debugString()}] to [${this.debugString()}])`,
       );
 
     return [evalValue, [...evalInst, new SetInstruction(this, evalValue)]];
@@ -114,7 +114,7 @@ export class StoreValue extends BaseValue implements IValue {
       return [temp, [new InstructionBase("sensor", temp, this, prop)]];
     }
     throw new CompilerError(
-      `The property [${prop.debugString()}] cannot be sensed`
+      `The property [${prop.debugString()}] cannot be sensed`,
     );
   }
 
