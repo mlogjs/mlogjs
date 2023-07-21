@@ -98,17 +98,17 @@ op rand &t19 3
 jump 99 notEqual &t19 0
 op rand &t19 4
 print &t19
-op rand b:34:4 1
-jump 103 notEqual b:34:4 0
-op rand b:34:4 2
-jump 105 equal b:34:4 0
-op rand b:34:4 3
-jump 109 notEqual b:34:4 0
-op rand b:34:4 3
-jump 109 notEqual b:34:4 0
-op rand b:34:4 4
-jump 113 notEqual b:34:4 0
-op rand b:34:4 3
-jump 113 notEqual b:34:4 0
-op rand b:34:4 4
+op rand b:36:4 1
+jump 103 notEqual b:36:4 0
+op rand b:36:4 2
+jump 105 equal b:36:4 0
+op rand b:36:4 3
+jump 109 notEqual b:36:4 0
+op rand b:36:4 3
+jump 109 notEqual b:36:4 0
+op rand b:36:4 4
+jump 113 notEqual b:36:4 0
+op rand b:36:4 3
+jump 113 notEqual b:36:4 0
+op rand b:36:4 4
 end
