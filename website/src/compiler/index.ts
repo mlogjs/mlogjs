@@ -10,7 +10,7 @@ let worker: Worker;
  */
 export async function compile(
   code: string,
-  options: CompilerOptions
+  options: CompilerOptions,
 ): Promise<CompilerResult> {
   // cuz vite insists on doing ssr
   worker ??= new Worker(new URL("./worker.ts", import.meta.url), {
@@ -34,6 +34,7 @@ export async function compile(
     };
 
     const onError = (e: ErrorEvent) => {
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
       if (e.error.id !== inputMessage.id) return;
       e.stopPropagation();
       worker.removeEventListener("error", onError);

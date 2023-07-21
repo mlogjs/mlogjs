@@ -31,7 +31,7 @@ export class NamespaceMacro extends ObjectValue {
 
     if (!(key instanceof LiteralValue) || !key.isString())
       throw new CompilerError(
-        "Cannot use dynamic properties on namespace macros"
+        "Cannot use dynamic properties on namespace macros",
       );
     const symbolName = this.changeCasing ? camelToDashCase(key.data) : key.data;
 

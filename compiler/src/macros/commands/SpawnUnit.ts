@@ -27,7 +27,7 @@ export class SpawnUnit extends MacroFunction {
             y,
             rotation ?? "0",
             team,
-            output
+            output,
           ),
         ],
       ];

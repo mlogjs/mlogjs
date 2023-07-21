@@ -30,7 +30,6 @@ const padding = 77 / 2;
 
 draw.color(255, 255, 255);
 
-// eslint-disable-next-line no-constant-condition
 while (true) {
   draw.clear(0, 0, 0);
 
@@ -99,6 +98,6 @@ function rotate(x, y, z) {
     -Math.cos(z) * Math.sin(x) + Math.sin(z) * Math.cos(x) * Math.sin(y),
     -Math.sin(y),
     Math.cos(y) * Math.sin(x),
-    Math.cos(y) * Math.cos(x)
+    Math.cos(y) * Math.cos(x),
   );
 }

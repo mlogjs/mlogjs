@@ -122,7 +122,7 @@ export class Scope implements IScope {
     op: string,
     result: IValue,
     left: IValue,
-    right?: IValue | undefined
+    right?: IValue | undefined,
   ): void {
     if (!left.name || !result.name || (right && !right.name)) return;
 
@@ -140,7 +140,7 @@ export class Scope implements IScope {
   getCachedOperation(
     op: string,
     left: IValue,
-    right?: IValue | undefined
+    right?: IValue | undefined,
   ): IValue | undefined {
     const id = formatCacheId(op, left, right);
     const result = this.operationCache[id];

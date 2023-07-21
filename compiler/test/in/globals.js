@@ -2,7 +2,7 @@
 print(
   ControlKind.ctrlFormation,
   ControlKind.ctrlPlayer,
-  ControlKind.ctrlProcessor
+  ControlKind.ctrlProcessor,
 );
 
 print(
@@ -13,7 +13,7 @@ print(
   Vars.this,
   Vars.thisx,
   Vars.thisy,
-  Vars.unit
+  Vars.unit,
 );
 
 print(
@@ -22,7 +22,7 @@ print(
   Teams.derelict,
   Teams.green,
   Teams.malis,
-  Teams.sharded
+  Teams.sharded,
 );
 
 print(
@@ -41,7 +41,7 @@ print(
   Items.sporePod,
   Items.surgeAlloy,
   Items.thorium,
-  Items.titanium
+  Items.titanium,
 );
 
 print(Liquids.cryofluid, Liquids.oil, Liquids.slag, Liquids.water);
@@ -84,7 +84,7 @@ print(
   Units.navanax,
   Units.alpha,
   Units.beta,
-  Units.gamma
+  Units.gamma,
 );
 
 print(
@@ -129,7 +129,7 @@ print(
   LAccess.payloadCount,
   LAccess.payloadType,
   LAccess.enabled,
-  LAccess.color
+  LAccess.color,
 );
 
 print(
@@ -289,5 +289,5 @@ print(
   Blocks.memoryCell,
   Blocks.memoryBank,
   Blocks.launchPad,
-  Blocks.interplanetaryAccelerator
+  Blocks.interplanetaryAccelerator,
 );

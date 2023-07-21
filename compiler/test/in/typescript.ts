@@ -11,7 +11,7 @@ print(
   State.awaiting,
   State.inactive,
   State.deactivated,
-  State.incremented
+  State.incremented,
 );
 
 let foo = getVar<number | symbol | undefined>("@unknown");

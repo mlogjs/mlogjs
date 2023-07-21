@@ -52,7 +52,7 @@ export class DynamicArray extends ObjectValue {
     public scope: IScope,
     public name: string,
     public values: IValue[],
-    public dynamic: boolean
+    public dynamic: boolean,
   ) {
     const getterName = `${name}.&read`;
     const setterName = `${name}.&write`;
@@ -75,13 +75,13 @@ export class DynamicArray extends ObjectValue {
           if (this.lengthStore) {
             pipeInsts(
               this.lengthStore["="](scope, new LiteralValue(values.length)),
-              inst
+              inst,
             );
           }
 
           return [null, inst];
         },
-        [values[0]]
+        [values[0]],
       ),
 
       at: new MacroFunction((scope, out, index) => {
@@ -103,8 +103,8 @@ export class DynamicArray extends ObjectValue {
               address,
               EJumpKind.GreaterThanEq,
               indexTemp,
-              new LiteralValue(0)
-            )
+              new LiteralValue(0),
+            ),
           );
         }
 
@@ -113,7 +113,7 @@ export class DynamicArray extends ObjectValue {
             ? index
             : pipeInsts(
                 indexTemp["+"](scope, this.lengthStore ?? sizeValue, indexTemp),
-                inst
+                inst,
               );
 
         if (!isLiteral) inst.push(new AddressResolver(address));
@@ -145,7 +145,7 @@ export class DynamicArray extends ObjectValue {
                 const [, inst] = entry["="](scope, item);
                 return [new LiteralValue(null), inst];
               },
-              [setterName]
+              [setterName],
             ),
             pop: new MacroFunction((scope, out) => {
               const checked = scope.checkIndexes;
@@ -153,7 +153,7 @@ export class DynamicArray extends ObjectValue {
 
               const index = pipeInsts(
                 lengthStore["-"](scope, new LiteralValue(1)),
-                inst
+                inst,
               );
 
               const failAddress = new LiteralValue(null);
@@ -202,7 +202,7 @@ export class DynamicArray extends ObjectValue {
                 failAddress,
                 EJumpKind.GreaterThanEq,
                 index,
-                lengthStore
+                lengthStore,
               );
 
               if (hasOut) {
@@ -232,8 +232,8 @@ export class DynamicArray extends ObjectValue {
                       failAddress,
                       EJumpKind.LessThan,
                       index,
-                      new LiteralValue(0)
-                    )
+                      new LiteralValue(0),
+                    ),
                   );
                 }
                 if (!hasOut || index instanceof LiteralValue)
@@ -249,8 +249,8 @@ export class DynamicArray extends ObjectValue {
                   "add",
                   counter,
                   this.removeAtAddr,
-                  index
-                )
+                  index,
+                ),
               );
               inst.push(new AddressResolver(returnAdress));
               pipeInsts(lengthStore["--"](scope, true), inst);
@@ -313,7 +313,7 @@ export class DynamicArray extends ObjectValue {
     for (const value of this.values) {
       this.scope.inst.push(
         new SetInstruction(this.getterTemp, value),
-        new SetCounterInstruction(this.returnTemp)
+        new SetCounterInstruction(this.returnTemp),
       );
     }
   }
@@ -327,7 +327,7 @@ export class DynamicArray extends ObjectValue {
     for (const value of this.values) {
       this.scope.inst.push(
         new SetInstruction(value, this.setterTemp),
-        new SetCounterInstruction(this.returnTemp)
+        new SetCounterInstruction(this.returnTemp),
       );
     }
   }
@@ -446,15 +446,15 @@ class DynamicArrayEntry extends BaseValue {
           failAddr,
           EJumpKind.LessThan,
           index,
-          new LiteralValue(0)
+          new LiteralValue(0),
         ),
         this.upperBound ??
           new JumpInstruction(
             failAddr,
             EJumpKind.GreaterThan,
             index,
-            new LiteralValue(values.length - 1)
-          )
+            new LiteralValue(values.length - 1),
+          ),
       );
     }
 
@@ -464,7 +464,7 @@ class DynamicArrayEntry extends BaseValue {
     const counter = new StoreValue(counterName);
     const doubleIndex = pipeInsts(
       index["*"](scope, new LiteralValue(itemSize)),
-      inst
+      inst,
     );
 
     const line = pipeInsts(getterAddr["+"](scope, doubleIndex, counter), inst);
@@ -507,15 +507,15 @@ class DynamicArrayEntry extends BaseValue {
             failAddress,
             EJumpKind.LessThan,
             index,
-            new LiteralValue(0)
+            new LiteralValue(0),
           ),
           this.upperBound ??
             new JumpInstruction(
               failAddress,
               EJumpKind.GreaterThan,
               index,
-              new LiteralValue(values.length - 1)
-            )
+              new LiteralValue(values.length - 1),
+            ),
         );
       }
 
@@ -526,12 +526,12 @@ class DynamicArrayEntry extends BaseValue {
       const counter = new StoreValue(counterName);
       const doubleIndex = pipeInsts(
         index["*"](scope, new LiteralValue(itemSize)),
-        inst
+        inst,
       );
 
       const line = pipeInsts(
         setterAddr["+"](scope, doubleIndex, counter),
-        inst
+        inst,
       );
 
       pipeInsts(counter["="](scope, line), inst);
@@ -549,13 +549,13 @@ class DynamicArrayEntry extends BaseValue {
           index["+"](
             scope,
             new LiteralValue(1),
-            indexIsLength ? lengthStore : undefined
+            indexIsLength ? lengthStore : undefined,
           ),
-          inst
+          inst,
         );
         if (!indexIsLength)
           inst.push(
-            new OperationInstruction("max", lengthStore, len, lengthStore)
+            new OperationInstruction("max", lengthStore, len, lengthStore),
           );
       }
     }
@@ -595,7 +595,7 @@ export class DynamicArrayConstructor extends MacroFunction {
         length = init.data.length.data;
       } else {
         throw new CompilerError(
-          "The dynamic array initializer must be an array macro or a number literal"
+          "The dynamic array initializer must be an array macro or a number literal",
         );
       }
 
@@ -609,7 +609,7 @@ export class DynamicArrayConstructor extends MacroFunction {
         for (let i = 0; i < length; i++) {
           const value = pipeInsts(
             init.get(scope, new LiteralValue(i), values[i]),
-            inst
+            inst,
           );
           pipeInsts(values[i]["="](scope, value), inst);
         }
@@ -620,9 +620,9 @@ export class DynamicArrayConstructor extends MacroFunction {
         pipeInsts(
           lengthStore["="](
             scope,
-            new LiteralValue(init instanceof ObjectValue ? length : 0)
+            new LiteralValue(init instanceof ObjectValue ? length : 0),
           ),
-          inst
+          inst,
         );
       }
 
@@ -637,13 +637,13 @@ function assertBounds(
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   index: LiteralValue<any>,
   min: number,
-  max: number
+  max: number,
 ): asserts index is LiteralValue<number> {
   if (!index.isNumber())
     throw new CompilerError("The index must be a store or a number literal");
 
   if (index.data < min || index.data > max)
     throw new CompilerError(
-      `The index "${index.data}" is out of bounds: [${min}, ${max}]`
+      `The index "${index.data}" is out of bounds: [${min}, ${max}]`,
     );
 }

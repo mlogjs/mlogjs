@@ -12,7 +12,7 @@ export class GetLink extends MacroFunction {
         (!(index instanceof LiteralValue) || !index.isNumber())
       )
         throw new CompilerError(
-          "The getlink index must be a number literal or a store"
+          "The getlink index must be a number literal or a store",
         );
       const outBuild = StoreValue.from(scope, out);
       return [outBuild, [new InstructionBase("getlink", outBuild, index)]];

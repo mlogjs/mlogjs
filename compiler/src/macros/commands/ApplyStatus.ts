@@ -50,7 +50,7 @@ export class ApplyStatus extends ObjectValue {
               String(overload !== "apply"),
               effect.data,
               unit,
-              duration
+              duration,
             ),
           ],
         ];

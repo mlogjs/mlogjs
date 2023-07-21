@@ -23,7 +23,9 @@ print((Math.rand(1) || Math.rand(2)) && (Math.rand(3) || Math.rand(4)));
 print((Math.rand(1) ?? Math.rand(2)) || Math.rand(3));
 
 print(
-  Math.rand(1) && (Math.rand(2) ?? Math.rand(3) ?? Math.rand(4)) && Math.rand(5)
+  Math.rand(1) &&
+    (Math.rand(2) ?? Math.rand(3) ?? Math.rand(4)) &&
+    Math.rand(5),
 );
 
 print((Math.rand(1) && Math.rand(2)) ?? (Math.rand(3) || Math.rand(4)));

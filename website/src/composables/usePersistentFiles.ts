@@ -19,11 +19,12 @@ const debounceSaveDelay = 1000;
 
 export function usePersistentFiles(
   editorRef: ShallowRef<monaco.editor.IStandaloneCodeEditor | undefined>,
-  outEditorRef: ShallowRef<monaco.editor.IStandaloneCodeEditor | undefined>
+  outEditorRef: ShallowRef<monaco.editor.IStandaloneCodeEditor | undefined>,
 ) {
   const currentFile = shallowRef<PersistentFile>();
   const files = shallowRef<PersistentFile[]>([]);
 
+  // eslint-disable-next-line @typescript-eslint/no-floating-promises
   fetchFiles();
 
   watch([currentFile, files], ([file]) => {
@@ -108,7 +109,7 @@ export function usePersistentFiles(
 
 export function useFileSaver(
   currentFile: Ref<PersistentFile | undefined>,
-  code: Ref<string>
+  code: Ref<string>,
 ) {
   watch(currentFile, file => {
     if (file?.data?.content == undefined) return;
@@ -131,9 +132,9 @@ export function useFileSaver(
 function getDB() {
   return new Promise<IDBDatabase>((resolve, reject) => {
     const request = indexedDB.open(dbData.name, dbData.version);
-    request.onerror = e => reject(request.error);
-    request.onsuccess = e => resolve(request.result);
-    request.onupgradeneeded = e => {
+    request.onerror = () => reject(request.error);
+    request.onsuccess = () => resolve(request.result);
+    request.onupgradeneeded = () => {
       const db = request.result;
       const fileStore = db.createObjectStore(dbData.filesStoreName, {
         keyPath: "id",
@@ -148,13 +149,13 @@ async function getAllFiles(database?: IDBDatabase): Promise<PersistentFile[]> {
   const db = database ?? (await getDB());
   return await new Promise((resolve, reject) => {
     const transaction = db.transaction(dbData.filesStoreName, "readonly");
-    let files: PersistentFile[] = [];
+    const files: PersistentFile[] = [];
     transaction.oncomplete = () => resolve(files);
     transaction.onerror = () => reject(transaction.error);
     const store = transaction.objectStore(dbData.filesStoreName);
     const index = store.index("name");
     const cursorRequest = index.openKeyCursor();
-    cursorRequest.onsuccess = e => {
+    cursorRequest.onsuccess = () => {
       const cursor = cursorRequest.result;
       if (!cursor) return;
 
@@ -169,7 +170,10 @@ export class PersistentFile {
   private beforeUnloadListener: (e: BeforeUnloadEvent) => void;
   private debouncedHandler: () => void;
 
-  constructor(public name: string, data?: Omit<FileData, "name">) {
+  constructor(
+    public name: string,
+    data?: Omit<FileData, "name">,
+  ) {
     if (data) {
       this.data = {
         ...data,
@@ -232,7 +236,7 @@ export class PersistentFile {
     const db = database ?? (await getDB());
     this.data = await new Promise((resolve, reject) => {
       const transaction = db.transaction(dbData.filesStoreName, "readonly");
-      transaction.oncomplete = () => resolve(request.result);
+      transaction.oncomplete = () => resolve(request.result as FileData);
       transaction.onerror = () => reject(transaction.error);
       const store = transaction.objectStore(dbData.filesStoreName);
       const index = store.index("name");

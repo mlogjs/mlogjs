@@ -45,15 +45,15 @@ export class UnitControl extends ObjectValue {
           case "getBlock": {
             const outType = StoreValue.from(
               scope,
-              extractDestrucuringOut(out, 0)
+              extractDestrucuringOut(out, 0),
             );
             const outBuilding = StoreValue.from(
               scope,
-              extractDestrucuringOut(out, 1)
+              extractDestrucuringOut(out, 1),
             );
             const outFloor = StoreValue.from(
               scope,
-              extractDestrucuringOut(out, 2)
+              extractDestrucuringOut(out, 2),
             );
 
             result = ObjectValue.fromArray([outType, outBuilding, outFloor]);

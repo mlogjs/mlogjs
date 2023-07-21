@@ -21,17 +21,20 @@ export function useCompiler({
   const compiledRef = ref("");
   const sourcemapsRef = shallowRef<CompilerResult[2]>();
 
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
   watchEffect(async onCleanup => {
     let subscribed = true;
     onCleanup(() => (subscribed = false));
     const editor = editorRef.value;
     if (!editor) return;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const monaco = monacoRef.value!;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const model = editor.getModel()!;
 
     const [output, error, sourcemaps] = await compile(
       code.value,
-      optionsRef.value
+      optionsRef.value,
     );
 
     const markers: editor.IMarkerData[] = [];

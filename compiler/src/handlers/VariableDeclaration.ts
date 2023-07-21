@@ -23,10 +23,10 @@ import { Compiler } from "../Compiler";
 export const VariableDeclaration: THandler<null> = (
   c,
   scope,
-  node: es.VariableDeclaration
+  node: es.VariableDeclaration,
 ) => {
   return c.handleMany(scope, node.declarations, child =>
-    VariableDeclarator(c, scope, child, undefined, node.kind)
+    VariableDeclarator(c, scope, child, undefined, node.kind),
   );
 };
 
@@ -35,7 +35,7 @@ export const VariableDeclarator: THandler<null> = (
   scope,
   node: es.VariableDeclarator,
   out,
-  kind: "let" | "var" | "const" = "let"
+  kind: "let" | "var" | "const" = "let",
 ) => {
   const { init } = node;
 
@@ -55,7 +55,7 @@ type TDeclareHandler<T extends es.Node> = (
   c: Compiler,
   scope: IScope,
   node: T,
-  kind: "let" | "const" | "var"
+  kind: "let" | "const" | "var",
 ) => TValueInstructions<DeclarationValue>;
 
 const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
@@ -72,7 +72,7 @@ const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
       default:
         throw new CompilerError(
           `Unsupported declaration type: ${node.type}`,
-          node
+          node,
         );
     }
   }) as TValueInstructions<DeclarationValue>;
@@ -81,13 +81,13 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
   scope,
   node,
-  kind
+  kind,
 ) => {
   const { name: identifier } = node;
   const name = nodeName(node, !c.compactNames && identifier);
   const out = new StoreValue(
     name,
-    kind === "const" ? EMutability.init : EMutability.mutable
+    kind === "const" ? EMutability.init : EMutability.mutable,
   );
 
   const declarationValue = new DeclarationValue({
@@ -112,7 +112,7 @@ const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
           if (init.macro)
             throw new CompilerError(
               "Macro values must be held by constants",
-              node
+              node,
             );
           pipeInsts(value["="](scope, init), inst);
         }
@@ -129,7 +129,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
   c,
   scope,
   node,
-  kind
+  kind,
 ) => {
   const members: TDestructuringMembers = new Map();
 
@@ -154,14 +154,14 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
           if (!init)
             throw new CompilerError(
               `The target object does not have a value at index ${i}`,
-              element
+              element,
             );
 
           const getDefault = value.defaultInit;
           if (getDefault) {
             init = pipeInsts(
               init["??"](scope, new LazyValue(() => getDefault()), value.out),
-              initInst
+              initInst,
             );
           }
           return [init, initInst];
@@ -180,7 +180,7 @@ const DeclareArrayPattern: TDeclareHandler<es.ArrayPattern> = (
     handler(init, initInst) {
       if (!(init instanceof ObjectValue))
         throw new CompilerError(
-          "The value being destructured must be an object value"
+          "The value being destructured must be an object value",
         );
       pipeInsts(out["="](scope, init), initInst);
 
@@ -195,7 +195,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
   c,
   scope,
   node,
-  kind
+  kind,
 ) => {
   const members: TDestructuringMembers = new Map();
 
@@ -227,7 +227,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
           if (getDefault) {
             init = pipeInsts(
               init["??"](scope, new LazyValue(() => getDefault()), value.out),
-              initInst
+              initInst,
             );
           }
 
@@ -251,7 +251,7 @@ const DeclareObjectPattern: TDeclareHandler<es.ObjectPattern> = (
       if (!init)
         throw new CompilerError(
           "Cannot use object destructuring without an initializer",
-          node
+          node,
         );
 
       pipeInsts(out["="](scope, init), initInst);
@@ -266,7 +266,7 @@ const DeclareAssignmentPattern: TDeclareHandler<es.AssignmentPattern> = (
   c,
   scope,
   node,
-  kind
+  kind,
 ) => {
   const [value, inst] = Declare(c, scope, node.left, kind);
 
@@ -301,7 +301,7 @@ class DeclarationValue extends VoidValue {
 
   handler(
     init: IValue | null,
-    inst: IInstruction[]
+    inst: IInstruction[],
   ): TValueInstructions<IValue | null> {
     return this.c.handle(this.scope, this.node, () => this.handle(init, inst));
   }

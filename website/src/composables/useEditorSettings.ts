@@ -35,7 +35,7 @@ function getSettings(): EditorSettings {
   const defaultSettings = getDefaultSettings();
 
   if (string) {
-    const data = JSON.parse(string);
+    const data = JSON.parse(string) as Partial<EditorSettings>;
     // ensures that default settings added in the future
     // can be introduced without removing the
     // already saved settings

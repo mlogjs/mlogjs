@@ -51,7 +51,7 @@ export class UnitRadar extends MacroFunction {
             sort.data,
             "0", // I don't know why, but mindustry requires this extra parameter
             order,
-            outUnit
+            outUnit,
           ),
         ],
       ];

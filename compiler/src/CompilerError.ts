@@ -60,6 +60,7 @@ export class CompilerError extends Error {
 
     if (error && typeof error === "object" && "loc" in error) {
       const err = error as ParsingError;
+      // eslint-disable-next-line @typescript-eslint/no-base-to-string
       message = err.toString();
       source ??= err.loc;
     } else if (error instanceof Error) {

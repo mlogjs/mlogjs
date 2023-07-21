@@ -34,6 +34,7 @@ self.addEventListener("message", (e: MessageEvent<InputMessage>) => {
 
     postMessage(outMessage);
   } catch (e) {
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
     (e as any).id = id;
     throw e;
   }

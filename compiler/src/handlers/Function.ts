@@ -7,7 +7,7 @@ function handleFunctionNode(
   c: Compiler,
   scope: IScope,
   node: es.Function,
-  out?: TEOutput
+  out?: TEOutput,
 ): TValueInstructions<FunctionValue> {
   let { params, body } = node;
 
@@ -35,7 +35,7 @@ export const ArrowFunctionExpression: THandler = (
   c,
   scope,
   node: es.ArrowFunctionExpression,
-  out
+  out,
 ) => {
   return handleFunctionNode(c, scope, node, out);
 };
@@ -43,7 +43,7 @@ export const ArrowFunctionExpression: THandler = (
 export const FunctionDeclaration: THandler = (
   c,
   scope,
-  node: es.FunctionDeclaration
+  node: es.FunctionDeclaration,
 ) => {
   const identifier = (node.id as es.Identifier).name;
   const name = nodeName(node, !c.compactNames && identifier);

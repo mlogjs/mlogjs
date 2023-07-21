@@ -36,7 +36,7 @@ export function extractOutName(out: TEOutput | undefined) {
 
 export function extractDestrucuringOut(
   out: TEOutput | undefined,
-  field: string | number
+  field: string | number,
 ) {
   if (isDiscardedOut(out)) return discardedName;
   if (!(out instanceof DestructuringValue)) return;
@@ -46,7 +46,7 @@ export function extractDestrucuringOut(
 /** Asserts that `value` is a `LiteralValue` that contains a string */
 export function assertStringLiteral(
   value: IValue | undefined,
-  name: string
+  name: string,
 ): asserts value is LiteralValue<string> {
   if (!(value instanceof LiteralValue) || !value.isString())
     throw new CompilerError(`${name} must be a string literal`);
@@ -56,7 +56,7 @@ export function assertStringLiteral(
 export function assertLiteralOneOf<T extends readonly string[]>(
   value: IValue | undefined,
   members: T,
-  name: string
+  name: string,
 ): asserts value is LiteralValue<T[number]> {
   assertStringLiteral(value, name);
   if (!members.includes(value.data))
@@ -64,14 +64,14 @@ export function assertLiteralOneOf<T extends readonly string[]>(
       `${name} must be one of: ${members
         .slice(0, -1)
         .map(member => `"${member}"`)
-        .join(", ")} or "${members[members.length - 1]}"`
+        .join(", ")} or "${members[members.length - 1]}"`,
     );
 }
 
 /** Asserts that `value` is either a store or a literal */
 export function assertIsRuntimeValue(
   value: IValue | undefined,
-  name: string
+  name: string,
 ): asserts value is LiteralValue | StoreValue {
   if (!(value instanceof LiteralValue) && !(value instanceof StoreValue))
     throw new CompilerError(`${name} must be a valid runtime value`);
@@ -80,7 +80,7 @@ export function assertIsRuntimeValue(
 /** Asserts that `value` is an `ObjectValue` */
 export function assertIsObjectMacro(
   value: IValue | undefined,
-  name: string
+  name: string,
 ): asserts value is ObjectValue {
   if (!(value instanceof ObjectValue))
     throw new CompilerError(`${name} must be an object macro`);
@@ -89,7 +89,7 @@ export function assertIsObjectMacro(
 /** Asserts that `value` is an `ObjectValue` that has a length property */
 export function assertIsArrayMacro(
   value: IValue | undefined,
-  name: string
+  name: string,
 ): asserts value is ObjectValue & {
   data: {
     length: LiteralValue<number>;
@@ -121,7 +121,7 @@ export interface IParameterDescriptor {
 /** Asserts that all of the fields described are present on `value`*/
 export function assertObjectFields(
   value: ObjectValue,
-  fields: (string | IParameterDescriptor)[]
+  fields: (string | IParameterDescriptor)[],
 ): (IValue | string)[] {
   const result: (IValue | string)[] = [];
 
@@ -139,7 +139,7 @@ export function assertObjectFields(
 
     if (param.default == undefined)
       throw new CompilerError(
-        `The field "${param.name ?? param.key}" must be present`
+        `The field "${param.name ?? param.key}" must be present`,
       );
 
     result.push(param.default);

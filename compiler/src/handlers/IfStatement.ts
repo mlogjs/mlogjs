@@ -46,7 +46,7 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
 
     inst.push(
       new AddressResolver(endIfAddr),
-      ...withAlwaysRuns(c.handle(scope, node.alternate), false)[1]
+      ...withAlwaysRuns(c.handle(scope, node.alternate), false)[1],
     );
 
     if (needsJump) inst.push(new AddressResolver(endElseAddr));
@@ -73,7 +73,7 @@ function createJumpOut(
   c: Compiler,
   scope: IScope,
   node: es.IfStatement,
-  endIfAddr: TLineRef
+  endIfAddr: TLineRef,
 ) {
   const jumpNode = asMergeableJumpNode(node.consequent);
   if (!jumpNode) return new JumpOutValue(node, endIfAddr, false);
@@ -82,7 +82,7 @@ function createJumpOut(
 }
 
 function asMergeableJumpNode(
-  body: es.Statement
+  body: es.Statement,
 ): es.BreakStatement | es.ContinueStatement | undefined {
   if (body.type === "ContinueStatement" || body.type === "BreakStatement")
     return body;

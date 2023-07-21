@@ -11,7 +11,7 @@ import { LazyValue, LiteralValue } from "../values";
 export const ExpressionStatement: THandler<IValue | null> = (
   c,
   scope,
-  node: es.ExpressionStatement
+  node: es.ExpressionStatement,
 ) => {
   return c.handle(scope, node.expression, undefined, discardedName);
 };
@@ -19,7 +19,7 @@ export const ExpressionStatement: THandler<IValue | null> = (
 export const BreakStatement: THandler<null> = (
   _,
   scope,
-  node: es.BreakStatement
+  node: es.BreakStatement,
 ) => {
   const label = node.label?.name;
 
@@ -33,7 +33,7 @@ export const BreakStatement: THandler<null> = (
 export const ContinueStatement: THandler<null> = (
   _,
   scope,
-  node: es.ContinueStatement
+  node: es.ContinueStatement,
 ) => {
   const addr = new LiteralValue(null);
 
@@ -49,7 +49,7 @@ export const ReturnStatement: THandler<IValue | null> = (
   c,
   scope,
   node: es.ReturnStatement,
-  out
+  out,
 ) => {
   const { argument } = node;
 
@@ -65,7 +65,7 @@ export const EmptyStatement: THandler<null> = () => [null, []];
 export const LabeledStatement: THandler<null> = (
   c,
   scope,
-  node: es.LabeledStatement
+  node: es.LabeledStatement,
 ) => {
   const inner = scope.createScope();
   inner.label = node.label.name;

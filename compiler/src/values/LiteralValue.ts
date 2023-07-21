@@ -18,7 +18,7 @@ const literalMethods: Record<
   length: function (this: LiteralValue<TLiteral | null>) {
     if (!this.isString())
       throw new CompilerError(
-        "Length method only works on string literal values."
+        "Length method only works on string literal values.",
       );
     return new LiteralValue(this.data.length);
   },
@@ -60,7 +60,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
       !Object.prototype.hasOwnProperty.call(literalMethods, name.data)
     )
       throw new CompilerError(
-        `The member [${name.debugString()}] does not exist on literal values.`
+        `The member [${name.debugString()}] does not exist on literal values.`,
       );
     return [method.apply(this, [scope]), []];
   }
@@ -137,7 +137,7 @@ for (const k in operatorMap) {
     this: LiteralValue,
     scope: IScope,
     value: LiteralValue,
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions {
     if (key === "&&") {
       if (this.data) return [value, []];
@@ -169,7 +169,7 @@ const unaryOperatorMap: {
 for (const key in unaryOperatorMap) {
   type K = keyof typeof unaryOperatorMap;
   LiteralValue.prototype[key as K] = function (
-    this: LiteralValue
+    this: LiteralValue,
   ): TValueInstructions {
     const fn = unaryOperatorMap[key as K];
     return [new LiteralValue(fn(this.data as never)), []];

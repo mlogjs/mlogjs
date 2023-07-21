@@ -19,7 +19,7 @@ export class JumpInstruction extends InstructionBase {
     public address: TLineRef,
     kind: EJumpKind,
     left: IValue | null = null,
-    right: IValue | null = null
+    right: IValue | null = null,
   ) {
     super("jump", address, kind, left, right);
   }
@@ -35,7 +35,7 @@ export class JumpInstruction extends InstructionBase {
         out.address,
         out.whenTrue ? EJumpKind.NotEqual : EJumpKind.Equal,
         test,
-        new LiteralValue(0)
+        new LiteralValue(0),
       ),
     ];
   }

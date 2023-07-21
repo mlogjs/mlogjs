@@ -63,7 +63,7 @@ export class BaseValue extends VoidValue implements IValue {
     scope: IScope,
     other: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions {
     const result = StoreValue.from(scope, out);
 
@@ -83,7 +83,7 @@ export class BaseValue extends VoidValue implements IValue {
           targetAddress,
           EJumpKind.Equal,
           test,
-          new LiteralValue(0)
+          new LiteralValue(0),
         ),
         ...rightInst,
         ...result["="](scope, right)[1],
@@ -109,7 +109,7 @@ export class BaseValue extends VoidValue implements IValue {
     scope: IScope,
     value: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions {
     const temp = StoreValue.from(scope, out);
     const [left, leftInst] = this.eval(scope, temp);
@@ -125,7 +125,7 @@ export class BaseValue extends VoidValue implements IValue {
           targetAddress,
           EJumpKind.Equal,
           left,
-          new LiteralValue(0)
+          new LiteralValue(0),
         ),
         ...rightInst,
         ...temp["="](scope, right)[1],
@@ -138,7 +138,7 @@ export class BaseValue extends VoidValue implements IValue {
     scope: IScope,
     value: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions {
     const temp = StoreValue.from(scope, out);
     const [left, leftInst] = this.eval(scope, temp);
@@ -155,7 +155,7 @@ export class BaseValue extends VoidValue implements IValue {
           targetAddress,
           EJumpKind.NotEqual,
           left,
-          new LiteralValue(0)
+          new LiteralValue(0),
         ),
         ...rightInst,
         ...temp["="](scope, right)[1],
@@ -175,7 +175,7 @@ for (const k in operatorMap) {
     this: BaseValue,
     scope: IScope,
     value: IValue,
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
     const [right, rightInst] = value.eval(scope);
@@ -223,12 +223,12 @@ for (const k in assignmentToBinary) {
   BaseValue.prototype[op] = function (
     this: IValue,
     scope: IScope,
-    value: IValue
+    value: IValue,
   ): TValueInstructions {
     const [opValue, opInst] = this[assignmentToBinary[op]](
       scope,
       value,
-      this.toOut()
+      this.toOut(),
     );
     const [retValue, retInst] = this["="](scope, opValue);
     return [retValue, [...opInst, ...retInst]];
@@ -240,7 +240,7 @@ for (const key of updateOperators) {
     this: IValue,
     scope: IScope,
     prefix: boolean,
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions {
     let [ret, inst] = this.eval(scope);
     if (!prefix && !isDiscardedOut(out)) {

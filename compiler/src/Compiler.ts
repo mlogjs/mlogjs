@@ -39,7 +39,7 @@ export class Compiler {
   }
 
   compile(
-    script: string
+    script: string,
   ): [string, null, es.SourceLocation[] | undefined] | [null, CompilerError] {
     let output: string;
     let sourcemaps: es.SourceLocation[] | undefined;
@@ -91,7 +91,7 @@ export class Compiler {
   }
 
   protected mapSources(
-    valueInst: TValueInstructions<IValue | null>
+    valueInst: TValueInstructions<IValue | null>,
   ): es.SourceLocation[] {
     const result: es.SourceLocation[] = [];
 
@@ -107,7 +107,7 @@ export class Compiler {
     node: es.Node,
     handler = this.handlers[node.type],
     out?: TEOutput,
-    arg?: unknown
+    arg?: unknown,
   ): TValueInstructions<IValue | null> {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
@@ -128,13 +128,13 @@ export class Compiler {
     node: es.Node,
     handler = this.handlers[node.type],
     out?: TEOutput,
-    arg?: unknown
+    arg?: unknown,
   ): TValueInstructions {
     const result = this.handle(scope, node, handler, out, arg);
     if (!result[0])
       throw new CompilerError(
         `This node (${node.type}) did not return a value`,
-        node
+        node,
       );
     return result as TValueInstructions;
   }
@@ -143,7 +143,7 @@ export class Compiler {
     scope: IScope,
     node: es.Node,
     out?: TEOutput,
-    arg?: unknown
+    arg?: unknown,
   ): TValueInstructions {
     const [res, inst] = this.handleValue(scope, node, undefined, out, arg);
     const [evaluated, evaluatedInst] = res.eval(scope, out);
@@ -166,13 +166,13 @@ export class Compiler {
   handleMany<T extends es.Node>(
     scope: IScope,
     nodes: T[],
-    handler?: (node: T) => TValueInstructions<IValue | null>
+    handler?: (node: T) => TValueInstructions<IValue | null>,
   ): TValueInstructions<null> {
     const lines: IInstruction[] = [];
     for (const node of hoistedFunctionNodes(nodes)) {
       pipeInsts(
         this.handle(scope, node, handler && (() => handler(node))),
-        lines
+        lines,
       );
     }
     return [null, lines];

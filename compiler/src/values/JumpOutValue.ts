@@ -40,13 +40,13 @@ export class JumpOutValue extends VoidValue {
   constructor(
     public node: es.Node,
     public address: TLineRef,
-    public whenTrue: boolean
+    public whenTrue: boolean,
   ) {
     super();
   }
 
   canHandle(
-    operator: string
+    operator: string,
   ): operator is TWhenTrueOperator | TWhenFalseOperator {
     if (this.whenTrue) return operator in operatorMap;
     return operator in invertedOperatorMap;
@@ -55,7 +55,7 @@ export class JumpOutValue extends VoidValue {
   handle(
     operator: TWhenTrueOperator | TWhenFalseOperator,
     left: IValue,
-    right: IValue
+    right: IValue,
   ) {
     let kind: EJumpKind;
     if (this.whenTrue) {

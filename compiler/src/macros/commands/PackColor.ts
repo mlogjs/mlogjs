@@ -8,7 +8,7 @@ export class PackColor extends MacroFunction {
     super((scope, out, ...args) => {
       if (args.length !== 4) {
         throw new CompilerError(
-          `Expected 4 arguments, received ${args.length}`
+          `Expected 4 arguments, received ${args.length}`,
         );
       }
 
@@ -16,11 +16,11 @@ export class PackColor extends MacroFunction {
         !args.every(
           (value): value is StoreValue | LiteralValue =>
             value instanceof StoreValue ||
-            (value instanceof LiteralValue && value.isNumber())
+            (value instanceof LiteralValue && value.isNumber()),
         )
       ) {
         throw new CompilerError(
-          "packColor arguments must be either stores or number literals"
+          "packColor arguments must be either stores or number literals",
         );
       }
 

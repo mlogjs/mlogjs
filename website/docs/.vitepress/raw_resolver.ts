@@ -1,4 +1,4 @@
-import type { PluginOption, ResolvedConfig } from "vite";
+import type { PluginOption } from "vite";
 import { readdir, stat, readFile, realpath } from "fs/promises";
 import { resolve, relative, dirname } from "path";
 
@@ -8,7 +8,7 @@ const raw = async (path: string): Promise<File[]> =>
   (await stat(path)).isDirectory()
     ? (
         await Promise.all(
-          (await readdir(path)).map(name => raw(resolve(path, name)))
+          (await readdir(path)).map(name => raw(resolve(path, name))),
         )
       ).flat()
     : [await Promise.all([realpath(path), readFile(path, "utf8")])];

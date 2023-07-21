@@ -35,7 +35,7 @@ export function assign<T extends {}>(
   props: {
     // eslint-disable-next-line @typescript-eslint/ban-types
     [K in keyof T as T[K] extends Function ? never : K]?: T[K];
-  }
+  },
 ): T {
   return Object.assign(obj, props);
 }

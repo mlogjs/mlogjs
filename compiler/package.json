@@ -12,7 +12,6 @@
     "build:dev": "rollup -c --environment DEV",
     "dev": "ts-node src/bin",
     "test": "jest",
-    "lint": "eslint src/**/*.ts",
     "coverage": "jest --coverage",
     "start": "pnpm run build && pnpm i -g . && mlogjs",
     "prepublishOnly": "pnpm run build"
@@ -44,9 +43,6 @@
     "@types/jest": "^29.5.2",
     "@types/node": "^18.16.19",
     "@types/yargs": "^17.0.24",
-    "@typescript-eslint/eslint-plugin": "^5.61.0",
-    "@typescript-eslint/parser": "^5.61.0",
-    "eslint": "^8.44.0",
     "jest": "^29.6.1",
     "rollup": "^3.26.2",
     "ts-jest": "^29.1.1",

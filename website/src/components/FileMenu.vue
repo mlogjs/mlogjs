@@ -26,7 +26,7 @@ async function deleteFile(file: PersistentFile) {
 }
 async function rename(file: PersistentFile) {
   const input = prompt(
-    "Enter the name of the file. Put an extension (.js or .ts) to specify the language."
+    "Enter the name of the file. Put an extension (.js or .ts) to specify the language.",
   );
   if (!input) return;
 

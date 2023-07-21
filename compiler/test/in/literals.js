@@ -15,5 +15,5 @@ print(
   // evaluates to true
   b || condition,
   // evaluates to fales,
-  d && condition
+  d && condition,
 );

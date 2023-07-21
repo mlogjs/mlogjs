@@ -8,7 +8,7 @@ const config = {
   },
   parserOptions: {
     tsconfigRootDir: __dirname,
-    project: ["./tsconfig.eslint.json", "./test/tsconfig.json"],
+    project: ["./compiler/tsconfig.eslint.json", "./website/tsconfig.json"],
   },
   plugins: ["@typescript-eslint"],
   extends: [
@@ -37,5 +37,4 @@ const config = {
   },
 };
 
-// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
 module.exports = config;

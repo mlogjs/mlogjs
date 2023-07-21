@@ -6,7 +6,7 @@ export const CallExpression: THandler<IValue | null> = (
   c,
   scope,
   node: es.CallExpression,
-  out
+  out,
 ) => {
   const inst: IInstruction[] = [];
 
@@ -32,7 +32,7 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   c,
   scope,
   node: es.TaggedTemplateExpression,
-  out
+  out,
 ) => {
   const [tag, tagInst] = c.handleEval(scope, node.tag);
 
@@ -42,9 +42,9 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
     template.quasis.map(quasi => new LiteralValue(quasi.value.cooked ?? "")),
     {
       raw: ObjectValue.fromArray(
-        template.quasis.map(quasi => new LiteralValue(quasi.value.raw))
+        template.quasis.map(quasi => new LiteralValue(quasi.value.raw)),
       ),
-    }
+    },
   );
 
   const expressions: IValue[] = [];
@@ -58,7 +58,7 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
   const [result, resultInst] = tag.call(
     scope,
     [stringsObject, ...expressions],
-    out
+    out,
   );
 
   return [result, [...expressionInsts, ...tagInst, ...resultInst]];

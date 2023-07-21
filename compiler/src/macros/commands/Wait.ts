@@ -11,7 +11,7 @@ export class Wait extends MacroFunction<null> {
         !(seconds instanceof LiteralValue && seconds.isNumber())
       )
         throw new CompilerError(
-          "The wait seconds must be either a number literal or a store"
+          "The wait seconds must be either a number literal or a store",
         );
 
       return [null, [new InstructionBase("wait", seconds)]];

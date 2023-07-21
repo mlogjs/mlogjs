@@ -29,7 +29,7 @@ const mathOperations: Record<
     const b = mod(y!, 360);
     return Math.min(
       a - b < 0 ? a - b + 360 : a - b,
-      b - a < 0 ? b - a + 360 : b - a
+      b - a < 0 ? b - a + 360 : b - a,
     );
   },
   len: (a, b) => Math.sqrt(a ** 2 + b! ** 2),
@@ -68,7 +68,7 @@ function createMacroMathOperations() {
       const argumentCount = +!!a + +!!b;
       if (fn && argumentCount != fn.length) {
         throw new CompilerError(
-          `Expected ${fn.length} arguments, but got ${argumentCount}`
+          `Expected ${fn.length} arguments, but got ${argumentCount}`,
         );
       }
       const cacheKey = getCacheKey(key);
@@ -76,7 +76,7 @@ function createMacroMathOperations() {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (!a.isNumber() || !b.isNumber())
             throw new CompilerError(
-              "Cannot do math operation with non-numerical literals."
+              "Cannot do math operation with non-numerical literals.",
             );
           return [new LiteralValue(fn(a.num, b.num)), []];
         }
@@ -97,7 +97,7 @@ function createMacroMathOperations() {
       if (fn && a instanceof LiteralValue) {
         if (!a.isNumber())
           throw new CompilerError(
-            "Cannot do math operation with non-numerical literal."
+            "Cannot do math operation with non-numerical literal.",
           );
 
         return [new LiteralValue(fn(a.num)), []];

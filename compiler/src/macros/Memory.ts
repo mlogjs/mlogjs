@@ -18,7 +18,7 @@ class MemoryEntry extends BaseValue {
   constructor(
     public scope: IScope,
     private mem: MemoryMacro,
-    private prop: IValue
+    private prop: IValue,
   ) {
     super();
   }
@@ -53,7 +53,10 @@ class MemoryEntry extends BaseValue {
 }
 
 class MemoryMacro extends ObjectValue {
-  constructor(public cell: StoreValue, size: LiteralValue | StoreValue) {
+  constructor(
+    public cell: StoreValue,
+    size: LiteralValue | StoreValue,
+  ) {
     super({
       length: size,
       size,
@@ -65,7 +68,7 @@ class MemoryMacro extends ObjectValue {
 
     if (key instanceof LiteralValue && !key.isNumber())
       throw new CompilerError(
-        `The member [${key.debugString()}] is not present in [${this.debugString()}]`
+        `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
       );
 
     const entry = new MemoryEntry(scope, this, key);
@@ -103,7 +106,7 @@ export class MemoryBuilder extends MacroFunction {
         !(size instanceof StoreValue)
       )
         throw new CompilerError(
-          "The memory size must be a number literal or a store."
+          "The memory size must be a number literal or a store.",
         );
 
       if (

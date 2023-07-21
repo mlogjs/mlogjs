@@ -52,7 +52,7 @@ export type THandler<T extends IValue | null = IValue> = (
   node: any,
   out: TEOutput | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  arg: any
+  arg: any,
 ) => TValueInstructions<T>;
 
 /**
@@ -147,14 +147,14 @@ export interface IScope {
     op: string,
     result: IValue,
     left: IValue,
-    right?: IValue
+    right?: IValue,
   ): void;
 
   /** Attempts to get an operation cached in this or in a parent scope. */
   getCachedOperation(
     op: string,
     left: IValue,
-    right?: IValue
+    right?: IValue,
   ): IValue | undefined;
 
   /**
@@ -208,19 +208,19 @@ export interface IValueOperators {
     scope: IScope,
     value: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions;
   "??"(
     scope: IScope,
     value: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions;
   "||"(
     scope: IScope,
     value: IValue,
     out?: TEOutput,
-    endAddress?: TLineRef
+    endAddress?: TLineRef,
   ): TValueInstructions;
   "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
   "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
@@ -277,7 +277,7 @@ export interface IValue extends IValueOperators {
   call(
     scope: IScope,
     args: IValue[],
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions<IValue | null>;
   get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
 
@@ -328,14 +328,14 @@ export interface IFunctionValue extends IValue {
   return(
     scope: IScope,
     argument: IValue | null,
-    out?: TEOutput
+    out?: TEOutput,
   ): TValueInstructions<IValue | null>;
 }
 
 /** Contains a value and the instructions required to compute it */
 export type TValueInstructions<Content extends IValue | null = IValue> = [
   Content,
-  IInstruction[]
+  IInstruction[],
 ];
 
 /** Map of overridable operators in object macros */

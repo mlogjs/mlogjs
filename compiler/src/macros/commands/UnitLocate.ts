@@ -40,7 +40,7 @@ export class UnitLocate extends ObjectValue {
         const outY = StoreValue.from(scope, extractDestrucuringOut(out, 2));
         const outBuilding = StoreValue.from(
           scope,
-          overload === "ore" ? discardedName : extractDestrucuringOut(out, 3)
+          overload === "ore" ? discardedName : extractDestrucuringOut(out, 3),
         );
         const outArgs = [outX, outY, outFound, outBuilding];
         let inputArgs: (IValue | string)[] = [];
@@ -55,13 +55,13 @@ export class UnitLocate extends ObjectValue {
 
             if (!(group instanceof LiteralValue))
               throw new CompilerError(
-                "The building group must be a string literal"
+                "The building group must be a string literal",
               );
 
             assertLiteralOneOf(
               group,
               validBuildingGroups,
-              "The building group"
+              "The building group",
             );
 
             inputArgs = [overload, group.data, enemy, "@copper"];
