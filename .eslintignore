@@ -3,3 +3,4 @@
 *.mjs
 *.d.ts
 compiler/test
+jest.config.ts

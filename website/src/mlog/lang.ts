@@ -99,11 +99,11 @@ export function registerMlogLang(monaco: Monaco) {
             },
           },
         ],
-        [/\@[a-zA-Z-_0-9]+/, "variable"],
+        [/@[a-zA-Z-_0-9]+/, "variable"],
         [/(\w+:)?\d+:\d+/, "key.parameter"],
         [/&[a-zA-Z0-9:]+/, "variable.predefined"],
-        [/\b[\-+]?\d+\.\d+\b/, "number.float"],
-        [/\b[\-+]?\d+\b/, "number"],
+        [/\b[-+]?\d+\.\d+\b/, "number.float"],
+        [/\b[-+]?\d+\b/, "number"],
         [/"(?:\\.|[^"\\])*"/g, "string"],
       ],
     },
@@ -112,7 +112,7 @@ export function registerMlogLang(monaco: Monaco) {
 
 export function configureMlogLang(
   monaco: Monaco,
-  editor: monaco.editor.IStandaloneCodeEditor
+  editor: monaco.editor.IStandaloneCodeEditor,
 ) {
   const jumpUnderlineCollection = editor.createDecorationsCollection();
   const targettedLineCollection = editor.createDecorationsCollection();
@@ -138,6 +138,7 @@ export function configureMlogLang(
     targettedLineCollection.clear();
     const jumpLine = getJumpLine(event);
     if (jumpLine == undefined) return;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const line = event.target.position!.lineNumber;
 
     jumpUnderlineCollection.set([
@@ -160,6 +161,7 @@ export function configureMlogLang(
     if (!event.ctrlKey) return;
     const { position } = target;
     if (!position) return;
+    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const lineContent = editor.getModel()!.getLineContent(position.lineNumber);
     const match = /^jump\s+(\d+)/.exec(lineContent);
     if (!match) return;
