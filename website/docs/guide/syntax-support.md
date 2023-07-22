@@ -14,6 +14,8 @@ Behavior:
 
 - `const` variables holding values that are also constant will inline that value on the output code.
 
+  ::: mlogjs-output
+
   ```js
   const a = "string";
   const b = Vars.this;
@@ -23,16 +25,7 @@ Behavior:
   printFlush(c);
   ```
 
-  ```mlog
-  print "string"
-  print " is a string"
-  print "\n"
-  print @this
-  print "\n"
-  printflush message1
-  end
-  ```
-
+  :::
   ::: tip
   It is heavily recommended to declare variables with `const` whenever possible,
   as that gives the compiler more opportunities to optimize the generated code.

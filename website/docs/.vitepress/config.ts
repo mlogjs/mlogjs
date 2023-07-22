@@ -1,6 +1,7 @@
 import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
+import { mlogjsOutputContainer } from "./mlogjs_output_container";
 
 const base = process.env.BASE ?? "/mlogjs/";
 
@@ -69,6 +70,9 @@ const config: UserConfig = {
   },
   markdown: {
     theme: "dark-plus",
+    config(md) {
+      md.use(mlogjsOutputContainer);
+    },
     languages: [
       {
         id: "mlog",

@@ -43,17 +43,13 @@ const value = sensor(customSymbol, building);
 Values returned by `getVar` will always be treated as mutable, which means
 that a constant bound to it won't be aliased:
 
+::: mlogjs-output
+
 ```js
 const foo = getVar("@foo");
 ```
 
 always produces:
-
-```mlog
-set foo:1:6 @foo
-end
-```
-
 :::
 
 ## `concat`
