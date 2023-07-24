@@ -13,6 +13,8 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@babel/parser": "^7.22.7",
+    "@babel/types": "^7.22.5",
     "@types/node": "^18.16.19",
     "flexsearch": "^0.7.31",
     "markdown-it": "^13.0.1",

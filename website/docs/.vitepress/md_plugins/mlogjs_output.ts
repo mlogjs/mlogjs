@@ -8,16 +8,16 @@ const extensions = ["js", "ts"];
 /**
  * This plugin creates a markdown container named `mlogjs-output`.
  *
- * The container will seek the first code fence contained within itself
- * and append a new code fence showing the compiler output of that code.
+ * The container will seek the first code fence contained within itself and
+ * append a new code fence showing the compiler output of that code.
  *
  * Something worth noting is that `markdown-it-container` does not handle
- * container nesting very well, so you might need to remove trailing `:::`
- * in those cases.
+ * container nesting very well, so you might need to remove trailing `:::` in
+ * those cases.
  *
  * @param md
  */
-export function mlogjsOutputContainer(md: MarkdownIt) {
+export function mlogjsOutput(md: MarkdownIt) {
   Container(md, "mlogjs-output", {
     render(tokens, index, options, env, self) {
       if (tokens[index].nesting === 1) return "";

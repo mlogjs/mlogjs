@@ -1,7 +1,8 @@
 import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
-import { mlogjsOutputContainer } from "./mlogjs_output_container";
+import { mlogjsOutput } from "./md_plugins/mlogjs_output";
+import { commandExample } from "./md_plugins/command_example";
 
 const base = process.env.BASE ?? "/mlogjs/";
 
@@ -23,6 +24,7 @@ const config: UserConfig = {
     },
     nav: [
       { text: "Guide", link: "/guide/getting-started" },
+      { text: "Examples", link: "/examples/" },
       { text: "Editor", link: "/editor" },
       {
         text: "Resources",
@@ -61,6 +63,15 @@ const config: UserConfig = {
           ],
         },
       ],
+      "/examples/": [
+        { text: "Examples", link: "/examples/" },
+        { text: "3D cube", link: "/examples/3dcube" },
+        { text: "Bounce", link: "/examples/bounce" },
+        { text: "Breakout", link: "/examples/breakout" },
+        { text: "Clock", link: "/examples/clock" },
+        { text: "Fibonacci", link: "/examples/fibonacci" },
+        { text: "Pascal's Triangle", link: "/examples/pascals_triangle" },
+      ],
     },
 
     socialLinks: [
@@ -71,7 +82,8 @@ const config: UserConfig = {
   markdown: {
     theme: "dark-plus",
     config(md) {
-      md.use(mlogjsOutputContainer);
+      md.use(mlogjsOutput);
+      md.use(commandExample);
     },
     languages: [
       {
