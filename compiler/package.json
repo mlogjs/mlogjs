@@ -18,15 +18,18 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/weisrc/mlogjs.git"
+    "url": "git+https://github.com/mlogjs/mlogjs.git"
   },
-  "keywords": [],
-  "author": "str1z",
+  "keywords": [
+    "mindustry",
+    "mindustry-logic",
+    "mlog"
+  ],
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/weisrc/mlogjs/issues"
+    "url": "https://github.com/mlogjs/mlogjs/issues"
   },
-  "homepage": "https://github.com/weisrc/mlogjs#readme",
+  "homepage": "https://github.com/mlogjs/mlogjs#readme",
   "engines": {
     "node": ">=16"
   },

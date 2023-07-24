@@ -1,9 +1,9 @@
 // compute pascal's triangle
 
 const triangleSize = 10;
-
-const currentLine = new Memory(getBuilding("cell1"));
-const previousLine = new Memory(getBuilding("cell2"));
+const { cell1, cell2 } = getBuildings();
+const currentLine = new Memory(cell1);
+const previousLine = new Memory(cell2);
 
 print`1
 1 1

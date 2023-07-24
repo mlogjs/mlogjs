@@ -12,4 +12,4 @@ print(obj.b);
 print(obj[0]);
 obj.c(20);
 
-printFlush(getBuilding("message1"));
+printFlush();

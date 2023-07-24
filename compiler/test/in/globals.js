@@ -1,4 +1,3 @@
-/// <reference path="../../lib/index.d.ts" />
 print(
   ControlKind.ctrlFormation,
   ControlKind.ctrlPlayer,
