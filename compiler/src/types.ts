@@ -11,8 +11,8 @@ export enum EInstIntent {
   continue,
   return,
   /**
-   * This is used by the `end` and `stop` instructions.
-   * Means that the processor will restart or shutdown.
+   * This is used by the `end` and `stop` instructions. Means that the processor
+   * will restart or shutdown.
    */
   exit,
 }
@@ -20,16 +20,16 @@ export enum EInstIntent {
 export interface IInstruction {
   intent: EInstIntent;
   /**
-   * Used by function values to check if a return instruction
-   * originates from them or other function.
+   * Used by function values to check if a return instruction originates from
+   * them or other function.
    */
   intentSource?: IValue;
   hidden: boolean;
   resolve(i: number): void;
   source?: es.SourceLocation;
   /**
-   * Helps analyzing control flow, handlers should
-   * indicate which instructions returned are guaranteed to run
+   * Helps analyzing control flow, handlers should indicate which instructions
+   * returned are guaranteed to run
    */
   alwaysRuns: boolean;
 }
@@ -41,7 +41,8 @@ export interface IInstruction {
  *
  * A string means that the handler should create a value with the given name.
  *
- * An IValue means that the handler should try to use `this` as the output value.
+ * An IValue means that the handler should try to use `this` as the output
+ * value.
  */
 export type TEOutput = IValue | string;
 
@@ -56,9 +57,8 @@ export type THandler<T extends IValue | null = IValue> = (
 ) => TValueInstructions<T>;
 
 /**
- * The scope manages the source code generated variables and their owners,
- * as well as break and continue statements and they also work as function
- * bodies.
+ * The scope manages the source code generated variables and their owners, as
+ * well as break and continue statements and they also work as function bodies.
  */
 export interface IScope {
   /** Every scope except the top level one has a parent */
@@ -67,8 +67,8 @@ export interface IScope {
   data: Record<string, IValue | null>;
   name: string;
   /**
-   * Additional instructions required by this scope, such as
-   * the instructions that make the body of a function
+   * Additional instructions required by this scope, such as the instructions
+   * that make the body of a function
    */
   inst: IInstruction[];
   /** The label applied to this scope */
@@ -77,33 +77,38 @@ export interface IScope {
   break: AddressResolver;
   /** Where to jump to on a continue statement */
   continue: AddressResolver;
-  /** The function linked to `this`, is `null` when the scope is not inside a function. */
+  /**
+   * The function linked to `this`, is `null` when the scope is not inside a
+   * function.
+   */
   function: IFunctionValue;
   /** Counts the number of temp variables generated during compilaton */
   ntemp: number;
 
   /**
-   * A record of the cached value operations, maps the id
-   * of an operation to a previously computed value.
+   * A record of the cached value operations, maps the id of an operation to a
+   * previously computed value.
    */
   operationCache: Record<string, IValue>;
 
   /** Tracks the dependency relation beteween values and cached operations */
   cacheDependencies: Record<string, string[]>;
   /**
-   * Tells array macros whether to check index access performed.
-   * This field is mutable.
+   * Tells array macros whether to check index access performed. This field is
+   * mutable.
    */
   checkIndexes: boolean;
-  /**
-   * Creates a new scope that has `this` as it's parent.
-   */
+  /** Creates a new scope that has `this` as it's parent. */
   createScope(): IScope;
   /**
-   * Creates a new scope to be used by a function value, the scope has the following properties:
-   * - uses `name` as it's primary name, it changes how variable names are formatted.
-   * - it has `this` as it's parent
-   * - independent variable registry
+   * Creates a new scope to be used by a function value, the scope has the
+   * following properties:
+   *
+   * - Uses `name` as it's primary name, it changes how variable names are
+   *   formatted.
+   * - It has `this` as it's parent
+   * - Independent variable registry
+   *
    * @param name The name of the scope
    * @param stacked
    */
@@ -113,21 +118,25 @@ export interface IScope {
   /** Gets a value by their owner's identifier */
   get(identifier: string): INamedValue;
   /**
-   * Registers `value` with an owner that uses `name` as both it's name and identifier,
-   * throws an error if there already is an owner with the same identitifer.
+   * Registers `value` with an owner that uses `name` as both it's name and
+   * identifier, throws an error if there already is an owner with the same
+   * identitifer.
+   *
    * @param name
    * @param value
    */
   set<T extends IValue>(name: string, value: T): T;
   /**
-   * Registers `value` with an owner that uses `name` as both it's name and identifier,
-   * overriding any preexisting variables with the same identifier.
+   * Registers `value` with an owner that uses `name` as both it's name and
+   * identifier, overriding any preexisting variables with the same identifier.
+   *
    * @param name
    * @param value
    */
   hardSet<T extends IValue>(name: string, value: T): T;
   /**
    * Creates an owned store and registers it to this scope.
+   *
    * @param identifier The name of the variable that will hold the store
    * @param name The mlog name that the owner will have
    */
@@ -135,8 +144,9 @@ export interface IScope {
   /**
    * Creates a shallow copy of this scope.
    *
-   * Be aware that since the copy is shallow, changes on object fields (except `data`)
-   * reflect on the original scope. Note that changes to the children of data also follow this rule.
+   * Be aware that since the copy is shallow, changes on object fields (except
+   * `data`) reflect on the original scope. Note that changes to the children of
+   * data also follow this rule.
    */
   copy(): IScope;
   /** Creates a temporary mlog variable name */
@@ -242,23 +252,18 @@ export interface IValueOperators {
 
 /** Defines the possible types of mutability of a value */
 export enum EMutability {
-  /**
-   * The value can be changed by the user's code,
-   * by the mlog runtime, or us
-   */
+  /** The value can be changed by the user's code, by the mlog runtime, or us */
   mutable,
   /**
-   * The value cannot be directly assigned,
-   * but it's still not safe from mutations coming from the runtime.
+   * The value cannot be directly assigned, but it's still not safe from
+   * mutations coming from the runtime.
    */
   readonly,
-  /** Compile-time constants.*/
+  /** Compile-time constants. */
   constant,
   /** An immutable value that hasn't been initialized yet */
   init,
-  /** A value unknown at compile-time
-   * that will not change after initialization
-   */
+  /** A value unknown at compile-time that will not change after initialization */
   immutable,
 }
 
@@ -270,8 +275,8 @@ export interface IValue extends IValueOperators {
   mutability: EMutability;
   macro: boolean;
   /**
-   * Evaluates `this`, returning it's representation in a more basic
-   * value like `StoreValue` with the instructions required to compute that value
+   * Evaluates `this`, returning it's representation in a more basic value like
+   * `StoreValue` with the instructions required to compute that value
    */
   eval(scope: IScope, out?: TEOutput): TValueInstructions;
   call(
@@ -282,21 +287,20 @@ export interface IValue extends IValueOperators {
   get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
 
   /**
-   * Wether `this` has a given property.
-   * This method is used to know if it's safe to get a
-   * field of an object without errors.
+   * Wether `this` has a given property. This method is used to know if it's
+   * safe to get a field of an object without errors.
    */
   hasProperty(scope: IScope, prop: IValue): boolean;
 
   /**
-   * A hook that the CallExpression and related handlers call
-   * before evaluating the function parameters.
+   * A hook that the CallExpression and related handlers call before evaluating
+   * the function parameters.
    */
   preCall(scope: IScope, out?: TEOutput): readonly TEOutput[] | undefined;
 
   /**
-   * A hook that the CallExpression and related handlers call
-   * after the call has been evaluated.
+   * A hook that the CallExpression and related handlers call after the call has
+   * been evaluated.
    */
   postCall(scope: IScope): void;
 
@@ -307,8 +311,8 @@ export interface IValue extends IValueOperators {
   toMlogString(): string;
 
   /**
-   * Allows some values to choose alternative representations
-   * when they are used as operation outputs.
+   * Allows some values to choose alternative representations when they are used
+   * as operation outputs.
    */
   toOut(): IValue;
 }

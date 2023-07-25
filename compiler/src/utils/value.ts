@@ -52,7 +52,10 @@ export function assertStringLiteral(
     throw new CompilerError(`${name} must be a string literal`);
 }
 
-/** Asserts that `value` is a string literal that is part of a given set of `members`*/
+/**
+ * Asserts that `value` is a string literal that is part of a given set of
+ * `members`
+ */
 export function assertLiteralOneOf<T extends readonly string[]>(
   value: IValue | undefined,
   members: T,
@@ -103,13 +106,19 @@ export function assertIsArrayMacro(
   throw new CompilerError(`${name} must be an array macro`);
 }
 
-/** Helper type used to describe the overloads of a macro function. See {@link assertObjectFields} */
+/**
+ * Helper type used to describe the overloads of a macro function. See
+ * {@link assertObjectFields}
+ */
 export type TOverloadDescriptor<K extends string> = Record<
   K,
   (string | IParameterDescriptor)[]
 >;
 
-/** Describes an object destructuring paremeter. Generally used with `assertObjectFields` */
+/**
+ * Describes an object destructuring paremeter. Generally used with
+ * `assertObjectFields`
+ */
 export interface IParameterDescriptor {
   key: string;
   name?: string;
@@ -118,7 +127,7 @@ export interface IParameterDescriptor {
   validate?(value: IValue): void;
 }
 
-/** Asserts that all of the fields described are present on `value`*/
+/** Asserts that all of the fields described are present on `value` */
 export function assertObjectFields(
   value: ObjectValue,
   fields: (string | IParameterDescriptor)[],

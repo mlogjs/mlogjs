@@ -11,8 +11,8 @@ import {
 import { camelToDashCase, itemNames } from "../utils";
 
 /**
- * `StoreValue` represents values unknown at compile time,
- * mostly used with mutable variables and temporary values.
+ * `StoreValue` represents values unknown at compile time, mostly used with
+ * mutable variables and temporary values.
  *
  * Stores are mutable by default.
  */

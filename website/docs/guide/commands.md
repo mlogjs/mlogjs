@@ -354,7 +354,8 @@ const result = sensor(myCustomSymbol, myBuilding);
 ```js [script.js]
 const myBuilding = getBuilding("container1");
 
-/** @type {symbol} problably defined by a mod */
+// probably defined by a mod
+/** @type {symbol} */
 const myCustomSymbol = getVar("@custom-symbol");
 const result = sensor(myCustomSymbol, myBuilding);
 ```

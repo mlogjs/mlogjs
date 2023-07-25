@@ -1,18 +1,14 @@
 /// <reference path="./kinds.d.ts" />
 
 type MemoryCapacity = 64 | 128 | 512;
-/**
- * Allows you to view and modify the data of memory cells and memory banks.
- */
+/** Allows you to view and modify the data of memory cells and memory banks. */
 declare class Memory<S extends MemoryCapacity = 64> {
   constructor(cell: BasicBuilding, size?: S);
 
   [Symbol.iterator](): IterableIterator<number>;
   [index: number]: number;
 
-  /**
-   * The practical length of the memory view.
-   */
+  /** The practical length of the memory view. */
   readonly length: S;
 }
 
@@ -36,7 +32,8 @@ declare class MutableArray<T> {
   fill(value: T): void;
 
   /**
-   * Returns the item at the given index. Negative indexes are relative to `this.size`.
+   * Returns the item at the given index. Negative indexes are relative to
+   * `this.size`.
    *
    * ```js
    * print(array.at(-1)); // equal to array[array.size - 1]
@@ -52,7 +49,8 @@ declare class MutableArray<T> {
 
 declare class DynamicArray<T> extends MutableArray<T> {
   /**
-   * Creates an array with a predefined capacity that supports dynamic index accesses.
+   * Creates an array with a predefined capacity that supports dynamic index
+   * accesses.
    *
    * The array can contain any value assignable to a store.
    */
@@ -60,9 +58,11 @@ declare class DynamicArray<T> extends MutableArray<T> {
   constructor(length: number);
 
   /**
-   * Sets the last item of the array to `undefined` and decreases its length by 1.
+   * Sets the last item of the array to `undefined` and decreases its length by
+   * 1.
    *
-   * This method only generates the instructions for getting the value when needed.
+   * This method only generates the instructions for getting the value when
+   * needed.
    *
    * You can use `unchecked` to skip the bound check.
    *
@@ -92,14 +92,14 @@ declare class DynamicArray<T> extends MutableArray<T> {
   /**
    * Removes the item at the given index.
    *
-   * This method only generates the instructions for getting the value when needed.
+   * This method only generates the instructions for getting the value when
+   * needed.
    *
    * The index must be within the range: [`0`, `this.length - 1`]
    *
    * You can use `unchecked` to skip the bound check.
    *
    * ```js
-   *
    * let a = array.removeAt(i); // generates getter instructions
    * array.removeAt(i); // doesn't generate getter instructions
    *
@@ -110,7 +110,8 @@ declare class DynamicArray<T> extends MutableArray<T> {
   removeAt(index: number): T;
 
   /**
-   * Returns the item at the given index. Negative indexes are relative to `this.length`.
+   * Returns the item at the given index. Negative indexes are relative to
+   * `this.length`.
    *
    * ```js
    * print(array.at(-1)); // equal to array[array.length - 1]
@@ -123,27 +124,27 @@ declare class DynamicArray<T> extends MutableArray<T> {
 }
 
 /**
- * A function that tells the compiler not to add
- * bound checking in the array accesses in the given expression.
+ * A function that tells the compiler not to add bound checking in the array
+ * accesses in the given expression.
  *
  * Only access that are computed inside the call are unchecked:
  *
  * ```js
  * // checked
- * const a = array[i]
+ * const a = array[i];
  * // unckecked
- * const b = unchecked(array[i])
+ * const b = unchecked(array[i]);
  *
  * // the array accesses inside `doSomething`
  * // are NOT unchecked
- * unchecked(doSomething(i))
+ * unchecked(doSomething(i));
  *
  * // only `array[i * 2]` is unchecked
- * const c = unchecked(doSomething(i) * array[i * 2])
+ * const c = unchecked(doSomething(i) * array[i * 2]);
  *
  * function doSomething(i) {
- *     // will always be checked
- *     return (array[i - 1] + array[i + 1]) / 2
+ *   // will always be checked
+ *   return (array[i - 1] + array[i + 1]) / 2;
  * }
  * ```
  */

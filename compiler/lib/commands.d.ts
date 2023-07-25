@@ -10,20 +10,20 @@ import {
 } from "./util";
 declare global {
   /**
-   * Appends the items to the print buffer, calling this function
-   * on its own will not print any contents to a message block.
+   * Appends the items to the print buffer, calling this function on its own
+   * will not print any contents to a message block.
    *
    * To print the contents of the print buffer and empty it call, `printFlush`.
    *
    * @param items The items to be added to the print buffer.
    *
-   * ```js
-   *  // call normally
-   *  print("a + b = ", left, " + ", right, " = ", left + right)
+   *   ```js
+   *   // call normally
+   *   print("a + b = ", left, " + ", right, " = ", left + right);
    *
-   *  // call with tagged string templates
-   *  print`a + b = ${left} + ${right} = ${left + right}`
-   * ```
+   *   // call with tagged string templates
+   *   print`a + b = ${left} + ${right} = ${left + right}`;
+   *   ```
    */
   function print(...items: unknown[]): void;
 
@@ -38,11 +38,11 @@ declare global {
     /**
      * Sets the color for the next drawing operations.
      *
-     *  Each parameter must be within range: [0, 255].
+     * Each parameter must be within range: [0, 255].
      *
-     *  ```js
-     *  draw.color(255, 255, 255, 128);
-     *  ```
+     * ```js
+     * draw.color(255, 255, 255, 128);
+     * ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -56,16 +56,15 @@ declare global {
      * ```js
      * draw.col(packColor(1, 1, 1, 1));
      * ```
-     *
      */
     function col(rgbaData: number): void;
 
     /**
      * Sets the width of the next lines to be drawn.
      *
-     *  ```js
-     *  draw.stroke(15);
-     *  ```
+     * ```js
+     * draw.stroke(15);
+     * ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -74,9 +73,9 @@ declare global {
     /**
      * Draws a line between two points.
      *
-     *  ```js
-     *  draw.line({ x: 5, y: 5, x2: 50, y2: 50 });
-     *  ```
+     * ```js
+     * draw.line({ x: 5, y: 5, x2: 50, y2: 50 });
+     * ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -89,14 +88,15 @@ declare global {
 
     /**
      * Draws a filled rectangle.
-     *  ```js
-     *  draw.rect({
-     *    x: 10,
-     *    y: 15,
-     *    height: 60,
-     *    width: 40,
-     *  });
-     *  ```
+     *
+     * ```js
+     * draw.rect({
+     *   x: 10,
+     *   y: 15,
+     *   height: 60,
+     *   width: 40,
+     * });
+     * ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -121,21 +121,23 @@ declare global {
 
     /**
      * Draws a filled, regular polygon.
+     *
      * @param options.sides The number of sides the polygon should have
-     * @param options.radius The smallest distance between a line and the center of the polygon
+     * @param options.radius The smallest distance between a line and the center
+     *   of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
-     *  ```js
-     *  draw.poly({
-     *    radius: 10,
-     *    rotation: 0,
-     *    sides: 10,
-     *    x: 25,
-     *    y: 25,
-     *  });
-     *  ```
+     *   ```js
+     *   draw.poly({
+     *     radius: 10,
+     *     rotation: 0,
+     *     sides: 10,
+     *     x: 25,
+     *     y: 25,
+     *   });
+     *   ```
      *
-     * Warning: nothing is drawn until `drawFlush` is called.
+     *   Warning: nothing is drawn until `drawFlush` is called.
      */
     function poly(options: {
       x: number;
@@ -150,21 +152,23 @@ declare global {
 
     /**
      * Draws the outline of a regular polygon.
+     *
      * @param options.sides The number of sides the polygon should have
-     * @param options.radius The smallest distance between a line and the center of the polygon
+     * @param options.radius The smallest distance between a line and the center
+     *   of the polygon
      * @param options.rotation The rotation of the polygon in degrees
      *
-     *  ```js
-     *  draw.linePoly({
-     *    radius: 10,
-     *    rotation: 0,
-     *    sides: 10,
-     *    x: 25,
-     *    y: 25,
-     *  });
-     *  ```
+     *   ```js
+     *   draw.linePoly({
+     *     radius: 10,
+     *     rotation: 0,
+     *     sides: 10,
+     *     x: 25,
+     *     y: 25,
+     *   });
+     *   ```
      *
-     * Warning: nothing is drawn until `drawFlush` is called.
+     *   Warning: nothing is drawn until `drawFlush` is called.
      */
     function linePoly(options: {
       x: number;
@@ -180,16 +184,16 @@ declare global {
     /**
      * Draws a filled triangle.
      *
-     *  ```js
-     *  draw.triangle({
-     *    x: 10,
-     *    y: 10,
-     *    x2: 20,
-     *    y2: 20,
-     *    x3: 30,
-     *    y3: 10,
-     *  });
-     *  ```
+     * ```js
+     * draw.triangle({
+     *   x: 10,
+     *   y: 10,
+     *   x2: 20,
+     *   y2: 20,
+     *   x3: 30,
+     *   y3: 10,
+     * });
+     * ```
      *
      * Warning: nothing is drawn until `drawFlush` is called.
      */
@@ -203,34 +207,37 @@ declare global {
     }): void;
 
     /**
-     * Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
+     * Draws an image of the respective content. (like `Units.dagger` and
+     * `Blocks.router`)
      *
      * Warning: nothing is drawn until `drawFlush` is called.
+     *
      * @param options.image The symbol for the image to be drawn.
      * @param options.rotation The rotation of the image in degrees.
      *
-     * Example:
-     * ```js
-     * // draw a router
-     * draw({
-     *  mode: "image",
-     *  x: 30,
-     *  y: 30,
-     *  image: Blocks.router,
-     *  size: 15,
-     *  rotation: 0
-     * });
+     *   Example:
      *
-     * // draw the unit bound to the processor
-     * draw({
-     *  mode: "image",
-     *  x: 60,
-     *  y: 60,
-     *  image: Vars.unit.type,
-     *  size: 15,
-     *  rotation: 0
-     * });
-     * ```
+     *   ```js
+     *   // draw a router
+     *   draw({
+     *     mode: "image",
+     *     x: 30,
+     *     y: 30,
+     *     image: Blocks.router,
+     *     size: 15,
+     *     rotation: 0,
+     *   });
+     *
+     *   // draw the unit bound to the processor
+     *   draw({
+     *     mode: "image",
+     *     x: 60,
+     *     y: 60,
+     *     image: Vars.unit.type,
+     *     size: 15,
+     *     rotation: 0,
+     *   });
+     *   ```
      */
     function image(options: {
       x: number;
@@ -244,37 +251,43 @@ declare global {
   }
 
   /**
-   * Writes the contents of the print buffer into the target message
-   * and clears the buffer afterwards.
-   * @param target The message building to write to. Writes to `message1` by default.
+   * Writes the contents of the print buffer into the target message and clears
+   * the buffer afterwards.
    *
-   * Note that the default value only applies if you don't pass any parameter to this function.
+   * @param target The message building to write to. Writes to `message1` by
+   *   default.
+   *
+   *   Note that the default value only applies if you don't pass any parameter to
+   *   this function.
    */
   function printFlush(target?: BasicBuilding): void;
 
   /**
-   * Writes the contents of the draw buffer into the target display
-   * and clears the buffer afterwards.
-   * @param target The display building to write to. Writes to `display1` by default.
+   * Writes the contents of the draw buffer into the target display and clears
+   * the buffer afterwards.
    *
-   * Note that the default value only applies if you don't pass any parameter to this function.
+   * @param target The display building to write to. Writes to `display1` by
+   *   default.
+   *
+   *   Note that the default value only applies if you don't pass any parameter to
+   *   this function.
    */
   function drawFlush(target?: BasicBuilding): void;
 
   /**
    * Gets a block link by its index.
    *
-   * To make safe queries it is recommended to check an index
-   * before trying to get a link. This can be done by using `Vars.links`.
-   * @param index
+   * To make safe queries it is recommended to check an index before trying to
+   * get a link. This can be done by using `Vars.links`.
    *
-   * Example:
-   * ```js
-   * if(index < Vars.links) {
-   *   const myBlock = getLink(index)
-   *   // ...
-   * }
-   * ```
+   * @param index Example:
+   *
+   *   ```js
+   *   if (index < Vars.links) {
+   *     const myBlock = getLink(index);
+   *     // ...
+   *   }
+   *   ```
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
@@ -283,26 +296,27 @@ declare global {
     /**
      * Sets whether the building is enabled or disabled.
      *
-     *  ```js
-     *  const conveyor = getBuilding("conveyor1");
-     *  control.enabled(conveyor, false);
-     *  ```
+     * ```js
+     * const conveyor = getBuilding("conveyor1");
+     * control.enabled(conveyor, false);
+     * ```
      */
     function enabled(building: BasicBuilding, value: boolean): void;
 
     /**
      * Makes the building shoot or aim at the given position
+     *
      * @param options.building The shooting building
      * @param options.shoot `true` to shoot, `false` to just aim at the position
      *
-     *  ```js
-     *  control.shoot({
-     *    building: getBuilding("cyclone1"),
-     *    shoot: true,
-     *    x: Vars.thisx,
-     *    y: Vars.thisy,
-     *  });
-     *  ```
+     *   ```js
+     *   control.shoot({
+     *     building: getBuilding("cyclone1"),
+     *     shoot: true,
+     *     x: Vars.thisx,
+     *     y: Vars.thisy,
+     *   });
+     *   ```
      */
     function shoot(options: {
       /** The shooting building */
@@ -315,26 +329,27 @@ declare global {
 
     /**
      * Shoot at an unit with velocity prediction
+     *
      * @param options.building The shooting building
      * @param options.unit The target unit
      * @param options.shoot `true` to shoot, `false` to just aim
      *
-     *  ```js
-     *  const turret = getBuilding("cyclone1");
+     *   ```js
+     *   const turret = getBuilding("cyclone1");
      *
-     *  const player = radar({
-     *    building: turret,
-     *    filters: ["player", "any", "any"],
-     *    order: true,
-     *    sort: "distance",
-     *  });
+     *   const player = radar({
+     *     building: turret,
+     *     filters: ["player", "any", "any"],
+     *     order: true,
+     *     sort: "distance",
+     *   });
      *
-     *  control.shootp({
-     *    building: turret,
-     *    unit: player,
-     *    shoot: true,
-     *  });
-     *  ```
+     *   control.shootp({
+     *     building: turret,
+     *     unit: player,
+     *     shoot: true,
+     *   });
+     *   ```
      */
     function shootp(options: {
       /** The shooting building */
@@ -348,44 +363,48 @@ declare global {
     /**
      * Sets the config of a block (like the item of a sorter)
      *
-     *  ```js
-     *  const sorter = getBuilding("sorter1");
+     * ```js
+     * const sorter = getBuilding("sorter1");
      *
-     *  control.config(sorter, Items.copper);
-     *  ```
+     * control.config(sorter, Items.copper);
+     * ```
      */
     function config(building: BasicBuilding, value: symbol): void;
 
     /**
      * Sets the color of an illuminator.
      *
-     *  ```js
-     *  const illuminator = getBuilding("illuminator1");
+     * ```js
+     * const illuminator = getBuilding("illuminator1");
      *
-     *  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
-     *  ```
+     * control.color(illuminator, packColor(0.2, 0.65, 1, 1));
+     * ```
      */
     function color(building: BasicBuilding, rgbaData: number): void;
   }
 
   /**
    * Detects an unit nearby this `building`.
+   *
    * @param options.building The building used to detect potential targets
-   * @param options.filters The filters for selecting a target. Use "any" for any target.
-   * @param options.order `true` to get the first result, `false` to get the last result.
+   * @param options.filters The filters for selecting a target. Use "any" for
+   *   any target.
+   * @param options.order `true` to get the first result, `false` to get the
+   *   last result.
    * @param options.sort The method on which the results should be sorted
    *
-   * Example:
-   * ```js
-   *  const turret = getBuilding("cyclone1")
-   *  // returns the furthest enemy unit
-   *  const result = radar({
-   *    building: turret,
-   *    filters: ["enemy", "any", "any"],
-   *    order: false,
-   *    sort: "distance"
-   *  });
-   * ```
+   *   Example:
+   *
+   *   ```js
+   *   const turret = getBuilding("cyclone1");
+   *   // returns the furthest enemy unit
+   *   const result = radar({
+   *     building: turret,
+   *     filters: ["enemy", "any", "any"],
+   *     order: false,
+   *     sort: "distance",
+   *   });
+   *   ```
    */
   function radar<T extends BasicUnit = AnyUnit>(options: {
     /** The building used to detect potential targets */
@@ -401,32 +420,35 @@ declare global {
   /**
    * Alternate way to access special properties on objects.
    *
-   * This method allows you to use customly created symbols
-   * and sensor them on buildings.
+   * This method allows you to use customly created symbols and sensor them on
+   * buildings.
+   *
    * @param property The property to be sensed on the building
    * @param target The object that will be "sensed"
    *
-   * Example:
-   *  ```ts
-   *  const myBuilding = getBuilding("container1");
+   *   Example:
    *
-   *  // typescript annotation, you can use jsdoc comments on
-   *  // regular javascript
-   *  const myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
-   *  const result = sensor(myCustomSymbol, myBuilding);
-   *  ```
+   *   ```ts
+   *   const myBuilding = getBuilding("container1");
+   *
+   *   // typescript annotation, you can use jsdoc comments on
+   *   // regular javascript
+   *   const myCustomSymbol = getVar<symbol>("@custom-symbol"); // problably defined by a mod
+   *   const result = sensor(myCustomSymbol, myBuilding);
+   *   ```
    */
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
   /**
    * Stops the execution for the given amount of
-   *  ```js
-   *  print("before");
-   *  printFlush();
-   *  wait(3.5);
-   *  print("after");
-   *  printFlush();
-   *  ```
+   *
+   * ```js
+   * print("before");
+   * printFlush();
+   * wait(3.5);
+   * print("after");
+   * printFlush();
+   * ```
    */
   function wait(seconds: number): void;
 
@@ -438,8 +460,9 @@ declare global {
      * Use `Vars.blockCount` to check the maximum index allowed.
      *
      * Example:
+     *
      * ```js
-     * if(index < Vars.blockCount) {
+     * if (index < Vars.blockCount) {
      *   const blockKind = lookup.block(index);
      * }
      * ```
@@ -452,8 +475,9 @@ declare global {
      * Use `Vars.unitCount` to check the maximum index allowed.
      *
      * Example:
+     *
      * ```js
-     * if(index < Vars.unitCount) {
+     * if (index < Vars.unitCount) {
      *   const unitKind = lookup.unit(index);
      * }
      * ```
@@ -466,8 +490,9 @@ declare global {
      * Use `Vars.itemCount` to check the maximum index allowed.
      *
      * Example:
+     *
      * ```js
-     * if(index < Vars.itemCount) {
+     * if (index < Vars.itemCount) {
      *   const itemKind = lookup.item(index);
      * }
      * ```
@@ -480,8 +505,9 @@ declare global {
      * Use `Vars.liquidCount` to check the maximum index allowed.
      *
      * Example:
+     *
      * ```js
-     * if(index < Vars.liquidCount) {
+     * if (index < Vars.liquidCount) {
      *   const liquidKind = lookup.liquid(index);
      * }
      * ```
@@ -494,65 +520,64 @@ declare global {
    *
    * Each paremeter must range from `0` to `1`.
    *
+   * ```js
+   * const colorData = packColor(0.1, 0.6, 0.8, 0.1);
    *
-   *  ```js
-   *  const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+   * // world processor only
+   * // sets the color of the ambient light
+   * setRule.ambientLight(colorData);
    *
-   *  // world processor only
-   *  // sets the color of the ambient light
-   *  setRule.ambientLight(colorData);
-   *
-   *  // set color of illuminator
-   *  const illuminator = getBuilding("illuminator1");
-   *  control.color(illuminator, packColor(0.2, 0.65, 1, 1));
-   *  ```
+   * // set color of illuminator
+   * const illuminator = getBuilding("illuminator1");
+   * control.color(illuminator, packColor(0.2, 0.65, 1, 1));
+   * ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
 
   /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
    *
-   * If an unit symbol is received, the processor will pick an
-   * unit of the given type.
+   * If an unit symbol is received, the processor will pick an unit of the given
+   * type.
    *
    * If an unit object is received, the processor will bind to the unit.
    *
-   *  ```js
-   *  unitBind(Units.flare);
+   * ```js
+   * unitBind(Units.flare);
    *
-   *  const { x, y } = Vars.unit;
+   * const { x, y } = Vars.unit;
    *
-   *  print`x: ${x} y: ${y}`;
-   *  printFlush();
-   *  ```
+   * print`x: ${x} y: ${y}`;
+   * printFlush();
+   * ```
    */
   function unitBind(unit: UnitSymbol | BasicUnit): void;
 
   namespace unitControl {
     /**
-     * Makes the unit bound to this processor stop moving but
-     * allows it to keep doing it's action (like mining or building)
+     * Makes the unit bound to this processor stop moving but allows it to keep
+     * doing it's action (like mining or building)
      */
     function idle(): void;
 
-    /**
-     * Makes the unit bound to this processor stop mining, building and moving
-     */
+    /** Makes the unit bound to this processor stop mining, building and moving */
     function stop(): void;
 
     /**
      * Makes the unit bound to this processor move to the given position.
      *
-     * The unit tends to move in a straight line to the target location,
-     * which doesn't work in situations where the unit encounters an obstacle
-     * (such as a dagger trying to get past a wall).
+     * The unit tends to move in a straight line to the target location, which
+     * doesn't work in situations where the unit encounters an obstacle (such as
+     * a dagger trying to get past a wall).
      *
      * For those scenarios it's better to use `unitControl.pathfind`.
      */
     function move(x: number, y: number): void;
 
     /**
-     * Makes the unit bound to this processor approach the given position at the given radius
+     * Makes the unit bound to this processor approach the given position at the
+     * given radius
+     *
      * @param options.radius How distant to the position the unit can be
      */
     function approach(options: {
@@ -565,18 +590,17 @@ declare global {
     /**
      * Makes the unit bound to this processor move to the given location.
      *
-     * Uses the unit's pathfinding algorithm to decide how to
-     * reach the desired location instead of blidly going in a straight line.
+     * Uses the unit's pathfinding algorithm to decide how to reach the desired
+     * location instead of blidly going in a straight line.
      */
     function pathfind(x: number, y: number): void;
 
-    /**
-     * Whether the unit bound to this processor should be boosted (floating)
-     */
+    /** Whether the unit bound to this processor should be boosted (floating) */
     function boost(enable: boolean): void;
 
     /**
      * Makes the unit bound to this processor shoot/aim at the given position
+     *
      * @param options.shoot `true` to shoot, `false` to just aim
      */
     function target(options: {
@@ -587,22 +611,24 @@ declare global {
     }): void;
 
     /**
-     * Makes the unit bound to this processor target an unit with velocity prediction
+     * Makes the unit bound to this processor target an unit with velocity
+     * prediction
+     *
      * @param options.unit The shoot target
      * @param options.shoot `true` to shoot, `false` to just aim
      *
-     *  ```js
-     *  const player = unitRadar({
-     *    filters: ["player", "any", "any"],
-     *    order: true,
-     *    sort: "distance",
-     *  });
+     *   ```js
+     *   const player = unitRadar({
+     *     filters: ["player", "any", "any"],
+     *     order: true,
+     *     sort: "distance",
+     *   });
      *
-     *  unitControl.targetp({
-     *    shoot: true,
-     *    unit: player,
-     *  });
-     *  ```
+     *   unitControl.targetp({
+     *     shoot: true,
+     *     unit: player,
+     *   });
+     *   ```
      */
     function targetp(options: {
       /** The shoot target */
@@ -612,23 +638,26 @@ declare global {
     }): void;
 
     /**
-     * Makes the unit bound to this processor drop it's held items onto the given target
-     * @param target Where to drop the items, if `Blocks.air`, the unit will throw it's items away
+     * Makes the unit bound to this processor drop it's held items onto the
+     * given target
+     *
+     * @param target Where to drop the items, if `Blocks.air`, the unit will
+     *   throw it's items away
      * @param amount How many items should be dropped
      *
-     *  ```js
-     *  const container = getBuilding("container1");
+     *   ```js
+     *   const container = getBuilding("container1");
      *
-     *  // ...
+     *   // ...
      *
-     *  // drop 40 items on the container
-     *  unitControl.itemDrop(container, 40);
+     *   // drop 40 items on the container
+     *   unitControl.itemDrop(container, 40);
      *
-     *  // ...
+     *   // ...
      *
-     *  // discard 10 items from the current unit
-     *  unitControl.itemDrop(Blocks.air, 10);
-     *  ```
+     *   // discard 10 items from the current unit
+     *   unitControl.itemDrop(Blocks.air, 10);
+     *   ```
      */
     function itemDrop(
       target: BasicBuilding | typeof Blocks.air,
@@ -637,19 +666,20 @@ declare global {
 
     /**
      * Makes the unit bound to this processor take items from a building
+     *
      * @param target The building that will have it's items taken
      * @param item The kind of item to take
      * @param amount How many items should be taken
      *
-     *  ```js
-     *  const vault = getBuilding("vault1");
+     *   ```js
+     *   const vault = getBuilding("vault1");
      *
-     *  // bind unit and move to the valult...
+     *   // bind unit and move to the valult...
      *
-     *  unitControl.itemTake(vault, Items.graphite, 50);
+     *   unitControl.itemTake(vault, Items.graphite, 50);
      *
-     *  // do something with the graphite...
-     *  ```
+     *   // do something with the graphite...
+     *   ```
      */
     function itemTake(
       target: BasicBuilding,
@@ -657,13 +687,12 @@ declare global {
       amount: number,
     ): void;
 
-    /**
-     * Makes the unit bound to this processor drop one entity from it's payload
-     */
+    /** Makes the unit bound to this processor drop one entity from it's payload */
     function payDrop(): void;
 
     /**
      * Makes the unit bound to this processor take an entity into it's payload
+     *
      * @param options.takeUnits Whether to take units or buildings
      */
     function payTake(options: {
@@ -672,37 +701,34 @@ declare global {
     }): void;
 
     /**
-     * Makes the unit bound to this processor enter/land on the
-     * payload block the unit is on
+     * Makes the unit bound to this processor enter/land on the payload block
+     * the unit is on
      */
     function payEnter(): void;
 
-    /**
-     * Makes the unit bound to this processor mine at the given position
-     */
+    /** Makes the unit bound to this processor mine at the given position */
     function mine(x: number, y: number): void;
 
-    /**
-     * Sets the numeric flag of the unit bound to this processor
-     */
+    /** Sets the numeric flag of the unit bound to this processor */
     function flag(value: number): void;
 
     /**
-     * Makes the unit bound to this processor build a building with the
-     * given properties
+     * Makes the unit bound to this processor build a building with the given
+     * properties
+     *
      * @param options.block The kind of building to build
      * @param options.rotation The rotation of the building, ranges from 0 to 3
      * @param options.config The config of the building
      *
-     *  ```js
-     *  unitControl.build({
-     *    x: 10,
-     *    y: 20,
-     *    block: Blocks.sorter,
-     *    rotation: 1,
-     *    config: Items.silicon,
-     *  });
-     *  ```
+     *   ```js
+     *   unitControl.build({
+     *     x: 10,
+     *     y: 20,
+     *     block: Blocks.sorter,
+     *     rotation: 1,
+     *     config: Items.silicon,
+     *   });
+     *   ```
      */
     function build(options: {
       x: number;
@@ -716,7 +742,8 @@ declare global {
     }): void;
 
     /**
-     * Makes the unit bound to this processor get data about a block at the given position
+     * Makes the unit bound to this processor get data about a block at the
+     * given position
      */
     function getBlock<T extends BasicBuilding = AnyBuilding>(
       x: number,
@@ -728,34 +755,39 @@ declare global {
     ];
 
     /**
-     * Checks if the unit bound to this processor is within a radius of a given position.
+     * Checks if the unit bound to this processor is within a radius of a given
+     * position.
      */
     function within(options: { x: number; y: number; radius: number }): boolean;
 
     /**
      * Resets the AI of the unit.
      *
-     * Calling `unbind` does not actually unbind the unit from the processor,
-     * it just makes the unit resume its natural behavior.
+     * Calling `unbind` does not actually unbind the unit from the processor, it
+     * just makes the unit resume its natural behavior.
      */
     function unbind(): void;
   }
 
   /**
    * Finds an unit near the unit bound to this processor
-   * @param options.filters The filters for selecting a target. Use "any" for any target.
-   * @param options.order `true` to get the first result, `false` to get the last result.
+   *
+   * @param options.filters The filters for selecting a target. Use "any" for
+   *   any target.
+   * @param options.order `true` to get the first result, `false` to get the
+   *   last result.
    * @param options.sort The method on which the results should be sorted
    *
-   * Example:
-   * ```js
-   *  // returns the furthest enemy unit
-   *  const result = unitRadar({
-   *    filters: ["enemy", "any", "any"],
-   *    order: false,
-   *    sort: "distance",
-   *  });
-   * ```
+   *   Example:
+   *
+   *   ```js
+   *   // returns the furthest enemy unit
+   *   const result = unitRadar({
+   *     filters: ["enemy", "any", "any"],
+   *     order: false,
+   *     sort: "distance",
+   *   });
+   *   ```
    */
   function unitRadar<T extends BasicUnit = AnyUnit>(options: {
     /** The filters for selecting a target. Use "any" for any target. */
@@ -769,61 +801,66 @@ declare global {
   /** Uses the unit bound to this processor to find specific types of blocks */
   namespace unitLocate {
     /**
-     * Uses the unit bound to this processor to find an ore vein anywhere on the map
+     * Uses the unit bound to this processor to find an ore vein anywhere on the
+     * map
+     *
      * @param ore The kind of item the ore should contain
      *
-     *  ```js
-     *  const [found, x, y] = unitLocate.ore(Items.copper);
+     *   ```js
+     *   const [found, x, y] = unitLocate.ore(Items.copper);
      *
-     *  if (found) {
-     *    unitControl.approach({ x, y, radius: 5 });
-     *  }
-     *  ```
+     *   if (found) {
+     *     unitControl.approach({ x, y, radius: 5 });
+     *   }
+     *   ```
      */
     function ore(
       ore: ItemSymbol,
     ): [found: false] | [found: true, x: number, y: number];
 
     /**
-     * Uses the unit bound to this processor to find a building anywhere on the map
+     * Uses the unit bound to this processor to find a building anywhere on the
+     * map
+     *
      * @param options.group The group that the building belongs to
-     * @param options.enemy Whether it should be an enemy building or an ally one
+     * @param options.enemy Whether it should be an enemy building or an ally
+     *   one
      *
-     *  ```js
-     *  const vault = getBuilding("vault1");
-     *  const takeAmount = 100;
+     *   ```js
+     *   const vault = getBuilding("vault1");
+     *   const takeAmount = 100;
      *
-     *  unitBind(Units.mega);
+     *   unitBind(Units.mega);
      *
-     *  // we don't use the `found` variable
-     *  // because we always have our own core
-     *  const [, x, y, core] = unitLocate.building({
-     *    group: "core",
-     *    enemy: false,
-     *  });
+     *   // we don't use the `found` variable
+     *   // because we always have our own core
+     *   const [, x, y, core] = unitLocate.building({
+     *     group: "core",
+     *     enemy: false,
+     *   });
      *
-     *  const location = {
-     *    x,
-     *    y,
-     *    radius: 5,
-     *  };
+     *   const location = {
+     *     x,
+     *     y,
+     *     radius: 5,
+     *   };
      *
-     *  if (!unitControl.within(location) && Vars.unit.totalItems == 0) {
-     *    // if the unit has no items and it is not near
-     *    // the core, move it to the core
-     *    // and take 100 copper
-     *    unitControl.approach(location);
-     *    unitControl.itemTake(core, Items.copper, takeAmount);
-     *  } else {
-     *    // else, approach the vault and drop the items on it
-     *    unitControl.approach({
-     *      x: vault.x,
-     *      y: vault.y,
-     *      radius: 5,
-     *    });
-     *    unitControl.itemDrop(vault, takeAmount);
-     *  }
-     *  ```
+     *   if (!unitControl.within(location) && Vars.unit.totalItems == 0) {
+     *     // if the unit has no items and it is not near
+     *     // the core, move it to the core
+     *     // and take 100 copper
+     *     unitControl.approach(location);
+     *     unitControl.itemTake(core, Items.copper, takeAmount);
+     *   } else {
+     *     // else, approach the vault and drop the items on it
+     *     unitControl.approach({
+     *       x: vault.x,
+     *       y: vault.y,
+     *       radius: 5,
+     *     });
+     *     unitControl.itemDrop(vault, takeAmount);
+     *   }
+     *   ```
      */
     function building<T extends BasicBuilding = AnyBuilding>(options: {
       /** The group that the building belongs to */
@@ -833,41 +870,43 @@ declare global {
     }): [found: false] | [found: true, x: number, y: number, building: T];
 
     /**
-     * Uses the unit bound to this processor to find an enemy spawn anywhere on the map.
+     * Uses the unit bound to this processor to find an enemy spawn anywhere on
+     * the map.
      *
      * Returns the enemy spawn point or its core, if it exists.
      *
-     *  ```js
-     *  const [found, x, y, core] = unitLocate.spawn();
+     * ```js
+     * const [found, x, y, core] = unitLocate.spawn();
      *
-     *  if (!found) {
-     *    print("No enemy core found");
-     *  } else if (core) {
-     *    print`core location at (${x}, ${y})`;
-     *  } else {
-     *    print`enemy spawn at (${x}, ${y})`;
-     *  }
+     * if (!found) {
+     *   print("No enemy core found");
+     * } else if (core) {
+     *   print`core location at (${x}, ${y})`;
+     * } else {
+     *   print`enemy spawn at (${x}, ${y})`;
+     * }
      *
-     *  printFlush();
-     *  ```
+     * printFlush();
+     * ```
      */
     function spawn<T extends BasicBuilding = AnyBuilding>():
       | [found: false]
       | [found: true, x: number, y: number, building: T];
 
     /**
-     * Uses the unit bound to this processor to find a damaged ally building anywhere on the map
+     * Uses the unit bound to this processor to find a damaged ally building
+     * anywhere on the map
      *
-     *  ```js
-     *  const [found, x, y, building] = unitLocate.damaged();
+     * ```js
+     * const [found, x, y, building] = unitLocate.damaged();
      *
-     *  if (found) {
-     *    print`go fix a ${building} at (${x}, ${y})`;
-     *  } else {
-     *    print("No damaged building found");
-     *  }
-     *  printFlush();
-     *  ```
+     * if (found) {
+     *   print`go fix a ${building} at (${x}, ${y})`;
+     * } else {
+     *   print("No damaged building found");
+     * }
+     * printFlush();
+     * ```
      */
     function damaged<T extends BasicBuilding = AnyBuilding>():
       | [found: false]
@@ -877,23 +916,23 @@ declare global {
   /**
    * Jumps to the top of the instruction stack.
    *
-   *  ```js
-   *  const { enabled } = getBuilding("switch1");
+   * ```js
+   * const { enabled } = getBuilding("switch1");
    *
-   *  if (!enabled) endScript();
-   *  // do something when the switch is enabled
-   *  ```
+   * if (!enabled) endScript();
+   * // do something when the switch is enabled
+   * ```
    */
   function endScript(): never;
 
   /**
-   * Halts the execution of this processor. Can be used to debug
-   * code and analyze the processor registers.
+   * Halts the execution of this processor. Can be used to debug code and
+   * analyze the processor registers.
    *
-   *  ```js
-   *  // stop the processor to debug variables
-   *  stopScript();
-   *  ```
+   * ```js
+   * // stop the processor to debug variables
+   * stopScript();
+   * ```
    */
   function stopScript(): never;
 
@@ -905,17 +944,23 @@ declare global {
     /** Gets the ore type on the given location. `Blocks.air` if there is no ore */
     function ore(x: number, y: number): OreSymbol | typeof Blocks.air;
 
-    /** Gets the block type on the give location. `Blocks.air` if there is no block. */
+    /**
+     * Gets the block type on the give location. `Blocks.air` if there is no
+     * block.
+     */
     function block(x: number, y: number): BlockSymbol;
 
-    /** Gets the building on the given location. `undefined` if there is no building. */
+    /**
+     * Gets the building on the given location. `undefined` if there is no
+     * building.
+     */
     function building<T extends BasicBuilding = AnyBuilding>(
       x: number,
       y: number,
     ): T | undefined;
   }
 
-  /**  Sets block data on a given location. World processor ONLY.  */
+  /** Sets block data on a given location. World processor ONLY. */
   namespace setBlock {
     // TODO: maybe have a separate floor symbol type?
     /** Sets the floor of the tile at the given location. */
@@ -924,7 +969,10 @@ declare global {
     /** Sets the ore at the given location. Use `Blocks.air` to remove any ore. */
     function ore(x: number, y: number, to: OreSymbol | typeof Blocks.air): void;
 
-    /** Sets the block at a given location, it can be a regular building or an environment block. */
+    /**
+     * Sets the block at a given location, it can be a regular building or an
+     * environment block.
+     */
     function block(options: {
       x: number;
       y: number;
@@ -948,12 +996,16 @@ declare global {
     rotation?: number;
   }): T;
 
-  /** Contains the variants for the `applyStatus` instruction. World processor ONLY. */
+  /**
+   * Contains the variants for the `applyStatus` instruction. World processor
+   * ONLY.
+   */
   namespace applyStatus {
     /**
      * Applies a status effect to the given unit.
      *
-     * The only status effects that don't require a duration are `overdrive` and `boss`.
+     * The only status effects that don't require a duration are `overdrive` and
+     * `boss`.
      */
     function apply(
       status: Exclude<TStatusEffect, TPermanentStatusEffect>,
@@ -963,9 +1015,7 @@ declare global {
 
     function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
 
-    /**
-     * Removes a status effect to the given unit.
-     */
+    /** Removes a status effect to the given unit. */
     function clear(status: TStatusEffect, unit: BasicUnit): void;
   }
 
@@ -977,7 +1027,10 @@ declare global {
   function spawnWave(natural: true): void;
   function spawnWave(natural: false, x: number, y: number): void;
 
-  /** Contains the multiple variants of the `set rule` instruction. World processor ONLY. */
+  /**
+   * Contains the multiple variants of the `set rule` instruction. World
+   * processor ONLY.
+   */
   namespace setRule {
     /** Sets the wave countdown in seconds. */
     function currentWaveTime(seconds: number): void;
@@ -1009,7 +1062,10 @@ declare global {
     /** Sets the base unit cap. */
     function unitCap(cap: number): void;
 
-    /** Sets the playable map area. Blocks that are out of the new bounds will be removed.  */
+    /**
+     * Sets the playable map area. Blocks that are out of the new bounds will be
+     * removed.
+     */
     function mapArea(options: {
       x: number;
       y: number;
@@ -1025,7 +1081,6 @@ declare global {
      *
      * `packColor` can be used to get the rgba data recevied by this function.
      *
-     *
      * ```js
      * // enables lighting and sets the color to gray
      * setRule.lighting(true);
@@ -1038,18 +1093,18 @@ declare global {
     function solarMultiplier(multiplier: number): void;
 
     /**
-     * Sets the build speed multiplier of a team.
-     * The multiplier will always be clamped between `0.001` and `50`.
+     * Sets the build speed multiplier of a team. The multiplier will always be
+     * clamped between `0.001` and `50`.
      */
     function buildSpeed(team: TeamSymbol, multiplier: number): void;
 
     /**
-     * Sets the speed multiplier for unit factories.
-     * The multiplier will always be clamped between `0` and `50`.
+     * Sets the speed multiplier for unit factories. The multiplier will always
+     * be clamped between `0` and `50`.
      */
     function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
 
-    /** Sets the build cost multiplier for constructing units.  */
+    /** Sets the build cost multiplier for constructing units. */
     function unitCost(team: TeamSymbol, multiplier: number): void;
 
     /** Sets the damage multiplier for units on a given team. */
@@ -1064,8 +1119,8 @@ declare global {
     /**
      * Sets the Real Time Strategy minimum weight for a team.
      *
-     * In other words it, sets the minimum "advantage" needed for a squad to attack.
-     * The higher the value, the more cautious the squad is.
+     * In other words it, sets the minimum "advantage" needed for a squad to
+     * attack. The higher the value, the more cautious the squad is.
      */
 
     function rtsMinWeight(team: TeamSymbol, value: number): void;
@@ -1079,8 +1134,8 @@ declare global {
   }
 
   /**
-   * Writes the contents of the print buffer in the selected mode
-   * and clears the buffer afterwards. World processor ONLY.
+   * Writes the contents of the print buffer in the selected mode and clears the
+   * buffer afterwards. World processor ONLY.
    *
    * ```js
    * print("Hello");
@@ -1132,7 +1187,10 @@ declare global {
     pierce: boolean;
   }): void;
 
-  /** Sets the speed of this world processor in instructions per tick. World processor ONLY. */
+  /**
+   * Sets the speed of this world processor in instructions per tick. World
+   * processor ONLY.
+   */
   function setRate(ipt: number): void;
 
   /** Contains the variants of the `fetch` instruction. World processor ONLY. */
@@ -1143,12 +1201,12 @@ declare global {
      * The index starts at 0.
      *
      * ```js
-     *  const count = fetch.unitCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const unit = fetch.unit(Teams.sharded, i);
-     *    print`x: ${unit.x}, y: ${unit.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.unitCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const unit = fetch.unit(Teams.sharded, i);
+     *   print`x: ${unit.x}, y: ${unit.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function unit<T extends BasicUnit = AnyUnit>(
@@ -1156,15 +1214,15 @@ declare global {
       index: number,
     ): T;
     /**
-     *  Gets the amount of units existing on a given team.
+     * Gets the amount of units existing on a given team.
      *
      * ```js
-     *  const count = fetch.unitCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const unit = fetch.unit(Teams.sharded, i);
-     *    print`x: ${unit.x}, y: ${unit.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.unitCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const unit = fetch.unit(Teams.sharded, i);
+     *   print`x: ${unit.x}, y: ${unit.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function unitCount(team: TeamSymbol): number;
@@ -1174,12 +1232,12 @@ declare global {
      * The index starts at 0.
      *
      * ```js
-     *  const count = fetch.playerCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const player = fetch.player(Teams.sharded, i);
-     *    print`x: ${player.x}, y: ${player.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.playerCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const player = fetch.player(Teams.sharded, i);
+     *   print`x: ${player.x}, y: ${player.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function player<T extends BasicUnit = AnyUnit>(
@@ -1190,12 +1248,12 @@ declare global {
      * Gets the amount of players existing on a given team.
      *
      * ```js
-     *  const count = fetch.playerCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const player = fetch.player(Teams.sharded, i);
-     *    print`x: ${player.x}, y: ${player.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.playerCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const player = fetch.player(Teams.sharded, i);
+     *   print`x: ${player.x}, y: ${player.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function playerCount(team: TeamSymbol): number;
@@ -1205,24 +1263,25 @@ declare global {
      * The index of the starts at 0.
      *
      * ```js
-     *  const count = fetch.coreCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const core = fetch.core(Teams.sharded, i);
-     *    print`x: ${core.x}, y: ${core.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.coreCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const core = fetch.core(Teams.sharded, i);
+     *   print`x: ${core.x}, y: ${core.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function core(team: TeamSymbol, index: number): AnyBuilding;
     /**
      * Gets the amount of cores existing on a given team.
+     *
      * ```js
-     *  const count = fetch.coreCount(Teams.sharded);
-     *  for(let i = 0; i < count; i++) {
-     *    const core = fetch.core(Teams.sharded, i);
-     *    print`x: ${core.x}, y: ${core.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.coreCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const core = fetch.core(Teams.sharded, i);
+     *   print`x: ${core.x}, y: ${core.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function coreCount(team: TeamSymbol): number;
@@ -1232,12 +1291,12 @@ declare global {
      * The index starts at 0.
      *
      * ```js
-     *  const count = fetch.buildCount(Teams.sharded, Blocks.router);
-     *  for(let i = 0; i < count; i++) {
-     *    const router = fetch.build(Teams.sharded, i, Blocks.router);
-     *    print`x: ${router.x}, y: ${router.y}\n`;
-     *  }
-     *  printFlush();
+     * const count = fetch.buildCount(Teams.sharded, Blocks.router);
+     * for (let i = 0; i < count; i++) {
+     *   const router = fetch.build(Teams.sharded, i, Blocks.router);
+     *   print`x: ${router.x}, y: ${router.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function build<T extends BasicBuilding = AnyBuilding>(
@@ -1249,12 +1308,12 @@ declare global {
      * Gets the amount of buildings existing on a given team.
      *
      * ```js
-     *  const count = fetch.buildCount(Teams.sharded, Blocks.router);
-     *  for(let i = 0; i < count; i++) {
-     *    const router = fetch.build(Teams.sharded, i, Blocks.router)
-     *    print`x: ${router.x}, y: ${router.y}\n`
-     *  }
-     *  printFlush()
+     * const count = fetch.buildCount(Teams.sharded, Blocks.router);
+     * for (let i = 0; i < count; i++) {
+     *   const router = fetch.build(Teams.sharded, i, Blocks.router);
+     *   print`x: ${router.x}, y: ${router.y}\n`;
+     * }
+     * printFlush();
      * ```
      */
     function buildCount(team: TeamSymbol, block: BuildingSymbol): number;
@@ -1266,7 +1325,7 @@ declare global {
   /** Sets a global flag. World processor ONLY. */
   function setFlag(flag: string, value: boolean): void;
 
-  /** Sets a property of a building or unit. World processor ONLY.*/
+  /** Sets a property of a building or unit. World processor ONLY. */
   function setProp<
     T extends BasicUnit | BasicBuilding,
     K extends TSettablePropSymbol<T>,

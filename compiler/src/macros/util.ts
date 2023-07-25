@@ -28,7 +28,10 @@ interface IOverloadNamespaceOptions<K extends string> {
   ): TValueInstructions<IValue | null>;
 }
 
-/** Used to create namespaces that contain multiple methods that map into instructions */
+/**
+ * Used to create namespaces that contain multiple methods that map into
+ * instructions
+ */
 export function createOverloadNamespace<K extends string>({
   overloads,
   handler,

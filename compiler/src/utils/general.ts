@@ -3,8 +3,8 @@ import { es } from "../types";
 /**
  * Returns a string that has the format: [line]:[column].
  *
- * If `name` is provided, and it is a string, the resulting string will
- * have the format: [name]:[line]:[column].
+ * If `name` is provided, and it is a string, the resulting string will have the
+ * format: [name]:[line]:[column].
  */
 export function nodeName(node: es.Node, name?: false | string) {
   // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
@@ -17,18 +17,17 @@ export function nodeName(node: es.Node, name?: false | string) {
  * Converts a camel case string into a dash case one.
  *
  * As an example `camelCase` becomes `camel-case`
+ *
  * @example
- * ```
- * camelToDashCase("camelCase") // returns "camel-case"
- * ```
+ *   ```
+ *   camelToDashCase("camelCase") // returns "camel-case"
+ *   ```;
  */
 export function camelToDashCase(name: string) {
   return name.replace(/[A-Z]/g, str => `-${str.toLowerCase()}`);
 }
 
-/**
- * A more type safe version of `Object.assign`
- */
+/** A more type safe version of `Object.assign` */
 // eslint-disable-next-line @typescript-eslint/ban-types
 export function assign<T extends {}>(
   obj: T,

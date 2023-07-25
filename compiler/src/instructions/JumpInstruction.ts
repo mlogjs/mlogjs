@@ -25,8 +25,8 @@ export class JumpInstruction extends InstructionBase {
   }
 
   /**
-   * Works with the `JumpOutValue` class to determine
-   * wether a jump should be added if the expression wasn't jump compressed.
+   * Works with the `JumpOutValue` class to determine wether a jump should be
+   * added if the expression wasn't jump compressed.
    */
   static or(test: IValue, out: JumpOutValue) {
     if (test === out) return [];

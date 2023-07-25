@@ -1,6 +1,4 @@
-/**
- * The prefix for internal variables inside the compiler output
- */
+/** The prefix for internal variables inside the compiler output */
 export const internalPrefix = "&";
 export const discardedName = `${internalPrefix}_`;
 
