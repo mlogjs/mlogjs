@@ -260,7 +260,8 @@ declare global {
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
    */
-  function printFlush(target?: BasicBuilding): void;
+  function printFlush(target: BasicBuilding): void;
+  function printFlush(): void;
 
   /**
    * Writes the contents of the draw buffer into the target display and clears
@@ -272,7 +273,8 @@ declare global {
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
    */
-  function drawFlush(target?: BasicBuilding): void;
+  function drawFlush(target: BasicBuilding): void;
+  function drawFlush(): void;
 
   /**
    * Gets a block link by its index.
