@@ -5,6 +5,7 @@ import { resolve } from "path";
 import { readFileSync, watchFile, type StatWatcher } from "fs";
 import { parse } from "@babel/parser";
 import { fileURLToPath } from "url";
+import type Token from "markdown-it/lib/token";
 
 interface EnvData {
   [name: string]: string;
@@ -15,7 +16,6 @@ const filePath = resolve(
   fileURLToPath(import.meta.url),
   "../../../../../compiler/lib/commands.d.ts",
 );
-const infoRegex = /^command-example\s+([a-zA-Z\.]+)/;
 
 let watcher: StatWatcher | undefined;
 
@@ -25,18 +25,15 @@ let watcher: StatWatcher | undefined;
  */
 export function commandExample(md: MarkdownIt) {
   Container(md, "command-example", {
-    validate(params) {
-      return infoRegex.test(params.trim());
-    },
     render(tokens, index, options, env, self) {
       if (tokens[index].nesting === -1) return "";
 
-      const match = tokens[index].info.trim().match(infoRegex)!;
-      const id = match[1];
-
       const data = getEnvData(env);
+      const parsedId = findExampleId(tokens, index);
 
-      const code = data[id];
+      if (!parsedId) return "";
+
+      const code = data[parsedId] ?? "no fence";
       if (!code) return "";
 
       const codeTokens = md.parse(`\`\`\`js\n${code}\n\`\`\``, env);
@@ -72,6 +69,22 @@ function loadEnvData(env: any) {
   return traverseAst(ast);
 }
 
+function findExampleId(tokens: Token[], index: number) {
+  let inHeading = false;
+  for (let i = index - 1; i >= 0; i--) {
+    const token = tokens[i];
+    if (token.type === "heading_close") {
+      inHeading = true;
+    }
+
+    if (inHeading && token.type === "inline") {
+      return token.children?.find(child => child.type === "code_inline")
+        ?.content;
+    }
+  }
+  return null;
+}
+
 function traverseAst(node: es.Node): Record<string, string> {
   if (es.isFile(node)) return traverseAst(node.program);
 
@@ -81,6 +94,11 @@ function traverseAst(node: es.Node): Record<string, string> {
       const name = id.name;
       const examples = traverseAst(node.body);
       const result: Record<string, string> = {};
+      const code = extractCodeExample(node);
+      if (code) {
+        result[name] = code;
+      }
+
       for (const key in examples) {
         result[`${name}.${key}`] = examples[key];
       }
@@ -97,12 +115,11 @@ function traverseAst(node: es.Node): Record<string, string> {
   }
   if (es.isTSDeclareFunction(node)) {
     const name = node.id?.name;
-    const comment = node.leadingComments?.find(
-      comment => comment.type === "CommentBlock",
-    );
-    if (!name || !comment) return {};
+    if (!name) return {};
 
-    const code = extractCodeExample(comment.value) ?? "no fence";
+    const code = extractCodeExample(node);
+    if (!code) return {};
+
     return {
       [name]: code,
     };
@@ -110,8 +127,13 @@ function traverseAst(node: es.Node): Record<string, string> {
   return {};
 }
 
-function extractCodeExample(comment: string) {
-  const lines = comment.replace(/^\s*\*/gm, "").split("\n");
+function extractCodeExample(node: es.Node) {
+  const comment = node.leadingComments?.find(
+    comment => comment.type === "CommentBlock",
+  );
+  if (!comment) return null;
+
+  const lines = comment.value.replace(/^\s*\*/gm, "").split("\n");
   const start = findFenceTag(lines, 0);
   if (start === null) return null;
 
