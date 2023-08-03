@@ -97,6 +97,14 @@ export class StoreValue extends BaseValue implements IValue {
 
   get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
     const mutability = EMutability.readonly;
+
+    const thisCoordName = getThisCoordName(this, prop);
+    if (thisCoordName)
+      return [
+        new StoreValue(`@this${thisCoordName}`, EMutability.constant),
+        [],
+      ];
+
     if (prop instanceof LiteralValue && prop.isString()) {
       const name = itemNames.includes(prop.data)
         ? camelToDashCase(prop.data)
@@ -136,4 +144,21 @@ export class StoreValue extends BaseValue implements IValue {
 
 function compareStores(left: StoreValue, right: IValue) {
   return right instanceof StoreValue && right.name === left.name;
+}
+
+/**
+  If `prop` is sensing on of the coordinates of `@this`, returns the coordinate name.
+ */
+function getThisCoordName(value: StoreValue, prop: IValue) {
+  if (value.name !== "@this") return;
+
+  let name: string | undefined;
+
+  if (prop instanceof LiteralValue && prop.isString()) {
+    name = prop.data;
+  } else if (prop instanceof StoreValue && prop.name.startsWith("@")) {
+    name = prop.name.slice(1);
+  }
+
+  if (name === "x" || name === "y") return name;
 }
