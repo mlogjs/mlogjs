@@ -1,0 +1,6 @@
+print "Processort at: ("
+print @thisx
+print ", "
+print @thisy
+print ")\n"
+printflush message1
