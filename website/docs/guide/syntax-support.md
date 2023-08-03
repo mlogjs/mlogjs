@@ -147,7 +147,7 @@ Behavior:
   const router = getBuilding("router1");
 
   printPoint(router);
-  printPoint({ x: Vars.thisx, y: Vars.thisy });
+  printPoint(Vars.this);
   print`distance: ${distance([router.x, router.y], [Vars.thisx, Vars.thisy])}`;
   printFlush();
 
