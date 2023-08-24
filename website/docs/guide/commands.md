@@ -235,19 +235,19 @@ and sensor them on buildings.
 ::: code-group
 
 ```ts [script.ts]
-const myBuilding = getBuilding("container1");
+const { container1 } = getBuildings();
 
 // problably defined by a mod
 const myCustomSymbol = getVar<symbol>("@custom-symbol");
-const result = sensor(myCustomSymbol, myBuilding);
+const result = sensor(myCustomSymbol, container1);
 ```
 
 ```js [script.js]
-const myBuilding = getBuilding("container1");
+const { container1 } = getBuildings();
 
 /** Probably defined by a mod @type {symbol} */
 const myCustomSymbol = getVar("@custom-symbol");
-const result = sensor(myCustomSymbol, myBuilding);
+const result = sensor(myCustomSymbol, container1);
 ```
 
 :::

@@ -277,8 +277,8 @@ declare global {
    *   this function.
    *
    *   ```js
-   *   const message = getBuilding("message2");
-   *   printFlush(message);
+   *   const { message2 } = getBuildings();
+   *   printFlush(message2);
    *
    *   printFlush(); // defaults to message1
    *   ```
@@ -297,10 +297,10 @@ declare global {
    *   this function.
    *
    *   ```js
-   *   const display = getBuilding("display2");
-   *   drawFlush(display);
+   *   const { display2 } = getBuildings();
+   *   printFlush(display2);
    *
-   *   drawFlush(); // defaults to display1
+   *   printFlush(); // defaults to display1
    *   ```
    */
   function drawFlush(target: BasicBuilding): void;
@@ -312,14 +312,17 @@ declare global {
    * To make safe queries it is recommended to check an index before trying to
    * get a link. This can be done by using `Vars.links`.
    *
-   * @param index Example:
+   * Example:
    *
-   *   ```js
-   *   if (index < Vars.links) {
-   *     const myBlock = getLink(index);
-   *     // ...
-   *   }
-   *   ```
+   * ```js
+   * for (let i = 0; i < Vars.links; i++) {
+   *   const building = getLink(i);
+   *   const { x, y } = building;
+   *   print`${building}: (${x}, ${y})\n`;
+   * }
+   *
+   * printFlush();
+   * ```
    */
   function getLink<T extends BasicBuilding = AnyBuilding>(index: number): T;
 
@@ -329,8 +332,9 @@ declare global {
      * Sets whether the building is enabled or disabled.
      *
      * ```js
-     * const conveyor = getBuilding("conveyor1");
-     * control.enabled(conveyor, false);
+     * const { conveyor1 } = getBuildings();
+     *
+     * control.enabled(conveyor1, false);
      * ```
      */
     function enabled(building: BasicBuilding, value: boolean): void;
@@ -342,8 +346,10 @@ declare global {
      * @param options.shoot `true` to shoot, `false` to just aim at the position
      *
      *   ```js
+     *   const { cyclone1 } = getBuildings();
+     *
      *   control.shoot({
-     *     building: getBuilding("cyclone1"),
+     *     building: cyclone1,
      *     shoot: true,
      *     x: Vars.thisx,
      *     y: Vars.thisy,
@@ -367,17 +373,17 @@ declare global {
      * @param options.shoot `true` to shoot, `false` to just aim
      *
      *   ```js
-     *   const turret = getBuilding("cyclone1");
+     *   const { cyclone1 } = getBuildings();
      *
      *   const player = radar({
-     *     building: turret,
+     *     building: cyclone1,
      *     filters: ["player", "any", "any"],
      *     order: true,
      *     sort: "distance",
      *   });
      *
      *   control.shootp({
-     *     building: turret,
+     *     building: cyclone1,
      *     unit: player,
      *     shoot: true,
      *   });
@@ -396,9 +402,9 @@ declare global {
      * Sets the config of a block (like the item of a sorter)
      *
      * ```js
-     * const sorter = getBuilding("sorter1");
+     * const { sorter1 } = getBuildings();
      *
-     * control.config(sorter, Items.copper);
+     * control.config(sorter1, Items.copper);
      * ```
      */
     function config(building: BasicBuilding, value: symbol): void;
@@ -407,9 +413,9 @@ declare global {
      * Sets the color of an illuminator.
      *
      * ```js
-     * const illuminator = getBuilding("illuminator1");
+     * const { illuminator1 } = getBuildings();
      *
-     * control.color(illuminator, packColor(0.2, 0.65, 1, 1));
+     * control.color(illuminator1, packColor(0.2, 0.65, 1, 1));
      * ```
      */
     function color(building: BasicBuilding, rgbaData: number): void;
@@ -428,10 +434,11 @@ declare global {
    *   Example:
    *
    *   ```js
-   *   const turret = getBuilding("cyclone1");
+   *   const { cyclone1 } = getBuildings();
+   *
    *   // returns the furthest enemy unit
    *   const result = radar({
-   *     building: turret,
+   *     building: cyclone1,
    *     filters: ["enemy", "any", "any"],
    *     order: false,
    *     sort: "distance",
@@ -472,7 +479,7 @@ declare global {
   function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
 
   /**
-   * Stops the execution for the given amount of
+   * Stops the execution for the given amount of seconds
    *
    * ```js
    * print("before");
@@ -494,12 +501,17 @@ declare global {
      * Example:
      *
      * ```js
-     * if (index < Vars.blockCount) {
-     *   const blockKind = lookup.block(index);
-     * }
+     * const first = lookup.block(0);
+     * const last = lookup.block(Vars.blockCount - 1);
+     *
+     * print`
+     * first block type: ${first}
+     * last block type: ${last}`;
+     *
+     * printFlush();
      * ```
      */
-    function block(index: number): BlockSymbol;
+    function block(index: number): BlockSymbol | undefined;
 
     /**
      * Looks up an unit symbol by it's index on the content registry.
@@ -510,8 +522,14 @@ declare global {
      * Example:
      *
      * ```js
-     * const index = Math.floor(Math.rand(Vars.unitCount));
-     * const unitType = lookup.unit(index);
+     * const first = lookup.unit(0);
+     * const last = lookup.unit(Vars.unitCount - 1);
+     *
+     * print`
+     * first unit type: ${first}
+     * last unit type: ${last}`;
+     *
+     * printFlush();
      * ```
      */
     function unit(index: number): UnitSymbol | undefined;
@@ -524,9 +542,14 @@ declare global {
      * Example:
      *
      * ```js
-     * if (index < Vars.itemCount) {
-     *   const itemKind = lookup.item(index);
-     * }
+     * const first = lookup.item(0);
+     * const last = lookup.item(Vars.itemCount - 1);
+     *
+     * print`
+     * first item type: ${first}
+     * last item type: ${last}`;
+     *
+     * printFlush();
      * ```
      */
     function item(index: number): ItemSymbol | undefined;
@@ -539,9 +562,14 @@ declare global {
      * Example:
      *
      * ```js
-     * if (index < Vars.liquidCount) {
-     *   const liquidKind = lookup.liquid(index);
-     * }
+     * const first = lookup.liquid(0);
+     * const last = lookup.liquid(Vars.liquidCount - 1);
+     *
+     * print`
+     * first liquid type: ${first}
+     * last liquid type: ${last}`;
+     *
+     * printFlush();
      * ```
      */
     function liquid(index: number): LiquidSymbol | undefined;
@@ -560,8 +588,8 @@ declare global {
    * setRule.ambientLight(colorData);
    *
    * // set color of illuminator
-   * const illuminator = getBuilding("illuminator1");
-   * control.color(illuminator, packColor(0.2, 0.65, 1, 1));
+   * const { illuminator1 } = getBuildings();
+   * control.color(illuminator1, packColor(0.2, 0.65, 1, 1));
    * ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
@@ -649,10 +677,10 @@ declare global {
      *
      * ```js
      * // makes flares follow the player's cursor
-     * const turret = getBuilding("foreshadow1");
+     * const { foreshadow1 } = getBuildings();
      *
      * const player = radar({
-     *   building: turret,
+     *   building: foreshadow1,
      *   filters: ["player", "any", "any"],
      *   order: true,
      *   sort: "distance",
@@ -702,6 +730,8 @@ declare global {
      * @param options.shoot `true` to shoot, `false` to just aim
      *
      *   ```js
+     *   unitBind(Units.flare);
+     *
      *   const player = unitRadar({
      *     filters: ["player", "any", "any"],
      *     order: true,
@@ -756,11 +786,11 @@ declare global {
      * @param amount How many items should be taken
      *
      *   ```js
-     *   const vault = getBuilding("vault1");
+     *   const { vault1 } = getBuildings();
      *
      *   // bind unit and move to the valult...
      *
-     *   unitControl.itemTake(vault, Items.graphite, 50);
+     *   unitControl.itemTake(vault1, Items.graphite, 50);
      *
      *   // do something with the graphite...
      *   ```
@@ -1078,9 +1108,9 @@ declare global {
    * Jumps to the top of the instruction stack.
    *
    * ```js
-   * const { enabled } = getBuilding("switch1");
+   * const { switch1 } = getBuildings();
    *
-   * if (!enabled) endScript();
+   * if (!switch1.enabled) endScript();
    * // do something when the switch is enabled
    * ```
    */
