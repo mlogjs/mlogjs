@@ -1,5 +1,4 @@
 // credits to Vinicius Rangel#0001
-const display = getBuilding("display1");
 
 const points = [
   [-1, -1, -1, -1, 1, -1], // 0
@@ -46,7 +45,7 @@ while (true) {
   drawLine(points[10]);
   drawLine(points[11]);
 
-  drawFlush(display);
+  drawFlush();
 
   rotate(2, 5, Math.rand(2));
 }
