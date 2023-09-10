@@ -760,12 +760,12 @@ declare global {
      * @param amount How many items should be dropped
      *
      *   ```js
-     *   const container = getBuilding("container1");
+     *   const { container1 } = getBuildings();
      *
      *   // ...
      *
      *   // drop 40 items on the container
-     *   unitControl.itemDrop(container, 40);
+     *   unitControl.itemDrop(container1, 40);
      *
      *   // ...
      *
