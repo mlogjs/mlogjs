@@ -50,9 +50,12 @@ function getEnvData(env: any): EnvData {
 
 function loadEnvData(env: any) {
   const content = readFileSync(filePath, "utf8");
-  watcher ??= watchFile(filePath, (curr, prev) => {
-    env[envKey] = undefined;
-  });
+
+  if (process.env.NODE_ENV === "development") {
+    watcher ??= watchFile(filePath, (curr, prev) => {
+      env[envKey] = undefined;
+    });
+  }
   const ast = parse(content, {
     plugins: ["typescript"],
     sourceType: "module",
