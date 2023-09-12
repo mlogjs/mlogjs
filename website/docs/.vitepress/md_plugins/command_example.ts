@@ -44,18 +44,20 @@ export function commandExample(md: MarkdownIt) {
 }
 
 function getEnvData(env: any): EnvData {
-  env[envKey] ??= loadEnvData(env);
-  return env[envKey];
-}
-
-function loadEnvData(env: any) {
-  const content = readFileSync(filePath, "utf8");
+  env[envKey] ??= loadEnvData();
 
   if (process.env.NODE_ENV === "development") {
-    watcher ??= watchFile(filePath, (curr, prev) => {
+    watcher ??= watchFile(filePath, () => {
       env[envKey] = undefined;
     });
   }
+
+  return env[envKey];
+}
+
+function loadEnvData() {
+  const content = readFileSync(filePath, "utf8");
+
   const ast = parse(content, {
     plugins: ["typescript"],
     sourceType: "module",
