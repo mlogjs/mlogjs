@@ -258,6 +258,11 @@ const result = sensor(myCustomSymbol, container1);
 
 Looks up content symbols by their index.
 
+For the inverse of this operation, you can sense the `id` of a symbol:
+
+::: command-example
+:::
+
 - #### `lookup.block`
 
   Looks up a block symbol by it's index on the content registry.

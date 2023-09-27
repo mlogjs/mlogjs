@@ -491,7 +491,18 @@ declare global {
    */
   function wait(seconds: number): void;
 
-  /** Looks up content symbols by their index. */
+  /**
+   * Looks up content symbols by their index.
+   *
+   * For the inverse of this operation, you can sense the `id` of a symbol:
+   *
+   * ```js
+   * const { type } = getLink(0);
+   *
+   * print(type === lookup.block(type.id));
+   * printFlush(); // prints "1"
+   * ```
+   */
   namespace lookup {
     /**
      * Looks up a block symbol by it's index on the content registry.

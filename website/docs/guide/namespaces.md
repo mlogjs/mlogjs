@@ -198,6 +198,7 @@ This namespace contains all symbols that can be used to access properties of ent
 - `name`
 - `payloadCount`
 - `payloadType`
+- `id`
 - `enabled`
 - `config`
 - `color`

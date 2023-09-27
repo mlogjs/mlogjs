@@ -1,6 +1,17 @@
 /// <reference no-default-lib="true"/>
 
-interface Symbol {}
+interface Symbol {
+  /**
+   * The `lookup` id of this symbol.
+   *
+   * Due to typescript's limitations, this property has been
+   * declared for all symbols, even ones that shouldn't have it.
+   *
+   * If a symbol is not part of `ItemSymbol`, `LiquidSymbol`,
+   * `UnitSymbol`, or `BlockSymbol`, it likely does not have an id.
+   */
+  readonly id: number;
+}
 
 interface SymbolConstructor {}
 
