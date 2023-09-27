@@ -18,7 +18,7 @@ import { appendSourceLocations, hideRedundantJumps, pipeInsts } from "./utils";
 type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
 
 export interface CompilerOptions {
-  /** Wether the compiler should preserve or compact variable and function names*/
+  /** Wether the compiler should preserve or compact variable and function names */
   compactNames?: boolean;
 
   sourcemap?: boolean;
@@ -156,12 +156,10 @@ export class Compiler {
   /**
    * Handles many nodes in order.
    *
-   * The usage of this method over a regular loop over an array of nodes
-   * is only required if the code inside the loop generates
-   * instructions that are not tracked by the compiler
-   * handler methods ({@link handle}, {@link handleEval}
+   * The usage of this method over a regular loop over an array of nodes is only
+   * required if the code inside the loop generates instructions that are not
+   * tracked by the compiler handler methods ({@link handle}, {@link handleEval}
    * and {@link handleMany})
-   *
    */
   handleMany<T extends es.Node>(
     scope: IScope,

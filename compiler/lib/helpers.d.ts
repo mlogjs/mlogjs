@@ -6,9 +6,9 @@ declare global {
   /**
    * Allows getting unlisted processor variables or symbols.
    *
-   * Using this method is discouraged because most values are
-   * already accessible under the namespaces `Units`, `Blocks`,
-   * `Items`, `Liquids`, `ControlKind` and `Vars`.
+   * Using this method is discouraged because most values are already accessible
+   * under the namespaces `Units`, `Blocks`, `Items`, `Liquids`, `ControlKind`
+   * and `Vars`.
    *
    * @param name The identifier of the value
    */
@@ -27,8 +27,8 @@ declare global {
   /**
    * Returns a record of all the buildings linked to this processor.
    *
-   * The use of this function is preferred if you are assigning
-   * buildings to multiple variables at once.
+   * The use of this function is preferred if you are assigning buildings to
+   * multiple variables at once.
    *
    * ```js
    * const { switch1: toggle, cell1 } = getBuildings();
@@ -61,13 +61,13 @@ declare global {
   /**
    * Inlines raw mlog code. Variables and expressions can be placed inside.
    *
-   * Although possible, using this function is heavily not recommended since
-   * you lose the benefits of getting type cheking and validation for some
+   * Although possible, using this function is heavily not recommended since you
+   * lose the benefits of getting type cheking and validation for some
    * commands.
    *
    * ```js
-   *  let x = 10
-   *  asm`ucontrol build ${x} ${x * 2} @router 0 0`
+   * let x = 10;
+   * asm`ucontrol build ${x} ${x * 2} @router 0 0`;
    * ```
    */
   function asm(strings: TemplateStringsArray, ...values: unknown[]): void;

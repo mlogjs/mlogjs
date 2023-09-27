@@ -1,6 +1,13 @@
 {
+  "plugins": ["prettier-plugin-jsdoc"],
   "endOfLine": "lf",
   "arrowParens": "avoid",
   "tabWidth": 2,
-  "printWidth": 80
+  "printWidth": 80,
+  "overrides": [
+    {
+      "files": ["compiler/lib/eslib/*"],
+      "options": { "plugins": [] }
+    }
+  ]
 }

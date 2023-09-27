@@ -1,24 +1,27 @@
-set x:5:4 88
-set y:6:4 88
-set vx:8:4 0
-set vy:9:4 2
+set x:4:4 88
+set y:5:4 88
+set vx:6:4 2
+set vy:7:4 0
 draw color 255 255 255
-op lessThan &t0 x:5:4 0
-jump 9 notEqual &t0 0
-op add &t1 x:5:4 5
-op greaterThan &t0 &t1 176
-jump 11 equal &t0 0
-op mul vx:8:4 vx:8:4 -1
-op lessThan &t2 y:6:4 0
-jump 15 notEqual &t2 0
-op add &t3 y:6:4 5
-op greaterThan &t2 &t3 176
-jump 17 equal &t2 0
-op mul vy:9:4 vy:9:4 -1
-op add x:5:4 x:5:4 vx:8:4
-op add y:6:4 y:6:4 vy:9:4
-op add vy:9:4 vy:9:4 -1
+sensor &t0 switch1 @enabled
+jump 26 equal &t0 0
+op add x:4:4 x:4:4 vx:6:4
+op add y:5:4 y:5:4 vy:7:4
+op add vy:7:4 vy:7:4 -1
+op lessThan &t1 x:4:4 0
+jump 14 notEqual &t1 0
+op add &t2 x:4:4 5
+op greaterThan &t1 &t2 176
+jump 16 equal &t1 0
+op mul vx:6:4 vx:6:4 -1
+op lessThan &t3 y:5:4 0
+jump 20 notEqual &t3 0
+op add &t4 y:5:4 5
+op greaterThan &t3 &t4 176
+jump 22 equal &t3 0
+op div vy:7:4 vy:7:4 -1.1
 draw clear 0 0 0
-draw rect x:5:4 y:6:4 5 5
+draw rect x:4:4 y:5:4 5 5
 drawflush display1
 jump 5 always
+end

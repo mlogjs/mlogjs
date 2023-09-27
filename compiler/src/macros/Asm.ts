@@ -82,7 +82,10 @@ function formatInstructions(args: (string | IValue)[]) {
   return instructions;
 }
 
-/** Determines if an asm line should be generated and trims it at the start and end */
+/**
+ * Determines if an asm line should be generated and trims it at the start and
+ * end
+ */
 function validateInstructionArgs(args: (string | IValue)[]) {
   if (args.length === 0) return false;
   if (args.length === 1) {

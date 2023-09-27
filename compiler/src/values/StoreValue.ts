@@ -11,8 +11,8 @@ import {
 import { camelToDashCase, itemNames } from "../utils";
 
 /**
- * `StoreValue` represents values unknown at compile time,
- * mostly used with mutable variables and temporary values.
+ * `StoreValue` represents values unknown at compile time, mostly used with
+ * mutable variables and temporary values.
  *
  * Stores are mutable by default.
  */
@@ -147,7 +147,8 @@ function compareStores(left: StoreValue, right: IValue) {
 }
 
 /**
-  If `prop` is sensing on of the coordinates of `@this`, returns the coordinate name.
+ * If `prop` is sensing on of the coordinates of `@this`, returns the coordinate
+ * name.
  */
 function getThisCoordName(value: StoreValue, prop: IValue) {
   if (value.name !== "@this") return;

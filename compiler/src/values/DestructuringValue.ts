@@ -7,9 +7,7 @@ export type TDestructuringMembers = Map<
   IValue,
   {
     value: IValue;
-    /**
-     * Handles the input value, is responsible for the assignment.
-     */
+    /** Handles the input value, is responsible for the assignment. */
     handler(
       get: () => TValueInstructions,
       propExists: () => boolean,
@@ -22,8 +20,8 @@ export type TDestructuringMembers = Map<
  * Specific case class, required on the ArrayPattern and ObjectPattern handlers
  * in order to keep the separation of concerns and make the code more modular.
  *
- * When it is assign a value, it will get it's own properties and recursively assign
- * each of them to their counterparts on the right hand value.
+ * When it is assign a value, it will get it's own properties and recursively
+ * assign each of them to their counterparts on the right hand value.
  */
 export class DestructuringValue extends VoidValue {
   macro = true;

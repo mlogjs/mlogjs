@@ -28,8 +28,8 @@ import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
 /**
- * The size of a dynamic array iteration item.
- * Includes the set counter instruction
+ * The size of a dynamic array iteration item. Includes the set counter
+ * instruction
  */
 const itemSize = 2;
 

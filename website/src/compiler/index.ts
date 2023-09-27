@@ -5,6 +5,7 @@ let worker: Worker;
 
 /**
  * Invokes a web worker to compile the code. It will throttle any calls that
+ *
  * @param code
  * @param options
  */

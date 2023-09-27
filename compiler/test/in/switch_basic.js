@@ -13,7 +13,7 @@ switch (dynamicItem) {
     print("always runs!\n");
 }
 
-printFlush(getBuilding("message1"));
+printFlush();
 
 function matchItem(n) {
   switch (n) {

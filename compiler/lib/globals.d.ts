@@ -28,22 +28,22 @@ interface Vars {
   readonly ipt: number;
   /** The unit bound to this processor */
   readonly unit: AnyUnit;
-  /** The amount of ticks that happened since the map started*/
+  /** The amount of ticks that happened since the map started */
   readonly tick: number;
   /** The current UNIX timestamp in milliseconds */
   readonly time: number;
   /**
    * The amount of seconds that passed since the map started.
    *
-   * This number is NOT an integer, use `Math.floor` to get the number
-   * of whole seconds that already passed.
+   * This number is NOT an integer, use `Math.floor` to get the number of whole
+   * seconds that already passed.
    */
   readonly second: number;
   /**
    * The amount of minutes that passed since the map started.
    *
-   * This number is NOT an integer, use `Math.floor` to get the number
-   * of whole minutes that already passed.
+   * This number is NOT an integer, use `Math.floor` to get the number of whole
+   * minutes that already passed.
    */
   readonly minute: number;
   /** The number of the current wave. Starts at 1. */
@@ -51,17 +51,17 @@ interface Vars {
   /**
    * The amount of seconds left before the next wave.
    *
-   * This number is NOT an integer, use `Math.floor` to get the number
-   * of whole seconds left.
+   * This number is NOT an integer, use `Math.floor` to get the number of whole
+   * seconds left.
    */
   readonly waveTime: number;
-  /** Total amount of items existent, can be used to check if an ID is valid*/
+  /** Total amount of items existent, can be used to check if an ID is valid */
   readonly itemCount: number;
-  /** Total amount of liquids existent, can be used to check if an ID is valid*/
+  /** Total amount of liquids existent, can be used to check if an ID is valid */
   readonly liquidCount: number;
-  /** Total amount of units existent, can be used to check if an ID is valid*/
+  /** Total amount of units existent, can be used to check if an ID is valid */
   readonly unitCount: number;
-  /** Total amount of blocks existent, can be used to check if an ID is valid*/
+  /** Total amount of blocks existent, can be used to check if an ID is valid */
   readonly blockCount: number;
 }
 

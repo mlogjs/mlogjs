@@ -28,7 +28,7 @@ export class CompilerError extends Error {
    *
    * If it's not `undefined` it means that `this` is just wrapping the error to
    * append extra data like the node stack
-   * */
+   */
   inner?: unknown;
 
   constructor(message: string, source?: CompilerErrorSource) {

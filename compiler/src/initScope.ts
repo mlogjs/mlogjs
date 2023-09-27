@@ -14,9 +14,7 @@ import { EMutability, IScope } from "./types";
 import { Asm } from "./macros/Asm";
 import { LiteralValue } from "./values";
 
-/**
- * Adds all the compiler globals to `scope`
- */
+/** Adds all the compiler globals to `scope` */
 export function initScope(scope: IScope) {
   scope.hardSet("undefined", new LiteralValue(null));
   // namespaces

@@ -9,4 +9,4 @@ print(concat`${first}${second}${third}`, "\n");
 print(concat(0, " ", undefined, " ", false), "\n");
 print(concat`${0} ${undefined} ${false}`, "\n");
 
-printFlush(getBuilding("message1"));
+printFlush();

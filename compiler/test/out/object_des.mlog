@@ -1,40 +1,40 @@
-sensor x:3:6 cyclone1 @x
-sensor y:3:9 cyclone1 @y
-sensor health:3:12 cyclone1 @health
+sensor x:4:6 cyclone1 @x
+sensor y:4:9 cyclone1 @y
+sensor health:4:12 cyclone1 @health
 ulocate building core 1 @copper &_ &_ &_ &t0
-sensor coreType:5:21 &t0 @type
-print x:3:6
-print y:3:9
-print health:3:12
-print coreType:5:21
+sensor coreType:6:21 &t0 @type
+print x:4:6
+print y:4:9
+print health:4:12
+print coreType:6:21
 printflush message1
-set x:3:6 10
-set y:3:9 20
-set health:3:12 200
+set x:4:6 10
+set y:4:9 20
+set health:4:12 200
 write 20 cell1 0
-set x:3:6 30
-set y:3:9 40
-set health:3:12 500
+set x:4:6 30
+set y:4:9 40
+set health:4:12 500
 write 50 cell1 0
 read &t1 cell1 0
-print x:3:6
-print y:3:9
-print health:3:12
+print x:4:6
+print y:4:9
+print health:4:12
 print &t1
-ulocate building core 1 @copper &_ &_ &_ &t0:computed:34:6
-sensor x:3:6 &t0:computed:34:6 @x
-sensor y:3:9 &t0:computed:34:6 @y
-read a:40:5 cell1 0
-read b:40:8 cell1 1
-read c:40:11 cell1 2
+ulocate building core 1 @copper &_ &_ &_ &t0:computed:35:6
+sensor x:4:6 &t0:computed:35:6 @x
+sensor y:4:9 &t0:computed:35:6 @y
+read a:41:5 cell1 0
+read b:41:8 cell1 1
+read c:41:11 cell1 2
 getlink &t2 1
-sensor a:40:5 &t2 @ammo
+sensor a:41:5 &t2 @ammo
 getlink &t3 2
-sensor b:40:8 &t3 @health
+sensor b:41:8 &t3 @health
 getlink &t4 1
-sensor a:40:5 &t4 @health
+sensor a:41:5 &t4 @health
 getlink &t5 2
-sensor b:40:8 &t5 @ammo
+sensor b:41:8 &t5 @ammo
 getlink &_ 0
 getlink &t6 1
 sensor &_ &t6 @copper

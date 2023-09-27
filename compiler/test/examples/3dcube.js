@@ -1,5 +1,4 @@
 // credits to Vinicius Rangel#0001
-const display = getBuilding("display1");
 
 const points = [
   [-1, -1, -1, -1, 1, -1], // 0
@@ -46,14 +45,12 @@ while (true) {
   drawLine(points[10]);
   drawLine(points[11]);
 
-  drawFlush(display);
+  drawFlush();
 
   rotate(2, 5, Math.rand(2));
 }
 
-/**
- * @param {number[]} positions
- */
+/** @param {number[]} positions */
 function drawLine([p1x, p1y, p1z, p2x, p2y, p2z]) {
   const z1 = a31 * p1x + a32 * p1y + a33 * p1z;
   const z2 = a31 * p2x + a32 * p2y + a33 * p2z;

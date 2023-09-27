@@ -1,6 +1,7 @@
-const mem = new Memory(getBuilding("cell1"));
+const { cell1, cyclone1 } = getBuildings();
+const mem = new Memory(cell1);
 
-let { x, y, health } = getBuilding("cyclone1");
+let { x, y, health } = cyclone1;
 
 const [, , , { type: coreType }] = unitLocate.building({
   group: "core",
@@ -8,7 +9,7 @@ const [, , , { type: coreType }] = unitLocate.building({
 });
 
 print(x, y, health, coreType);
-printFlush(getBuilding("message1"));
+printFlush();
 
 // test with objetc macro
 ({ x, y, health, first: mem[0] } = { x: 10, y: 20, health: 200, first: 20 });

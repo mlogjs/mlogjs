@@ -1,5 +1,3 @@
-// Doing this is needed because typescript
-// will otherwise infer the type of Vars.unit to be never
 if (Vars.unit == undefined) {
   unitBind(Units.flare);
 }
@@ -8,7 +6,7 @@ print("health: ", Vars.unit.health, "\n");
 
 let item = Items.copper;
 print("amount of ", item, " : ", Vars.unit[item]);
-printFlush(getBuilding("message1"));
+printFlush();
 
 const unitA = radar({
   building: getBuilding("cyclone1"),

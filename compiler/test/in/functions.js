@@ -7,9 +7,9 @@ let a = 1;
 let b = 1;
 
 let result = op(type, a, b);
-const message1 = getBuilding("message1");
+
 print("The result is: ", result, ".");
-printFlush(message1);
+printFlush();
 
 function sub(a, b) {
   return a - b;

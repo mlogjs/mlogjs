@@ -1,8 +1,8 @@
-const switchBlock = getBuilding("switch1");
+const { switch1 } = getBuildings();
 
-if (!switchBlock.enabled) endScript();
+if (!switch1.enabled) endScript();
 
-control.enabled(switchBlock, false);
+control.enabled(switch1, false);
 
 cutscene.pan({ x: 10, y: 10, speed: 0.02 });
 wait(0.5);

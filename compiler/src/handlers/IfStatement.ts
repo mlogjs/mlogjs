@@ -55,8 +55,9 @@ export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
 };
 
 /**
- * Returns `true` if the instruction array ends with an instruction
- * that already changes the control flow of the script (like `jump x always`, `end` , `stop`, etc)
+ * Returns `true` if the instruction array ends with an instruction that already
+ * changes the control flow of the script (like `jump x always`, `end` , `stop`,
+ * etc)
  */
 function endsWithControlFlow(inst: IInstruction[]) {
   for (let i = inst.length - 1; i >= 0; i--) {
