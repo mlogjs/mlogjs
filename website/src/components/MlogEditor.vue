@@ -4,7 +4,7 @@ import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 // resolved by vite, check the config.ts file
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
-import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import monaco from "../monaco";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
@@ -25,11 +25,7 @@ const { isDark } = useData();
 
 const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
 
-loader.config({
-  paths: {
-    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.40.0/min/vs",
-  },
-});
+loader.config({ monaco });
 
 type EditorOptions = monaco.editor.IStandaloneEditorConstructionOptions;
 
