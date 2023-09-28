@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, shallowRef, watch } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
-// resolved by vite, check the config.ts file
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
 import monaco from "../monaco";
