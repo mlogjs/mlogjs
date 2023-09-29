@@ -3,7 +3,7 @@ import { computed, provide, ref, shallowRef, watch } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
-import monaco from "../monaco";
+import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
@@ -24,7 +24,11 @@ const { isDark } = useData();
 
 const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
 
-loader.config({ monaco });
+loader.config({
+  paths: {
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.40.0/min/vs",
+  },
+});
 
 type EditorOptions = monaco.editor.IStandaloneEditorConstructionOptions;
 
