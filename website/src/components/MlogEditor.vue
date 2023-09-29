@@ -1,7 +1,6 @@
 <script setup lang="ts">
 import { computed, provide, ref, shallowRef, watch } from "vue";
 import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
-// resolved by vite, check the config.ts file
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
 import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
@@ -27,7 +26,7 @@ const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
 
 loader.config({
   paths: {
-    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.40.0/min/vs",
+    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs",
   },
 });
 

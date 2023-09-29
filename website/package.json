@@ -16,10 +16,11 @@
     "@babel/parser": "^7.22.7",
     "@babel/types": "^7.22.5",
     "@types/node": "^18.16.19",
+    "@types/splitpanes": "^2.2.2",
     "flexsearch": "^0.7.31",
     "markdown-it": "^13.0.1",
     "vite": "^4.4.9",
-    "vitepress": "1.0.0-rc.12",
+    "vitepress": "1.0.0-rc.20",
     "vue": "^3.3.4"
   },
   "dependencies": {
@@ -28,7 +29,7 @@
     "@types/markdown-it-container": "^2.0.5",
     "markdown-it-container": "^3.0.0",
     "mlogjs": "workspace:^",
-    "monaco-editor": "^0.40.0",
+    "monaco-editor": "^0.43.0",
     "splitpanes": "^3.1.5"
   }
 }

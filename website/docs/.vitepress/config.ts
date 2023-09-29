@@ -80,7 +80,10 @@ const config: UserConfig = {
     ],
   },
   markdown: {
-    theme: "dark-plus",
+    theme: {
+      dark: "dark-plus",
+      light: "light-plus",
+    },
     config(md) {
       md.use(mlogjsOutput);
       md.use(commandExample);
