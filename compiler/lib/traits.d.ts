@@ -204,6 +204,7 @@ declare global {
 
   interface Nameable
     extends WithSymbols<{
+      /** The name of the player controlling this unit. */
       readonly name?: string;
     }> {}
 
