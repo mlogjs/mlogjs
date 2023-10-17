@@ -105,6 +105,11 @@ declare global {
 
   interface WithProgress
     extends WithSymbols<{
+      /**
+       * Action progress, in the range: [0, 1].
+       *
+       * Returns the production, turret reload or construction progress.
+       */
       readonly progress: number;
     }> {}
 
