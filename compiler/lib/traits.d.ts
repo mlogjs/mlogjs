@@ -216,7 +216,7 @@ declare global {
 
   interface WithEnable
     extends WithSymbols<{
-      enabled: boolean;
+      readonly enabled: boolean;
     }> {}
   interface WithConfig<
     T extends symbol | number | undefined = symbol | undefined,
@@ -226,16 +226,16 @@ declare global {
 
   interface WithSpeed
     extends WithSymbols<{
-      speed: number;
+      readonly speed: number;
     }> {}
 
   interface WithColor
     extends WithSymbols<{
-      color: number;
+      readonly color: number;
     }> {}
 
   interface WithTeam
     extends WithSymbols<{
-      team: number;
+      readonly team: number;
     }> {}
 }
