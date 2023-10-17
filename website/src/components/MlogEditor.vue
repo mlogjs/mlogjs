@@ -51,7 +51,8 @@ const typescriptSettingsRef = computed(() => ({
   ...settings.value.typescript,
 }));
 
-const [sizes, handlePaneResize] = usePaneSizes();
+const isMobile = useMediaQuery("(max-width: 800px)");
+const [sizes, handlePaneResize] = usePaneSizes(isMobile);
 const code = ref("");
 
 const editorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
@@ -74,7 +75,6 @@ useSourceMapping({
   sourcemapsRef,
   monacoRef,
 });
-const isMobile = useMediaQuery("(max-width: 800px)");
 
 watch([currentFile, typescriptSettingsRef], ([file, typescript]) => {
   if (!monacoRef.value || !file) return;
@@ -137,10 +137,10 @@ function copyToClipboard() {
       style="flex: 1; width: 100vw"
       @resized="handlePaneResize"
     >
-      <Pane v-if="!isMobile" :size="sizes[0]">
+      <Pane v-if="!isMobile" :size="sizes.sideBar">
         <SideBar :copy-to-clipboard="copyToClipboard" />
       </Pane>
-      <Pane :size="sizes[1]">
+      <Pane :size="sizes.codeEditor">
         <Editor
           language="typescript"
           v-model:value="code"
@@ -150,7 +150,7 @@ function copyToClipboard() {
           @mount="onMount"
         ></Editor>
       </Pane>
-      <Pane :size="sizes[2]">
+      <Pane :size="sizes.outputEditor">
         <Editor
           language="mlog"
           :theme="theme"
