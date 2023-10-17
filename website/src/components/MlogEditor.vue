@@ -129,6 +129,7 @@ function copyToClipboard() {
 
 <template>
   <div class="editor-wrapper">
+    <SideBar v-if="horizontal" :copy-to-clipboard="copyToClipboard" />
     <Splitpanes
       class="default-theme"
       :horizontal="horizontal"
@@ -136,7 +137,7 @@ function copyToClipboard() {
       style="height: var(--wrapper-height); width: 100vw"
       @resized="handlePaneResize"
     >
-      <Pane :size="sizes[0]">
+      <Pane v-if="!horizontal" :size="sizes[0]">
         <SideBar :copy-to-clipboard="copyToClipboard" />
       </Pane>
       <Pane :size="sizes[1]">
