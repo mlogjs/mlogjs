@@ -87,6 +87,14 @@ declare global {
 
   interface WithShield
     extends WithSymbols<{
+      /**
+       * The amount of shield hp `this` has.
+       *
+       * If `this` has a force field, returns the force field's hp.
+       *
+       * Or else, if `this` is an unit, returns the hp of this unit's personal
+       * shield, which is as one given by a `pulsar`.
+       */
       readonly shield: number;
     }> {}
 
