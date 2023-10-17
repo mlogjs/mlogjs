@@ -30,11 +30,29 @@ declare global {
 
   interface PowerHolder
     extends WithSymbols<{
+      /** The amount of power stored in this building. */
       readonly totalPower: number;
+      /** The maximum amount of power this building can hold. */
       readonly powerCapacity: number;
+      /**
+       * The amount of power stored in the power net that is this building is a
+       * part of.
+       */
       readonly powerNetStored: number;
+      /**
+       * The maximum amount of power that can be stored in the power net that is
+       * this building is a part of.
+       */
       readonly powerNetCapacity: number;
+      /**
+       * How much power is being generated in the power net that is this
+       * building is a part of.
+       */
       readonly powerNetIn: number;
+      /**
+       * How much power is being spent in the power net that is this building is
+       * a part of.
+       */
       readonly powerNetOut: number;
     }> {}
 
