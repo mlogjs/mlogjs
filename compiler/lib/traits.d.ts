@@ -115,6 +115,10 @@ declare global {
 
   interface WithTimescale
     extends WithSymbols<{
+      /**
+       * The speed boost applied to this building by, for example, an overdrive
+       * projector.
+       */
       readonly timescale: number;
     }> {}
 
