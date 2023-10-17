@@ -59,6 +59,11 @@ declare global {
       readonly heat: number;
     }> {}
 
+  interface WithShield
+    extends WithSymbols<{
+      readonly shield: number;
+    }> {}
+
   interface WithEffiency
     extends WithSymbols<{
       readonly efficiency: number;

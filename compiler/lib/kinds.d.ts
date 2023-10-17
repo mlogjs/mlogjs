@@ -4,6 +4,7 @@ interface BasicUnit
   extends ItemHolder,
     Shooting,
     WithHealth,
+    WithShield,
     Rotatable,
     Spaced,
     Ranged,
@@ -41,4 +42,4 @@ interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 // just to make this future proof
 interface AnyTurret extends BasicTurret {}
 
-interface AnyBuilding extends AnyTurret, Heatable {}
+interface AnyBuilding extends AnyTurret, Heatable, WithShield {}
