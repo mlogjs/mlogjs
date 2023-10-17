@@ -176,7 +176,29 @@ declare global {
 
   interface Controllable
     extends WithSymbols<{
+      /**
+       * The type of control that is being applied to `this`.
+       *
+       * If `this` is a building:
+       *
+       * - `ControlKind.ctrlPlayer` if a player is controlling `this`.
+       * - `0` otherwise.
+       *
+       * If `this` is an unit:
+       *
+       * - `ControlKind.ctrlProcessor` if `this` is being controlled by a
+       *   processor.
+       * - `ControlKind.ctrlPlayer` if `this` is being controlled directly by a
+       *   player.
+       * - `ControlKind.ctrlCommand` if `this` is being controlled by player
+       *   commands.
+       * - `0` otherwise.
+       */
       readonly controlled: 0 | ControlKind;
+      /**
+       * The entity controlling this unit. Is either a player, a processor or
+       * `this`.
+       */
       readonly controller: AnyUnit | BasicBuilding;
     }> {}
 
