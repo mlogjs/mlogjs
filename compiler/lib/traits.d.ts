@@ -226,6 +226,7 @@ declare global {
 
   interface WithSpeed
     extends WithSymbols<{
+      /** The base movement speed of this unit. Measured in tiles/second. */
       readonly speed: number;
     }> {}
 
