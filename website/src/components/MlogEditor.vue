@@ -134,7 +134,7 @@ function copyToClipboard() {
       class="default-theme"
       :horizontal="horizontal"
       :push-other-panes="false"
-      style="height: var(--wrapper-height); width: 100vw"
+      style="flex: 1; width: 100vw"
       @resized="handlePaneResize"
     >
       <Pane v-if="!horizontal" :size="sizes[0]">
@@ -169,6 +169,9 @@ function copyToClipboard() {
   --wrapper-height: calc(100vh - var(--vp-nav-height));
   height: var(--wrapper-height);
   width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .editor-wrapper :deep(.splitpanes__splitter) {
   background-color: gray;
