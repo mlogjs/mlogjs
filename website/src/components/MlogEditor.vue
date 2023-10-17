@@ -74,7 +74,7 @@ useSourceMapping({
   sourcemapsRef,
   monacoRef,
 });
-const horizontal = useMediaQuery("(max-width: 800px)");
+const isMobile = useMediaQuery("(max-width: 800px)");
 
 watch([currentFile, typescriptSettingsRef], ([file, typescript]) => {
   if (!monacoRef.value || !file) return;
@@ -129,15 +129,15 @@ function copyToClipboard() {
 
 <template>
   <div class="editor-wrapper">
-    <SideBar v-if="horizontal" :copy-to-clipboard="copyToClipboard" />
+    <SideBar v-if="isMobile" :copy-to-clipboard="copyToClipboard" />
     <Splitpanes
       class="default-theme"
-      :horizontal="horizontal"
+      :horizontal="isMobile"
       :push-other-panes="false"
       style="flex: 1; width: 100vw"
       @resized="handlePaneResize"
     >
-      <Pane v-if="!horizontal" :size="sizes[0]">
+      <Pane v-if="!isMobile" :size="sizes[0]">
         <SideBar :copy-to-clipboard="copyToClipboard" />
       </Pane>
       <Pane :size="sizes[1]">
