@@ -219,6 +219,7 @@ declare namespace LAccess {
   const health: unique symbol;
   const maxHealth: unique symbol;
   const heat: unique symbol;
+  const shield: unique symbol;
   const efficiency: unique symbol;
   const progress: unique symbol;
   const timescale: unique symbol;
