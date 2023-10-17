@@ -74,6 +74,14 @@ declare global {
 
   interface Heatable
     extends WithSymbols<{
+      /**
+       * Can mean:
+       *
+       * - The damage buildup in the force field of force projectors. This buildup
+       *   decreases over time as the force projector regenerates.
+       * - The warmup progress of impact reactors, in the range: [0, 1].
+       * - The heat of a thorium reactor, in the range: [0, 1].
+       */
       readonly heat: number;
     }> {}
 
