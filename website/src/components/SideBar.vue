@@ -84,6 +84,7 @@ div :deep(svg) {
 div.bar-actions {
   display: flex;
   justify-content: space-around;
+  margin: 0.5em 0;
 }
 dialog {
   background-color: var(--vp-c-bg);

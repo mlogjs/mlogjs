@@ -51,7 +51,8 @@ const typescriptSettingsRef = computed(() => ({
   ...settings.value.typescript,
 }));
 
-const [sizes, handlePaneResize] = usePaneSizes();
+const isMobile = useMediaQuery("(max-width: 800px)");
+const [sizes, handlePaneResize] = usePaneSizes(isMobile);
 const code = ref("");
 
 const editorRef = shallowRef<monaco.editor.IStandaloneCodeEditor>();
@@ -74,7 +75,6 @@ useSourceMapping({
   sourcemapsRef,
   monacoRef,
 });
-const horizontal = useMediaQuery("(max-width: 800px)");
 
 watch([currentFile, typescriptSettingsRef], ([file, typescript]) => {
   if (!monacoRef.value || !file) return;
@@ -129,17 +129,18 @@ function copyToClipboard() {
 
 <template>
   <div class="editor-wrapper">
+    <SideBar v-if="isMobile" :copy-to-clipboard="copyToClipboard" />
     <Splitpanes
       class="default-theme"
-      :horizontal="horizontal"
+      :horizontal="isMobile"
       :push-other-panes="false"
-      style="height: var(--wrapper-height); width: 100vw"
+      style="flex: 1; width: 100vw"
       @resized="handlePaneResize"
     >
-      <Pane :size="sizes[0]">
+      <Pane v-if="!isMobile" :size="sizes.sideBar">
         <SideBar :copy-to-clipboard="copyToClipboard" />
       </Pane>
-      <Pane :size="sizes[1]">
+      <Pane :size="sizes.codeEditor">
         <Editor
           language="typescript"
           v-model:value="code"
@@ -149,7 +150,7 @@ function copyToClipboard() {
           @mount="onMount"
         ></Editor>
       </Pane>
-      <Pane :size="sizes[2]">
+      <Pane :size="sizes.outputEditor">
         <Editor
           language="mlog"
           :theme="theme"
@@ -168,6 +169,9 @@ function copyToClipboard() {
   --wrapper-height: calc(100vh - var(--vp-nav-height));
   height: var(--wrapper-height);
   width: 100vw;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
 }
 .editor-wrapper :deep(.splitpanes__splitter) {
   background-color: gray;
