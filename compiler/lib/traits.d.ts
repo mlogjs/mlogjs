@@ -124,6 +124,20 @@ declare global {
 
   interface Rotatable
     extends WithSymbols<{
+      /**
+       * The rotation of this entity.
+       *
+       * Most buildings have their rotation represented by an integer within the
+       * range [0, 3]. With each meaning:
+       *
+       * - 0 => right
+       * - 1 => up
+       * - 2 => left
+       * - 3 => down
+       *
+       * While units and some other buildings (like turrets) will have their
+       * rotation represented in degrees stored in a floating point number.
+       */
       readonly rotation: number;
     }> {}
 
