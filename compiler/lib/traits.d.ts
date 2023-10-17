@@ -237,6 +237,7 @@ declare global {
 
   interface WithTeam
     extends WithSymbols<{
+      /** The team id of `this`. */
       readonly team: number;
     }> {}
 }
