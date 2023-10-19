@@ -174,7 +174,7 @@ declare global {
       readonly flag: number;
     }> {}
 
-  interface Controllable
+  interface Controlled
     extends WithSymbols<{
       /**
        * The type of control that is being applied to `this`.
@@ -195,6 +195,10 @@ declare global {
        * - `0` otherwise.
        */
       readonly controlled: 0 | ControlKind;
+    }> {}
+
+  interface WithController
+    extends WithSymbols<{
       /**
        * The entity controlling this unit. Is either a player, a processor or
        * `this`.
