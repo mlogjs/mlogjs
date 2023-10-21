@@ -2,9 +2,15 @@ import "./globals";
 
 type LogicSymbols = typeof Items & typeof Liquids & typeof LAccess;
 
-export type WithSymbols<T extends Record<string, unknown>> = T & {
-  readonly [K in keyof (LogicSymbols | T) as LogicSymbols[K]]: T[K];
+type AsSymbolRecord<T extends Record<string, unknown>> = {
+  -readonly [K in keyof (LogicSymbols | T) as LogicSymbols[K]]: T[K];
 };
+
+export type MutableWithSymbols<T extends Record<string, unknown>> = T &
+  AsSymbolRecord<T>;
+
+export type WithSymbols<T extends Record<string, unknown>> = T &
+  Readonly<AsSymbolRecord<T>>;
 
 declare global {
   interface LiquidHolder
