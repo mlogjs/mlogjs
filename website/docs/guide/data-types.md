@@ -1,8 +1,8 @@
-# Data Types
+# Compiler Data Types
 
 Because the mlog environment is different from the regular javascript environments, code is structured in a different way.
 
-There are a total of five different data types:
+To compile your scripts, mlogjs uses four internal types to represent values:
 
 - Literal
 - Store
@@ -17,7 +17,6 @@ Literal values are the raw values that you write directly. They are constant str
 123; // is a literal
 const a = 123; // is a literal as well
 const b = "some string"; // string literal
-typeof a === "literal"; // true
 ```
 
 ## Store
@@ -26,19 +25,22 @@ Store values are the registers in the game inside a processor.
 
 You can also "sense" their properties as if they were fields.
 
+::: mlogjs-output
+
 ```js
 let a = 123; // is a store number
 let b = "string"; // is a store string
-typeof b === "store"; // true
 
 const building = getBuilding("conveyor1");
-print(building.ammo); // results in a sensor instruction followed by a print instruction
-
 const item = Items.coal;
 
-print(building[item]); // this works too
+print`health: ${building.health}, ${item}: ${building[item]}`;
+
 printFlush();
 ```
+
+output:
+:::
 
 ## Function
 
@@ -48,7 +50,6 @@ Function values are constants.
 function add(a, b) {
   return a + b;
 }
-typeof add === "function"; // true
 ```
 
 ## Object
@@ -64,7 +65,6 @@ const obj = {
 obj.a; // 1
 obj.b(1, 2); // 3
 obj(2, 2); // 4
-typeof obj === "object"; // true
 ```
 
 ::: warning

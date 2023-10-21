@@ -1,4 +1,4 @@
-import { WithSymbols } from "./traits";
+import { MutableWithSymbols } from "./traits";
 
 export type TRadarFilter =
   | "any"
@@ -56,32 +56,29 @@ export type TStatusEffect =
 
 export type TPermanentStatusEffect = "boss" | "overdrive";
 
-type CommonSettableProps = {
-  [P in keyof typeof Items | keyof typeof Liquids]: number;
-} & {
+type CommonSettableProps = Record<keyof typeof Items, number> & {
   team: TeamSymbol | number;
   health: number;
 };
 
-type TUnitSettableProps = CommonSettableProps & {
-  x: number;
-  y: number;
-  flag: number;
-  payloadType?: UnitSymbol | BuildingSymbol;
-};
+interface SettableUnit
+  extends MutableWithSymbols<
+    CommonSettableProps & {
+      x: number;
+      y: number;
+      flag: number;
+      rotation: number;
+      payloadType?: UnitSymbol | BuildingSymbol;
+    }
+  > {}
 
-type TBuildingSettableProps = CommonSettableProps & {
-  totalPower: number;
-};
-
-export type TSettablePropSymbol<T extends BasicBuilding | BasicUnit> = Extract<
-  keyof TSettablePropMap<T>,
-  symbol
->;
-export type TSettablePropMap<T extends BasicBuilding | BasicUnit> =
-  T extends BasicBuilding
-    ? WithSymbols<TBuildingSettableProps>
-    : WithSymbols<TUnitSettableProps>;
+interface SettableBuilding
+  extends MutableWithSymbols<
+    CommonSettableProps &
+      Record<keyof typeof Liquids, number> & {
+        totalPower: number;
+      }
+  > {}
 
 export type TLogicLinkNames<T extends string> =
   `${TLogicLinkName<T>}${TLogicLinkDigit}`;
