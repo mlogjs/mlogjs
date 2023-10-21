@@ -106,15 +106,18 @@ export class StoreValue extends BaseValue implements IValue {
       ];
 
     if (prop instanceof LiteralValue && prop.isString()) {
-      const name = itemNames.includes(prop.data)
-        ? camelToDashCase(prop.data)
-        : prop.data;
-
       const result = StoreValue.from(scope, out, mutability);
 
       return [
         result,
-        [new InstructionBase("sensor", result, this, `@${name}`)],
+        [
+          new InstructionBase(
+            "sensor",
+            result,
+            this,
+            formatSenseablePropName(prop.data),
+          ),
+        ],
       ];
     }
     if (prop instanceof StoreValue) {
@@ -140,6 +143,11 @@ export class StoreValue extends BaseValue implements IValue {
   toMlogString() {
     return this.name;
   }
+}
+
+export function formatSenseablePropName(name: string) {
+  if (itemNames.includes(name)) return "@" + camelToDashCase(name);
+  return "@" + name;
 }
 
 function compareStores(left: StoreValue, right: IValue) {

@@ -1,12 +1,12 @@
 import "./kind";
 import {
-  TSettablePropMap,
-  TSettablePropSymbol,
   TRadarFilter,
   TRadarSort,
   TUnitLocateBuildingGroup,
   TStatusEffect,
   TPermanentStatusEffect,
+  SettableUnit,
+  SettableBuilding,
 } from "./util";
 declare global {
   /**
@@ -1813,15 +1813,14 @@ declare global {
   function setFlag(flag: string, value: boolean): void;
 
   /**
-   * Sets a property of a building or unit. World processor ONLY.
+   * Creates a writable record that allows you to set a property of a building
+   * or unit. World processor ONLY.
    *
    * ```js
    * const router = fetch.build(Teams.sharded, 0, Blocks.router);
-   * setProp(LAccess.team, router, Teams.derelict);
+   * setProp(router).team = Teams.derelict;
    * ```
    */
-  function setProp<
-    T extends BasicUnit | BasicBuilding,
-    K extends TSettablePropSymbol<T>,
-  >(property: K, target: T, value: TSettablePropMap<T>[K]): void;
+  function setProp(target: BasicBuilding): SettableBuilding;
+  function setProp(target: BasicUnit): SettableUnit;
 }

@@ -988,7 +988,7 @@ Sets a global flag.
 
 ### `setProp`
 
-Sets a property of a building or unit.
+Creates a writable record that allows you to set a property of a building or unit.
 
 ::: command-example
 :::
