@@ -82,10 +82,6 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     return [this, []];
   }
 
-  typeof(): TValueInstructions {
-    return [new LiteralValue("literal"), []];
-  }
-
   isString(): this is LiteralValue<string> {
     return typeof this.data === "string";
   }

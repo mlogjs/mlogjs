@@ -95,10 +95,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.name = extractOutName(out) ?? scope.makeTempName();
   }
 
-  typeof(): TValueInstructions {
-    return [new LiteralValue("function"), []];
-  }
-
   private initScope() {
     this.childScope = this.scope.createFunction(this.name);
     this.childScope.function = this;
