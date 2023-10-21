@@ -1,4 +1,4 @@
-import { ref, type Ref } from "vue";
+import { ref, type Ref, watchEffect } from "vue";
 
 export type PaneResizeEvent = { min: number; max: number; size: number }[];
 
@@ -12,8 +12,10 @@ const desktopStorageKey = "desktop-editor-splits";
 const mobileStorageKey = "mobile-editor-splits";
 
 export function usePaneSizes(isMobile: Ref<boolean>) {
-  const sizes = ref(getSavedSizes(isMobile.value));
-
+  const sizes = ref<PaneSizes>(getSavedSizes(isMobile.value));
+  watchEffect(() => {
+    sizes.value = getSavedSizes(isMobile.value);
+  });
   function handlePaneResize(event: PaneResizeEvent) {
     sizes.value = arrayToPaneSizes(
       event.map(item => item.size),

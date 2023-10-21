@@ -69,7 +69,8 @@ async function rename(file: PersistentFile) {
 <style scoped>
 ul {
   box-sizing: border-box;
-  height: calc(var(--wrapper-height) - 1.5em);
+  height: calc(var(--wrapper-height) - var(--sidebar-toolbar-height));
+  max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
 }

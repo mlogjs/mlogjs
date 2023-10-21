@@ -75,6 +75,7 @@ async function createFile() {
 <style scoped>
 div {
   --svg-icon-fill: var(--vp-c-text-1);
+  --sidebar-toolbar-height: 3em;
 }
 
 div :deep(svg) {
@@ -84,7 +85,8 @@ div :deep(svg) {
 div.bar-actions {
   display: flex;
   justify-content: space-around;
-  margin: 0.5em 0;
+  align-items: center;
+  height: var(--sidebar-toolbar-height);
 }
 dialog {
   background-color: var(--vp-c-bg);
