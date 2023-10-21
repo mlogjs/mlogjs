@@ -45,12 +45,6 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  typeof(scope: IScope, out?: TEOutput): TValueInstructions {
-    const { $typeof } = this.data;
-    if ($typeof) return $typeof.call(scope, [], out);
-    return [new LiteralValue("object"), []];
-  }
-
   get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
       // avoids naming collisions with keys like
@@ -127,7 +121,6 @@ for (const op of leftRightOperators) {
 }
 
 for (const op of unaryOperators) {
-  if (op === "typeof") continue;
   ObjectValue.prototype[op] = function (scope: IScope, out?: TEOutput) {
     const $ = this.data[`$${op}`];
     if (!$) return VoidValue.prototype[op].apply(this, [scope, out]);

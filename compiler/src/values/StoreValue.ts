@@ -46,10 +46,6 @@ export class StoreValue extends BaseValue implements IValue {
     return out;
   }
 
-  typeof(): TValueInstructions {
-    return [new LiteralValue("store"), []];
-  }
-
   "="(scope: IScope, value: IValue): TValueInstructions {
     if (
       this.mutability !== EMutability.mutable &&
