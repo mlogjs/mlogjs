@@ -242,6 +242,12 @@ declare global {
 
   interface WithColor
     extends WithSymbols<{
+      /**
+       * Can be:
+       *
+       * - Color of the `this`, if it is an illuminator.
+       * - Color of the team of `this`.
+       */
       readonly color: number;
     }> {}
 
