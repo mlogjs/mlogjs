@@ -248,6 +248,16 @@ declare namespace LAccess {
   const id: unique symbol;
   const enabled: unique symbol;
   const config: unique symbol;
+  /**
+   * Senses, in:
+   *
+   * - Illuminators: the illuminator's light color.
+   * - Buildings: the buildings's team's color.
+   * - Units: the unit's team's color.
+   * - Block symbols: the block's map color.
+   * - Item symbols: the item's color.
+   * - Liquid symbols: the liquid's color.
+   */
   const color: unique symbol;
 }
 
