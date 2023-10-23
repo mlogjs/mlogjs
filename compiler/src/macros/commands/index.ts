@@ -29,3 +29,5 @@ export * from "./Fetch";
 export * from "./GetFlag";
 export * from "./SetFlag";
 export * from "./SetProp";
+export * from "./Sync";
+export * from "./Effect";

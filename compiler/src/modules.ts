@@ -88,6 +88,8 @@ export function createWordModule() {
     getFlag: new commands.GetFlag(),
     setFlag: new commands.SetFlag(),
     setProp: new commands.SetProp(),
+    sync: new commands.Sync(),
+    effect: new commands.Effect(),
   });
   return module;
 }
