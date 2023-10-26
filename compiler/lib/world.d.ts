@@ -109,7 +109,7 @@ export namespace setBlock {
     x: number;
     y: number;
     to: EnvBlockSymbol | BuildingSymbol;
-    team: TeamSymbol;
+    team: TeamIdentifier;
     rotation: number;
   }): void;
 }
@@ -133,7 +133,7 @@ export function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
   type: UnitSymbol;
   x: number;
   y: number;
-  team: TeamSymbol;
+  team: TeamIdentifier;
   /** The initial rotation of the unit in degrees. */
   rotation?: number;
 }): T;
@@ -329,7 +329,7 @@ export namespace setRule {
    * setRule.buildSpeed(Teams.sharded, 1.5);
    * ```
    */
-  function buildSpeed(team: TeamSymbol, multiplier: number): void;
+  function buildSpeed(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the speed multiplier for unit factories. The multiplier will always be
@@ -339,7 +339,7 @@ export namespace setRule {
    * setRule.unitBuildSpeed(Teams.sharded, 3);
    * ```
    */
-  function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
+  function unitBuildSpeed(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the build cost multiplier for constructing units.
@@ -348,7 +348,7 @@ export namespace setRule {
    * setRule.unitCost(Teams.sharded, 1.75);
    * ```
    */
-  function unitCost(team: TeamSymbol, multiplier: number): void;
+  function unitCost(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the damage multiplier for units on a given team.
@@ -357,7 +357,7 @@ export namespace setRule {
    * setRule.unitDamage(Teams.sharded, 1.25);
    * ```
    */
-  function unitDamage(team: TeamSymbol, multiplier: number): void;
+  function unitDamage(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the block health multiplier for a given team.
@@ -366,7 +366,7 @@ export namespace setRule {
    * setRule.blockHealth(Teams.crux, 0.75);
    * ```
    */
-  function blockHealth(team: TeamSymbol, multiplier: number): void;
+  function blockHealth(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the block damage multiplier for a given team.
@@ -375,7 +375,7 @@ export namespace setRule {
    * setRule.blockDamage(Teams.crux, 2);
    * ```
    */
-  function blockDamage(team: TeamSymbol, multiplier: number): void;
+  function blockDamage(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the Real Time Strategy minimum weight for a team.
@@ -388,7 +388,7 @@ export namespace setRule {
    * ```
    */
 
-  function rtsMinWeight(team: TeamSymbol, value: number): void;
+  function rtsMinWeight(team: TeamIdentifier, value: number): void;
 
   /**
    * Sets the Real Time Strategy minimum size of attack squads of a team.
@@ -399,7 +399,7 @@ export namespace setRule {
    * setRule.rtsMinSquad(Teams.sharded, 5);
    * ```
    */
-  function rtsMinSquad(team: TeamSymbol, value: number): void;
+  function rtsMinSquad(team: TeamIdentifier, value: number): void;
 }
 
 /**
@@ -507,7 +507,7 @@ export namespace cutscene {
  * ```
  */
 export function explosion(options: {
-  team: TeamSymbol;
+  team: TeamIdentifier;
   x: number;
   y: number;
   radius: number;
@@ -543,7 +543,7 @@ export namespace fetch {
    * ```
    */
   function unit<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
   ): T;
   /**
@@ -558,7 +558,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function unitCount(team: TeamSymbol): number;
+  function unitCount(team: TeamIdentifier): number;
   /**
    * Gets a player from a team.
    *
@@ -574,7 +574,7 @@ export namespace fetch {
    * ```
    */
   function player<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
   ): T;
   /**
@@ -589,7 +589,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function playerCount(team: TeamSymbol): number;
+  function playerCount(team: TeamIdentifier): number;
   /**
    * Gets a core from a team.
    *
@@ -604,7 +604,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function core(team: TeamSymbol, index: number): AnyBuilding;
+  function core(team: TeamIdentifier, index: number): AnyBuilding;
   /**
    * Gets the amount of cores existing on a given team.
    *
@@ -617,7 +617,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function coreCount(team: TeamSymbol): number;
+  function coreCount(team: TeamIdentifier): number;
   /**
    * Gets a building from a team.
    *
@@ -633,7 +633,7 @@ export namespace fetch {
    * ```
    */
   function build<T extends BasicBuilding = AnyBuilding>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
     block: BuildingSymbol,
   ): T;
@@ -649,7 +649,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function buildCount(team: TeamSymbol, block: BuildingSymbol): number;
+  function buildCount(team: TeamIdentifier, block: BuildingSymbol): number;
 }
 
 /**

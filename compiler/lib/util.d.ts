@@ -57,7 +57,7 @@ export type TStatusEffect =
 export type TPermanentStatusEffect = "boss" | "overdrive";
 
 type CommonSettableProps = Record<keyof typeof Items, number> & {
-  team: TeamSymbol | number;
+  team: TeamIdentifier;
   health: number;
 };
 

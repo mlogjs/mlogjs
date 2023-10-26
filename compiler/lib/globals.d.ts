@@ -92,6 +92,7 @@ declare namespace Teams {
 }
 
 type TeamSymbol = (typeof Teams)[keyof typeof Teams];
+type TeamIdentifier = TeamSymbol | number;
 
 declare namespace Items {
   const copper: unique symbol;
