@@ -681,3 +681,105 @@ export function setFlag(flag: string, value: boolean): void;
  */
 export function setProp(target: BasicBuilding): SettableBuilding;
 export function setProp(target: BasicUnit): SettableUnit;
+
+/**
+ * Synchronizes an mlog register with the server. Can be called up to 20 times
+ * per second.
+ */
+export function sync(variable: unknown): void;
+
+export namespace effect {
+  function warn(x: number, y: number): void;
+  function cross(x: number, y: number): void;
+  function blockFall(x: number, y: number, data: BlockSymbol): void;
+  function placeBlock(x: number, y: number, size: number): void;
+  function placeBlockSpark(x: number, y: number, size: number): void;
+  function breakBlock(x: number, y: number, size: number): void;
+  function spawn(x: number, y: number): void;
+  function trail(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function breakPop(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function smokeCloud(x: number, y: number, color: number): void;
+  function vapor(x: number, y: number, color: number): void;
+  function hit(x: number, y: number, color: number): void;
+  function hitSquare(x: number, y: number, color: number): void;
+  function shootSmall(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function shootBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSmall(x: number, y: number, rotation: number): void;
+  function smokeBig(x: number, y: number, rotation: number): void;
+  function smokeColor(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSquare(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSquareBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function spark(x: number, y: number, color: number): void;
+  function sparkBig(x: number, y: number, color: number): void;
+  function sparkShoot(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function sparkShootBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function drill(x: number, y: number, color: number): void;
+  function drillBig(x: number, y: number, color: number): void;
+  function lightBlock(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function explosion(x: number, y: number, size: number): void;
+  function smokePuff(x: number, y: number, color: number): void;
+  function sparkExplosion(x: number, y: number, color: number): void;
+  function crossExplosion(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function wave(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function bubble(x: number, y: number): void;
+}
