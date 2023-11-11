@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added support for getters and setters.
 - Added brief documentation to some senseable properties.
 - Added typings for the `id` property on symbols.
 - Added the `getBuildings` helper function.
