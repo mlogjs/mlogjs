@@ -1,3 +1,5 @@
+import { flushMessage } from "mlogjs:world";
+
 const turret = getBuilding("foreshadow1");
 
 const player = radar({

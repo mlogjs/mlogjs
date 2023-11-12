@@ -1,6 +1,6 @@
-set dynamicFlag:1:4 "someFlag"
+set dynamicFlag:3:4 "someFlag"
 getflag &t0 "foo"
-getflag &t1 dynamicFlag:1:4
+getflag &t1 dynamicFlag:3:4
 print &t0
 print "\n"
 print &t1

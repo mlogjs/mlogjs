@@ -1,3 +1,5 @@
+import { setRule } from "mlogjs:world";
+
 setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
 setRule.attackMode(false);
 setRule.blockDamage(Teams.crux, 0.5);

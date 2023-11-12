@@ -5,7 +5,10 @@
     "checkJs": true,
     "noLib": true,
     "noEmit": true,
-    "types": []
+    "types": [],
+    "paths": {
+      "mlogjs:world": ["../lib/world"]
+    }
   },
   "include": ["./in", "../lib", "./examples"]
 }

@@ -1,3 +1,5 @@
+import { cutscene, flushMessage } from "mlogjs:world";
+
 const { switch1 } = getBuildings();
 
 if (!switch1.enabled) endScript();
