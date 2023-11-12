@@ -13,9 +13,14 @@ import { GetGlobal } from "./macros/GetGlobal";
 import { EMutability, IScope } from "./types";
 import { Asm } from "./macros/Asm";
 import { LiteralValue } from "./values";
+import { Scope } from "./Scope";
 
-/** Adds all the compiler globals to `scope` */
-export function initScope(scope: IScope) {
+/**
+ * Creates the global scope of the user's script, contains all built-ins that
+ * are not privileged
+ */
+export function createGlobalScope(): IScope {
+  const scope = new Scope();
   scope.hardSet("undefined", new LiteralValue(null));
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro());
@@ -75,4 +80,6 @@ export function initScope(scope: IScope) {
   scope.hardSet("getFlag", new commands.GetFlag());
   scope.hardSet("setFlag", new commands.SetFlag());
   scope.hardSet("setProp", new commands.SetProp());
+
+  return scope;
 }
