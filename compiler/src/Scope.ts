@@ -24,6 +24,7 @@ export class Scope implements IScope {
   label?: string;
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
+  builtInModules: Record<string, IValue>;
 
   constructor({
     data = {},
@@ -33,6 +34,7 @@ export class Scope implements IScope {
     inst = [],
     operationCache = {},
     cacheDependencies = {},
+    builtInModules = {},
   }: Partial<
     Pick<
       IScope,
@@ -43,6 +45,7 @@ export class Scope implements IScope {
       | "inst"
       | "operationCache"
       | "cacheDependencies"
+      | "builtInModules"
     >
   > = {}) {
     this.data = data;
@@ -52,6 +55,7 @@ export class Scope implements IScope {
     this.inst = inst;
     this.operationCache = operationCache;
     this.cacheDependencies = cacheDependencies;
+    this.builtInModules = builtInModules;
   }
   copy(): IScope {
     const scope = new Scope({

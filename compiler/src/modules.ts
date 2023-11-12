@@ -12,15 +12,20 @@ import {
 import { GetGlobal } from "./macros/GetGlobal";
 import { EMutability, IScope } from "./types";
 import { Asm } from "./macros/Asm";
-import { LiteralValue } from "./values";
+import { LiteralValue, ObjectValue } from "./values";
 import { Scope } from "./Scope";
+import { worldModuleName } from "./utils";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
  * are not privileged
  */
 export function createGlobalScope(): IScope {
-  const scope = new Scope();
+  const scope = new Scope({
+    builtInModules: {
+      [worldModuleName]: createWordModule(),
+    },
+  });
   scope.hardSet("undefined", new LiteralValue(null));
   // namespaces
   scope.hardSet("ControlKind", new NamespaceMacro());
@@ -64,22 +69,25 @@ export function createGlobalScope(): IScope {
   scope.hardSet("unitRadar", new commands.UnitRadar());
   scope.hardSet("unitLocate", new commands.UnitLocate());
 
-  // world processor commands
-
-  scope.hardSet("getBlock", new commands.GetBlock());
-  scope.hardSet("setBlock", new commands.SetBlock());
-  scope.hardSet("spawnUnit", new commands.SpawnUnit());
-  scope.hardSet("applyStatus", new commands.ApplyStatus());
-  scope.hardSet("spawnWave", new commands.SpawnWave());
-  scope.hardSet("setRule", new commands.SetRule());
-  scope.hardSet("flushMessage", new commands.FlushMessage());
-  scope.hardSet("cutscene", new commands.Cutscene());
-  scope.hardSet("explosion", new commands.Explosion());
-  scope.hardSet("setRate", new commands.SetRate());
-  scope.hardSet("fetch", new commands.Fetch());
-  scope.hardSet("getFlag", new commands.GetFlag());
-  scope.hardSet("setFlag", new commands.SetFlag());
-  scope.hardSet("setProp", new commands.SetProp());
-
   return scope;
+}
+
+export function createWordModule() {
+  const module = new ObjectValue({
+    getBlock: new commands.GetBlock(),
+    setBlock: new commands.SetBlock(),
+    spawnUnit: new commands.SpawnUnit(),
+    applyStatus: new commands.ApplyStatus(),
+    spawnWave: new commands.SpawnWave(),
+    setRule: new commands.SetRule(),
+    flushMessage: new commands.FlushMessage(),
+    cutscene: new commands.Cutscene(),
+    explosion: new commands.Explosion(),
+    setRate: new commands.SetRate(),
+    fetch: new commands.Fetch(),
+    getFlag: new commands.GetFlag(),
+    setFlag: new commands.SetFlag(),
+    setProp: new commands.SetProp(),
+  });
+  return module;
 }

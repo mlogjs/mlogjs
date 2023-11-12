@@ -15,3 +15,4 @@ export * from "./TemplateExpression";
 export * from "./BlockStatement";
 export * from "./File";
 export * from "./Typescript";
+export * from "./Import";
