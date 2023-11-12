@@ -5,7 +5,7 @@ import {
   TStatusEffect,
 } from "./util";
 
-/** Gets block data from the map. Available ONLY for world processors. */
+/** Gets block data from the map. */
 export namespace getBlock {
   /**
    * Gets the floor type on the given location
@@ -70,7 +70,7 @@ export namespace getBlock {
   ): T | undefined;
 }
 
-/** Sets block data on a given location. World processor ONLY. */
+/** Sets block data on a given location. */
 export namespace setBlock {
   // TODO: maybe have a separate floor symbol type?
   /**
@@ -115,7 +115,7 @@ export namespace setBlock {
 }
 
 /**
- * Spawns an unit at the given location. World processor ONLY.
+ * Spawns an unit at the given location.
  *
  * @param options.rotation The initial rotation of the unit in degrees.
  *
@@ -138,10 +138,7 @@ export function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
   rotation?: number;
 }): T;
 
-/**
- * Contains the variants for the `applyStatus` instruction. World processor
- * ONLY.
- */
+/** Contains the variants for the `applyStatus` instruction. */
 export namespace applyStatus {
   /**
    * Applies a status effect to the given unit.
@@ -176,8 +173,6 @@ export namespace applyStatus {
 /**
  * Spawns an enemy wave, can be used even if there is an already active wave.
  *
- * World processor ONLY.
- *
  * ```js
  * // natural wave, units appear on the enemy spawn
  * spawnWave(true);
@@ -189,10 +184,7 @@ export namespace applyStatus {
 export function spawnWave(natural: true): void;
 export function spawnWave(natural: false, x: number, y: number): void;
 
-/**
- * Contains the multiple variants of the `set rule` instruction. World processor
- * ONLY.
- */
+/** Contains the multiple variants of the `set rule` instruction. */
 export namespace setRule {
   /**
    * Sets the wave countdown in seconds.
@@ -412,7 +404,7 @@ export namespace setRule {
 
 /**
  * Writes the contents of the print buffer in the selected mode and clears the
- * buffer afterwards. World processor ONLY.
+ * buffer afterwards.
  *
  * ```js
  * print("Hello");
@@ -466,7 +458,7 @@ export namespace flushMessage {
   function toast(duration: number): void;
 }
 
-/** Controls the player camera. World processor ONLY. */
+/** Controls the player camera. */
 export namespace cutscene {
   /**
    * Moves the player's camera to the given location.
@@ -499,7 +491,7 @@ export namespace cutscene {
 }
 
 /**
- * Creates an explosion. World processor ONLY.
+ * Creates an explosion.
  *
  * ```js
  * explosion({
@@ -526,8 +518,7 @@ export function explosion(options: {
 }): void;
 
 /**
- * Sets the speed of this world processor in instructions per tick. World
- * processor ONLY.
+ * Sets the speed of this world processor in instructions per tick.
  *
  * ```js
  * setRate(20);
@@ -535,7 +526,7 @@ export function explosion(options: {
  */
 export function setRate(ipt: number): void;
 
-/** Contains the variants of the `fetch` instruction. World processor ONLY. */
+/** Contains the variants of the `fetch` instruction. */
 export namespace fetch {
   /**
    * Gets an unit from the given team
@@ -662,7 +653,7 @@ export namespace fetch {
 }
 
 /**
- * Checks if a global flag is set. World processor ONLY.
+ * Checks if a global flag is set.
  *
  * ```js
  * const flagEnabled = getFlag("foo");
@@ -671,7 +662,7 @@ export namespace fetch {
 export function getFlag(flag: string): boolean;
 
 /**
- * Sets a global flag. World processor ONLY.
+ * Sets a global flag.
  *
  * ```js
  * setFlag("foo", true);
@@ -681,7 +672,7 @@ export function setFlag(flag: string, value: boolean): void;
 
 /**
  * Creates a writable record that allows you to set a property of a building or
- * unit. World processor ONLY.
+ * unit.
  *
  * ```js
  * const router = fetch.build(Teams.sharded, 0, Blocks.router);
