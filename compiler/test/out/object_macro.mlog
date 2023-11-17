@@ -3,4 +3,6 @@ print "String literal"
 print "number index"
 print "Number is "
 print 20
+op rand &t0:&t1 10
+print &t0:&t1
 printflush message1

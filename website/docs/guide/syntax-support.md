@@ -365,6 +365,7 @@ Behavior:
 
 - Works just like [constants](#variable-declarations), inlines each value on the places it's used.
 - Arrays have a compile time constant `length` property.
+- Objects can be declared with getters and setters
 
 Limitations:
 

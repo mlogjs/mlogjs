@@ -1,8 +1,17 @@
 import { CompilerError } from "../CompilerError";
-import { es, IInstruction, IValue, THandler } from "../types";
+import {
+  es,
+  IInstruction,
+  IScope,
+  IValue,
+  TEOutput,
+  THandler,
+  TValueInstructions,
+} from "../types";
 import { extractDestrucuringOut, pipeInsts } from "../utils";
 import {
   AssignmentValue,
+  BaseValue,
   DestructuringValue,
   IObjectValueData,
   LazyValue,
@@ -39,7 +48,19 @@ export const ObjectExpression: THandler = (
     const memberOut = extractDestrucuringOut(out, index);
     const member = pipeInsts(c.handleEval(scope, value, memberOut), inst);
 
-    data[index] = member;
+    if (prop.type !== "ObjectMethod" || prop.kind === "method") {
+      data[index] = member;
+    } else {
+      if (!(data[index] instanceof ObjectGetSetEntry))
+        data[index] = new ObjectGetSetEntry();
+      const entry = data[index] as ObjectGetSetEntry;
+
+      if (prop.kind === "get") {
+        entry.getter = member;
+      } else {
+        entry.setter = member;
+      }
+    }
   }
   return [new ObjectValue(data), inst];
 };
@@ -200,3 +221,27 @@ export const AssignmentPattern: THandler<IValue> = (
 
   return [new AssignmentValue(left, right), inst];
 };
+
+class ObjectGetSetEntry extends BaseValue {
+  macro = true;
+  getter?: IValue;
+  setter?: IValue;
+
+  constructor() {
+    super();
+  }
+
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
+    if (!this.getter)
+      throw new CompilerError("This property does not have a getter");
+    const [value, inst] = this.getter.call(scope, [], out);
+    return [value ?? new LiteralValue(null), inst];
+  }
+
+  "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+    if (!this.setter)
+      throw new CompilerError("This property does not have a setter");
+    const [, inst] = this.setter.call(scope, [value], out);
+    return [value, inst];
+  }
+}
