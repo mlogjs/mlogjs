@@ -71,7 +71,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     return false;
   }
 
-  get num() {
+  get num(): number {
     if (this.data === null) return 0;
     if (typeof this.data === "string") return 1;
     return this.data;
@@ -148,7 +148,13 @@ for (const k in operatorMap) {
       return BaseValue.prototype[key].apply(this, [scope, value, out]);
     }
 
-    return [new LiteralValue(fn(this.data as never, value.data as never)), []];
+    // patch constant string concatenation
+    // TODO: remove this in favor of the `concat` function
+    if (key === "+" && this.isString()) {
+      return [new LiteralValue(this.data + value.data), []];
+    }
+
+    return [new LiteralValue(fn(this.num, value.num)), []];
   };
 }
 
@@ -167,7 +173,7 @@ for (const key in unaryOperatorMap) {
     this: LiteralValue,
   ): TValueInstructions {
     const fn = unaryOperatorMap[key as K];
-    return [new LiteralValue(fn(this.data as never)), []];
+    return [new LiteralValue(fn(this.num)), []];
   };
 }
 
