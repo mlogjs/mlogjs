@@ -117,12 +117,11 @@ const operatorMap = {
   "&": (a, b) => a & b,
   "^": (a, b) => a ^ b,
   ">>": (a, b) => a >> b,
-  ">>>": (a, b) => a >> b,
   "<<": (a, b) => a << b,
   "&&": (a, b) => +(a && b),
   "||": (a, b) => +(a || b),
 } as const satisfies Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??" | ">>>">,
   TBinOperationFn
 >;
 
