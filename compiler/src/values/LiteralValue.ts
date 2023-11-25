@@ -71,7 +71,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     return false;
   }
 
-  get num() {
+  get num(): number {
     if (this.data === null) return 0;
     if (typeof this.data === "string") return 1;
     return this.data;
@@ -95,7 +95,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   }
 }
 
-type TOperationFn = (a: number, b?: number) => number;
+type TOperationFn = (a: number) => number;
 type TBinOperationFn = (a: number, b: number) => number;
 
 const operatorMap = {
@@ -113,16 +113,15 @@ const operatorMap = {
   "/": (a, b) => a / b,
   "%": (a, b) => a % b,
   "**": (a, b) => a ** b,
-  "|": (a, b) => a | b,
-  "&": (a, b) => a & b,
-  "^": (a, b) => a ^ b,
-  ">>": (a, b) => a >> b,
-  ">>>": (a, b) => a >> b,
-  "<<": (a, b) => a << b,
+  "|": bitwiseOp((a, b) => a | b),
+  "&": bitwiseOp((a, b) => a & b),
+  "^": bitwiseOp((a, b) => a ^ b),
+  ">>": bitwiseOp((a, b) => a >> b),
+  "<<": bitwiseOp((a, b) => a << b),
   "&&": (a, b) => +(a && b),
   "||": (a, b) => +(a || b),
 } as const satisfies Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??" | ">>>">,
   TBinOperationFn
 >;
 
@@ -149,7 +148,13 @@ for (const k in operatorMap) {
       return BaseValue.prototype[key].apply(this, [scope, value, out]);
     }
 
-    return [new LiteralValue(fn(this.data as never, value.data as never)), []];
+    // patch constant string concatenation
+    // TODO: remove this in favor of the `concat` function
+    if (key === "+" && this.isString()) {
+      return [new LiteralValue(this.data + value.data), []];
+    }
+
+    return [new LiteralValue(fn(this.num, value.num)), []];
   };
 }
 
@@ -157,7 +162,7 @@ const unaryOperatorMap: {
   [k in Exclude<UnaryOperator, "delete" | "typeof" | "void">]: TOperationFn;
 } = {
   "!": v => +!v,
-  "~": v => ~v,
+  "~": bitwiseOp(v => ~v),
   "u-": v => -v,
   "u+": v => +v,
 } as const;
@@ -168,6 +173,26 @@ for (const key in unaryOperatorMap) {
     this: LiteralValue,
   ): TValueInstructions {
     const fn = unaryOperatorMap[key as K];
-    return [new LiteralValue(fn(this.data as never)), []];
+    return [new LiteralValue(fn(this.num)), []];
+  };
+}
+
+/**
+ * Performs bitwise operations on 64-bit integers to ensure that the operations
+ * evaluated at compile time produce the same results as the mlog runtime.
+ *
+ * This is necessary because javascript converts its 64-bit floats into 32-bit
+ * integers to perform bitwise operations, however mlog casts 64-bit floats into
+ * 64-bit integers to achieve the same goal. This means that using javascript
+ * numbers to evaluate these operations at compile time can cause disparity
+ * between the compiler and the runtime for values bigger than `2^31-1`.
+ */
+function bitwiseOp(fn: (...args: bigint[]) => bigint) {
+  return (...args: number[]) => {
+    const bigResult = fn(...args.map(BigInt));
+
+    // limit the result to 64 bits of precision (signed long)
+    // and convert it back into a number
+    return Number(BigInt.asIntN(64, bigResult));
   };
 }

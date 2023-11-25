@@ -108,12 +108,14 @@ export const operatorMap = {
   "&": "and",
   "^": "xor",
   ">>": "shr",
-  ">>>": "shr",
   "<<": "shl",
   "&&": "land",
   "||": "or",
 } as const satisfies Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "!==" | "??">,
+  Exclude<
+    BinaryOperator | LogicalOperator,
+    "instanceof" | "in" | "!==" | "??" | ">>>"
+  >,
   string
 >;
 

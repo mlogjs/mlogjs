@@ -1,0 +1,9 @@
+print 8
+print "\n"
+print 8589934592
+print "\n"
+print 12884901888
+print "\n"
+print 17179869184
+print "\n"
+printflush message1
