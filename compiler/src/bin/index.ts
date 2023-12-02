@@ -1,4 +1,10 @@
-import { existsSync, readFileSync, writeFileSync, cpSync } from "node:fs";
+import {
+  existsSync,
+  readFileSync,
+  writeFileSync,
+  cpSync,
+  rmSync,
+} from "node:fs";
 import { hideBin } from "yargs/helpers";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
@@ -106,13 +112,19 @@ yargs(hideBin(process.argv))
   .parse();
 
 export function setup(dir: string, tsconfig: boolean) {
+  const dotDir = join(dir, ".mlogjs");
+
+  if (existsSync(dotDir)) {
+    rmSync(dotDir, { recursive: true });
+  }
+
   const libPath = getLibFolderPath();
-  cpSync(libPath, join(dir, ".mlogjs/lib"), {
+  cpSync(libPath, join(dotDir, "lib"), {
     recursive: true,
   });
 
   const innerTSConfig = getInnerTSConfig();
-  writeFileSync(join(dir, ".mlogjs/tsconfig.json"), innerTSConfig);
+  writeFileSync(join(dotDir, "tsconfig.json"), innerTSConfig);
 
   if (!tsconfig) return;
   const rootTSConfig = getRootTSConfig();
