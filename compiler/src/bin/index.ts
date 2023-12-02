@@ -1,10 +1,11 @@
-import { existsSync, readFileSync, writeFileSync, cpSync } from "fs";
+import { existsSync, readFileSync, writeFileSync, cpSync } from "node:fs";
 import { hideBin } from "yargs/helpers";
-import { Compiler } from ".";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
-import { join, parse, resolve } from "path";
+import { join, parse, resolve } from "node:path";
+import { Compiler } from "../index";
+import { getInnerTSConfig, getLibFolderPath, getRootTSConfig } from "./files";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 yargs(hideBin(process.argv))
@@ -27,33 +28,10 @@ yargs(hideBin(process.argv))
         });
     },
     argv => {
-      // this approach depends on the fact that the
-      // output bin.cjs file is one folder bellow the package folder
-      const currentPath = __dirname.replace(/\\/g, "/");
-      const parent = currentPath.split("/").slice(0, -1).join("/");
-      const libPath = join(parent, "lib");
       const dir = resolve(process.cwd(), argv.dir);
-      const target = join(dir, "lib");
-      cpSync(libPath, target, {
-        recursive: true,
-      });
-
-      if (!argv.tsconfig) return;
-
-      const tsconfigPath = join(dir, "tsconfig.json");
-      const json = {
-        compilerOptions: {
-          allowJs: true,
-          checkJs: true,
-          moduleDetection: "force",
-          noEmit: true,
-          noLib: true,
-          target: "ESNext",
-        },
-        include: ["./lib", "*.js", "*.ts"],
-        exclude: ["node_modules"],
-      };
-      writeFileSync(tsconfigPath, JSON.stringify(json, null, "\t"));
+      console.log(process.cwd());
+      console.log(argv.dir);
+      setup(dir, argv.tsconfig);
     },
   )
   .command(
@@ -126,6 +104,20 @@ yargs(hideBin(process.argv))
   .scriptName("mlogjs")
   .demandCommand()
   .parse();
+
+export function setup(dir: string, tsconfig: boolean) {
+  const libPath = getLibFolderPath();
+  cpSync(libPath, join(dir, ".mlogjs/lib"), {
+    recursive: true,
+  });
+
+  const innerTSConfig = getInnerTSConfig();
+  writeFileSync(join(dir, ".mlogjs/tsconfig.json"), innerTSConfig);
+
+  if (!tsconfig) return;
+  const rootTSConfig = getRootTSConfig();
+  writeFileSync(join(dir, "tsconfig.json"), rootTSConfig);
+}
 
 function defaultOutPath(path: string) {
   const parsed = parse(path);
