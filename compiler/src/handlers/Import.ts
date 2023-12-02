@@ -10,17 +10,14 @@ export const ImportDeclaration: THandler<null> = (
   scope,
   node: es.ImportDeclaration,
 ) => {
-  if (node.source.value in scope.builtInModules) {
-    for (const specifier of node.specifiers) {
-      c.handle(scope, specifier, undefined, undefined, node.source.value);
-    }
-    return [null, []];
-  }
+  if (node.importKind === "type") return [null, []];
 
-  if (node.importKind !== "type") {
+  if (!(node.source.value in scope.builtInModules))
     throw new CompilerError(noExternalModuleErrorMessage);
-  }
 
+  for (const specifier of node.specifiers) {
+    c.handle(scope, specifier, undefined, undefined, node.source.value);
+  }
   return [null, []];
 };
 
@@ -55,8 +52,6 @@ export const ImportSpecifier: THandler<null> = (
   source: string,
 ) => {
   if (node.importKind === "type") return [null, []];
-  if (!(source in scope.builtInModules))
-    throw new CompilerError(noExternalModuleErrorMessage);
 
   const module = scope.builtInModules[source];
   const { imported, local } = node;
