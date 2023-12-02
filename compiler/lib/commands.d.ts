@@ -1,13 +1,5 @@
 import "./kind";
-import {
-  TRadarFilter,
-  TRadarSort,
-  TUnitLocateBuildingGroup,
-  TStatusEffect,
-  TPermanentStatusEffect,
-  SettableUnit,
-  SettableBuilding,
-} from "./util";
+import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
 declare global {
   /**
    * Appends the items to the print buffer, calling this function on its own
