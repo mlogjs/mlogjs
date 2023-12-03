@@ -19,6 +19,9 @@ export function setMonacoTypescriptSettings(
     noLib: true,
     noEmit: true,
     target: monaco.languages.typescript.ScriptTarget.ESNext,
+    paths: {
+      [worldModuleName]: [toEditorPath("lib/world.d.ts")],
+    },
     ...settings,
   };
 
