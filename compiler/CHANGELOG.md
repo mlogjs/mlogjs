@@ -18,6 +18,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- (Breaking) world processor functionality was moved to the `mlogjs:world` module.
 - Reading `Vars.this.x` now returns `Vars.thisx` (the same applies for `Vars.this.y`).
 - `Vars.unit` is now treated as a mutable readonly value.
 - Expanded the list of supported status effects for the `applyStatus` command.
