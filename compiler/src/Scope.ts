@@ -1,4 +1,4 @@
-import { StoreValue } from "./values";
+import { LiteralValue, StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
   IFunctionValue,
@@ -95,7 +95,16 @@ export class Scope implements IScope {
     const value = this.data[identifier];
     if (value) return value as INamedValue;
     if (this.parent) return this.parent.get(identifier);
-    throw new CompilerError(`${identifier} is not declared.`);
+    let message = `${identifier} is not declared.`;
+
+    const name = new LiteralValue(identifier);
+    for (const moduleName in this.builtInModules) {
+      const module = this.builtInModules[moduleName];
+      if (module.hasProperty(this, name)) {
+        message += ` Did you mean to use "${identifier}" exported from "${moduleName}"?`;
+      }
+    }
+    throw new CompilerError(message);
   }
 
   set<T extends IValue>(name: string, value: T): T {
