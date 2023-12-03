@@ -5,4 +5,7 @@ export function loadMonaco(): Promise<Monaco> {
 }
 
 export { configureMlogLang } from "./mlog";
-export { setMonacoTypescriptSettings } from "./typescript";
+export {
+  setMonacoTypescriptSettings,
+  addWorldModuleSnippet,
+} from "./typescript";

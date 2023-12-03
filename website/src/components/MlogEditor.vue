@@ -16,7 +16,11 @@ import {
 } from "../composables/usePersistentFiles";
 import { useEditorSettings } from "../composables/useEditorSettings";
 import { useMonaco } from "../composables/useMonaco";
-import { configureMlogLang, setMonacoTypescriptSettings } from "../monaco";
+import {
+  addWorldModuleSnippet,
+  configureMlogLang,
+  setMonacoTypescriptSettings,
+} from "../monaco";
 import MonacoEditor, {
   provideMonaco,
   useMonacoTheme,
@@ -82,6 +86,14 @@ watchEffect(() => {
   const monaco = monacoRef.value;
   if (!monaco) return;
   setMonacoTypescriptSettings(monaco, settings.value.typescript);
+});
+
+watchEffect(onCleanup => {
+  const monaco = monacoRef.value;
+  if (!monaco) return;
+
+  const disposable = addWorldModuleSnippet(monaco);
+  onCleanup(() => disposable.dispose());
 });
 
 function onReady(editor: monaco.editor.IStandaloneCodeEditor) {
