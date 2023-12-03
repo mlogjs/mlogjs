@@ -1,5 +1,10 @@
 import "./kind";
-import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
+import {
+  TDrawPrintAlign,
+  TRadarFilter,
+  TRadarSort,
+  TUnitLocateBuildingGroup,
+} from "./util";
 declare global {
   /**
    * Appends the items to the print buffer, calling this function on its own
@@ -255,6 +260,17 @@ declare global {
       size: number;
       /** The rotation of the image in degrees. */
       rotation: number;
+    }): void;
+
+    /**
+     * Draws text from the print buffer, clearing it afterwards.
+     *
+     * Only ASCII characters are supported.
+     */
+    function print(options: {
+      x: number;
+      y: number;
+      align: TDrawPrintAlign;
     }): void;
   }
 

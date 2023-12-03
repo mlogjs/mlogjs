@@ -1,5 +1,16 @@
 import { MutableWithSymbols } from "./traits";
 
+export type TDrawPrintAlign =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "topLeft"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomRight";
+
 export type TRadarFilter =
   | "any"
   | "enemy"
