@@ -1,3 +1,5 @@
+import { setBlock } from "mlogjs:world";
+
 const turret = getBuilding("foreshadow1");
 
 let { x, y, shooting } = radar({

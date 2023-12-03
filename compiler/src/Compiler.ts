@@ -1,9 +1,8 @@
 import { parse } from "@babel/parser";
 import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
-import { initScope } from "./initScope";
+import { createGlobalScope } from "./modules";
 import { AddressResolver, EndInstruction } from "./instructions";
-import { Scope } from "./Scope";
 import {
   es,
   IInstruction,
@@ -46,9 +45,10 @@ export class Compiler {
 
     try {
       const program = this.parse(script);
-      const scope = new Scope({});
-
-      initScope(scope);
+      const globalScope = createGlobalScope();
+      // this allows the user to shadow global variables inside
+      // the script, since it is treated as a module
+      const scope = globalScope.createScope();
 
       const valueInst = this.handle(scope, program);
       if (needsEndInstruction(valueInst[1], scope)) {
@@ -87,6 +87,7 @@ export class Compiler {
     return parse(script, {
       ranges: true,
       plugins: ["typescript"],
+      sourceType: "module",
     });
   }
 

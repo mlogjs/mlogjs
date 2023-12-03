@@ -1,4 +1,4 @@
-import { StoreValue } from "./values";
+import { LiteralValue, StoreValue } from "./values";
 import { AddressResolver } from "./instructions";
 import {
   IFunctionValue,
@@ -24,6 +24,7 @@ export class Scope implements IScope {
   label?: string;
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
+  builtInModules: Record<string, IValue>;
 
   constructor({
     data = {},
@@ -33,6 +34,7 @@ export class Scope implements IScope {
     inst = [],
     operationCache = {},
     cacheDependencies = {},
+    builtInModules = {},
   }: Partial<
     Pick<
       IScope,
@@ -43,6 +45,7 @@ export class Scope implements IScope {
       | "inst"
       | "operationCache"
       | "cacheDependencies"
+      | "builtInModules"
     >
   > = {}) {
     this.data = data;
@@ -52,6 +55,7 @@ export class Scope implements IScope {
     this.inst = inst;
     this.operationCache = operationCache;
     this.cacheDependencies = cacheDependencies;
+    this.builtInModules = builtInModules;
   }
   copy(): IScope {
     const scope = new Scope({
@@ -91,7 +95,16 @@ export class Scope implements IScope {
     const value = this.data[identifier];
     if (value) return value as INamedValue;
     if (this.parent) return this.parent.get(identifier);
-    throw new CompilerError(`${identifier} is not declared.`);
+    let message = `${identifier} is not declared.`;
+
+    const name = new LiteralValue(identifier);
+    for (const moduleName in this.builtInModules) {
+      const module = this.builtInModules[moduleName];
+      if (module.hasProperty(this, name)) {
+        message += ` Did you mean to use "${identifier}" exported from "${moduleName}"?`;
+      }
+    }
+    throw new CompilerError(message);
   }
 
   set<T extends IValue>(name: string, value: T): T {

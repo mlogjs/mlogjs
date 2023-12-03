@@ -420,6 +420,16 @@ Limitations:
 
   :::
 
+### Modules
+
+Currently, you can only import the functionality of modules that are built into mlogjs, such as `mlogjs:world`. However you can still use type imports in typescript files:
+
+```ts
+// works
+import { explosion } from "mlogjs:world";
+import type { Foo } from "./my_module";
+```
+
 ## Typescript
 
 ### Enums

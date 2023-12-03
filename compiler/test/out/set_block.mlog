@@ -1,9 +1,9 @@
 radar player any any distance foreshadow1 1 &t0
-sensor x:3:6 &t0 @x
-sensor y:3:9 &t0 @y
-sensor shooting:3:12 &t0 @shooting
-jump 6 notEqual shooting:3:12 0
+sensor x:5:6 &t0 @x
+sensor y:5:9 &t0 @y
+sensor shooting:5:12 &t0 @shooting
+jump 6 notEqual shooting:5:12 0
 end
-setblock block @boulder x:3:6 y:3:9 @sharded 0
-setblock floor @metal-floor2 x:3:6 y:3:9 @derelict 0
-setblock ore @ore-copper x:3:6 y:3:9 @derelict 0
+setblock block @boulder x:5:6 y:5:9 @sharded 0
+setblock floor @metal-floor2 x:5:6 y:5:9 @derelict 0
+setblock ore @ore-copper x:5:6 y:5:9 @derelict 0

@@ -9,7 +9,7 @@ interface Params {
   editorRef: ShallowRef<editor.IStandaloneCodeEditor | undefined>;
   outEditorRef: ShallowRef<editor.IStandaloneCodeEditor | undefined>;
   sourcemapsRef: ShallowRef<Sourcemaps | undefined>;
-  monacoRef: ShallowRef<Monaco | null>;
+  monacoRef: ShallowRef<Monaco | undefined>;
 }
 
 const className = "selection-highlighted";

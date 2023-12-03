@@ -98,6 +98,16 @@ export interface IScope {
    * mutable.
    */
   checkIndexes: boolean;
+
+  /**
+   * Maps mlogjs' built-in modules, such as `"mlogjs:world"`.
+   *
+   * This was put here because only the compiler object and scope are accessible
+   * to the ast node handlers, and it is more appropriate to put this in the
+   * scope rather than the compiler object.
+   */
+  builtInModules: Record<string, IValue>;
+
   /** Creates a new scope that has `this` as it's parent. */
   createScope(): IScope;
   /**

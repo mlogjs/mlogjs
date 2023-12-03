@@ -2,6 +2,7 @@ import type { Monaco } from "../util";
 import type * as monaco from "monaco-editor";
 
 const langId = "mlog";
+
 export function registerMlogLang(monaco: Monaco) {
   monaco.languages.register({
     id: langId,

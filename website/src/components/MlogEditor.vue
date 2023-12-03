@@ -1,15 +1,11 @@
 <script setup lang="ts">
-import { computed, provide, ref, shallowRef, watch } from "vue";
-import Editor, { useMonaco, loader } from "@guolao/vue-monaco-editor";
+import { computed, provide, ref, shallowRef, watchEffect } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
 import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";
-import { parseExtraLibs, type Monaco } from "../util";
-import { configureMlogLang, registerMlogLang } from "../mlog/lang";
-import lib from "mlogjs/lib!raw";
 import { useData } from "vitepress";
 import { useMediaQuery } from "../composables/useMediaQuery";
 import SideBar from "./SideBar.vue";
@@ -19,16 +15,20 @@ import {
   usePersistentFiles,
 } from "../composables/usePersistentFiles";
 import { useEditorSettings } from "../composables/useEditorSettings";
-
+import { useMonaco } from "../composables/useMonaco";
+import {
+  addWorldModuleSnippet,
+  configureMlogLang,
+  setMonacoTypescriptSettings,
+} from "../monaco";
+import MonacoEditor, {
+  provideMonaco,
+  useMonacoTheme,
+} from "@jeanjpnm/monaco-vue";
+import "@jeanjpnm/monaco-vue/style.css";
 const { isDark } = useData();
 
 const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
-
-loader.config({
-  paths: {
-    vs: "https://cdn.jsdelivr.net/npm/monaco-editor@0.43.0/min/vs",
-  },
-});
 
 type EditorOptions = monaco.editor.IStandaloneEditorConstructionOptions;
 
@@ -47,9 +47,6 @@ const optionsRef = computed<CompilerOptions>(() => ({
   ...settings.value.mlogjs,
   sourcemap: true,
 }));
-const typescriptSettingsRef = computed(() => ({
-  ...settings.value.typescript,
-}));
 
 const isMobile = useMediaQuery("(max-width: 800px)");
 const [sizes, handlePaneResize] = usePaneSizes(isMobile);
@@ -62,7 +59,10 @@ provide("virtual-fs", persistentFiles);
 const { currentFile } = persistentFiles;
 useFileSaver(currentFile, code);
 
-const { monacoRef } = useMonaco();
+const monacoRef = useMonaco();
+provideMonaco({ monacoRef });
+useMonacoTheme(monacoRef, theme);
+
 const [compiledRef, sourcemapsRef] = useCompiler({
   code,
   editorRef,
@@ -76,36 +76,31 @@ useSourceMapping({
   monacoRef,
 });
 
-watch([currentFile, typescriptSettingsRef], ([file, typescript]) => {
-  if (!monacoRef.value || !file) return;
-  const defaults = monacoRef.value.languages.typescript.typescriptDefaults;
-  const options = defaults.getCompilerOptions();
-  const isJs = file.name.endsWith(".js");
-  defaults.setCompilerOptions({
-    ...options,
-    ...typescript,
-    allowJs: isJs,
-  });
+const language = computed(() => {
+  const file = currentFile.value;
+  if (file?.name.endsWith(".js")) return "javascript";
+  return "typescript";
 });
 
-function beforeMount(monaco: Monaco) {
-  const defaults = monaco.languages.typescript.typescriptDefaults;
-  defaults.setCompilerOptions({
-    allowNonTsExtensions: true,
-    checkJs: true,
-    noLib: true,
-    noEmit: true,
-    target: monaco.languages.typescript.ScriptTarget.ESNext,
-    ...typescriptSettingsRef.value,
-  });
-  defaults.setExtraLibs(parseExtraLibs(lib));
-  registerMlogLang(monaco);
-}
+watchEffect(() => {
+  const monaco = monacoRef.value;
+  if (!monaco) return;
+  setMonacoTypescriptSettings(monaco, settings.value.typescript);
+});
 
-function onMount(editor: monaco.editor.IStandaloneCodeEditor) {
+watchEffect(onCleanup => {
+  const monaco = monacoRef.value;
+  if (!monaco) return;
+
+  const disposable = addWorldModuleSnippet(monaco);
+  onCleanup(() => disposable.dispose());
+});
+
+function onReady(editor: monaco.editor.IStandaloneCodeEditor) {
   editorRef.value = editor;
 }
-function onOutMount(editor: monaco.editor.IStandaloneCodeEditor) {
+
+function onOutReady(editor: monaco.editor.IStandaloneCodeEditor) {
   outEditorRef.value = editor;
   configureMlogLang(monacoRef.value!, editor);
 }
@@ -141,24 +136,21 @@ function copyToClipboard() {
         <SideBar :copy-to-clipboard="copyToClipboard" />
       </Pane>
       <Pane :size="sizes.codeEditor">
-        <Editor
-          language="typescript"
+        <MonacoEditor
+          :language="language"
           v-model:value="code"
-          :theme="theme"
           :options="editorOptions"
-          @before-mount="beforeMount"
-          @mount="onMount"
-        ></Editor>
+          @ready="onReady"
+        ></MonacoEditor>
       </Pane>
       <Pane :size="sizes.outputEditor">
-        <Editor
+        <MonacoEditor
           language="mlog"
-          :theme="theme"
           :value="compiledRef"
           :options="outEditorOptions"
-          @mount="onOutMount"
+          @ready="onOutReady"
         >
-        </Editor>
+        </MonacoEditor>
       </Pane>
     </Splitpanes>
   </div>

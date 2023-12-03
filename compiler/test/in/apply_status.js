@@ -1,3 +1,5 @@
+import { applyStatus } from "mlogjs:world";
+
 const turret = getBuilding("foreshadow1");
 
 const unit = radar({

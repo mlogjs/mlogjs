@@ -1,7 +1,7 @@
 ubind @gamma
-sensor shootX:3:8 @unit @shootX
-sensor shootY:3:16 @unit @shootY
-sensor shooting:3:24 @unit @shooting
-jump 6 notEqual shooting:3:24 0
+sensor shootX:5:8 @unit @shootX
+sensor shootY:5:16 @unit @shootY
+sensor shooting:5:24 @unit @shooting
+jump 6 notEqual shooting:5:24 0
 end
-spawnwave shootX:3:8 shootY:3:16 false
+spawnwave shootX:5:8 shootY:5:16 false

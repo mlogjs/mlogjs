@@ -29,3 +29,4 @@ export const itemNames = [
 
 /** The name of a special processor variable, controls the instruction pointer */
 export const counterName = "@counter";
+export const worldModuleName = "mlogjs:world";

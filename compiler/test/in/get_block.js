@@ -1,3 +1,5 @@
+import { getBlock } from "mlogjs:world";
+
 const block = getBlock.block(10, 10);
 const building = getBlock.building(10, 10);
 const floor = getBlock.floor(10, 10);

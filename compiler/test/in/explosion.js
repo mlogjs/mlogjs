@@ -1,3 +1,5 @@
+import { explosion } from "mlogjs:world";
+
 unitBind(Units.gamma);
 
 const { shootX, shootY, shooting } = Vars.unit;

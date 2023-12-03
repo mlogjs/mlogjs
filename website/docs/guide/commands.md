@@ -566,11 +566,15 @@ Uses the unit bound to this processor to find specific types of blocks
 ## World
 
 These commands are exclusive to world processors and will not work
-on regular processor
+on a regular processor. They must be imported from `mlogjs:world`.
+
+```js
+import { getBlock, setBlock } from "mlogjs:world";
+```
 
 ### `getBlock`
 
-Gets block data from the map. Available ONLY for world processors.
+Gets block data from the map.
 
 - #### `getBlock.floor`
 
@@ -831,7 +835,7 @@ Contains the multiple variants of the `setrule` instruction.
 ### `flushMessage`
 
 Writes the contents of the print buffer in the selected mode
-and clears the buffer afterwards. World processor ONLY.
+and clears the buffer afterwards.
 
 ::: command-example
 :::

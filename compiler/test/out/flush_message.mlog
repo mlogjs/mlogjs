@@ -1,5 +1,5 @@
-radar player any any distance foreshadow1 1 player:3:6
+radar player any any distance foreshadow1 1 player:5:6
 print "You is a "
-print player:3:6
+print player:5:6
 message announce 3
 wait 10

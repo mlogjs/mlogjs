@@ -1,8 +1,8 @@
-radar ground any any distance foreshadow1 1 unit:3:6
-status false overdrive unit:3:6 10
-status false melting unit:3:6 20
-status false burning unit:3:6 20
-status false tarred unit:3:6 20
+radar ground any any distance foreshadow1 1 unit:5:6
+status false overdrive unit:5:6 10
+status false melting unit:5:6 20
+status false burning unit:5:6 20
+status false tarred unit:5:6 20
 wait 2
-status true overdrive unit:3:6
+status true overdrive unit:5:6
 wait 3

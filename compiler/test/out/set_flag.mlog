@@ -1,4 +1,4 @@
-set flag:1:4 "sodfs"
+set flag:3:4 "sodfs"
 op rand &t0 1
 op greaterThan &t1 &t0 0.5
-setflag flag:1:4 &t1
+setflag flag:3:4 &t1
