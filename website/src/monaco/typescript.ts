@@ -23,7 +23,7 @@ export function addWorldModuleSnippet(monaco: Monaco) {
             {
               label: `Add import from "${worldModuleName}"`,
               kind: monaco.languages.CompletionItemKind.Snippet,
-              insertText: `import {  } from '${worldModuleName}';`,
+              insertText: `import {  } from "${worldModuleName}";`,
               range: new monaco.Range(
                 position.lineNumber,
                 0,
