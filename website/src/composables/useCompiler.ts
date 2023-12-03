@@ -9,7 +9,7 @@ interface Params {
   code: Ref<string>;
   editorRef: ShallowRef<editor.IStandaloneCodeEditor | undefined>;
   optionsRef: ShallowRef<CompilerOptions>;
-  monacoRef: ShallowRef<Monaco | null>;
+  monacoRef: ShallowRef<Monaco | undefined>;
 }
 
 export function useCompiler({
