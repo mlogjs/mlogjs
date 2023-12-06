@@ -1,8 +1,8 @@
-import path from "path";
 import type { UserConfig } from "vitepress";
 import { rawResolver } from "./raw_resolver";
 import { mlogjsOutput } from "./md_plugins/mlogjs_output";
 import { commandExample } from "./md_plugins/command_example";
+import mlogTm from "./langs/mlog.tmLanguage.json";
 
 const base = process.env.BASE ?? "/mlogjs/";
 
@@ -90,9 +90,11 @@ const config: UserConfig = {
     },
     languages: [
       {
-        id: "mlog",
-        scopeName: "source.mlog",
-        path: path.resolve(__dirname, "./langs/mlog.tmLanguage.json"),
+        ...mlogTm,
+        repository: {
+          $base: {},
+          $self: {},
+        },
       },
     ],
   },

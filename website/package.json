@@ -19,8 +19,8 @@
     "@types/splitpanes": "^2.2.2",
     "flexsearch": "^0.7.31",
     "markdown-it": "^13.0.1",
-    "vite": "^4.4.9",
-    "vitepress": "1.0.0-rc.20",
+    "vite": "^5.0.5",
+    "vitepress": "1.0.0-rc.31",
     "vue": "^3.3.4"
   },
   "dependencies": {
