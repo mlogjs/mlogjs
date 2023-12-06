@@ -107,6 +107,9 @@ const config: UserConfig = {
     ],
   ],
   vite: {
+    // the root path is website/docs/, so this will make
+    // vite look for the env file in website/
+    envDir: "../",
     define: {
       "process.env": {},
     },
