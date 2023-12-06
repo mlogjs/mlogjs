@@ -1,25 +1,16 @@
 import { CompilerError } from "../CompilerError";
-import { MacroFunction } from "../macros";
-import {
-  leftRightOperators,
-  unaryOperators,
-  updateOperators,
-} from "../operators";
 import {
   EMutability,
   IScope,
   IValue,
   TEOutput,
-  TOperatorMacroMap,
   TValueInstructions,
 } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
-export interface IObjectValueData extends TOperatorMacroMap {
+export interface IObjectValueData {
   [k: string]: IValue | undefined;
-  $get?: MacroFunction<IValue>;
-  $eval?: MacroFunction<IValue>;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -57,12 +48,9 @@ export class ObjectValue extends VoidValue {
       }
     }
 
-    const { $get } = this.data;
-    if (!$get)
-      throw new CompilerError(
-        `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
-      );
-    return $get.call(scope, [key], out);
+    throw new CompilerError(
+      `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
+    );
   }
 
   hasProperty(scope: IScope, prop: IValue): boolean {
@@ -77,24 +65,11 @@ export class ObjectValue extends VoidValue {
     return false;
   }
 
-  eval(scope: IScope, out?: TEOutput): TValueInstructions {
-    const { $eval } = this.data;
-    if (!$eval) return [this, []];
-    return $eval.call(scope, [], out);
-  }
-  call(
-    scope: IScope,
-    args: IValue[],
-    out?: TEOutput,
-  ): TValueInstructions<IValue | null> {
-    const { $call } = this.data;
-    if (!$call) return super.call(scope, args, out);
-    return $call.call(scope, args, out);
+  eval(): TValueInstructions {
+    return [this, []];
   }
 
-  "??"(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    const $ = this.data["$??"];
-    if ($) return $.call(scope, [other], out);
+  "??"(): TValueInstructions {
     return [this, []];
   }
 
@@ -106,39 +81,4 @@ export class ObjectValue extends VoidValue {
   toMlogString(): string {
     return '"[macro ObjectValue]"';
   }
-}
-
-for (const op of leftRightOperators) {
-  if (op === "??") continue;
-  ObjectValue.prototype[op] = function (
-    this: ObjectValue,
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-  ) {
-    const $ = this.data[`$${op}`];
-    if (!$) return VoidValue.prototype[op].apply(this, [scope, value, out]);
-    return $.call(scope, [value], out);
-  };
-}
-
-for (const op of unaryOperators) {
-  ObjectValue.prototype[op] = function (scope: IScope, out?: TEOutput) {
-    const $ = this.data[`$${op}`];
-    if (!$) return VoidValue.prototype[op].apply(this, [scope, out]);
-    return $.call(scope, [], out);
-  };
-}
-
-for (const op of updateOperators) {
-  ObjectValue.prototype[op] = function (
-    this: ObjectValue,
-    scope: IScope,
-    prefix: boolean,
-    out?: TEOutput,
-  ) {
-    const $ = this.data[`$${op}`];
-    if (!$) return VoidValue.prototype[op].apply(this, [scope, prefix, out]);
-    return $.call(scope, [new LiteralValue(+prefix)], out);
-  };
 }
