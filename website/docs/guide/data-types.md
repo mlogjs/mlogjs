@@ -54,19 +54,13 @@ function add(a, b) {
 
 ## Object
 
-Object values are constants and support operator overriding.
+Object values are constants.
 
 ```js
 const obj = {
   a: 1,
   b: (a, b) => a + b,
-  $call: (a, b) => a * b,
 };
 obj.a; // 1
 obj.b(1, 2); // 3
-obj(2, 2); // 4
 ```
-
-::: warning
-Note that operator overriding cannot be checked by typescript, so its use is not recommended.
-:::
