@@ -2,8 +2,6 @@ export * as es from "@babel/types";
 import * as es from "@babel/types";
 import { Compiler } from "./Compiler";
 import { AddressResolver } from "./instructions";
-import { MacroFunction } from "./macros";
-import { LeftRightOperator, UnaryOperator, UpdateOperator } from "./operators";
 
 export enum EInstIntent {
   none,
@@ -351,11 +349,3 @@ export type TValueInstructions<Content extends IValue | null = IValue> = [
   Content,
   IInstruction[],
 ];
-
-/** Map of overridable operators in object macros */
-export type TOperatorMacroMap = {
-  [K in
-    | UnaryOperator
-    | UpdateOperator
-    | LeftRightOperator as `$${K}`]?: MacroFunction;
-};
