@@ -10,3 +10,7 @@ declare module "*!raw" {
   const lib: [string, string][];
   export default lib;
 }
+
+interface ImportMetaEnv {
+  VITE_POSTHOG_TOKEN?: string;
+}
