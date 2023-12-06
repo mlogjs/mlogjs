@@ -30,6 +30,7 @@
     "markdown-it-container": "^3.0.0",
     "mlogjs": "workspace:^",
     "monaco-editor": "^0.44.0",
+    "posthog-js": "^1.93.6",
     "splitpanes": "^3.1.5"
   }
 }
