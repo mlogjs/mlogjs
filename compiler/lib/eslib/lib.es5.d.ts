@@ -201,6 +201,18 @@ interface Math {
    * @param y The exponent value of the expression.
    */
   pow(x: number, y: number): number;
+
+  /**
+   * Returns a supplied numeric expression rounded to the nearest integer.
+   * @param x The value to be rounded to the nearest integer.
+   */
+  round(x: number): number;
+
+  /**
+   * Returns e (the base of natural logarithms) raised to a power.
+   * @param x A numeric expression representing the power of e.
+   */
+  exp(x: number): number;
 }
 declare const Math: Math;
 
