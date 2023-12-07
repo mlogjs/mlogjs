@@ -157,9 +157,9 @@ function createMacroMathOperations() {
 
       // const x = degrees * Math.degToRad;
       // return (Math.exp(x) - Math.exp(-x)) / 2;
-      const { exp, radToDeg } = macroMathOperations;
+      const { exp, degToRad } = macroMathOperations;
       const inst: IInstruction[] = [];
-      const x = pipeInsts(degrees["*"](scope, radToDeg), inst);
+      const x = pipeInsts(degrees["*"](scope, degToRad), inst);
       const expx = pipeInsts(exp.call(scope, [x]), [])!;
       const negativeX = pipeInsts(x["u-"](scope), inst);
       const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
