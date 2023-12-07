@@ -21,6 +21,17 @@ Math.atan(a);
 Math.idiv(a, 2);
 Math.pow(a, 2);
 Math.angleDiff(a, -5);
+Math.sign(a);
+Math.round(a);
+Math.trunc(a);
+Math.exp(a);
+Math.expm1(a);
+Math.cosh(a);
+Math.acosh(a);
+Math.sinh(a);
+Math.asinh(a);
+Math.tanh(a);
+Math.atanh(a);
 
 // compile time evaluation
 
@@ -47,6 +58,17 @@ temp = Math.atan(10.5);
 temp = Math.idiv(5, 2);
 temp = Math.pow(2, 9);
 temp = Math.angleDiff(10, -35);
+temp = Math.sign(10);
+temp = Math.round(10.5);
+temp = Math.trunc(-1.2);
+temp = Math.exp(1);
+temp = Math.expm1(1);
+temp = Math.cosh(180);
+temp = Math.acosh(11.5919);
+temp = Math.sinh(90);
+temp = Math.asinh(2.3);
+temp = Math.tanh(180);
+temp = Math.atanh(0.99627);
 
 print`
 ${Math.PI}
