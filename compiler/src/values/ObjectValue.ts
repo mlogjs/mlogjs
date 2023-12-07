@@ -10,7 +10,7 @@ import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData {
-  [k: string]: IValue | undefined;
+  [k: string]: IValue;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -41,8 +41,7 @@ export class ObjectValue extends VoidValue {
       // avoids naming collisions with keys like
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
-        // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
-        const member = this.data[key.data]!;
+        const member = this.data[key.data];
         if (out) return member.eval(scope, out);
         return [member, []];
       }

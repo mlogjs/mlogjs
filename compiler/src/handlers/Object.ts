@@ -71,11 +71,11 @@ export const ArrayExpression: THandler = (
   node: es.ArrayExpression,
   out,
 ) => {
-  const items: (IValue | undefined)[] = [];
+  const items: IValue[] = [];
   const inst: IInstruction[] = [];
   node.elements.forEach((element, i) => {
     if (!element) {
-      items.push(undefined);
+      items.push(new LiteralValue(null));
       return;
     }
     const value = pipeInsts(

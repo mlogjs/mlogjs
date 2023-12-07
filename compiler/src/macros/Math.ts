@@ -84,7 +84,7 @@ function createMacroMathOperations() {
       const half = new LiteralValue(0.5);
       const incremented = pipeInsts(x["+"](scope, half), inst);
       const { floor } = macroMathOperations;
-      const result = pipeInsts(floor!.call(scope, [incremented], out), inst)!;
+      const result = pipeInsts(floor.call(scope, [incremented], out), inst)!;
       return [result, inst];
     }),
     trunc: new MacroFunction((scope, out, x) => {
