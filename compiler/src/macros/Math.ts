@@ -1,7 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { EMutability, IValue } from "../types";
+import { EMutability, IInstruction, IValue } from "../types";
+import { pipeInsts } from "../utils";
 import {
   IObjectValueData,
   LiteralValue,
@@ -61,15 +62,24 @@ function createMacroMathOperations() {
     E: new StoreValue("@e", EMutability.constant),
     degToRad: new StoreValue("@degToRad", EMutability.constant),
     radToDeg: new StoreValue("@radToDeg", EMutability.constant),
+    round: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // return Math.floor(a + 0.5);
+      const inst: IInstruction[] = [];
+      const half = new LiteralValue(0.5);
+      const incremented = pipeInsts(x["+"](scope, half), inst);
+      const { floor } = macroMathOperations;
+      const result = pipeInsts(floor!.call(scope, [incremented], out), inst)!;
+      return [result, inst];
+    }),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
     macroMathOperations[key] = new MacroFunction<IValue>((scope, out, a, b) => {
       const argumentCount = +!!a + +!!b;
-      if (fn && argumentCount != fn.length) {
-        throw new CompilerError(
-          `Expected ${fn.length} arguments, but got ${argumentCount}`,
-        );
+      if (fn) {
+        assertArgumentCount(argumentCount, fn.length);
       }
       const cacheKey = getCacheKey(key);
       if (b) {
@@ -121,6 +131,13 @@ function getCacheKey(key: string) {
   return key;
 }
 
+function assertArgumentCount(current: number, expected: number) {
+  if (current != expected) {
+    throw new CompilerError(
+      `Expected ${expected} arguments, but got ${current}`,
+    );
+  }
+}
 export class MlogMath extends ObjectValue {
   constructor() {
     super(createMacroMathOperations());
