@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added custom implementations for more math functions:
+  - `Math.sign`
+  - `Math.round`
+  - `Math.trunc`
+  - `Math.exp`
+  - `Math.expm1`
+  - `Math.cosh`
+  - `Math.acosh`
+  - `Math.sinh`
+  - `Math.asinh`
+  - `Math.tanh`
+  - `Math.atanh`
 - Added support for getters and setters.
 - Added brief documentation to some senseable properties.
 - Added typings for the `id` property on symbols.
