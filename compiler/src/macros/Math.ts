@@ -122,6 +122,36 @@ function createMacroMathOperations() {
       const subtracted = pipeInsts(ex["-"](scope, one, out), inst);
       return [subtracted, inst];
     }),
+    cosh: new MacroFunction((scope, out, degrees) => {
+      assertArgumentCount(+!!degrees, 1);
+
+      // const x = degrees * Math.degToRad;
+      // return (Math.exp(x) + Math.exp(-x)) / 2;
+      const { exp, degToRad } = macroMathOperations;
+      const inst: IInstruction[] = [];
+      const x = pipeInsts(degrees["*"](scope, degToRad), inst);
+      const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      const negativeX = pipeInsts(x["u-"](scope), inst);
+      const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
+      const sum = pipeInsts(expx["+"](scope, expnegx), inst);
+      const result = pipeInsts(sum["/"](scope, new LiteralValue(2), out), inst);
+      return [result, inst];
+    }),
+    acosh: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // return Math.log(x + Math.sqrt(x ** 2 - 1)) * Math.radToDeg;
+      const { log, sqrt, radToDeg } = macroMathOperations;
+      const inst: IInstruction[] = [];
+      const x2 = pipeInsts(x["**"](scope, new LiteralValue(2)), inst);
+      const one = new LiteralValue(1);
+      const x2minus1 = pipeInsts(x2["-"](scope, one), inst);
+      const sqrtx2minus1 = pipeInsts(sqrt.call(scope, [x2minus1]), inst)!;
+      const sum = pipeInsts(x["+"](scope, sqrtx2minus1), inst);
+      const radians = pipeInsts(log.call(scope, [sum], out), inst)!;
+      const degrees = pipeInsts(radians["*"](scope, radToDeg), inst);
+      return [degrees, inst];
+    }),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
