@@ -181,6 +181,38 @@ function createMacroMathOperations() {
       const degrees = pipeInsts(radians["*"](scope, radToDeg), inst);
       return [degrees, inst];
     }),
+    tanh: new MacroFunction((scope, out, degrees) => {
+      assertArgumentCount(+!!degrees, 1);
+
+      // const x = degrees * Math.degToRad;
+      // return (Math.exp(x) - Math.exp(-x)) / (Math.exp(x) + Math.exp(-x));
+      const { exp, degToRad } = macroMathOperations;
+      const inst: IInstruction[] = [];
+      const x = pipeInsts(degrees["*"](scope, degToRad), inst);
+      const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      const negativeX = pipeInsts(x["u-"](scope), inst);
+      const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
+      const sub = pipeInsts(expx["-"](scope, expnegx), inst);
+      const sum = pipeInsts(expx["+"](scope, expnegx), inst);
+      const result = pipeInsts(sub["/"](scope, sum, out), inst);
+      return [result, inst];
+    }),
+    atanh: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // return (Math.log((1 + x) / (1 - x)) / 2) * Math.radToDeg;
+      const { log, radToDeg } = macroMathOperations;
+      const inst: IInstruction[] = [];
+      const one = new LiteralValue(1);
+      const two = new LiteralValue(2);
+      const sum = pipeInsts(one["+"](scope, x), inst);
+      const sub = pipeInsts(one["-"](scope, x), inst);
+      const div = pipeInsts(sum["/"](scope, sub), inst);
+      const logOfDiv = pipeInsts(log.call(scope, [div]), inst)!;
+      const radians = pipeInsts(logOfDiv["/"](scope, two, out), inst);
+      const degrees = pipeInsts(radians["*"](scope, radToDeg), inst);
+      return [degrees, inst];
+    }),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
