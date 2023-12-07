@@ -62,6 +62,20 @@ function createMacroMathOperations() {
     E: new StoreValue("@e", EMutability.constant),
     degToRad: new StoreValue("@degToRad", EMutability.constant),
     radToDeg: new StoreValue("@radToDeg", EMutability.constant),
+    sign: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // inspired by the branchless sign function from
+      // https://stackoverflow.com/a/14612943/13745435
+
+      // return (a > 0) - (a < 0);
+      const inst: IInstruction[] = [];
+      const zero = new LiteralValue(0);
+      const gt = pipeInsts(x[">"](scope, zero), inst);
+      const lt = pipeInsts(x["<"](scope, zero), inst);
+      const result = pipeInsts(gt["-"](scope, lt, out), inst);
+      return [result, inst];
+    }),
     round: new MacroFunction((scope, out, x) => {
       assertArgumentCount(+!!x, 1);
 
