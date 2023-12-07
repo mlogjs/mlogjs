@@ -29,6 +29,8 @@ jobs:
       - run: pnpm -C compiler coverage
       - run: pnpm -C compiler build
       - run: pnpm -C website build
+        env:
+          VITE_POSTHOG_TOKEN: ${{ secrets.VITE_POSTHOG_TOKEN }}
       - run: pnpm -C website docs:copy
       - name: Upload Artifact
         uses: actions/upload-pages-artifact@v1
