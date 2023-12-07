@@ -101,6 +101,27 @@ function createMacroMathOperations() {
       const result = pipeInsts(x["-"](scope, rest, out), inst);
       return [result, inst];
     }),
+    exp: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // return Math.E ** x;
+      const inst: IInstruction[] = [];
+
+      const { E } = macroMathOperations;
+      const result = pipeInsts(E["**"](scope, x, out), inst);
+      return [result, inst];
+    }),
+    expm1: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // return Math.exp(x) - 1;
+      const inst: IInstruction[] = [];
+      const { exp } = macroMathOperations;
+      const ex = pipeInsts(exp.call(scope, [x]), inst)!;
+      const one = new LiteralValue(1);
+      const subtracted = pipeInsts(ex["-"](scope, one, out), inst);
+      return [subtracted, inst];
+    }),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
