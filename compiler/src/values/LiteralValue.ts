@@ -10,6 +10,7 @@ import {
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 import { CompilerError } from "../CompilerError";
+import { mathConstants } from "../utils";
 
 const literalMethods: Record<
   string,
@@ -41,6 +42,22 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
   }
   toMlogString() {
     const { data } = this;
+
+    // math constants are literal values
+    // so that the compiler can optimize them
+    // in operations
+    // this helps to print them in their global variable form
+    // instead of their literal value
+    switch (data) {
+      case mathConstants.E:
+        return "@e";
+      case mathConstants.PI:
+        return "@pi";
+      case mathConstants.degToRad:
+        return "@degToRad";
+      case mathConstants.radToDeg:
+        return "@radToDeg";
+    }
     if (typeof data !== "string") return JSON.stringify(data);
 
     // this special handling is required because of

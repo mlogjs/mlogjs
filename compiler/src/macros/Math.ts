@@ -1,8 +1,8 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
-import { EMutability, IInstruction, IValue } from "../types";
-import { pipeInsts } from "../utils";
+import { IInstruction, IValue } from "../types";
+import { mathConstants, pipeInsts } from "../utils";
 import {
   IObjectValueData,
   LiteralValue,
@@ -58,10 +58,10 @@ const orderIndependentOperations = ["max", "min", "len"];
 
 function createMacroMathOperations() {
   const macroMathOperations: IObjectValueData = {
-    PI: new StoreValue("@pi", EMutability.constant),
-    E: new StoreValue("@e", EMutability.constant),
-    degToRad: new StoreValue("@degToRad", EMutability.constant),
-    radToDeg: new StoreValue("@radToDeg", EMutability.constant),
+    PI: new LiteralValue(mathConstants.PI),
+    E: new LiteralValue(mathConstants.E),
+    degToRad: new LiteralValue(mathConstants.degToRad),
+    radToDeg: new LiteralValue(mathConstants.radToDeg),
     sign: new MacroFunction((scope, out, x) => {
       assertArgumentCount(+!!x, 1);
 
