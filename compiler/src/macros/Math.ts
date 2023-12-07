@@ -73,6 +73,20 @@ function createMacroMathOperations() {
       const result = pipeInsts(floor!.call(scope, [incremented], out), inst)!;
       return [result, inst];
     }),
+    trunc: new MacroFunction((scope, out, x) => {
+      assertArgumentCount(+!!x, 1);
+
+      // subtracts the decimal part of a number from itself
+      // works with both positive and negative numbers,
+      // returning the integer part of the number
+
+      // return a - (a % 1);
+      const inst: IInstruction[] = [];
+      const one = new LiteralValue(1);
+      const rest = pipeInsts(x["%"](scope, one), inst);
+      const result = pipeInsts(x["-"](scope, rest, out), inst);
+      return [result, inst];
+    }),
   };
   for (const key in mathOperations) {
     const fn = mathOperations[key];
