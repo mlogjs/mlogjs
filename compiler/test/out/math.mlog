@@ -21,28 +21,83 @@ op atan &_ a:1:4
 op idiv &_ a:1:4 2
 op pow &_ a:1:4 2
 op angleDiff &_ a:1:4 -5
-set temp:28:4 0
-set temp:28:4 20
-set temp:28:4 10.5
-set temp:28:4 62.300527191945
-set temp:28:4 22.588713996153036
-op noise temp:28:4 10.5 20
-set temp:28:4 10.5
-set temp:28:4 2.3513752571634776
-set temp:28:4 1.021189299069938
-set temp:28:4 0.18223552549214747
-set temp:28:4 0.9832549075639546
-set temp:28:4 0.18533904493153439
-set temp:28:4 10
-set temp:28:4 11
-set temp:28:4 3.24037034920393
-op rand temp:28:4 10.5
-set temp:28:4 null
-set temp:28:4 null
-set temp:28:4 84.5596679689945
-set temp:28:4 2
-set temp:28:4 512
-set temp:28:4 45
+op greaterThan &t0 a:1:4 0
+op lessThan &t1 a:1:4 0
+op sub &_ &t0 &t1
+op add &t2 a:1:4 0.5
+op floor &_ &t2
+op mod &t3 a:1:4 1
+op sub &_ a:1:4 &t3
+op pow &_ @e a:1:4
+op pow &t4 @e a:1:4
+op sub &_ &t4 1
+op mul &t5 a:1:4 @degToRad
+op sub &t7 0 &t5
+op pow &t8 @e &t7
+op add &t9 &t6 &t8
+op div &_ &t9 2
+op pow &t10 a:1:4 2
+op sub &t11 &t10 1
+op sqrt &t12 &t11
+op add &t13 a:1:4 &t12
+op log &_ &t13
+op mul &t14 &_ @radToDeg
+op mul &t15 a:1:4 @degToRad
+op sub &t17 0 &t15
+op pow &t18 @e &t17
+op sub &t19 &t16 &t18
+op div &t20 &t19 2
+op pow &t21 a:1:4 2
+op add &t22 &t21 1
+op sqrt &t23 &t22
+op add &t24 a:1:4 &t23
+op log &_ &t24
+op mul &t25 &_ @radToDeg
+op mul &t26 a:1:4 @degToRad
+op sub &t28 0 &t26
+op pow &t29 @e &t28
+op sub &t30 &t27 &t29
+op add &t31 &t27 &t29
+op div &_ &t30 &t31
+op add &t32 1 a:1:4
+op sub &t33 1 a:1:4
+op div &t34 &t32 &t33
+op log &t35 &t34
+op div &_ &t35 2
+op mul &t36 &_ @radToDeg
+set temp:39:4 0
+set temp:39:4 20
+set temp:39:4 10.5
+set temp:39:4 62.300527191945
+set temp:39:4 22.588713996153036
+op noise temp:39:4 10.5 20
+set temp:39:4 10.5
+set temp:39:4 2.3513752571634776
+set temp:39:4 1.021189299069938
+set temp:39:4 0.18223552549214747
+set temp:39:4 0.9832549075639546
+set temp:39:4 0.18533904493153439
+set temp:39:4 10
+set temp:39:4 11
+set temp:39:4 3.24037034920393
+op rand temp:39:4 10.5
+set temp:39:4 null
+set temp:39:4 null
+set temp:39:4 84.5596679689945
+set temp:39:4 2
+set temp:39:4 512
+set temp:39:4 45
+set temp:39:4 1
+set temp:39:4 11
+set temp:39:4 -1
+set temp:39:4 @e
+set temp:39:4 1.718281828459045
+set temp:39:4 11.591953275521517
+set temp:39:4 179.99973568806888
+set temp:39:4 2.3012989023072943
+set temp:39:4 89.97033320163936
+set temp:39:4 0.9962720762207501
+set temp:39:4 179.98401956048068
 print "\n"
 print @pi
 print "\n"

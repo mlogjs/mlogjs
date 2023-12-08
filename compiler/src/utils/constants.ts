@@ -30,3 +30,10 @@ export const itemNames = [
 /** The name of a special processor variable, controls the instruction pointer */
 export const counterName = "@counter";
 export const worldModuleName = "mlogjs:world";
+
+export const mathConstants = {
+  E: Math.E,
+  PI: Math.PI,
+  radToDeg: 180 / Math.PI,
+  degToRad: Math.PI / 180,
+};
