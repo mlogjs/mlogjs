@@ -4,13 +4,14 @@ import {
   writeFileSync,
   cpSync,
   rmSync,
+  watchFile,
 } from "node:fs";
 import { hideBin } from "yargs/helpers";
 import { highlight } from "cli-highlight";
 import yargs from "yargs";
 import chalk from "chalk";
 import { join, parse, resolve } from "node:path";
-import { Compiler } from "../index";
+import { Compiler, CompilerOptions } from "../index";
 import { getInnerTSConfig, getLibFolderPath, getRootTSConfig } from "./files";
 
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
@@ -58,6 +59,11 @@ yargs(hideBin(process.argv))
           default: false,
           describe:
             "Wether the compiler should preserve or compact variable and function names",
+        })
+        .option("watch", {
+          type: "boolean",
+          default: false,
+          describe: "Wether the compiler should watch for file changes",
         });
     },
     argv => {
@@ -68,42 +74,17 @@ yargs(hideBin(process.argv))
       const out = argv.out ?? defaultOutPath(path);
       if (path == out)
         return console.log("The out path cannot be the same as the input path");
-      const compiler = new Compiler({
+
+      const options: CompilerOptions = {
         compactNames: argv["compact-names"],
-      });
-      const code = readFileSync(path, "utf8");
-      const [output, error] = compiler.compile(code);
-      if (error) {
-        if (!error.loc) {
-          console.log(error.inner ?? error);
-          return;
-        }
-        const { start, end } = error.loc;
+      };
 
-        const lines = code.split("\n");
-        console.log(
-          chalk.cyanBright([resolve(path), start.line, start.column].join(":")),
-        );
-        for (
-          let i = Math.max(start.line - 3, 0);
-          i < Math.min(end.line + 2, lines.length);
-          i++
-        ) {
-          const n = i + 1;
-          if (n !== start.line) continue;
-          const head = chalk.gray(`${n} | `.padStart(6, " "));
-          console.log(head + highlight(lines[i], { language: "js" }));
-          console.log(
-            chalk.red(" ".repeat(6 + start.column) + "^ " + error.message),
-          );
-        }
+      compile(path, out, options);
 
-        return;
-      }
-      writeFileSync(out, output);
-      console.log(
-        `Success: Compiled ${path}. Your compiled code is at ${out}.`,
-      );
+      if (!argv.watch) return;
+      // using interval of 600 milliseconds
+      // because 1 second might feel too slow to the user
+      watchFile(path, { interval: 600 }, () => compile(path, out, options));
     },
   )
   .help()
@@ -111,7 +92,7 @@ yargs(hideBin(process.argv))
   .demandCommand()
   .parse();
 
-export function setup(dir: string, tsconfig: boolean) {
+function setup(dir: string, tsconfig: boolean) {
   const dotDir = join(dir, ".mlogjs");
 
   if (existsSync(dotDir)) {
@@ -129,6 +110,45 @@ export function setup(dir: string, tsconfig: boolean) {
   if (!tsconfig) return;
   const rootTSConfig = getRootTSConfig();
   writeFileSync(join(dir, "tsconfig.json"), rootTSConfig);
+}
+
+function compile(path: string, outPath: string, options: CompilerOptions) {
+  const resolvedPath = resolve(process.cwd(), path);
+  const code = readFileSync(path, "utf8");
+  const compiler = new Compiler(options);
+  const [result, error] = compiler.compile(code);
+
+  if (!error) {
+    writeFileSync(outPath, result);
+    console.log(
+      `Success: Compiled ${path}. Your compiled code is at ${outPath}.`,
+    );
+    return;
+  }
+
+  if (!error.loc) {
+    console.log(error.inner ?? error);
+    return;
+  }
+
+  const { start, end } = error.loc;
+
+  const lines = code.split("\n");
+  console.log(
+    chalk.cyanBright([resolvedPath, start.line, start.column].join(":")),
+  );
+
+  for (
+    let i = Math.max(start.line - 3, 0);
+    i < Math.min(end.line + 2, lines.length);
+    i++
+  ) {
+    const n = i + 1;
+    if (n !== start.line) continue;
+    const head = chalk.gray(`${n} | `.padStart(6, " "));
+    console.log(head + highlight(lines[i], { language: "ts" }));
+    console.log(chalk.red(" ".repeat(6 + start.column) + "^ " + error.message));
+  }
 }
 
 function defaultOutPath(path: string) {
