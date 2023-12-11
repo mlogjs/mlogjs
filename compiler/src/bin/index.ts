@@ -111,7 +111,7 @@ yargs(hideBin(process.argv))
   .demandCommand()
   .parse();
 
-export function setup(dir: string, tsconfig: boolean) {
+function setup(dir: string, tsconfig: boolean) {
   const dotDir = join(dir, ".mlogjs");
 
   if (existsSync(dotDir)) {
