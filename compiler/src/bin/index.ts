@@ -58,6 +58,11 @@ yargs(hideBin(process.argv))
           default: false,
           describe:
             "Wether the compiler should preserve or compact variable and function names",
+        })
+        .option("watch", {
+          type: "boolean",
+          default: false,
+          describe: "Wether the compiler should watch for file changes",
         });
     },
     argv => {
