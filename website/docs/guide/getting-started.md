@@ -32,6 +32,17 @@ The quickest way to get started on the compiler is with the
   Your browser does not support the video tag.
   </video>
 
+- ### Integration with [Mlog Watcher](https://github.com/Sharlottes/MlogWatcher)
+
+  Send the compiled code to your currently selected processor by pressing <kbd>Ctrl</kbd>+<kbd>S</kbd> or enabling auto sending.
+
+  You can enable this functionality in the settings.
+
+  <video autoplay loop muted>
+  <source src="https://github.com/Sharlottes/MlogWatcher/assets/61994401/4df1ba70-d9dc-4b9b-935d-e11e2c2f2d46">
+  Your browser does not support the video tag.
+  </video>
+
 ## Local setup
 
 This section assumes that you are familiar with the following concepts:

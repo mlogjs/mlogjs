@@ -16,6 +16,11 @@ export interface EditorSettings {
   editor: {
     confirmFileDeletion: boolean;
   };
+  mlogWatcher: {
+    enabled: boolean;
+    autoSend: boolean;
+    serverPort: number;
+  };
 }
 
 export type EditorSettingsRef = Ref<EditorSettings>;
@@ -62,6 +67,11 @@ function getDefaultSettings(): EditorSettings {
       noImplicitAny: false,
       strict: false,
       strictNullChecks: false,
+    },
+    mlogWatcher: {
+      enabled: false,
+      autoSend: false,
+      serverPort: 9992,
     },
   };
 }
