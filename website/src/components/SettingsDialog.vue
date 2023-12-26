@@ -92,6 +92,25 @@ function onClose() {
           />
         </label>
       </fieldset>
+      <fieldset>
+        <legend>Mlog Watcher</legend>
+        <label>
+          Auto Send
+          <input
+            type="checkbox"
+            name="mlog-watcher-auto-send"
+            v-model="settings.mlogWatcher.autoSend"
+          />
+        </label>
+        <label>
+          Server port
+          <input
+            type="number"
+            name="mlog-watcher-server-port"
+            v-model.lazy="settings.mlogWatcher.serverPort"
+          />
+        </label>
+      </fieldset>
       <button class="save" type="submit" @click="onClose">Save</button>
     </form>
   </dialog>
@@ -115,6 +134,16 @@ fieldset {
 label {
   display: flex;
   justify-content: space-between;
+}
+
+input {
+  font-family: var(--vp-font-family-base);
+  text-align: right;
+}
+
+input[name="mlog-watcher-server-port"] {
+  width: 4em;
+  border-bottom: 2px solid var(--vp-c-border);
 }
 
 button.save {
