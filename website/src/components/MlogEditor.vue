@@ -77,7 +77,7 @@ useSourceMapping({
   monacoRef,
 });
 
-useMlogWatcherSocket(settings, compiledRef);
+const sendToMlogWatcher = useMlogWatcherSocket(settings, compiledRef);
 
 const language = computed(() => {
   const file = currentFile.value;
@@ -97,6 +97,16 @@ watchEffect(onCleanup => {
 
   const disposable = addWorldModuleSnippet(monaco);
   onCleanup(() => disposable.dispose());
+});
+
+watchEffect(() => {
+  const monaco = monacoRef.value;
+  const editor = editorRef.value;
+  if (!editor || !monaco) return;
+
+  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+    sendToMlogWatcher();
+  });
 });
 
 function onReady(editor: monaco.editor.IStandaloneCodeEditor) {

@@ -10,7 +10,11 @@ export function useMlogWatcherSocket(
   const port = computed(() => settingsRef.value.mlogWatcher.serverPort);
   const autoSend = computed(() => settingsRef.value.mlogWatcher.autoSend);
 
-  const send = debounce(700, (code: string) => {
+  const send = (code: string) => {
+    socket.value?.send(code);
+  };
+
+  const debouncedSend = debounce(700, (code: string) => {
     socket.value?.send(code);
   });
 
@@ -27,8 +31,10 @@ export function useMlogWatcherSocket(
   });
 
   watchEffect(() => {
-    if (ready.value && autoSend.value) send(code.value);
+    if (ready.value && autoSend.value) debouncedSend(code.value);
   });
+
+  return () => send(code.value);
 }
 
 function debounce<Args extends unknown[]>(
