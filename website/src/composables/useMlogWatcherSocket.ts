@@ -24,6 +24,9 @@ export function useMlogWatcherSocket(
     websocket.onopen = () => {
       ready.value = true;
     };
+    websocket.onclose = () => {
+      ready.value = false;
+    };
     socket.value = websocket;
 
     onCleanup(() => {
