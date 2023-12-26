@@ -7,6 +7,7 @@ export function useMlogWatcherSocket(
 ) {
   const socket = ref<WebSocket>();
   const ready = ref(false);
+  const manuallyTriggered = ref(false);
   const port = computed(() => settingsRef.value.mlogWatcher.serverPort);
   const autoSend = computed(() => settingsRef.value.mlogWatcher.autoSend);
 
@@ -34,7 +35,14 @@ export function useMlogWatcherSocket(
     if (ready.value && autoSend.value) debouncedSend(code.value);
   });
 
-  return () => send(code.value);
+  watchEffect(() => {
+    if (ready.value && manuallyTriggered.value) {
+      send(code.value);
+      manuallyTriggered.value = false;
+    }
+  });
+
+  return () => (manuallyTriggered.value = true);
 }
 
 function debounce<Args extends unknown[]>(
