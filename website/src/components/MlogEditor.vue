@@ -99,13 +99,20 @@ watchEffect(onCleanup => {
   onCleanup(() => disposable.dispose());
 });
 
-watchEffect(() => {
-  const monaco = monacoRef.value;
-  const editor = editorRef.value;
-  if (!editor || !monaco) return;
-
-  editor.addCommand(monaco.KeyMod.CtrlCmd | monaco.KeyCode.KeyS, () => {
+watchEffect(onCleanup => {
+  // global event handler to
+  // allow the user to press ctrl+s
+  // without needing to focus the editor
+  function handler(e: KeyboardEvent) {
+    if (!e.ctrlKey || e.key !== "s") return;
+    e.preventDefault();
     sendToMlogWatcher();
+  }
+
+  window.addEventListener("keydown", handler);
+
+  onCleanup(() => {
+    window.removeEventListener("keydown", handler);
   });
 });
 
