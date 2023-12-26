@@ -17,6 +17,7 @@ export interface EditorSettings {
     confirmFileDeletion: boolean;
   };
   mlogWatcher: {
+    enabled: boolean;
     autoSend: boolean;
     serverPort: number;
   };
@@ -68,7 +69,8 @@ function getDefaultSettings(): EditorSettings {
       strictNullChecks: false,
     },
     mlogWatcher: {
-      autoSend: true,
+      enabled: false,
+      autoSend: false,
       serverPort: 9992,
     },
   };

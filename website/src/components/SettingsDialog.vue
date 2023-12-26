@@ -93,7 +93,11 @@ function onClose() {
         </label>
       </fieldset>
       <fieldset>
-        <legend>Mlog Watcher</legend>
+        <legend>Mlog Watcher Integration</legend>
+        <label>
+          Enabled
+          <input type="checkbox" v-model="settings.mlogWatcher.enabled" />
+        </label>
         <label>
           Auto Send
           <input

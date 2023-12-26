@@ -10,6 +10,7 @@ export function useMlogWatcherSocket(
   const manuallyTriggered = ref(false);
   const port = computed(() => settingsRef.value.mlogWatcher.serverPort);
   const autoSend = computed(() => settingsRef.value.mlogWatcher.autoSend);
+  const enabled = computed(() => settingsRef.value.mlogWatcher.enabled);
 
   const send = (code: string) => {
     socket.value?.send(code);
@@ -20,6 +21,8 @@ export function useMlogWatcherSocket(
   });
 
   watchEffect(onCleanup => {
+    if (!enabled.value) return;
+
     const websocket = new WebSocket(`ws://localhost:${port.value}`);
     websocket.onopen = () => {
       ready.value = true;
