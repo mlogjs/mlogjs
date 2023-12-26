@@ -1,32 +1,33 @@
-import { onMounted, onUnmounted, watchEffect, type Ref, ref } from "vue";
+import { watchEffect, type Ref, ref, computed } from "vue";
+import type { EditorSettingsRef } from "./useEditorSettings";
 
-export function useMlogWatcherSocket(port: number, code: Ref<string>) {
+export function useMlogWatcherSocket(
+  settingsRef: EditorSettingsRef,
+  code: Ref<string>,
+) {
   const socket = ref<WebSocket>();
   const ready = ref(false);
+  const port = computed(() => settingsRef.value.mlogWatcher.serverPort);
+  const autoSend = computed(() => settingsRef.value.mlogWatcher.autoSend);
 
   const send = debounce(700, (code: string) => {
     socket.value?.send(code);
   });
 
-  onMounted(() => {
-    const websocket = new WebSocket(`ws://localhost:${port}`);
-    socket.value = websocket;
+  watchEffect(onCleanup => {
+    const websocket = new WebSocket(`ws://localhost:${port.value}`);
     websocket.onopen = () => {
-      console.log("opened");
       ready.value = true;
     };
-    websocket.onerror = event => {
-      console.log(event);
-    };
-  });
+    socket.value = websocket;
 
-  onUnmounted(() => {
-    socket.value?.close();
+    onCleanup(() => {
+      socket.value?.close();
+    });
   });
 
   watchEffect(() => {
-    console.log("changed");
-    if (ready.value) send(code.value);
+    if (ready.value && autoSend.value) send(code.value);
   });
 }
 

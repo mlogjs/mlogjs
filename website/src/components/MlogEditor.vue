@@ -77,7 +77,7 @@ useSourceMapping({
   monacoRef,
 });
 
-useMlogWatcherSocket(9992, compiledRef);
+useMlogWatcherSocket(settings, compiledRef);
 
 const language = computed(() => {
   const file = currentFile.value;
