@@ -1,5 +1,13 @@
 import { Compiler } from "../Compiler";
-import { THandler, es, IScope, TValueInstructions, TEOutput } from "../types";
+import { CompilerError } from "../CompilerError";
+import {
+  THandler,
+  es,
+  IScope,
+  TValueInstructions,
+  TEOutput,
+  EInlineType,
+} from "../types";
 import { nodeName } from "../utils";
 import { FunctionValue } from "../values/FunctionValue";
 
@@ -19,13 +27,16 @@ function handleFunctionNode(
     body.loc = loc;
   }
 
+  const inlineType = getInlineType(body.directives);
+
   return [
     new FunctionValue({
       scope,
-      params: params as es.Identifier[],
+      params,
       body,
       c,
       out,
+      inlineType,
     }),
     [],
   ];
@@ -54,3 +65,19 @@ export const FunctionDeclaration: THandler = (
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;
 export const ObjectMethod: THandler = ArrowFunctionExpression;
+
+function getInlineType(directives: es.Directive[]) {
+  for (const directive of directives) {
+    const value = directive.value.value;
+
+    switch (value) {
+      case "inline":
+        return EInlineType.always;
+      case "inline never":
+        return EInlineType.never;
+      default:
+        throw new CompilerError(`Invalid function directive: "${value}"`);
+    }
+  }
+  return EInlineType.auto;
+}
