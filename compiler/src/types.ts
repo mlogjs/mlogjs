@@ -84,14 +84,6 @@ export interface IScope {
   ntemp: number;
 
   /**
-   * A record of the cached value operations, maps the id of an operation to a
-   * previously computed value.
-   */
-  operationCache: Record<string, IValue>;
-
-  /** Tracks the dependency relation beteween values and cached operations */
-  cacheDependencies: Record<string, string[]>;
-  /**
    * Tells array macros whether to check index access performed. This field is
    * mutable.
    */
@@ -159,28 +151,6 @@ export interface IScope {
   copy(): IScope;
   /** Creates a temporary mlog variable name */
   makeTempName(): string;
-
-  /** Adds the result of an operation to the local cache */
-  addCachedOperation(
-    op: string,
-    result: IValue,
-    left: IValue,
-    right?: IValue,
-  ): void;
-
-  /** Attempts to get an operation cached in this or in a parent scope. */
-  getCachedOperation(
-    op: string,
-    left: IValue,
-    right?: IValue,
-  ): IValue | undefined;
-
-  /**
-   * Removes all cached operations dependent on the given value.
-   *
-   * Affects this scope and all of its parents.
-   */
-  clearDependentCache(value: IValue): void;
 }
 
 // we can't use type maps to define actual methods
