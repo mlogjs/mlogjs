@@ -118,16 +118,3 @@ export const operatorMap = {
   >,
   string
 >;
-
-export const orderIndependentOperators: readonly Operator[] = [
-  "!=",
-  "!==",
-  "&&",
-  "&",
-  "*",
-  "+",
-  "==",
-  "===",
-  "|",
-  "||",
-] as const;
