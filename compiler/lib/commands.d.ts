@@ -290,8 +290,11 @@ declare global {
    *
    *   printFlush(); // defaults to message1
    *   ```
+   *
+   *   If `target` is `undefined` the contents of the print buffer will be
+   *   discarded.
    */
-  function printFlush(target: BasicBuilding): void;
+  function printFlush(target: BasicBuilding | undefined): void;
   function printFlush(): void;
 
   /**
