@@ -80,6 +80,8 @@ interface SettableUnit
       flag: number;
       rotation: number;
       payloadType?: UnitSymbol | BuildingSymbol;
+      speed: number;
+      armor: number;
     }
   > {}
 

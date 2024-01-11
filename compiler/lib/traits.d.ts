@@ -256,4 +256,17 @@ declare global {
       /** The team id of `this`. */
       readonly team: number;
     }> {}
+
+  interface WithArmor
+    extends WithSymbols<{
+      readonly armor: number;
+    }> {}
+
+  interface WithCamera
+    extends WithSymbols<{
+      readonly cameraX: number;
+      readonly cameraY: number;
+      readonly cameraWidth: number;
+      readonly cameraHeight: number;
+    }> {}
 }

@@ -221,6 +221,7 @@ declare namespace LAccess {
   const maxHealth: unique symbol;
   const heat: unique symbol;
   const shield: unique symbol;
+  const armor: unique symbol;
   const efficiency: unique symbol;
   const progress: unique symbol;
   const timescale: unique symbol;
@@ -229,6 +230,10 @@ declare namespace LAccess {
   const y: unique symbol;
   const shootX: unique symbol;
   const shootY: unique symbol;
+  const cameraX: unique symbol;
+  const cameraY: unique symbol;
+  const cameraWidth: unique symbol;
+  const cameraHeight: unique symbol;
   const size: unique symbol;
   const dead: unique symbol;
   const range: unique symbol;
