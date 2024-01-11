@@ -1,57 +1,59 @@
 import { CompilerError } from "../CompilerError";
 import { THandler, es } from "../types";
+import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 
 const noExternalModuleErrorMessage =
   "Cannot import values from modules that are not built into the compiler";
 
-export const ImportDeclaration: THandler<null> = (
+export const ImportDeclaration: THandler = (
   c,
   scope,
+  context,
   node: es.ImportDeclaration,
 ) => {
-  if (node.importKind === "type") return [null, []];
+  if (node.importKind === "type") return nullId;
 
   if (!(node.source.value in scope.builtInModules))
     throw new CompilerError(noExternalModuleErrorMessage);
 
   for (const specifier of node.specifiers) {
-    c.handle(scope, specifier, undefined, undefined, node.source.value);
+    c.handle(scope, context, specifier, undefined, node.source.value);
   }
-  return [null, []];
+  return nullId;
 };
 
-export const ImportDefaultSpecifier: THandler<null> = (
+export const ImportDefaultSpecifier: THandler = (
   c,
   scope,
+  context,
   node: es.ImportDefaultSpecifier,
-  out,
   source: string,
 ) => {
-  if (!(source in scope.builtInModules)) return [null, []];
+  if (!(source in scope.builtInModules)) return nullId;
   throw new CompilerError(`"${source}" does not have a default export`);
 };
 
-export const ImportNamespaceSpecifier: THandler<null> = (
+export const ImportNamespaceSpecifier: THandler = (
   c,
   scope,
+  context,
   node: es.ImportDefaultSpecifier,
-  out,
   source: string,
 ) => {
   scope.set(node.local.name, scope.builtInModules[source]);
 
-  return [null, []];
+  return nullId;
 };
 
-export const ImportSpecifier: THandler<null> = (
+export const ImportSpecifier: THandler = (
   c,
   scope,
+  context,
   node: es.ImportSpecifier,
-  out,
   source: string,
 ) => {
-  if (node.importKind === "type") return [null, []];
+  if (node.importKind === "type") return nullId;
 
   const module = scope.builtInModules[source];
   const { imported, local } = node;
@@ -66,7 +68,8 @@ export const ImportSpecifier: THandler<null> = (
     );
   }
 
+  //  TODO: update after dealing with object members
   const [value] = module.get(scope, key);
-  scope.set(local.name, value);
-  return [null, []];
+  scope.set(local.name, value as any as number);
+  return nullId;
 };

@@ -1,40 +1,35 @@
-import { es, IInstruction, IValue, THandler } from "../types";
-import { pipeInsts } from "../utils";
+import { CallInstruction } from "../flow";
+import { es, THandler } from "../types";
 import { LiteralValue, ObjectValue } from "../values";
 
-export const CallExpression: THandler<IValue | null> = (
+export const CallExpression: THandler = (
   c,
   scope,
+  context,
   node: es.CallExpression,
-  out,
 ) => {
-  const inst: IInstruction[] = [];
+  const callee = c.handle(scope, context, node.callee);
 
-  const callee = pipeInsts(c.handleEval(scope, node.callee), inst);
-
-  const paramOuts = callee.preCall(scope, out);
-
-  const args = node.arguments.map((node, index) => {
-    const out = paramOuts?.[index];
-    return pipeInsts(c.handleEval(scope, node, out), inst);
+  const args = node.arguments.map(node => {
+    return c.handleCopy(scope, context, node);
   });
+  const out = c.generateId();
 
-  const callValue = pipeInsts(callee.call(scope, args, out), inst);
+  context.addInstruction(new CallInstruction(callee, args, out, node));
 
-  callee.postCall(scope);
-
-  return [callValue, inst];
+  return out;
 };
 
 export const NewExpression = CallExpression;
 
-export const TaggedTemplateExpression: THandler<IValue | null> = (
+export const TaggedTemplateExpression: THandler = (
   c,
   scope,
+  context,
   node: es.TaggedTemplateExpression,
-  out,
 ) => {
-  const [tag, tagInst] = c.handleEval(scope, node.tag);
+  //  TODO: handle nested properties of object values
+  const tag = c.handle(scope, context, node.tag);
 
   const template = node.quasi;
 
@@ -47,19 +42,20 @@ export const TaggedTemplateExpression: THandler<IValue | null> = (
     },
   );
 
-  const expressions: IValue[] = [];
-  const expressionInsts: IInstruction[] = [];
+  const stringsObjectId = c.registerValue(stringsObject);
+
+  const expressions: number[] = [];
 
   template.expressions.forEach(expression => {
-    const value = pipeInsts(c.handleEval(scope, expression), expressionInsts);
+    const value = c.handleCopy(scope, context, expression);
+
     expressions.push(value);
   });
 
-  const [result, resultInst] = tag.call(
-    scope,
-    [stringsObject, ...expressions],
-    out,
+  const out = c.generateId();
+  context.addInstruction(
+    new CallInstruction(tag, [stringsObjectId, ...expressions], out, node),
   );
 
-  return [result, [...expressionInsts, ...tagInst, ...resultInst]];
+  return out;
 };

@@ -1,157 +1,69 @@
-import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import {
-  EInstIntent,
-  EMutability,
-  es,
-  IInstruction,
-  IScope,
-  THandler,
-} from "../types";
-import { lazy, usesAddressResolver, withAlwaysRuns } from "../utils";
-import { LiteralValue } from "../values";
+  BinaryOperationInstruction,
+  Block,
+  BreakIfInstruction,
+  BreakInstruction,
+} from "../flow";
+import { es, THandler } from "../types";
+import { nullId } from "../utils";
 
-export const SwitchStatement: THandler<null> = (
+export const SwitchStatement: THandler = (
   c,
   scope,
+  context,
   node: es.SwitchStatement,
 ) => {
   const innerScope = scope.createScope();
+  const refBlock = new Block([]);
+  const exitBlock = new Block([]);
+  context.connectBlock(refBlock, node);
+  innerScope.break = exitBlock;
 
-  const [ref, refInst] = c.handleEval(scope, node.discriminant);
+  const ref = c.handle(scope, context, node.discriminant);
 
-  const inst: IInstruction[] = [];
-
-  const endAdress = new LiteralValue(null);
-  const endLine = new AddressResolver(endAdress).bindBreak(innerScope);
-
-  const caseJumps: IInstruction[] = [];
-  let defaultJump: JumpInstruction | undefined;
-
-  // if there is a case that is guaranteed to run
-  let constantCase = false;
-  let onlyConstantTests = true;
+  let nextBodyBlock = new Block([]);
+  let nextTestBlock = new Block([]);
+  let defaultCaseEntry = new Block([], new BreakInstruction(exitBlock, node));
+  context.connectBlock(nextTestBlock, node);
 
   for (const scase of node.cases) {
-    const bodyInst = lazy(
-      () => c.handleMany(createCaseScope(innerScope), scase.consequent)[1],
-    );
-    const bodyAdress = new LiteralValue(null);
-    const bodyLine = new AddressResolver(bodyAdress);
+    const bodyEntry = nextBodyBlock;
+    const testEntry = nextTestBlock;
+    nextBodyBlock = new Block([]);
 
-    const canFallInto = !endsWithoutFalltrough(inst);
-    let includeJump = !constantCase;
-    const includeBody = !constantCase || canFallInto;
+    if (scase.test) {
+      nextTestBlock = new Block([]);
+      context.currentBlock = testEntry;
 
-    if (!scase.test) {
-      if (includeJump) {
-        [defaultJump] = c.handle(innerScope, scase, () => [
-          null,
-          [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-        ])[1] as JumpInstruction[];
-      }
-      if (includeBody) inst.push(bodyLine, ...bodyInst());
-      continue;
+      const value = c.handle(scope, context, scase.test);
+      const condition = c.generateId();
+      context.addInstruction(
+        new BinaryOperationInstruction(
+          "strictEqual",
+          ref,
+          value,
+          condition,
+          scase,
+        ),
+      );
+      context.setEndInstruction(
+        new BreakIfInstruction(condition, bodyEntry, nextTestBlock, scase),
+      );
+    } else {
+      // testEntry.endInstruction = new BreakInstruction(bodyEntry);
+      defaultCaseEntry = bodyEntry;
     }
 
-    const [test, testInst] = c.handleEval(innerScope, scase.test);
-    if (onlyConstantTests)
-      onlyConstantTests = test.mutability === EMutability.constant;
+    context.currentBlock = bodyEntry;
 
-    let jump: IInstruction[];
-    // check if it can be evaluated at compile time
-    // the scope copy prevents unecessary increases in the temp counter
-    const [comp] = ref["=="](innerScope.copy(), test);
+    c.handleMany(innerScope, context, scase.consequent);
 
-    if (comp instanceof LiteralValue) {
-      // whether other cases can falltrough and reach this one
-      const noFallInto = !canFallInto;
-      const isLastCase = scase === node.cases[node.cases.length - 1];
-      if (!comp.data) {
-        // this case is not accessible in any way
-        if (noFallInto) continue;
-        includeJump = false;
-      } else {
-        // this case is only accessible via the comparison jump
-        // and all the other cases will never run
-        if (
-          noFallInto &&
-          onlyConstantTests &&
-          (isLastCase || endsWithoutFalltrough(bodyInst()))
-        ) {
-          return [null, [...bodyInst(), endLine]];
-        }
-
-        jump = c.handle(innerScope, scase, () => [
-          null,
-          [new JumpInstruction(bodyAdress, EJumpKind.Always)],
-        ])[1];
-        constantCase = true;
-      }
-    }
-    // makes sourcemapping for the jump more specific
-    jump ??= c.handle(innerScope, scase, () => [
-      null,
-      [new JumpInstruction(bodyAdress, EJumpKind.StrictEqual, ref, test)],
-    ])[1];
-
-    if (includeJump) caseJumps.push(...testInst, ...jump);
-    if (includeBody) inst.push(bodyLine, ...bodyInst());
+    context.setEndInstruction(new BreakInstruction(nextBodyBlock, node));
   }
 
-  // ensures that the processor exits
-  // the switch if no cases match
-  defaultJump ??= new JumpInstruction(endAdress, EJumpKind.Always);
+  nextTestBlock.endInstruction = new BreakInstruction(defaultCaseEntry, node);
+  nextBodyBlock.endInstruction = new BreakInstruction(exitBlock, node);
 
-  if (caseJumps.length > 0) {
-    withAlwaysRuns([null, [...caseJumps.slice(1), defaultJump]], false);
-    withAlwaysRuns([null, inst], false);
-  }
-
-  return [
-    null,
-    [
-      ...refInst,
-      ...caseJumps,
-      ...(caseJumps.length > 0 && !constantCase ? [defaultJump] : []),
-      ...inst,
-      ...(usesEndLine(endLine, inst, defaultJump) ? [endLine] : []),
-    ],
-  ];
+  context.currentBlock = exitBlock;
+  return nullId;
 };
-
-function endsWithoutFalltrough(inst: IInstruction[]) {
-  if (inst.length === 0) return true;
-  for (let i = inst.length - 1; i >= 0; i--) {
-    const instruction = inst[i];
-
-    // this means that there is an instruction trying to reference
-    // the final function `set @counter` instruction
-    // of course this generates an unecessary
-    // `set @counter` in cases where a control flow
-    // structure contains a fallback return statement
-    // TODO: fix this with static analysis
-    if (instruction instanceof AddressResolver) return false;
-    if (instruction.hidden) continue;
-
-    return instruction.intent !== EInstIntent.none;
-  }
-  return false;
-}
-
-function usesEndLine(
-  endLine: AddressResolver,
-  inst: IInstruction[],
-  defaultJump: JumpInstruction,
-) {
-  if (endLine.bonds.includes(defaultJump.address)) return true;
-  return usesAddressResolver(endLine, inst);
-}
-
-function createCaseScope(scope: IScope) {
-  // prevents the operation cache from propagating
-  // but also allows the case to declare variables
-  // that can be used by other cases
-  const child = scope.createScope();
-  child.data = scope.data;
-  return child;
-}

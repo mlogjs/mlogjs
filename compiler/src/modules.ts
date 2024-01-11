@@ -13,74 +13,86 @@ import {
   Unchecked,
   VarsNamespace,
 } from "./macros";
-import { EMutability, IScope } from "./types";
+import { EMutability, IScope, IValue } from "./types";
 import { Asm } from "./macros/Asm";
-import { LiteralValue, ObjectValue } from "./values";
+import { ObjectValue } from "./values";
 import { Scope } from "./Scope";
-import { worldModuleName } from "./utils";
+import { nullId, worldModuleName } from "./utils";
+import { ICompilerContext } from "./CompilerContext";
 import { ColorsNamespace, SoundsNamespace } from "./macros/Namespace";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
  * are not privileged
  */
-export function createGlobalScope(): IScope {
+export function createGlobalScope(c: ICompilerContext): IScope {
   const scope = new Scope({
     builtInModules: {
       [worldModuleName]: createWordModule(),
     },
   });
-  scope.hardSet("undefined", new LiteralValue(null));
-  // namespaces
-  scope.hardSet("ControlKind", new NamespaceMacro());
-  scope.hardSet("Vars", new VarsNamespace());
-  scope.hardSet("Teams", new NamespaceMacro());
-  scope.hardSet("Items", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("Liquids", new NamespaceMacro());
-  scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("LAccess", new NamespaceMacro());
-  scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("Colors", new ColorsNamespace());
 
-  // helper methods
-  scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
-  scope.hardSet("getBuildings", new GetBuildings());
-  scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
-  scope.hardSet("getColor", new GetColor());
-  scope.hardSet("concat", new Concat());
-  scope.hardSet("asm", new Asm());
+  scope.hardSet("undefined", nullId);
 
-  scope.hardSet("Math", new MlogMath());
-  scope.hardSet("Memory", new MemoryBuilder());
-  scope.hardSet("StringView", new StringViewBuilder());
-  scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
-  scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
-  scope.hardSet("unchecked", new Unchecked());
-  scope.hardSet("Align", new NamespaceMacro());
-  scope.hardSet("Weathers", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("Sounds", new SoundsNamespace());
+  const data: Record<string, IValue> = {
+    // namespaces
+    ControlKind: new NamespaceMacro(),
+    Vars: new VarsNamespace(),
+    Teams: new NamespaceMacro(),
+    Items: new NamespaceMacro({ changeCasing: true }),
+    Liquids: new NamespaceMacro(),
+    Units: new NamespaceMacro({ changeCasing: true }),
+    LAccess: new NamespaceMacro(),
+    Blocks: new NamespaceMacro({ changeCasing: true }),
+    Colors: new ColorsNamespace(),
 
-  // commands
-  scope.hardSet("draw", new commands.Draw());
-  scope.hardSet("print", new commands.Print());
-  scope.hardSet("format", new commands.Format());
-  scope.hardSet("printChar", new commands.PrintChar());
-  scope.hardSet("printFlush", new commands.PrintFlush());
-  scope.hardSet("drawFlush", new commands.DrawFlush());
-  scope.hardSet("getLink", new commands.GetLink());
-  scope.hardSet("control", new commands.Control());
-  scope.hardSet("radar", new commands.Radar());
-  scope.hardSet("sensor", new commands.Sensor());
-  scope.hardSet("wait", new commands.Wait());
-  scope.hardSet("lookup", new commands.Lookup());
-  scope.hardSet("packColor", new commands.PackColor());
-  scope.hardSet("unpackColor", new commands.UnpackColor());
-  scope.hardSet("endScript", new commands.End());
-  scope.hardSet("stopScript", new commands.Stop());
-  scope.hardSet("unitBind", new commands.UnitBind());
-  scope.hardSet("unitControl", new commands.UnitControl());
-  scope.hardSet("unitRadar", new commands.UnitRadar());
-  scope.hardSet("unitLocate", new commands.UnitLocate());
+    // helper methods
+    getBuilding: new GetGlobal(EMutability.constant),
+    getBuildings: new GetBuildings(),
+    getVar: new GetGlobal(EMutability.mutable),
+    getColor: new GetColor(),
+    concat: new Concat(),
+    asm: new Asm(),
+
+    Math: new MlogMath(),
+    Memory: new MemoryBuilder(),
+    StringView: new StringViewBuilder(),
+    MutableArray: new DynamicArrayConstructor(false),
+    DynamicArray: new DynamicArrayConstructor(true),
+    unchecked: new Unchecked(),
+    Align: new NamespaceMacro(),
+    Weathers: new NamespaceMacro({changeCasing: true}),
+    Sounds: new SoundsNamespace(),
+
+
+    // commands
+    draw: new commands.Draw(),
+    print: new commands.Print(),
+    format: new commands.Format(),
+    printChar: new commands.PrintChar(),
+    printFlush: new commands.PrintFlush(),
+    drawFlush: new commands.DrawFlush(),
+    getLink: new commands.GetLink(),
+    control: new commands.Control(),
+    radar: new commands.Radar(),
+    sensor: new commands.Sensor(),
+    wait: new commands.Wait(),
+    lookup: new commands.Lookup(),
+    packColor: new commands.PackColor(),
+    unpackColor: new commands.UnpackColor(),
+    endScript: new commands.End(),
+    stopScript: new commands.Stop(),
+    unitBind: new commands.UnitBind(),
+    unitControl: new commands.UnitControl(),
+    unitRadar: new commands.UnitRadar(),
+    unitLocate: new commands.UnitLocate(),
+  };
+
+  for (const name in data) {
+    const id = c.registerValue(data[name]);
+    c.setValueName(id, name);
+    scope.set(name, id);
+  }
 
   return scope;
 }

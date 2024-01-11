@@ -1,22 +1,14 @@
-import { Compiler } from "../Compiler";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import {
-  THandler,
-  es,
-  IScope,
-  TValueInstructions,
-  TEOutput,
-  EInlineType,
-} from "../types";
+import { THandler, es, IScope, EInlineType } from "../types";
 import { nodeName } from "../utils";
 import { FunctionValue } from "../values/FunctionValue";
 
 function handleFunctionNode(
-  c: Compiler,
+  c: ICompilerContext,
   scope: IScope,
   node: es.Function,
-  out?: TEOutput,
-): TValueInstructions<FunctionValue> {
+): number {
   let { params, body } = node;
 
   if (es.isExpression(body)) {
@@ -27,40 +19,40 @@ function handleFunctionNode(
     body.loc = loc;
   }
 
-  const inlineType = getInlineType(body.directives);
+  // const inlineType = getInlineType(body.directives);
 
-  return [
+  return c.registerValue(
     new FunctionValue({
       scope,
       params,
       body,
-      c,
-      out,
-      inlineType,
+      c
     }),
-    [],
-  ];
+  );
 }
 
 export const ArrowFunctionExpression: THandler = (
   c,
   scope,
+  context,
   node: es.ArrowFunctionExpression,
-  out,
 ) => {
-  return handleFunctionNode(c, scope, node, out);
+  return handleFunctionNode(c, scope, node);
 };
 
 export const FunctionDeclaration: THandler = (
   c,
   scope,
+  context,
   node: es.FunctionDeclaration,
 ) => {
   const identifier = (node.id as es.Identifier).name;
   const name = nodeName(node, !c.compactNames && identifier);
-  const functionIns = handleFunctionNode(c, scope, node, name);
-  scope.set(identifier, functionIns[0]);
-  return functionIns;
+
+  const functionId = handleFunctionNode(c, scope, node);
+  scope.set(name, functionId);
+  c.setValueName(functionId, name);
+  return functionId;
 };
 
 export const FunctionExpression: THandler = ArrowFunctionExpression;

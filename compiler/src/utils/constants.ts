@@ -37,3 +37,5 @@ export const mathConstants = {
   radToDeg: 180 / Math.PI,
   degToRad: Math.PI / 180,
 };
+
+export const nullId = 0;
