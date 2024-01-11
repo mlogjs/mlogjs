@@ -5,6 +5,19 @@ import {
   TStatusEffect,
 } from "./util";
 
+// privileged global variables
+interface PVars {
+  readonly server: boolean;
+  readonly client: boolean;
+  readonly clientLocale: string;
+  readonly clientUnit: AnyUnit;
+  readonly clientName: string;
+  readonly clientTeam: number;
+  readonly clientMobile: boolean;
+}
+
+export var PVars: PVars;
+
 /** Gets block data from the map. */
 export namespace getBlock {
   /**
@@ -321,6 +334,9 @@ export namespace setRule {
    */
   function solarMultiplier(multiplier: number): void;
 
+  function ban(content: BlockSymbol | UnitSymbol): void;
+  function unban(content: BlockSymbol | UnitSymbol): void;
+
   /**
    * Sets the build speed multiplier of a team. The multiplier will always be
    * clamped between `0.001` and `50`.
@@ -424,7 +440,7 @@ export namespace flushMessage {
    * flushMessage.notify();
    * ```
    */
-  function notify(): void;
+  function notify(): boolean;
   /**
    * Puts the content on the top left corner of the screen
    *
@@ -433,7 +449,7 @@ export namespace flushMessage {
    * flushMessage.mission();
    * ```
    */
-  function mission(): void;
+  function mission(): boolean;
   /**
    * Puts the content on the middle of the screen
    *
@@ -444,7 +460,7 @@ export namespace flushMessage {
    *   flushMessage.announce(3);
    *   ```
    */
-  function announce(duration: number): void;
+  function announce(duration: number): boolean;
   /**
    * Puts the content on the middle top of the screen
    *
@@ -455,7 +471,7 @@ export namespace flushMessage {
    *   flushMessage.toast(5);
    *   ```
    */
-  function toast(duration: number): void;
+  function toast(duration: number): boolean;
 }
 
 /** Controls the player camera. */
@@ -503,6 +519,7 @@ export namespace cutscene {
  *   air: true,
  *   ground: true,
  *   pierce: true,
+ *   effect: true,
  * });
  * ```
  */
@@ -515,6 +532,7 @@ export function explosion(options: {
   air: boolean;
   ground: boolean;
   pierce: boolean;
+  effect: boolean;
 }): void;
 
 /**
@@ -783,3 +801,58 @@ export namespace effect {
   }): void;
   function bubble(x: number, y: number): void;
 }
+
+export interface Marker {
+  remove(): void;
+  set visibility(value: boolean);
+  toggleVisibility(): void;
+  set text(value: string | number);
+  flushText(): void;
+  set x(value: number);
+  set y(value: number);
+  set pos(value: { x: number; y: number });
+  set endX(value: number);
+  set endY(value: number);
+  set endPos(value: { x: number; y: number });
+  set fontSize(value: number);
+  set textHeight(value: number);
+  set labelBackground(value: boolean);
+  set labelOutline(value: boolean);
+  set labelFlags(value: { background: boolean; outline: boolean });
+  set radius(value: number);
+  set stroke(value: number);
+  set rotation(value: number);
+  set shapeSides(value: number);
+  set shapeFill(value: boolean);
+  set shapeOutline(value: boolean);
+  set shape(value: { sides: number; fill: boolean; outline: boolean });
+  set color(value: number);
+}
+
+interface MarkerConstructor {
+  of(id: number): Marker;
+  shapeText(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  minimap(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  shape(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  line(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+  text(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+}
+
+export var Marker: MarkerConstructor;
+
+export function localePrint(name: string): void;
