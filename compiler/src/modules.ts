@@ -3,6 +3,7 @@ import {
   Concat,
   DynamicArrayConstructor,
   GetBuildings,
+  MarkerConstructor,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
@@ -90,6 +91,8 @@ export function createWordModule() {
     setProp: new commands.SetProp(),
     sync: new commands.Sync(),
     effect: new commands.Effect(),
+    localePrint: new commands.LocalePrint(),
+    Marker: new MarkerConstructor(),
   });
   return module;
 }

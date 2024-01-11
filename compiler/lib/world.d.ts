@@ -804,7 +804,7 @@ export namespace effect {
 
 export interface Marker {
   remove(): void;
-  set visibility(value: boolean);
+  set visible(value: boolean);
   toggleVisibility(): void;
   set text(value: string | number);
   flushText(): void;
