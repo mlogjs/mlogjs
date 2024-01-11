@@ -24,8 +24,8 @@ import {
 export const ObjectExpression: THandler = (
   c,
   scope,
+  context,
   node: es.ObjectExpression,
-  out,
 ) => {
   const data: IObjectValueData = {};
   const inst: IInstruction[] = [];
@@ -45,8 +45,7 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
 
-    const memberOut = extractDestrucuringOut(out, index);
-    const member = pipeInsts(c.handleEval(scope, value, memberOut), inst);
+    const member = pipeInsts(c.handle(scope, value, memberOut), inst);
 
     if (prop.type !== "ObjectMethod" || prop.kind === "method") {
       data[index] = member;
@@ -79,7 +78,7 @@ export const ArrayExpression: THandler = (
       return;
     }
     const value = pipeInsts(
-      c.handleEval(scope, element, extractDestrucuringOut(out, i)),
+      c.handle(scope, element, extractDestrucuringOut(out, i)),
       inst,
     );
     items.push(value);
@@ -95,11 +94,11 @@ export const MemberExpression: THandler = (
   optional = false,
 ) => {
   const [prop, propInst] = node.computed
-    ? c.handleEval(scope, node.property)
+    ? c.handle(scope, node.property)
     : [new LiteralValue((node.property as es.Identifier).name), []];
 
   if (!out) {
-    const [obj, objInst] = c.handleEval(scope, node.object);
+    const [obj, objInst] = c.handle(scope, node.object);
 
     if (optional && obj instanceof LiteralValue && obj.data === null)
       return [obj, [...objInst, ...propInst]];
@@ -125,7 +124,7 @@ export const MemberExpression: THandler = (
     ]),
   );
 
-  const [obj, objInst] = c.handleEval(scope, node.object, objOut);
+  const [obj, objInst] = c.handle(scope, node.object, objOut);
 
   if (optional && obj instanceof LiteralValue && obj.data === null)
     return [obj, [...objInst, ...propInst]];
@@ -174,7 +173,7 @@ export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
     const [key, keyInst] =
       propKey.type === "Identifier" && !prop.computed
         ? [new LiteralValue(propKey.name), []]
-        : c.handleEval(scope, propKey);
+        : c.handle(scope, propKey);
 
     const value = pipeInsts(c.handleValue(scope, prop.value), inst);
     const hasDefault = value instanceof AssignmentValue;
@@ -217,7 +216,7 @@ export const AssignmentPattern: THandler<IValue> = (
   node: es.AssignmentPattern,
 ) => {
   const [left, inst] = c.handleValue(scope, node.left);
-  const right = new LazyValue((_, out) => c.handleEval(scope, node.right, out));
+  const right = new LazyValue((_, out) => c.handle(scope, node.right, out));
 
   return [new AssignmentValue(left, right), inst];
 };

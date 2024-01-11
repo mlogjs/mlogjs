@@ -1,30 +1,31 @@
 import { CompilerError } from "../CompilerError";
-import { es, IValue, THandler, TValueInstructions } from "../types";
-import { nodeName } from "../utils";
+import { es, THandler } from "../types";
+import { nodeName, nullId } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 const TypeCastExpression: THandler = (
   c,
   scope,
+  context,
   node: es.TSAsExpression | es.TSTypeAssertion,
-  out,
 ) => {
-  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
+  return c.handle(scope, context, node.expression);
 };
 
 export const TSAsExpression = TypeCastExpression;
 
 export const TSTypeAssertion = TypeCastExpression;
 
-const IgnoredHandler: THandler<null> = () => [null, []];
+const IgnoredHandler: THandler = () => nullId;
 
 export const TSInterfaceDeclaration = IgnoredHandler;
 
 export const TSTypeAliasDeclaration = IgnoredHandler;
 
-export const TSEnumDeclaration: THandler<null> = (
+export const TSEnumDeclaration: THandler = (
   c,
   scope,
+  context,
   node: es.TSEnumDeclaration,
 ) => {
   if (!node.const)
@@ -41,7 +42,7 @@ export const TSEnumDeclaration: THandler<null> = (
       throw new CompilerError("This enum member must be initialized", member);
 
     const [value] = member.initializer
-      ? c.handleEval(scope, member.initializer)
+      ? c.handle(scope, member.initializer)
       : [new LiteralValue(counter)];
 
     if (!(value instanceof LiteralValue))
@@ -73,15 +74,15 @@ export const TSEnumDeclaration: THandler<null> = (
 export const TSNonNullExpression: THandler = (
   c,
   scope,
+  context,
   node: es.TSNonNullExpression,
-  out,
 ) => {
-  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
+  return c.handle(scope, context, node.expression);
 };
 
-export const TSSatisfiesExpression: THandler<IValue | null> = (
+export const TSSatisfiesExpression: THandler = (
   c,
   scope,
+  context,
   node: es.TSSatisfiesExpression,
-  out,
-) => c.handle(scope, node.expression, undefined, out);
+) => c.handle(scope, context, node.expression);

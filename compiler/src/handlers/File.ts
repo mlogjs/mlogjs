@@ -1,6 +1,6 @@
 import { Scope } from "../Scope";
-import { es, IValue, THandler } from "../types";
+import { es, THandler } from "../types";
 
-export const File: THandler<IValue | null> = (c, scope, node: es.File) => {
-  return c.handle(scope ?? new Scope({}), node.program);
+export const File: THandler = (c, scope, context, node: es.File) => {
+  return c.handle(scope ?? new Scope({}), context, node.program);
 };

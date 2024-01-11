@@ -1,23 +1,16 @@
-import { LiteralValue, StoreValue } from "./values";
-import { AddressResolver } from "./instructions";
-import {
-  IFunctionValue,
-  IInstruction,
-  INamedValue,
-  IScope,
-  IValue,
-} from "./types";
+import { LiteralValue } from "./values";
+import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 import { CompilerError } from "./CompilerError";
-import { internalPrefix } from "./utils";
+import { Block } from "./flow";
 
 export class Scope implements IScope {
-  data: Record<string, IValue | null>;
+  data: Record<string, number>;
   parent: IScope | null;
   ntemp: number;
   name: string;
   inst: IInstruction[];
-  break!: AddressResolver;
-  continue!: AddressResolver;
+  break!: Block;
+  continue!: Block;
   function!: IFunctionValue;
   label?: string;
   // Only `unchecked` is supposed to change this
@@ -74,9 +67,9 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(identifier: string): INamedValue {
+  get(identifier: string): number {
     const value = this.data[identifier];
-    if (value) return value as INamedValue;
+    if (value !== undefined) return value;
     if (this.parent) return this.parent.get(identifier);
     let message = `${identifier} is not declared.`;
 
@@ -90,27 +83,15 @@ export class Scope implements IScope {
     throw new CompilerError(message);
   }
 
-  set<T extends IValue>(name: string, value: T): T {
+  set(name: string, value: number): void {
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
 
-  hardSet<T extends IValue>(name: string, value: T): T {
+  hardSet(name: string, value: number): void {
     if (!name)
       throw new CompilerError("Values in a scope must have an identifier");
     this.data[name] = value;
-    return value;
-  }
-  make(identifier: string, name: string): StoreValue {
-    const value = new StoreValue(name);
-    return this.set(identifier, value);
-  }
-  makeTempName(): string {
-    let result = `${internalPrefix}t${this.ntemp}`;
-    if (this.name) result += `:${this.name}`;
-
-    this.ntemp++;
-    return result;
   }
 }

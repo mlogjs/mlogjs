@@ -2,19 +2,13 @@ import { parse } from "@babel/parser";
 import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
 import { createGlobalScope } from "./modules";
-import { AddressResolver, EndInstruction } from "./instructions";
-import {
-  es,
-  IInstruction,
-  IScope,
-  IValue,
-  TEOutput,
-  THandler,
-  TValueInstructions,
-} from "./types";
-import { appendSourceLocations, hideRedundantJumps, pipeInsts } from "./utils";
+import { es, IInstruction, THandler } from "./types";
+import { hideRedundantJumps } from "./utils";
+import { CompilerContext } from "./CompilerContext";
+import { HandlerContext } from "./HandlerContext";
+import { Block, EndInstruction, Graph } from "./flow";
 
-type THandlerMap = { [k in es.Node["type"]]?: THandler<IValue | null> };
+type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
 export interface CompilerOptions {
   /** Wether the compiler should preserve or compact variable and function names */
@@ -44,23 +38,36 @@ export class Compiler {
     let sourcemaps: es.SourceLocation[] | undefined;
 
     try {
+      const c = new CompilerContext(this);
       const program = this.parse(script);
-      const globalScope = createGlobalScope();
+      const globalScope = createGlobalScope(c);
       // this allows the user to shadow global variables inside
       // the script, since it is treated as a module
       const scope = globalScope.createScope();
 
-      const valueInst = this.handle(scope, program);
-      if (needsEndInstruction(valueInst[1], scope)) {
-        valueInst[1].push(new EndInstruction());
-      }
-      valueInst[1].push(...scope.inst);
+      const rootContext = new HandlerContext(
+        new Block([]),
+        new Block([], new EndInstruction()),
+      );
 
-      hideRedundantJumps(valueInst[1]);
-      this.resolve(valueInst);
-      output = this.serialize(valueInst) + "\n";
+      c.handle(scope, rootContext, program);
+      c.resolveTypes();
+
+      const rootGraph = Graph.from(rootContext.entry, rootContext.exit);
+
+      const inst = rootGraph.toMlog(c);
+
+      // const valueInst = this.handle(scope, program);
+      // if (needsEndInstruction(valueInst[1], scope)) {
+      //   valueInst[1].push(new EndInstruction());
+      // }
+      // valueInst[1].push(...scope.inst);
+
+      hideRedundantJumps(inst);
+      this.resolve(inst);
+      output = this.serialize(inst) + "\n";
       if (this.sourcemap) {
-        sourcemaps = this.mapSources(valueInst);
+        sourcemaps = this.mapSources(inst);
       }
     } catch (error) {
       const err =
@@ -70,16 +77,15 @@ export class Compiler {
     return [output, null, sourcemaps];
   }
 
-  protected resolve(valueInst: TValueInstructions<IValue | null>) {
+  protected resolve(instructions: IInstruction[]) {
     let i = 0;
-    for (const inst of valueInst[1]) {
+    for (const inst of instructions) {
       inst.resolve(i);
       if (!inst.hidden) i++;
     }
   }
 
-  protected serialize(resLines: TValueInstructions<IValue | null>) {
-    const [, inst] = resLines;
+  protected serialize(inst: IInstruction[]) {
     return inst.filter(l => !l.hidden).join("\n");
   }
 
@@ -91,111 +97,13 @@ export class Compiler {
     });
   }
 
-  protected mapSources(
-    valueInst: TValueInstructions<IValue | null>,
-  ): es.SourceLocation[] {
+  protected mapSources(insts: IInstruction[]): es.SourceLocation[] {
     const result: es.SourceLocation[] = [];
 
-    for (const inst of valueInst[1]) {
+    for (const inst of insts) {
       if (!inst.hidden) result.push(inst.source as es.SourceLocation);
     }
 
     return result;
   }
-
-  handle(
-    scope: IScope,
-    node: es.Node,
-    handler = this.handlers[node.type],
-    out?: TEOutput,
-    arg?: unknown,
-  ): TValueInstructions<IValue | null> {
-    try {
-      if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      const result = handler(this, scope, node, out, arg);
-      if (this.sourcemap) return appendSourceLocations(result, node);
-      return result;
-    } catch (error) {
-      if (error instanceof CompilerError) {
-        error.loc ??= node.loc as es.SourceLocation;
-      }
-      throw error;
-    }
-  }
-
-  /** Handles the node and asserts that it resolves to a value. */
-  handleValue(
-    scope: IScope,
-    node: es.Node,
-    handler = this.handlers[node.type],
-    out?: TEOutput,
-    arg?: unknown,
-  ): TValueInstructions {
-    const result = this.handle(scope, node, handler, out, arg);
-    if (!result[0])
-      throw new CompilerError(
-        `This node (${node.type}) did not return a value`,
-        node,
-      );
-    return result as TValueInstructions;
-  }
-
-  handleEval(
-    scope: IScope,
-    node: es.Node,
-    out?: TEOutput,
-    arg?: unknown,
-  ): TValueInstructions {
-    const [res, inst] = this.handleValue(scope, node, undefined, out, arg);
-    const [evaluated, evaluatedInst] = res.eval(scope, out);
-    const result: TValueInstructions = [evaluated, [...inst, ...evaluatedInst]];
-
-    if (this.sourcemap) return appendSourceLocations(result, node);
-    return result;
-  }
-
-  /**
-   * Handles many nodes in order.
-   *
-   * The usage of this method over a regular loop over an array of nodes is only
-   * required if the code inside the loop generates instructions that are not
-   * tracked by the compiler handler methods ({@link handle}, {@link handleEval}
-   * and {@link handleMany})
-   */
-  handleMany<T extends es.Node>(
-    scope: IScope,
-    nodes: T[],
-    handler?: (node: T) => TValueInstructions<IValue | null>,
-  ): TValueInstructions<null> {
-    const lines: IInstruction[] = [];
-    for (const node of hoistedFunctionNodes(nodes)) {
-      pipeInsts(
-        this.handle(scope, node, handler && (() => handler(node))),
-        lines,
-      );
-    }
-    return [null, lines];
-  }
-}
-
-function* hoistedFunctionNodes<T extends es.Node>(nodes: T[]) {
-  // sorting is O(n long n) while this is just O(n)
-  // besides, it's better not to modify the node array
-  for (const node of nodes) {
-    if (node.type === "FunctionDeclaration") {
-      yield node;
-    }
-  }
-
-  for (const node of nodes) {
-    if (node.type !== "FunctionDeclaration") {
-      yield node;
-    }
-  }
-}
-
-function needsEndInstruction(inst: IInstruction[], scope: IScope) {
-  const last = inst[inst.length - 1];
-  if (last instanceof AddressResolver) return true;
-  return scope.inst.length > 0;
 }

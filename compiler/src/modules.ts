@@ -10,64 +10,75 @@ import {
   VarsNamespace,
 } from "./macros";
 import { GetGlobal } from "./macros/GetGlobal";
-import { EMutability, IScope } from "./types";
+import { EMutability, IScope, IValue } from "./types";
 import { Asm } from "./macros/Asm";
-import { LiteralValue, ObjectValue } from "./values";
+import { ObjectValue } from "./values";
 import { Scope } from "./Scope";
-import { worldModuleName } from "./utils";
+import { nullId, worldModuleName } from "./utils";
+import { ICompilerContext } from "./CompilerContext";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
  * are not privileged
  */
-export function createGlobalScope(): IScope {
+export function createGlobalScope(c: ICompilerContext): IScope {
   const scope = new Scope({
     builtInModules: {
       [worldModuleName]: createWordModule(),
     },
   });
-  scope.hardSet("undefined", new LiteralValue(null));
-  // namespaces
-  scope.hardSet("ControlKind", new NamespaceMacro());
-  scope.hardSet("Vars", new VarsNamespace());
-  scope.hardSet("Teams", new NamespaceMacro());
-  scope.hardSet("Items", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("Liquids", new NamespaceMacro());
-  scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("LAccess", new NamespaceMacro());
-  scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
 
-  // helper methods
-  scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
-  scope.hardSet("getBuildings", new GetBuildings());
-  scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
-  scope.hardSet("concat", new Concat());
-  scope.hardSet("asm", new Asm());
+  scope.hardSet("undefined", nullId);
 
-  scope.hardSet("Math", new MlogMath());
-  scope.hardSet("Memory", new MemoryBuilder());
-  scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
-  scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
-  scope.hardSet("unchecked", new Unchecked());
+  const data: Record<string, IValue> = {
+    // namespaces
+    ControlKind: new NamespaceMacro(),
+    Vars: new VarsNamespace(),
+    Teams: new NamespaceMacro(),
+    Items: new NamespaceMacro({ changeCasing: true }),
+    Liquids: new NamespaceMacro(),
+    Units: new NamespaceMacro({ changeCasing: true }),
+    LAccess: new NamespaceMacro(),
+    Blocks: new NamespaceMacro({ changeCasing: true }),
 
-  // commands
-  scope.hardSet("draw", new commands.Draw());
-  scope.hardSet("print", new commands.Print());
-  scope.hardSet("printFlush", new commands.PrintFlush());
-  scope.hardSet("drawFlush", new commands.DrawFlush());
-  scope.hardSet("getLink", new commands.GetLink());
-  scope.hardSet("control", new commands.Control());
-  scope.hardSet("radar", new commands.Radar());
-  scope.hardSet("sensor", new commands.Sensor());
-  scope.hardSet("wait", new commands.Wait());
-  scope.hardSet("lookup", new commands.Lookup());
-  scope.hardSet("packColor", new commands.PackColor());
-  scope.hardSet("endScript", new commands.End());
-  scope.hardSet("stopScript", new commands.Stop());
-  scope.hardSet("unitBind", new commands.UnitBind());
-  scope.hardSet("unitControl", new commands.UnitControl());
-  scope.hardSet("unitRadar", new commands.UnitRadar());
-  scope.hardSet("unitLocate", new commands.UnitLocate());
+    // helper methods
+    getBuilding: new GetGlobal(EMutability.constant),
+    getBuildings: new GetBuildings(),
+    getVar: new GetGlobal(EMutability.mutable),
+    concat: new Concat(),
+    asm: new Asm(),
+
+    Math: new MlogMath(),
+    Memory: new MemoryBuilder(),
+    MutableArray: new DynamicArrayConstructor(false),
+    DynamicArray: new DynamicArrayConstructor(true),
+    unchecked: new Unchecked(),
+
+    // commands
+    draw: new commands.Draw(),
+    print: new commands.Print(),
+    printFlush: new commands.PrintFlush(),
+    drawFlush: new commands.DrawFlush(),
+    getLink: new commands.GetLink(),
+    control: new commands.Control(),
+    radar: new commands.Radar(),
+    sensor: new commands.Sensor(),
+    wait: new commands.Wait(),
+    lookup: new commands.Lookup(),
+    packColor: new commands.PackColor(),
+    endScript: new commands.End(),
+    stopScript: new commands.Stop(),
+    unitBind: new commands.UnitBind(),
+    unitControl: new commands.UnitControl(),
+    unitRadar: new commands.UnitRadar(),
+    unitLocate: new commands.UnitLocate(),
+  };
+
+  for (const name in data) {
+    const id = c.registerValue(data[name]);
+    c.setValueName(id, name);
+    scope.set(name, id);
+  }
 
   return scope;
 }
