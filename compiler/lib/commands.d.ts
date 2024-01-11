@@ -712,6 +712,8 @@ declare global {
      */
     function pathfind(x: number, y: number): void;
 
+    function autoPathfind(): void;
+
     /**
      * Whether the unit bound to this processor should be boosted (floating)
      *
