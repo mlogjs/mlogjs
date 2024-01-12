@@ -131,7 +131,7 @@ class MarkerMacroMethod extends MacroFunction<null> {
     public prop: string,
   ) {
     super(() => {
-      return [null, [new InstructionBase("setmarker", id, prop)]];
+      return [null, [new InstructionBase("setmarker", prop, id)]];
     });
   }
 }
