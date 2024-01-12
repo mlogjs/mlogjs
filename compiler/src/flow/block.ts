@@ -2,6 +2,18 @@ import { ICompilerContext } from "../CompilerContext";
 import { IInstruction } from "../types";
 import { TBlockEndInstruction, TBlockInstruction } from "./instructions";
 
+export interface IForwardEdge {
+  type: "forward";
+  block: Block;
+}
+
+export interface IBackwardEdge {
+  type: "backward";
+  block: Block;
+}
+
+export type TEdge = IForwardEdge | IBackwardEdge;
+
 export class Block {
   parents: Block[] = [];
   constructor(
@@ -10,6 +22,10 @@ export class Block {
   ) {}
 
   get children(): Block[] {
+    return this.edges.map(edge => edge.block);
+  }
+
+  get edges(): TEdge[] {
     if (!this.endInstruction) return [];
     switch (this.endInstruction.type) {
       case "break":
@@ -45,6 +61,20 @@ export class Block {
         return inst;
       }
     }
+  }
+
+  toForward(): IForwardEdge {
+    return {
+      type: "forward",
+      block: this,
+    };
+  }
+
+  toBackward(): IBackwardEdge {
+    return {
+      type: "backward",
+      block: this,
+    };
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {

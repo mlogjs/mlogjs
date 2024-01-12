@@ -11,10 +11,14 @@ export const WhileStatement: THandler = (
   const testBlock = new Block([]);
   const bodyBlock = new Block([]);
   const afterLoopBlock = new Block([]);
+  const continueBlock = new Block(
+    [],
+    new BreakInstruction(testBlock.toBackward(), node),
+  );
 
   const childScope = scope.createScope();
   childScope.break = afterLoopBlock;
-  childScope.continue = testBlock;
+  childScope.continue = continueBlock;
 
   context.connectBlock(testBlock, node);
 
@@ -25,7 +29,7 @@ export const WhileStatement: THandler = (
 
   context.currentBlock = bodyBlock;
   c.handle(childScope, context, node.body);
-  context.setEndInstruction(new BreakInstruction(testBlock, node));
+  context.setEndInstruction(new BreakInstruction(continueBlock, node));
 
   context.currentBlock = afterLoopBlock;
   return nullId;
@@ -54,7 +58,7 @@ export const DoWhileStatement: THandler = (
   const test = c.handle(scope, context, node.test);
 
   context.setEndInstruction(
-    new BreakIfInstruction(test, bodyBlock, afterLoopBlock),
+    new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock),
   );
 
   context.currentBlock = afterLoopBlock;
