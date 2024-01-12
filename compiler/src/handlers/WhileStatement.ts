@@ -52,13 +52,13 @@ export const DoWhileStatement: THandler = (
   context.connectBlock(bodyBlock, node);
   c.handle(childScope, context, node.body);
 
-  context.setEndInstruction(new BreakInstruction(testBlock));
+  context.setEndInstruction(new BreakInstruction(testBlock, node));
 
   context.currentBlock = testBlock;
   const test = c.handle(scope, context, node.test);
 
   context.setEndInstruction(
-    new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock),
+    new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock, node),
   );
 
   context.currentBlock = afterLoopBlock;
