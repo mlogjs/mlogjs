@@ -109,7 +109,7 @@ class MarkerMacroSetter extends VoidValue {
   "="(scope: IScope, value: IValue): TValueInstructions {
     const inst: IInstruction[] = [];
     if (this.keys.length === 0) {
-      inst.push(new InstructionBase("setmarker", this.id, this.prop, value));
+      inst.push(new InstructionBase("setmarker", this.prop, this.id, value));
     } else {
       const members: IValue[] = [];
       for (const key of this.keys) {
@@ -117,7 +117,7 @@ class MarkerMacroSetter extends VoidValue {
         members.push(member);
       }
       inst.push(
-        new InstructionBase("setmarker", this.id, this.prop, ...members),
+        new InstructionBase("setmarker", this.prop, this.id, ...members),
       );
     }
 
