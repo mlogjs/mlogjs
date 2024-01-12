@@ -228,7 +228,7 @@ export class Graph {
         case "return":
           throw new CompilerError("Not implemented");
         default:
-          if (block === this.end && block.parents.length <= 1) break;
+          // if (block === this.end && block.parents.length <= 1) break;
           instructions.push(new InstructionBase("end"));
           instructions[instructions.length - 1].source = endInstruction?.source;
       }
