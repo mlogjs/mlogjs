@@ -255,7 +255,11 @@ export class Graph {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
       const { alternate, consequent } = endInstruction;
-      if (alternate.block.instructions.length > 0) return;
+      if (
+        consequent.type === "backward" ||
+        alternate.block.instructions.length > 0
+      )
+        return;
       const conditionInst = block.conditionInstruction();
 
       if (!conditionInst?.isInvertible()) return;
