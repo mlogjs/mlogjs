@@ -2,7 +2,7 @@ import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
 import { IInstruction, es } from "../types";
-import { Block } from "./block";
+import { Block, TEdge } from "./block";
 
 export class ConstBindInstruction {
   type = "const-bind" as const;
@@ -218,28 +218,38 @@ export class UnaryOperatorInstruction {
 export type TSourceLoc = es.SourceLocation | undefined | null;
 export class BreakInstruction {
   type = "break" as const;
+  target: TEdge;
   source?: es.SourceLocation;
-  constructor(
-    public target: Block,
-    node?: es.Node,
-  ) {
+  constructor(target: Block | TEdge, node?: es.Node) {
     this.source = node?.loc ?? undefined;
+    this.target =
+      target instanceof Block ? { type: "forward", block: target } : target;
   }
 }
 
 export class BreakIfInstruction {
   type = "break-if" as const;
   source?: es.SourceLocation;
+  consequent: TEdge;
+  alternate: TEdge;
 
   hasBackEdge = false;
 
   constructor(
     public condition: number,
-    public consequent: Block,
-    public alternate: Block,
+    consequent: Block | TEdge,
+    alternate: Block | TEdge,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
+    this.consequent =
+      consequent instanceof Block
+        ? { type: "forward", block: consequent }
+        : consequent;
+    this.alternate =
+      alternate instanceof Block
+        ? { type: "forward", block: alternate }
+        : alternate;
   }
 }
 

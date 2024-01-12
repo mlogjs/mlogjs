@@ -8,7 +8,7 @@ import {
 } from "../instructions";
 import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue } from "../values";
-import { Block } from "./block";
+import { Block, TEdge } from "./block";
 import { BreakInstruction } from "./instructions";
 
 // control flow graph internals for the compiler
@@ -61,28 +61,31 @@ export class Graph {
 
       const { consequent, alternate } = block.endInstruction;
 
-      if (consequent.parents.length === 1 && alternate.parents.length === 1) {
+      if (
+        consequent.block.parents.length === 1 &&
+        alternate.block.parents.length === 1
+      ) {
         queue.shift();
         continue;
       }
 
-      if (consequent.parents.length > 1) {
+      if (consequent.block.parents.length > 1) {
         const newBlock = new Block([], new BreakInstruction(consequent));
         newBlock.endInstruction!.source = block.endInstruction.source;
         newBlock.addParent(block);
-        consequent.removeParent(block);
-        consequent.addParent(newBlock);
-        block.endInstruction.consequent = newBlock;
+        consequent.block.removeParent(block);
+        consequent.block.addParent(newBlock);
+        block.endInstruction.consequent = newBlock.toForward();
       }
 
-      if (alternate.parents.length > 1) {
+      if (alternate.block.parents.length > 1) {
         const newBlock = new Block([], new BreakInstruction(alternate));
         newBlock.endInstruction!.source = block.endInstruction.source;
 
         newBlock.addParent(block);
-        alternate.removeParent(block);
-        alternate.addParent(newBlock);
-        block.endInstruction.alternate = newBlock;
+        alternate.block.removeParent(block);
+        alternate.block.addParent(newBlock);
+        block.endInstruction.alternate = newBlock.toForward();
       }
     }
   }
@@ -91,33 +94,33 @@ export class Graph {
     traverse(this.start, block => {
       while (block.endInstruction?.type === "break") {
         const { target } = block.endInstruction;
-        if (target.parents.length !== 1) break;
-        block.instructions.push(...target.instructions);
-        block.endInstruction = target.endInstruction;
-        target.children.forEach(child => {
-          child.removeParent(target);
+        if (target.block.parents.length !== 1) break;
+        block.instructions.push(...target.block.instructions);
+        block.endInstruction = target.block.endInstruction;
+        target.block.children.forEach(child => {
+          child.removeParent(target.block);
           child.addParent(block);
         });
-        if (target === this.end) this.end = block;
+        if (target.block === this.end) this.end = block;
       }
     });
   }
 
   skipBlocks() {
-    function tryToRedirect(block: Block, oldTarget: Block) {
+    function tryToRedirect(block: Block, oldTarget: TEdge) {
       let current = oldTarget;
 
       while (
-        current.endInstruction?.type === "break" &&
-        current.instructions.length === 0
+        current.block.endInstruction?.type === "break" &&
+        current.block.instructions.length === 0
       ) {
-        current = current.endInstruction.target;
+        current = current.block.endInstruction.target;
       }
 
       if (current === oldTarget) return;
       const newTarget = current;
-      newTarget.addParent(block);
-      oldTarget.removeParent(block);
+      newTarget.block.addParent(block);
+      oldTarget.block.removeParent(block);
       return newTarget;
     }
 
@@ -151,17 +154,21 @@ export class Graph {
       addresses.set(block, new LiteralValue(null));
     });
 
-    let pending: Block | undefined;
-
-    const flatten = (block: Block, force = false) => {
+    const flatten = (block: Block) => {
       if (visited.has(block)) return;
       const { parents } = block;
-      if (!force && !parents.every(parent => visited.has(parent))) {
-        pending ??= block;
+
+      if (
+        !parents
+          .filter(parent => {
+            const edge = parent.edges.find(edge => edge.block === block);
+            return edge?.type === "forward";
+          })
+          .every(parent => visited.has(parent))
+      ) {
         return;
       }
       visited.add(block);
-      if (pending === block) pending = undefined;
       instructions.push(new AddressResolver(addresses.get(block)!));
       // instructions.push(new InstructionBase("blockstart"));
       instructions.push(...block.toMlog(c));
@@ -170,7 +177,7 @@ export class Graph {
         case "break":
           instructions.push(
             new JumpInstruction(
-              addresses.get(endInstruction.target)!,
+              addresses.get(endInstruction.target.block)!,
               EJumpKind.Always,
             ),
           );
@@ -183,7 +190,7 @@ export class Graph {
           if (conditionInst) {
             instructions.push(
               new JumpInstruction(
-                addresses.get(consequent)!,
+                addresses.get(consequent.block)!,
                 conditionInst.operator as EJumpKind,
                 c.getValue(conditionInst.left),
                 c.getValue(conditionInst.right),
@@ -192,7 +199,7 @@ export class Graph {
           } else {
             instructions.push(
               new JumpInstruction(
-                addresses.get(consequent)!,
+                addresses.get(consequent.block)!,
                 EJumpKind.NotEqual,
                 condition,
                 new LiteralValue(0),
@@ -201,7 +208,10 @@ export class Graph {
           }
 
           instructions.push(
-            new JumpInstruction(addresses.get(alternate)!, EJumpKind.Always),
+            new JumpInstruction(
+              addresses.get(alternate.block)!,
+              EJumpKind.Always,
+            ),
           );
           instructions[instructions.length - 1].source = source;
           instructions[instructions.length - 2].source = source;
@@ -227,16 +237,16 @@ export class Graph {
       // and because of how break-if is implemented
       // having the alternate branch before the consequent branch
       // reduces the amount of instructions needed
-      for (let i = block.children.length - 1; i >= 0; i--) {
+      for (let i = block.edges.length - 1; i >= 0; i--) {
+        const edge = block.edges[i];
+        if (edge.type === "backward") continue;
         // for (let i = 0; i < block.children.length; i++) {
-        const child = block.children[i];
-        flatten(child);
+        flatten(edge.block);
       }
     };
 
     flatten(this.start);
 
-    while (pending) flatten(pending, true);
     return instructions;
   }
 
@@ -245,7 +255,7 @@ export class Graph {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
       const { alternate, consequent } = endInstruction;
-      if (alternate.instructions.length > 0) return;
+      if (alternate.block.instructions.length > 0) return;
       const conditionInst = block.conditionInstruction();
 
       if (!conditionInst?.isInvertible()) return;
@@ -270,12 +280,12 @@ export class Graph {
 }
 
 function traverse(block: Block, action: (block: Block) => void) {
-  const visited = new Set<Block>();
   function _traverse(block: Block) {
-    if (visited.has(block)) return;
-    visited.add(block);
     action(block);
-    block.children.forEach(_traverse);
+    for (const edge of block.edges) {
+      if (edge.type === "backward") continue;
+      _traverse(edge.block);
+    }
   }
 
   _traverse(block);

@@ -43,7 +43,7 @@ export const ForStatement: THandler = (
     c.handle(scope, context, node.update);
   }
 
-  context.setEndInstruction(new BreakInstruction(testBlock, node));
+  context.setEndInstruction(new BreakInstruction(testBlock.toBackward(), node));
 
   context.currentBlock = afterLoopBlock;
 
