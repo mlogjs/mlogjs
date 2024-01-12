@@ -54,8 +54,6 @@ const mathOperations: Record<
   rand: null,
 };
 
-const orderIndependentOperations = ["max", "min", "len"];
-
 function createMacroMathOperations() {
   const macroMathOperations: IObjectValueData = {
     PI: new LiteralValue(mathConstants.PI),
@@ -221,7 +219,6 @@ function createMacroMathOperations() {
       if (fn) {
         assertArgumentCount(argumentCount, fn.length);
       }
-      const cacheKey = getCacheKey(key);
       if (b) {
         if (fn && a instanceof LiteralValue && b instanceof LiteralValue) {
           if (!a.isNumber() || !b.isNumber())
@@ -231,17 +228,7 @@ function createMacroMathOperations() {
           return [new LiteralValue(fn(a.num, b.num)), []];
         }
 
-        const cachedResult = scope.getCachedOperation(cacheKey, a, b);
-        if (cachedResult) return [cachedResult, []];
-
-        // max, min and len do not change if the arguments change in order
-        if (orderIndependentOperations.includes(key)) {
-          const cachedResult = scope.getCachedOperation(cacheKey, b, a);
-          if (cachedResult) return [cachedResult, []];
-        }
-
         const temp = StoreValue.from(scope, out);
-        scope.addCachedOperation(cacheKey, temp, a, b);
         return [temp, [new OperationInstruction(key, temp, a, b)]];
       }
       if (fn && a instanceof LiteralValue) {
@@ -252,23 +239,13 @@ function createMacroMathOperations() {
 
         return [new LiteralValue(fn(a.num)), []];
       }
-      const cachedResult = scope.getCachedOperation(cacheKey, a);
-      if (cachedResult) return [cachedResult, []];
 
       const temp = StoreValue.from(scope, out);
-
-      // ensures that operations like `rand` are not cached
-      if (mathOperations[key]) scope.addCachedOperation(cacheKey, temp, a);
 
       return [temp, [new OperationInstruction(key, temp, a, null)]];
     });
   }
   return macroMathOperations;
-}
-
-function getCacheKey(key: string) {
-  if (key === "pow") return "**";
-  return key;
 }
 
 function assertArgumentCount(current: number, expected: number) {

@@ -1,7 +1,8 @@
 export * as es from "@babel/types";
 import * as es from "@babel/types";
-import { Compiler } from "./Compiler";
-import { AddressResolver } from "./instructions";
+import { Block } from "./flow";
+import { ICompilerContext } from "./CompilerContext";
+import { HandlerContext } from "./HandlerContext";
 
 export enum EInstIntent {
   none,
@@ -44,15 +45,15 @@ export interface IInstruction {
  */
 export type TEOutput = IValue | string;
 
-export type THandler<T extends IValue | null = IValue> = (
-  compiler: Compiler,
+export type THandler = (
+  compilerContext: ICompilerContext,
   scope: IScope,
+  handlerContext: HandlerContext,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   node: any,
-  out: TEOutput | undefined,
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   arg: any,
-) => TValueInstructions<T>;
+) => number;
 
 /**
  * The scope manages the source code generated variables and their owners, as
@@ -62,7 +63,7 @@ export interface IScope {
   /** Every scope except the top level one has a parent */
   parent: IScope | null;
   /** The registry of variables contained by this scope */
-  data: Record<string, IValue | null>;
+  data: Record<string, number>;
   name: string;
   /**
    * Additional instructions required by this scope, such as the instructions
@@ -72,9 +73,9 @@ export interface IScope {
   /** The label applied to this scope */
   label?: string;
   /** Where to jump to on a break statement */
-  break: AddressResolver;
+  break: Block;
   /** Where to jump to on a continue statement */
-  continue: AddressResolver;
+  continue: Block;
   /**
    * The function linked to `this`, is `null` when the scope is not inside a
    * function.
@@ -83,14 +84,6 @@ export interface IScope {
   /** Counts the number of temp variables generated during compilaton */
   ntemp: number;
 
-  /**
-   * A record of the cached value operations, maps the id of an operation to a
-   * previously computed value.
-   */
-  operationCache: Record<string, IValue>;
-
-  /** Tracks the dependency relation beteween values and cached operations */
-  cacheDependencies: Record<string, string[]>;
   /**
    * Tells array macros whether to check index access performed. This field is
    * mutable.
@@ -124,7 +117,7 @@ export interface IScope {
   /** Checks if there is an owner registered with the specified identifier */
   has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(identifier: string): INamedValue;
+  get(identifier: string): number;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, throws an error if there already is an owner with the same
@@ -133,7 +126,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  set<T extends IValue>(name: string, value: T): T;
+  set(name: string, id: number): void;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, overriding any preexisting variables with the same identifier.
@@ -141,14 +134,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  hardSet<T extends IValue>(name: string, value: T): T;
-  /**
-   * Creates an owned store and registers it to this scope.
-   *
-   * @param identifier The name of the variable that will hold the store
-   * @param name The mlog name that the owner will have
-   */
-  make(identifier: string, name: string): IValue;
+  hardSet(name: string, value: number): void;
   /**
    * Creates a shallow copy of this scope.
    *
@@ -157,30 +143,6 @@ export interface IScope {
    * data also follow this rule.
    */
   copy(): IScope;
-  /** Creates a temporary mlog variable name */
-  makeTempName(): string;
-
-  /** Adds the result of an operation to the local cache */
-  addCachedOperation(
-    op: string,
-    result: IValue,
-    left: IValue,
-    right?: IValue,
-  ): void;
-
-  /** Attempts to get an operation cached in this or in a parent scope. */
-  getCachedOperation(
-    op: string,
-    left: IValue,
-    right?: IValue,
-  ): IValue | undefined;
-
-  /**
-   * Removes all cached operations dependent on the given value.
-   *
-   * Affects this scope and all of its parents.
-   */
-  clearDependentCache(value: IValue): void;
 }
 
 // we can't use type maps to define actual methods
@@ -277,9 +239,6 @@ export enum EMutability {
 
 export interface IValue extends IValueOperators {
   // main properties
-
-  /** The name is used by values that exist on some form in the runtime */
-  name?: string;
   mutability: EMutability;
   macro: boolean;
   /**
@@ -349,3 +308,5 @@ export type TValueInstructions<Content extends IValue | null = IValue> = [
   Content,
   IInstruction[],
 ];
+
+export type TBlockInstructions = [number, Block[]];

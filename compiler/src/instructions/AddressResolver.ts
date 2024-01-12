@@ -1,5 +1,5 @@
 import { InstructionBase } from ".";
-import { IScope, TLineRef } from "../types";
+import { TLineRef } from "../types";
 
 export class AddressResolver extends InstructionBase {
   public get hidden() {
@@ -16,13 +16,5 @@ export class AddressResolver extends InstructionBase {
   }
   bind(bond: TLineRef) {
     this.bonds.push(bond);
-  }
-  bindBreak(scope: IScope) {
-    scope.break = this;
-    return this;
-  }
-  bindContinue(scope: IScope) {
-    scope.continue = this;
-    return this;
   }
 }

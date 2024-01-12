@@ -1,15 +1,22 @@
+import { Block } from "../flow";
 import { AddressResolver, JumpInstruction } from "../instructions";
-import { es, IInstruction, IValue, TValueInstructions } from "../types";
+import {
+  es,
+  IInstruction,
+  IValue,
+  TBlockInstructions,
+  TValueInstructions,
+} from "../types";
 
-export function appendSourceLocations<T extends IValue | null>(
-  valueInst: TValueInstructions<T>,
+export function appendSourceLocations(
+  insts: IInstruction[],
   node: es.Node,
-): TValueInstructions<T> {
-  for (const inst of valueInst[1]) {
+): IInstruction[] {
+  for (const inst of insts) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     inst.source ??= node.loc!;
   }
-  return valueInst;
+  return insts;
 }
 
 export function withAlwaysRuns<T extends IValue | null>(
@@ -58,6 +65,11 @@ export function pipeInsts<T extends IValue | null>(
   inst: IInstruction[],
 ): T {
   inst.push(...value[1]);
+  return value[0];
+}
+
+export function pipeBlocks(value: TBlockInstructions, blocks: Block[]) {
+  blocks.push(...value[1]);
   return value[0];
 }
 

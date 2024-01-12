@@ -1,6 +1,5 @@
-import { Scope } from "../Scope";
 import { es, THandler } from "../types";
 
-export const Program: THandler<null> = (c, scope, node: es.Program) => {
-  return c.handleMany(scope ?? new Scope({}), node.body);
+export const Program: THandler = (c, scope, context, node: es.Program) => {
+  return c.handleMany(scope, context, node.body);
 };

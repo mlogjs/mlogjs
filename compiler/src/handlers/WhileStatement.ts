@@ -1,114 +1,66 @@
-import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
+import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
 import { es, THandler } from "../types";
-import { usesAddressResolver, withAlwaysRuns } from "../utils";
-import { LiteralValue } from "../values";
-import { JumpOutValue } from "../values/JumpOutValue";
+import { nullId } from "../utils";
 
-export const WhileStatement: THandler<null> = (
+export const WhileStatement: THandler = (
   c,
   scope,
+  context,
   node: es.WhileStatement,
 ) => {
-  const startLoopAddr = new LiteralValue(null);
-  const endLoopAddr = new LiteralValue(null);
-
-  const hasEmptyBody = isEmptyBody(node.body);
-  const testOut = hasEmptyBody
-    ? new JumpOutValue(node, startLoopAddr, true)
-    : new JumpOutValue(node, endLoopAddr, false);
-
-  const [test, testLines] = c.handleEval(scope, node.test, testOut);
+  const testBlock = new Block([]);
+  const bodyBlock = new Block([]);
+  const afterLoopBlock = new Block([]);
+  const continueBlock = new Block(
+    [],
+    new BreakInstruction(testBlock.toBackward(), node),
+  );
 
   const childScope = scope.createScope();
-  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
-    childScope,
+  childScope.break = afterLoopBlock;
+  childScope.continue = continueBlock;
+
+  context.connectBlock(testBlock, node);
+
+  const test = c.handle(scope, context, node.test);
+  context.setEndInstruction(
+    new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
   );
-  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
-  if (scope.label) {
-    startLoopLine.bindContinue(scope);
-  }
+  context.currentBlock = bodyBlock;
+  c.handle(childScope, context, node.body);
+  context.setEndInstruction(new BreakInstruction(continueBlock, node));
 
-  if (test instanceof LiteralValue) {
-    if (!test.data) return [null, []];
-
-    const bodyInst = c.handle(childScope, node.body)[1];
-    return [
-      null,
-      [
-        startLoopLine,
-        ...bodyInst,
-        new JumpInstruction(startLoopAddr, EJumpKind.Always),
-        ...(usesAddressResolver(endLoopLine, bodyInst) ? [endLoopLine] : []),
-      ],
-    ];
-  }
-
-  return [
-    null,
-    [
-      startLoopLine,
-      ...testLines,
-      ...JumpInstruction.or(test, testOut),
-      ...withAlwaysRuns(c.handle(childScope, node.body), false)[1],
-      ...(hasEmptyBody
-        ? []
-        : [new JumpInstruction(startLoopAddr, EJumpKind.Always), endLoopLine]),
-    ],
-  ];
+  context.currentBlock = afterLoopBlock;
+  return nullId;
 };
 
-export const DoWhileStatement: THandler<null> = (
+export const DoWhileStatement: THandler = (
   c,
   scope,
+  context,
   node: es.DoWhileStatement,
 ) => {
-  const startLoopAddr = new LiteralValue(null);
-  const endLoopAddr = new LiteralValue(null);
-  const testOut = new JumpOutValue(node, startLoopAddr, true);
-
-  const [test, testLines] = c.handleEval(scope, node.test, testOut);
+  const testBlock = new Block([]);
+  const bodyBlock = new Block([]);
+  const afterLoopBlock = new Block([]);
 
   const childScope = scope.createScope();
-  const startLoopLine = new AddressResolver(startLoopAddr).bindContinue(
-    childScope,
+  childScope.break = afterLoopBlock;
+  childScope.continue = testBlock;
+
+  context.connectBlock(bodyBlock, node);
+  c.handle(childScope, context, node.body);
+
+  context.setEndInstruction(new BreakInstruction(testBlock, node));
+
+  context.currentBlock = testBlock;
+  const test = c.handle(scope, context, node.test);
+
+  context.setEndInstruction(
+    new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock, node),
   );
-  const endLoopLine = new AddressResolver(endLoopAddr).bindBreak(childScope);
 
-  if (scope.label) {
-    startLoopLine.bindContinue(scope);
-  }
-
-  const [, bodyLines] = c.handle(childScope, node.body);
-
-  if (test instanceof LiteralValue) {
-    if (!test.data) return [null, bodyLines];
-    return [
-      null,
-      [
-        startLoopLine,
-        ...bodyLines,
-        new JumpInstruction(startLoopAddr, EJumpKind.Always),
-        ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
-      ],
-    ];
-  }
-
-  return [
-    null,
-    [
-      startLoopLine,
-      ...bodyLines,
-      ...testLines,
-      ...JumpInstruction.or(test, testOut),
-      ...(usesAddressResolver(endLoopLine, bodyLines) ? [endLoopLine] : []),
-    ],
-  ];
+  context.currentBlock = afterLoopBlock;
+  return nullId;
 };
-
-function isEmptyBody(node: es.Statement) {
-  if (node.type === "EmptyStatement") return true;
-  if (node.type === "BlockStatement") return node.body.length === 0;
-
-  return false;
-}

@@ -16,49 +16,66 @@ import {
   EMutability,
   IInstruction,
 } from "../types";
-import { nodeName, pipeInsts } from "../utils";
+import { nodeName, nullId, pipeInsts } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { Compiler } from "../Compiler";
+import { ICompilerContext } from "../CompilerContext";
+import { HandlerContext } from "../HandlerContext";
+import { AssignmentInstruction, ConstBindInstruction } from "../flow";
 
-export const VariableDeclaration: THandler<null> = (
+export const VariableDeclaration: THandler = (
   c,
   scope,
+  context,
   node: es.VariableDeclaration,
 ) => {
-  return c.handleMany(scope, node.declarations, child =>
-    VariableDeclarator(c, scope, child, undefined, node.kind),
+  return c.handleMany(scope, context, node.declarations, child =>
+    VariableDeclarator(c, scope, context, child, node.kind),
   );
 };
 
-export const VariableDeclarator: THandler<null> = (
+export const VariableDeclarator: THandler = (
   c,
   scope,
+  context,
   node: es.VariableDeclarator,
-  out,
   kind: "let" | "var" | "const" = "let",
 ) => {
-  const { init } = node;
+  const { id, init } = node;
+  if (id.type !== "Identifier")
+    throw new CompilerError(
+      "Only identifiers are supported for variable declarations",
+      id,
+    );
 
-  const [value, inst] = Declare(c, scope, node.id, kind);
+  const name = nodeName(id, !c.compactNames && id.name);
+  const valueId = c.generateId();
+
+  scope.set(id.name, valueId);
+  c.setValue(valueId, new StoreValue(name));
+  c.setValueName(valueId, name);
 
   if (init) {
-    const [result, resultInst] = c.handleEval(scope, init, value.out);
-    pipeInsts(value.handler(result, resultInst), inst);
-  } else {
-    pipeInsts(value.handler(null, []), inst);
+    const value = c.handle(scope, context, init);
+    if (kind === "const") {
+      context.addInstruction(new ConstBindInstruction(valueId, value, node));
+    } else {
+      context.addInstruction(new AssignmentInstruction(valueId, value, node));
+    }
   }
 
-  return [null, inst];
+  return nullId;
 };
 
 type TDeclareHandler<T extends es.Node> = (
-  c: Compiler,
+  c: ICompilerContext,
   scope: IScope,
+  context: HandlerContext,
   node: T,
   kind: "let" | "const" | "var",
-) => TValueInstructions<DeclarationValue>;
+) => number;
 
-const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
+const Declare: TDeclareHandler<es.LVal> = (c, scope, context, node, kind) => {
   return c.handle(scope, node, () => {
     switch (node.type) {
       case "Identifier":
@@ -80,6 +97,7 @@ const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
   scope,
+  context,
   node,
   kind,
 ) => {
