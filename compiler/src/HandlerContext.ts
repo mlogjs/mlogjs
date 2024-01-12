@@ -25,11 +25,7 @@ export class HandlerContext {
 
   connectBlock(block: Block, node: es.Node) {
     if (block === this.currentBlock) return;
-    if (this.currentBlock.endInstruction)
-      throw new CompilerError(
-        "The current block already has an end instruction",
-      );
-    this.currentBlock.endInstruction = new BreakInstruction(block, node);
+    this.setEndInstruction(new BreakInstruction(block, node));
     this.currentBlock = block;
   }
 
