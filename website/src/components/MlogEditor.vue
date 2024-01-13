@@ -26,6 +26,7 @@ import MonacoEditor, {
   useMonacoTheme,
 } from "@jeanjpnm/monaco-vue";
 import "@jeanjpnm/monaco-vue/style.css";
+import { useMlogWatcherSocket } from "../composables/useMlogWatcherSocket";
 const { isDark } = useData();
 
 const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
@@ -76,6 +77,8 @@ useSourceMapping({
   monacoRef,
 });
 
+const sendToMlogWatcher = useMlogWatcherSocket(settings, compiledRef);
+
 const language = computed(() => {
   const file = currentFile.value;
   if (file?.name.endsWith(".js")) return "javascript";
@@ -94,6 +97,23 @@ watchEffect(onCleanup => {
 
   const disposable = addWorldModuleSnippet(monaco);
   onCleanup(() => disposable.dispose());
+});
+
+watchEffect(onCleanup => {
+  // global event handler to
+  // allow the user to press ctrl+s
+  // without needing to focus the editor
+  function handler(e: KeyboardEvent) {
+    if (!e.ctrlKey || e.key !== "s") return;
+    e.preventDefault();
+    sendToMlogWatcher();
+  }
+
+  window.addEventListener("keydown", handler);
+
+  onCleanup(() => {
+    window.removeEventListener("keydown", handler);
+  });
 });
 
 function onReady(editor: monaco.editor.IStandaloneCodeEditor) {

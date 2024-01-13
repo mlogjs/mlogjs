@@ -16,6 +16,11 @@ export interface EditorSettings {
   editor: {
     confirmFileDeletion: boolean;
   };
+  mlogWatcher: {
+    enabled: boolean;
+    autoSend: boolean;
+    serverPort: number;
+  };
 }
 
 export type EditorSettingsRef = Ref<EditorSettings>;
@@ -39,9 +44,11 @@ function getSettings(): EditorSettings {
     // ensures that default settings added in the future
     // can be introduced without removing the
     // already saved settings
-    Object.assign(defaultSettings.editor, data.editor);
-    Object.assign(defaultSettings.mlogjs, data.mlogjs);
-    Object.assign(defaultSettings.typescript, data.typescript);
+
+    for (const key in defaultSettings) {
+      const k = key as keyof EditorSettings;
+      Object.assign(defaultSettings[k], data[k]);
+    }
   }
 
   // default settings
@@ -62,6 +69,11 @@ function getDefaultSettings(): EditorSettings {
       noImplicitAny: false,
       strict: false,
       strictNullChecks: false,
+    },
+    mlogWatcher: {
+      enabled: false,
+      autoSend: false,
+      serverPort: 9992,
     },
   };
 }

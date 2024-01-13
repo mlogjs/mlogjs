@@ -336,6 +336,12 @@ export interface IBindableValue<T extends TLiteral | null = TLiteral>
 }
 export type TLineRef = IBindableValue<number | null>;
 
+export enum EInlineType {
+  auto,
+  always,
+  never,
+}
+
 export interface IFunctionValue extends IValue {
   return(
     scope: IScope,

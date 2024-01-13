@@ -160,6 +160,31 @@ Behavior:
   }
   ```
 
+- Functions can be always/never inlined based on their `inline` directive:
+
+  ```js
+  // works with mixed types
+  print(distance({ x: Math.rand(Vars.mapw), y: 0 }, Vars.this));
+
+  print(distance(Vars.unit, Vars.this));
+
+  function distance(a, b) {
+    "inline";
+    return Math.len(a.x - b.x, a.y - b.y);
+  }
+  ```
+
+  ::: info
+  `inline` is used to tell the compiler that the function's body must be reevaluated on each call.
+  This drops many of the restrictions of regular function calls, allowing the use of higher order functions and more complicated objects as parameters.
+
+  `inline never` can be used to tell the compiler that a function must never be inlined
+  :::
+
+  ::: warning
+  Writing to the function parameters can cause undefined behavior when inlining.
+  :::
+
 Limitations:
 
 - Functions can only be bound to constants

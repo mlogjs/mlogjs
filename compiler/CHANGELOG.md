@@ -9,6 +9,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added a directive to control a function's inlining behavior
+- Added a watch mode to the CLI via the `--watch` flag.
 - Added custom implementations for more math functions:
   - `Math.sign`
   - `Math.round`

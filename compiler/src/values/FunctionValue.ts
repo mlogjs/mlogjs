@@ -15,6 +15,7 @@ import {
   SetCounterInstruction,
 } from "../instructions";
 import {
+  EInlineType,
   EInstIntent,
   EMutability,
   es,
@@ -49,6 +50,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   macro = true;
 
   scope: IScope;
+  inlineType: EInlineType;
   private childScope!: IScope;
   private params: FunctionParam[];
   private paramValues: TParamValue[] = [];
@@ -64,7 +66,6 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
   private addr!: LiteralValue<number | null>;
   private temp!: StoreValue;
   private ret!: StoreValue;
-  private inline!: boolean;
   private tryingInline!: boolean;
   private body: es.BlockStatement;
   private c: Compiler;
@@ -80,12 +81,14 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     body,
     c,
     out,
+    inlineType,
   }: {
     scope: IScope;
     body: es.BlockStatement;
     c: Compiler;
-    params: es.Identifier[];
+    params: FunctionParam[];
     out?: TEOutput;
+    inlineType: EInlineType;
   }) {
     super();
     this.scope = scope;
@@ -93,6 +96,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.c = c;
     this.params = params;
     this.name = extractOutName(out) ?? scope.makeTempName();
+    this.inlineType = inlineType;
   }
 
   private initScope() {
@@ -119,6 +123,8 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     this.addr = new LiteralValue(null);
     this.temp = new StoreValue(`${internalPrefix}f${this.name}`);
     this.ret = new StoreValue(`${internalPrefix}r${this.name}`);
+
+    if (this.inlineType === EInlineType.always) return;
     this.inst = [
       new AddressResolver(this.addr),
       ...this.c.handle(this.childScope, this.body)[1],
@@ -257,21 +263,27 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
         `Cannot call: expected ${min} arguments but got: ${args.length}`,
       );
     }
+
     validateParameters(args, this.paramValues);
-    const inlineCall = this.inlineCall(scope, args, out);
-    hideRedundantJumps(inlineCall[1]);
-    const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
-    if (this.inline || inlineSize <= this.callSize) return inlineCall;
+    if (this.inlineType !== EInlineType.never) {
+      const inlineCall = this.inlineCall(scope, args, out);
+      hideRedundantJumps(inlineCall[1]);
+
+      if (this.inlineType === EInlineType.always) return inlineCall;
+
+      const inlineSize = inlineCall[1].filter(i => !i.hidden).length;
+      if (inlineSize <= this.callSize) return inlineCall;
+    }
     return this.normalCall(scope, args, out);
   }
 
   return(scope: IScope, arg: IValue | null): TValueInstructions<IValue | null> {
     this.ensureInit();
     if (arg && arg.macro) {
-      this.inline = true;
+      this.inlineType = EInlineType.always;
       return [null, []];
     }
-    if (this.inline || this.tryingInline) return this.inlineReturn(scope, arg);
+    if (this.tryingInline) return this.inlineReturn(scope, arg);
     return this.normalReturn(scope, arg);
   }
 
@@ -281,7 +293,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
 
   preCall(): readonly IValue[] | undefined {
     this.ensureInit();
-    if (this.inline || this.tryingInline) return;
+    if (this.inlineType === EInlineType.always || this.tryingInline) return;
     return this.paramOuts;
   }
 
@@ -312,7 +324,7 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
           left,
         );
         const right = new LazyValue(scope => {
-          if (this.inline || this.tryingInline) {
+          if (this.tryingInline) {
             return this.c.handleEval(scope, param.right, left);
           }
           return [rightValue, [...rightInst]];
