@@ -9,7 +9,7 @@ import {
 import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
-import { BreakInstruction } from "./instructions";
+import { BinaryOperationInstruction, BreakInstruction } from "./instructions";
 
 // control flow graph internals for the compiler
 export class Graph {
@@ -250,7 +250,7 @@ export class Graph {
     return instructions;
   }
 
-  canonicalizeBreakIfs() {
+  canonicalizeBreakIfs(c: ICompilerContext) {
     traverse(this.start, block => {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
@@ -262,9 +262,23 @@ export class Graph {
         return;
       const conditionInst = block.conditionInstruction();
 
-      if (!conditionInst?.isInvertible()) return;
-
-      conditionInst.invert();
+      // TODO: just add a the "equals 0" instruction
+      // and let the optimizer merge it with other operations
+      if (conditionInst) {
+        if (!conditionInst.isInvertible()) return;
+        conditionInst.invert();
+      } else {
+        const newCondition = c.generateId();
+        block.instructions.push(
+          new BinaryOperationInstruction(
+            "equal",
+            endInstruction.condition,
+            c.registerValue(new LiteralValue(0)),
+            newCondition,
+          ),
+        );
+        endInstruction.condition = newCondition;
+      }
       endInstruction.alternate = consequent;
       endInstruction.consequent = alternate;
     });
@@ -273,7 +287,7 @@ export class Graph {
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
-    this.canonicalizeBreakIfs();
+    this.canonicalizeBreakIfs(c);
     this.removeCriticalEdges();
     this.skipBlocks();
 
