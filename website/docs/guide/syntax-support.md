@@ -181,6 +181,10 @@ Behavior:
   `inline never` can be used to tell the compiler that a function must never be inlined
   :::
 
+  ::: warning
+  Writing to the function parameters can cause undefined behavior when inlining.
+  :::
+
 Limitations:
 
 - Functions can only be bound to constants
