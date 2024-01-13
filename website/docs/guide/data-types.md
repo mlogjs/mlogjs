@@ -45,6 +45,7 @@ output:
 ## Function
 
 Function values are constants.
+Functions [can be inlined](./syntax-support.md#functions)
 
 ```js
 function add(a, b) {
