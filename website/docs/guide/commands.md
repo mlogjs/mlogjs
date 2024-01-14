@@ -960,6 +960,9 @@ Contains the variants of the `fetch` instruction.
 
   Gets the amount of units existing on a given team.
 
+  - `type` - The type of unit to count.
+    If `type` is not specified, returns the total amount of units
+
   ::: command-example
   :::
 
@@ -1007,6 +1010,9 @@ Contains the variants of the `fetch` instruction.
 - #### `fetch.buildCount`
 
   Gets the amount of buildings existing on a given team.
+
+  - `type` - The type of building to count
+    If `type` is not specified, returns the total amount of buildings.
 
   ::: command-example
   :::

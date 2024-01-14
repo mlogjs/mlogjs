@@ -590,6 +590,8 @@ export namespace fetch {
   /**
    * Gets the amount of units existing on a given team.
    *
+   * If `type` is not specified, returns the total amount of units
+   *
    * ```js
    * const count = fetch.unitCount(Teams.sharded);
    * for (let i = 0; i < count; i++) {
@@ -599,7 +601,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function unitCount(team: TeamIdentifier): number;
+  function unitCount(team: TeamIdentifier, type?: UnitSymbol): number;
   /**
    * Gets a player from a team.
    *
@@ -681,6 +683,8 @@ export namespace fetch {
   /**
    * Gets the amount of buildings existing on a given team.
    *
+   * If `type` is not specified, returns the total amount of buildings
+   *
    * ```js
    * const count = fetch.buildCount(Teams.sharded, Blocks.router);
    * for (let i = 0; i < count; i++) {
@@ -690,7 +694,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function buildCount(team: TeamIdentifier, block: BuildingSymbol): number;
+  function buildCount(team: TeamIdentifier, type?: BuildingSymbol): number;
 }
 
 /**
