@@ -156,16 +156,9 @@ export class Graph {
 
     const flatten = (block: Block) => {
       if (visited.has(block)) return;
-      const { parents } = block;
+      const { forwardParents } = block;
 
-      if (
-        !parents
-          .filter(parent => {
-            const edge = parent.edges.find(edge => edge.block === block);
-            return edge?.type === "forward";
-          })
-          .every(parent => visited.has(parent))
-      ) {
+      if (!forwardParents.every(parent => visited.has(parent))) {
         return;
       }
       visited.add(block);
@@ -237,8 +230,8 @@ export class Graph {
       // and because of how break-if is implemented
       // having the alternate branch before the consequent branch
       // reduces the amount of instructions needed
-      for (let i = block.edges.length - 1; i >= 0; i--) {
-        const edge = block.edges[i];
+      for (let i = block.childEdges.length - 1; i >= 0; i--) {
+        const edge = block.childEdges[i];
         if (edge.type === "backward") continue;
         // for (let i = 0; i < block.children.length; i++) {
         flatten(edge.block);
@@ -300,7 +293,7 @@ export class Graph {
 function traverse(block: Block, action: (block: Block) => void) {
   function _traverse(block: Block) {
     action(block);
-    for (const edge of block.edges) {
+    for (const edge of block.childEdges) {
       if (edge.type === "backward") continue;
       _traverse(edge.block);
     }
