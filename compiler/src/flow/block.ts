@@ -21,11 +21,19 @@ export class Block {
     public endInstruction?: TBlockEndInstruction,
   ) {}
 
-  get children(): Block[] {
-    return this.edges.map(edge => edge.block);
+  get forwardParents(): Block[] {
+    return this.parents.filter(parent =>
+      parent.childEdges.some(
+        edge => edge.block === this && edge.type === "forward",
+      ),
+    );
   }
 
-  get edges(): TEdge[] {
+  get children(): Block[] {
+    return this.childEdges.map(edge => edge.block);
+  }
+
+  get childEdges(): TEdge[] {
     if (!this.endInstruction) return [];
     switch (this.endInstruction.type) {
       case "break":
