@@ -284,15 +284,15 @@ declare global {
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
    *
+   *   If `target` is `undefined`, the contents of the print buffer will be
+   *   discarded.
+   *
    *   ```js
    *   const { message2 } = getBuildings();
    *   printFlush(message2);
    *
    *   printFlush(); // defaults to message1
    *   ```
-   *
-   *   If `target` is `undefined` the contents of the print buffer will be
-   *   discarded.
    */
   function printFlush(target: BasicBuilding | undefined): void;
   function printFlush(): void;

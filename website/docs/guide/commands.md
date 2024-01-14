@@ -137,6 +137,9 @@ and clears the buffer afterwards.
 
   Note that the default value only applies if you don't pass any parameter to this function.
 
+  If `target` is `undefined`, the contents of the print buffer will be
+  discarded.
+
 ::: command-example
 :::
 
