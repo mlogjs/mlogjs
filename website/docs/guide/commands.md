@@ -390,6 +390,16 @@ Controls the unit bound to the processor
   ::: command-example
   :::
 
+- #### `unitControl.autoPathfind`
+
+  Makes the unit bound to this processor automatically pathfind to the
+  nearest enemy core or drop point.
+
+  Is the same as standard wave enemy pathfinding.
+
+  ::: command-example
+  :::
+
 - #### `unitControl.boost`
 
   Whether the unit bound to this processor should be boosted (floating).

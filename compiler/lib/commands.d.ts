@@ -715,6 +715,16 @@ declare global {
      */
     function pathfind(x: number, y: number): void;
 
+    /**
+     * Makes the unit bound to this processor automatically pathfind to the
+     * nearest enemy core or drop point.
+     *
+     * Is the same as standard wave enemy pathfinding.
+     *
+     * ```js
+     * unitControl.autoPathfind();
+     * ```
+     */
     function autoPathfind(): void;
 
     /**
