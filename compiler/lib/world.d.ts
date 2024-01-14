@@ -448,7 +448,9 @@ export namespace setRule {
  */
 export namespace flushMessage {
   /**
-   * Shows a nofication at the top of the screen
+   * Shows a nofication at the top of the screen.
+   *
+   * Returns whether the operation was executed successfully.
    *
    * ```js
    * print("something");
@@ -459,6 +461,8 @@ export namespace flushMessage {
   /**
    * Puts the content on the top left corner of the screen
    *
+   * Returns whether the operation was executed successfully.
+   *
    * ```js
    * print("something");
    * flushMessage.mission();
@@ -467,6 +471,8 @@ export namespace flushMessage {
   function mission(): boolean;
   /**
    * Puts the content on the middle of the screen
+   *
+   * Returns whether the operation was executed successfully.
    *
    * @param duration The duration, in seconds
    *
@@ -478,6 +484,8 @@ export namespace flushMessage {
   function announce(duration: number): boolean;
   /**
    * Puts the content on the middle top of the screen
+   *
+   * Returns whether the operation was executed successfully.
    *
    * @param duration The duration, in seconds
    *

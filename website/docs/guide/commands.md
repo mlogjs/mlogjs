@@ -869,21 +869,27 @@ and clears the buffer afterwards.
 
 - #### `flushMessage.notify`
 
-  Shows a nofication at the top of the screen
+  Shows a nofication at the top of the screen.
+
+  Returns whether the operation was executed successfully.
 
   ::: command-example
   :::
 
 - #### `flushMessage.mission`
 
-  Puts the content on the top left corner of the screen
+  Puts the content on the top left corner of the screen.
+
+  Returns whether the operation was executed successfully.
 
   ::: command-example
   :::
 
 - #### `flushMessage.announce`
 
-  Puts the content on the middle of the screen
+  Puts the content on the middle of the screen.
+
+  Returns whether the operation was executed successfully.
 
   - `duration` - The duration, in seconds
 
@@ -892,7 +898,9 @@ and clears the buffer afterwards.
 
 - #### `flushMessage.toast`
 
-  Puts the content on the middle top of the screen
+  Puts the content on the middle top of the screen.
+
+  Returns whether the operation was executed successfully.
 
   - `duration` - The duration, in seconds
 
