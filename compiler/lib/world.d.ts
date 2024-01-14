@@ -855,4 +855,16 @@ interface MarkerConstructor {
 
 export var Marker: MarkerConstructor;
 
-export function localePrint(name: string): void;
+/**
+ * Add map locale property value to the print buffer.
+ *
+ * To set map locale bundles in map editor, check Map Info > Locale Bundles.
+ *
+ * If client is a mobile device, tries to print a property ending in ".mobile"
+ * first.
+ *
+ * ```js
+ * localePrint("map.locale.key");
+ * ```
+ */
+export function localePrint(key: string): void;

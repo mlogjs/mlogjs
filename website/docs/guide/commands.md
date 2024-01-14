@@ -996,3 +996,15 @@ Creates a writable record that allows you to set a property of a building or uni
 
 ::: command-example
 :::
+
+### `localePrint`
+
+Add map locale property value to the print buffer.
+
+To set map locale bundles in map editor, check Map Info > Locale Bundles.
+
+If client is a mobile device, tries to print a property ending in ".mobile"
+first.
+
+::: command-example
+:::
