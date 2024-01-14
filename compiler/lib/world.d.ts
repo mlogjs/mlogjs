@@ -334,7 +334,22 @@ export namespace setRule {
    */
   function solarMultiplier(multiplier: number): void;
 
+  /**
+   * Bans a block/unit type from the world.
+   *
+   * ```js
+   * setRule.ban(Blocks.router);
+   * ```
+   */
   function ban(content: BlockSymbol | UnitSymbol): void;
+
+  /**
+   * Removes the ban of a block/unit type in the world.
+   *
+   * ```js
+   * setRule.unban(Blocks.router);
+   * ```
+   */
   function unban(content: BlockSymbol | UnitSymbol): void;
 
   /**

@@ -779,6 +779,20 @@ Contains the multiple variants of the `setrule` instruction.
   ::: command-example
   :::
 
+- #### `setRule.ban`
+
+  Bans a block/unit type from the world.
+
+  ::: command-example
+  :::
+
+- #### `setRule.unban`
+
+  Removes the ban of a block/unit type in the world.
+
+  ::: command-example
+  :::
+
 - #### `setRule.buildSpeed`
 
   Sets the build speed multiplier of a team.
