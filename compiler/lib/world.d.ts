@@ -829,35 +829,46 @@ export namespace effect {
   function bubble(x: number, y: number): void;
 }
 
+/** Represents a maker, invoking the methods or */
 export interface Marker {
+  /** Deletes the marker, making its id available for reuse. */
   remove(): void;
   set visible(value: boolean);
-  toggleVisibility(): void;
-  set text(value: string | number);
-  flushText(): void;
-  set x(value: number);
-  set y(value: number);
+  /** Wether the marker should be on the minimap or in the world */
+  set minimap(value: boolean);
+  set autoscale(value: boolean);
   set pos(value: { x: number; y: number });
-  set endX(value: number);
-  set endY(value: number);
   set endPos(value: { x: number; y: number });
-  set fontSize(value: number);
-  set textHeight(value: number);
-  set labelBackground(value: boolean);
-  set labelOutline(value: boolean);
-  set labelFlags(value: { background: boolean; outline: boolean });
+  set drawLayer(value: number);
+  set color(value: number);
   set radius(value: number);
   set stroke(value: number);
   set rotation(value: number);
-  set shapeSides(value: number);
-  set shapeFill(value: boolean);
-  set shapeOutline(value: boolean);
   set shape(value: { sides: number; fill: boolean; outline: boolean });
-  set color(value: number);
+  /**
+   * Writes the contents of the print buffer to the marker's text. Empties the
+   * print buffer.
+   */
+  flushText(options: { fetch: boolean }): void;
+  set fontSize(value: number);
+  set textHeight(value: number);
+  set labelFlags(value: { background: boolean; outline: boolean });
+  set texture(value: string);
+  /** Writes the contents of the print buffer to the marker's texture. */
+  flushTexture(): void;
+  set textureSize(value: { width: number; height: number });
 }
 
 interface MarkerConstructor {
+  /**
+   * Creates a marker object with the given id.
+   *
+   * This function provides access to existing markers and does not generate a
+   * `makemaker` instruction.
+   */
   of(id: number): Marker;
+
+  /** Creates a new logic marker in the world. */
   shapeText(options: {
     id: number;
     x: number;
@@ -878,8 +889,15 @@ interface MarkerConstructor {
   }): Marker;
   line(options: { id: number; x: number; y: number; replace: boolean }): Marker;
   text(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+  texture(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
 }
 
+/** Contains methods to create marker objects. */
 export var Marker: MarkerConstructor;
 
 /**

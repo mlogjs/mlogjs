@@ -1,6 +1,6 @@
 import { InstructionBase } from "../instructions";
 import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
-import { pipeInsts } from "../utils";
+import { assertIsObjectMacro, assertObjectFields, pipeInsts } from "../utils";
 import { LiteralValue, ObjectValue, StoreValue, VoidValue } from "../values";
 import { MacroFunction } from "./Function";
 import { createOverloadNamespace } from "./util";
@@ -30,6 +30,10 @@ export class MarkerConstructor extends ObjectValue {
           named: "options",
           args: ["id", "x", "y", "replace"],
         },
+        texture: {
+          named: "options",
+          args: ["id", "x", "y", "replace"],
+        },
       },
 
       handler(scope, overload, out, ...args) {
@@ -50,7 +54,7 @@ export class MarkerConstructor extends ObjectValue {
         const marker = new MarkerMacro(id);
 
         if (overload !== "of") {
-          inst.push(new InstructionBase("makemarker", id, overload, ...rest));
+          inst.push(new InstructionBase("makemarker", overload, id, ...rest));
         }
         return [marker, inst];
       },
@@ -62,37 +66,38 @@ export class MarkerConstructor extends ObjectValue {
 class MarkerMacro extends ObjectValue {
   constructor(id: IValue) {
     super({
-      remove: new MarkerMacroMethod(id, "remove"),
-      visible: new MarkerMacroSetter(id, "setVisibility"),
-      toggleVisibility: new MarkerMacroMethod(id, "toggleVisibility"),
-      text: new MarkerMacroSetter(id, "text"),
-      flushText: new MarkerMacroMethod(id, "flushText"),
-      x: new MarkerMacroSetter(id, "x"),
-      y: new MarkerMacroSetter(id, "y"),
+      remove: new MacroFunction(() => [null, [setmarker(id, "remove")]]),
+      visible: new MarkerMacroSetter(id, "visibility"),
+      minimap: new MarkerMacroSetter(id, "minimap"),
+      autoscale: new MarkerMacroSetter(id, "autoscale"),
       pos: new MarkerMacroSetter(id, "pos", ["x", "y"]),
-      endX: new MarkerMacroSetter(id, "endX"),
-      endY: new MarkerMacroSetter(id, "endY"),
       endPos: new MarkerMacroSetter(id, "endPos", ["x", "y"]),
+      drawLayer: new MarkerMacroSetter(id, "drawLayer"),
+      color: new MarkerMacroSetter(id, "color"),
+      radius: new MarkerMacroSetter(id, "radius"),
+      stroke: new MarkerMacroSetter(id, "stroke"),
+      rotation: new MarkerMacroSetter(id, "rotation"),
+      shape: new MarkerMacroSetter(id, "shape", ["sides", "fill", "outline"]),
+      flushText: new MacroFunction((scope, out, options) => {
+        assertIsObjectMacro(options, "options");
+        const [fetch] = assertObjectFields(options, ["fetch"]);
+        return [null, [setmarker(id, "flushText", fetch)]];
+      }),
       fontSize: new MarkerMacroSetter(id, "fontSize"),
       textHeight: new MarkerMacroSetter(id, "textHeight"),
-      labelBackground: new MarkerMacroSetter(id, "labelBackground"),
-      labelOutline: new MarkerMacroSetter(id, "labelOutline"),
       labelFlags: new MarkerMacroSetter(id, "labelFlags", [
         "background",
         "outline",
       ]),
-      radius: new MarkerMacroSetter(id, "radius"),
-      stroke: new MarkerMacroSetter(id, "stroke"),
-      rotation: new MarkerMacroSetter(id, "rotation"),
-      shapeSides: new MarkerMacroSetter(id, "shapeSides"),
-      shapeFill: new MarkerMacroSetter(id, "shapeFill"),
-      shapeOutline: new MarkerMacroSetter(id, "shapeOutline"),
-      setShape: new MarkerMacroSetter(id, "setShape", [
-        "sides",
-        "fill",
-        "outline",
+      texture: new MarkerMacroSetter(id, "texture", [], args => ["0", ...args]),
+      flushTexture: new MacroFunction(() => [
+        null,
+        [setmarker(id, "texture", "1")],
       ]),
-      color: new MarkerMacroSetter(id, "color"),
+      textureSize: new MarkerMacroSetter(id, "textureSize", [
+        "width",
+        "height",
+      ]),
     });
   }
 }
@@ -102,36 +107,33 @@ class MarkerMacroSetter extends VoidValue {
     public id: IValue,
     public prop: string,
     public keys: string[] = [],
+    public modifyArgs?: (args: IValue[]) => (IValue | string)[],
   ) {
     super();
   }
 
   "="(scope: IScope, value: IValue): TValueInstructions {
     const inst: IInstruction[] = [];
+    let args = [];
     if (this.keys.length === 0) {
-      inst.push(new InstructionBase("setmarker", this.prop, this.id, value));
+      args.push(value);
     } else {
-      const members: IValue[] = [];
       for (const key of this.keys) {
         const member = pipeInsts(value.get(scope, new LiteralValue(key)), inst);
-        members.push(member);
+        args.push(member);
       }
-      inst.push(
-        new InstructionBase("setmarker", this.prop, this.id, ...members),
-      );
     }
+
+    if (this.modifyArgs) {
+      args = this.modifyArgs(args);
+    }
+
+    inst.push(setmarker(this.id, this.prop, ...args));
 
     return [value, inst];
   }
 }
 
-class MarkerMacroMethod extends MacroFunction<null> {
-  constructor(
-    public id: IValue,
-    public prop: string,
-  ) {
-    super(() => {
-      return [null, [new InstructionBase("setmarker", prop, id)]];
-    });
-  }
+function setmarker(id: IValue, prop: string, ...args: (IValue | string)[]) {
+  return new InstructionBase("setmarker", prop, id, ...args);
 }
