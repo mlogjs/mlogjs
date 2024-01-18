@@ -7,12 +7,13 @@ import {
 } from "./util";
 declare global {
   /**
-   * Appends the items to the print buffer, calling this function on its own
-   * will not print any contents to a message block.
+   * Appends the items to the global text buffer, calling this function on its
+   * own will not print any contents to a message block.
    *
-   * To print the contents of the print buffer and empty it call, `printFlush`.
+   * To print the contents of the global text buffer and empty it, call
+   * `printFlush`.
    *
-   * @param items The items to be added to the print buffer.
+   * @param items The items to be added to the global text buffer.
    *
    *   ```js
    *   const a = Math.floor(Math.rand(10));
@@ -263,7 +264,7 @@ declare global {
     }): void;
 
     /**
-     * Draws text from the print buffer, clearing it afterwards.
+     * Draws text from the global text buffer, clearing it afterwards.
      *
      * Only ASCII characters are supported.
      */
@@ -275,8 +276,8 @@ declare global {
   }
 
   /**
-   * Writes the contents of the print buffer into the target message and clears
-   * the buffer afterwards.
+   * Writes the contents of the global text buffer into the target message and
+   * clears the buffer afterwards.
    *
    * @param target The message building to write to. Writes to `message1` by
    *   default.
@@ -284,7 +285,7 @@ declare global {
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
    *
-   *   If `target` is `undefined`, the contents of the print buffer will be
+   *   If `target` is `undefined`, the contents of the global text buffer will be
    *   discarded.
    *
    *   ```js

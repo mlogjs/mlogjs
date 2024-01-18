@@ -434,8 +434,8 @@ export namespace setRule {
 }
 
 /**
- * Writes the contents of the print buffer in the selected mode and clears the
- * buffer afterwards.
+ * Writes the contents of the global text buffer in the selected mode and clears
+ * the buffer afterwards.
  *
  * ```js
  * print("Hello");
@@ -846,15 +846,15 @@ export interface Marker {
   set rotation(value: number);
   set shape(value: { sides: number; fill: boolean; outline: boolean });
   /**
-   * Writes the contents of the print buffer to the marker's text. Empties the
-   * print buffer.
+   * Writes the contents of the global text buffer to the marker's text. Empties
+   * the global text buffer.
    */
   flushText(options: { fetch: boolean }): void;
   set fontSize(value: number);
   set textHeight(value: number);
   set labelFlags(value: { background: boolean; outline: boolean });
   set texture(value: string);
-  /** Writes the contents of the print buffer to the marker's texture. */
+  /** Writes the contents of the global text buffer to the marker's texture. */
   flushTexture(): void;
   set textureSize(value: { width: number; height: number });
 }
@@ -901,7 +901,7 @@ interface MarkerConstructor {
 export var Marker: MarkerConstructor;
 
 /**
- * Add map locale property value to the print buffer.
+ * Add map locale property value to the global text buffer.
  *
  * To set map locale bundles in map editor, check Map Info > Locale Bundles.
  *
