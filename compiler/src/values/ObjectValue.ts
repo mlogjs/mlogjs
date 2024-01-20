@@ -1,3 +1,4 @@
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import {
   EMutability,
@@ -10,7 +11,7 @@ import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData {
-  [k: string]: IValue;
+  [k: string]: number;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -23,12 +24,13 @@ export class ObjectValue extends VoidValue {
   }
 
   static fromArray(
+    c: ICompilerContext,
     items: IObjectValueData[keyof IObjectValueData][],
     initialData?: IObjectValueData,
   ): ObjectValue {
     const data: IObjectValueData = {
       ...initialData,
-      length: new LiteralValue(items.length),
+      length: c.registerValue(new LiteralValue(items.length)),
     };
     items.forEach((item, i) => {
       if (item) data[i] = item;
@@ -42,8 +44,7 @@ export class ObjectValue extends VoidValue {
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
         const member = this.data[key.data];
-        if (out) return member.eval(scope, out);
-        return [member, []];
+        return member;
       }
     }
 

@@ -1,6 +1,13 @@
 import { CompilerError } from "./CompilerError";
 import * as handlers from "./handlers";
-import { es, IScope, THandler, IValue } from "./types";
+import {
+  es,
+  IScope,
+  THandler,
+  IValue,
+  EMutability,
+  TWriteCallback,
+} from "./types";
 import { CompilerOptions } from "./Compiler";
 import { HandlerContext } from "./HandlerContext";
 import { nullId } from "./utils";
@@ -37,6 +44,14 @@ export interface ICompilerContext {
     handler?: THandler,
     arg?: unknown,
   ): number;
+
+  handleWrite(
+    scope: IScope,
+    handlerContext: HandlerContext,
+    node: es.Node,
+    handler?: THandler,
+    arg?: unknown,
+  ): TWriteCallback;
 
   /**
    * Handles many nodes in order.
@@ -139,9 +154,36 @@ export class CompilerContext implements ICompilerContext {
     arg?: unknown,
   ): number {
     const value = this.handle(scope, handlerContext, node, handler, arg);
-    // const copy = this.generateId();
-    // handlerContext.addInstruction(new ConstBindInstruction(copy, value, node));
-    return value;
+    const copy = this.generateId();
+    handlerContext.addInstruction(new ConstBindInstruction(copy, value, node));
+    return copy;
+  }
+
+  handleWrite(
+    scope: IScope,
+    handlerContext: HandlerContext,
+    node: es.Node,
+    handler = this.handlers[node.type],
+    arg?: unknown,
+  ): TWriteCallback {
+    try {
+      if (!handler?.handleWrite)
+        throw new CompilerError("Missing handler for " + node.type);
+      const result = handler.handleWrite(
+        this,
+        scope,
+        handlerContext,
+        node,
+        arg,
+      );
+      // if (this.sourcemap) return appendSourceLocations(result, node);
+      return result;
+    } catch (error) {
+      if (error instanceof CompilerError) {
+        error.loc ??= node.loc as es.SourceLocation;
+      }
+      throw error;
+    }
   }
 
   /**

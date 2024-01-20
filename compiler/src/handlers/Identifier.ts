@@ -1,3 +1,4 @@
+import { AssignmentInstruction } from "../flow";
 import { es, THandler } from "../types";
 
 export const Identifier: THandler = (
@@ -6,6 +7,14 @@ export const Identifier: THandler = (
   context,
   node: es.Identifier,
 ) => {
-  //   TODO: rewrite scope to use value ids
-  return scope.get(node.name) as any as number;
+  return scope.get(node.name);
+};
+
+Identifier.handleWrite = (c, scope, context, node: es.Identifier) => {
+  const variable = c.handle(scope, context, node);
+  return (value, callerNode) => {
+    context.addInstruction(
+      new AssignmentInstruction(variable, value, callerNode),
+    );
+  };
 };
