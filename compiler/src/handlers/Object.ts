@@ -1,24 +1,27 @@
 import { CompilerError } from "../CompilerError";
 import {
+  AssignmentInstruction,
+  BinaryOperationInstruction,
+  Block,
+  BreakIfInstruction,
+  BreakInstruction,
+  ValueGetInstruction,
+  ValueSetInstruction,
+} from "../flow";
+import {
   es,
-  IInstruction,
   IScope,
   IValue,
   TEOutput,
   THandler,
   TValueInstructions,
 } from "../types";
-import { extractDestrucuringOut, pipeInsts } from "../utils";
+import { nullId } from "../utils";
 import {
-  AssignmentValue,
   BaseValue,
-  DestructuringValue,
   IObjectValueData,
-  LazyValue,
   LiteralValue,
   ObjectValue,
-  StoreValue,
-  TDestructuringMembers,
 } from "../values";
 
 export const ObjectExpression: THandler = (
@@ -28,7 +31,6 @@ export const ObjectExpression: THandler = (
   node: es.ObjectExpression,
 ) => {
   const data: IObjectValueData = {};
-  const inst: IInstruction[] = [];
   for (const prop of node.properties) {
     if (prop.type === "SpreadElement")
       throw new CompilerError("Cannot handle spread element", prop);
@@ -40,16 +42,15 @@ export const ObjectExpression: THandler = (
     if (key.type === "Identifier") {
       index = key.name;
     } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
-      index = `${key.value}`;
+      index = String(key.value);
     } else {
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
 
-    const member = pipeInsts(c.handle(scope, value, memberOut), inst);
-
+    const member = c.handleCopy(scope, context, value);
     if (prop.type !== "ObjectMethod" || prop.kind === "method") {
       data[index] = member;
-    } else {
+    } /* else {
       if (!(data[index] instanceof ObjectGetSetEntry))
         data[index] = new ObjectGetSetEntry();
       const entry = data[index] as ObjectGetSetEntry;
@@ -60,165 +61,285 @@ export const ObjectExpression: THandler = (
         entry.setter = member;
       }
     }
+  } */
+    // return [new ObjectValue(data), inst];
   }
-  return [new ObjectValue(data), inst];
+  return c.registerValue(new ObjectValue(data));
 };
 
 export const ArrayExpression: THandler = (
   c,
   scope,
+  context,
   node: es.ArrayExpression,
-  out,
 ) => {
-  const items: IValue[] = [];
-  const inst: IInstruction[] = [];
-  node.elements.forEach((element, i) => {
+  const items: number[] = [];
+  node.elements.forEach(element => {
     if (!element) {
-      items.push(new LiteralValue(null));
+      items.push(nullId);
       return;
     }
-    const value = pipeInsts(
-      c.handle(scope, element, extractDestrucuringOut(out, i)),
-      inst,
-    );
+    const value = c.handleCopy(scope, context, element);
     items.push(value);
   });
-  return [ObjectValue.fromArray(items), inst];
+
+  return c.registerValue(ObjectValue.fromArray(c, items));
 };
 
 export const MemberExpression: THandler = (
   c,
   scope,
+  context,
   node: es.MemberExpression,
-  out,
-  optional = false,
+  optional: boolean = false,
 ) => {
-  const [prop, propInst] = node.computed
-    ? c.handle(scope, node.property)
-    : [new LiteralValue((node.property as es.Identifier).name), []];
+  const obj = c.handle(scope, context, node.object);
+  const prop = node.computed
+    ? c.handle(scope, context, node.property)
+    : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-  if (!out) {
-    const [obj, objInst] = c.handle(scope, node.object);
+  const temp = c.generateId();
 
-    if (optional && obj instanceof LiteralValue && obj.data === null)
-      return [obj, [...objInst, ...propInst]];
-
-    const [got, gotInst] = obj.get(scope, prop);
-    return [got, [...objInst, ...propInst, ...gotInst]];
-  }
-
-  const temp = StoreValue.out(scope, out);
-
-  const objOut = new DestructuringValue(
-    new Map([
-      [
-        prop,
-        {
-          value: temp,
-          // a direct assignment should NOT happen
-          handler: () => {
-            throw new CompilerError("Unexpected destructuring assignment");
-          },
-        },
-      ],
-    ]),
+  // TODO: handle optional chaining
+  context.addInstruction(
+    new ValueGetInstruction({
+      object: obj,
+      key: prop,
+      out: temp,
+      node,
+      optional,
+    }),
   );
 
-  const [obj, objInst] = c.handle(scope, node.object, objOut);
+  return temp;
 
-  if (optional && obj instanceof LiteralValue && obj.data === null)
-    return [obj, [...objInst, ...propInst]];
+  // if (!out) {
+  //   const [obj, objInst] = c.handle(scope, node.object);
 
-  const [got, gotInst] = obj.get(scope, prop, temp);
-  return [got, [...objInst, ...propInst, ...gotInst]];
+  //   if (optional && obj instanceof LiteralValue && obj.data === null)
+  //     return [obj, [...objInst, ...propInst]];
+
+  //   const [got, gotInst] = obj.get(scope, prop);
+  //   return [got, [...objInst, ...propInst, ...gotInst]];
+  // }
+
+  // const temp = StoreValue.out(scope, out);
+
+  // const objOut = new DestructuringValue(
+  //   new Map([
+  //     [
+  //       prop,
+  //       {
+  //         value: temp,
+  //         // a direct assignment should NOT happen
+  //         handler: () => {
+  //           throw new CompilerError("Unexpected destructuring assignment");
+  //         },
+  //       },
+  //     ],
+  //   ]),
+  // );
+
+  // const [obj, objInst] = c.handle(scope, node.object, objOut);
+
+  // if (optional && obj instanceof LiteralValue && obj.data === null)
+  //   return [obj, [...objInst, ...propInst]];
+
+  // const [got, gotInst] = obj.get(scope, prop, temp);
+  // return [got, [...objInst, ...propInst, ...gotInst]];
 };
 
-export const ArrayPattern: THandler = (c, scope, node: es.ArrayPattern) => {
-  const inst: IInstruction[] = [];
-  const members: TDestructuringMembers = new Map();
-  for (let i = 0; i < node.elements.length; i++) {
-    const element = node.elements[i];
-    if (!element) continue;
-    const value = pipeInsts(c.handleValue(scope, element), inst);
-    const hasDefault = value instanceof AssignmentValue;
+MemberExpression.handleWrite = (
+  c,
+  scope,
+  context,
+  node: es.MemberExpression,
+) => {
+  const obj = c.handle(scope, context, node.object);
+  const key = node.computed
+    ? c.handleCopy(scope, context, node.property)
+    : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-    members.set(new LiteralValue(i), {
-      value: value.toOut(),
-      handler(get, propExists, scope) {
-        return c.handle(scope, element, () => {
-          if (propExists() || !hasDefault) {
-            const inst = get();
-            // assigns the output to the target value
-            pipeInsts(value["="](scope, inst[0]), inst[1]);
-            return inst;
-          }
-          return value["="](scope, new LiteralValue(null));
-        });
-      },
-    });
-  }
-  return [new DestructuringValue(members), inst];
+  return value => {
+    context.addInstruction(new ValueSetInstruction(obj, key, value, node));
+  };
 };
 
-export const ObjectPattern: THandler = (c, scope, node: es.ObjectPattern) => {
-  const inst: IInstruction[] = [];
-  const members: TDestructuringMembers = new Map();
-  for (const prop of node.properties) {
-    if (prop.type === "RestElement")
-      throw new CompilerError("The rest operator is not supported");
+export const ArrayPattern: THandler = (
+  c,
+  scope,
+  context,
+  node: es.ArrayPattern,
+) => {
+  throw new CompilerError("node is not supposed to be evaluated in read mode");
+  // const inst: IInstruction[] = [];
+  // const members: TDestructuringMembers = new Map();
+  // for (let i = 0; i < node.elements.length; i++) {
+  //   const element = node.elements[i];
+  //   if (!element) continue;
+  //   const value = pipeInsts(c.handleValue(scope, element), inst);
+  //   const hasDefault = value instanceof AssignmentValue;
 
-    if (!prop) continue;
+  //   members.set(new LiteralValue(i), {
+  //     value: value.toOut(),
+  //     handler(get, propExists, scope) {
+  //       return c.handle(scope, element, () => {
+  //         if (propExists() || !hasDefault) {
+  //           const inst = get();
+  //           // assigns the output to the target value
+  //           pipeInsts(value["="](scope, inst[0]), inst[1]);
+  //           return inst;
+  //         }
+  //         return value["="](scope, new LiteralValue(null));
+  //       });
+  //     },
+  //   });
+  // }
+  // return [new DestructuringValue(members), inst];
+};
 
-    const propKey = prop.key;
-    const [key, keyInst] =
-      propKey.type === "Identifier" && !prop.computed
-        ? [new LiteralValue(propKey.name), []]
-        : c.handle(scope, propKey);
+ArrayPattern.handleWrite = (c, scope, context, node: es.ArrayPattern) => {
+  return (value, callerNode) => {
+    for (let i = 0; i < node.elements.length; i++) {
+      const element = node.elements[i];
+      if (!element) continue;
 
-    const value = pipeInsts(c.handleValue(scope, prop.value), inst);
-    const hasDefault = value instanceof AssignmentValue;
+      const key = c.registerValue(new LiteralValue(i));
+      const temp = c.generateId();
+      context.addInstruction(new ValueGetInstruction(value, key, temp, node));
+      const assign = c.handleWrite(scope, context, element);
+      assign(temp, callerNode);
+    }
+  };
+};
 
-    members.set(key, {
-      value: value.toOut(),
-      handler(get, propExists, scope) {
-        return c.handle(scope, prop, () => {
-          const inst = keyInst;
-          if (propExists() || !hasDefault) {
-            const input = pipeInsts(get(), inst);
-            // assigns the output to the target value
-            const output = pipeInsts(value["="](scope, input), inst);
-            return [output, inst];
-          }
+export const ObjectPattern: THandler = (
+  c,
+  scope,
+  context,
+  node: es.ObjectPattern,
+) => {
+  throw new CompilerError("node is not supposed to be evaluated in read mode");
+  // const inst: IInstruction[] = [];
+  // const members: TDestructuringMembers = new Map();
+  // for (const prop of node.properties) {
+  //   if (prop.type === "RestElement")
+  //     throw new CompilerError("The rest operator is not supported");
 
-          const result = pipeInsts(
-            value["="](scope, new LiteralValue(null)),
-            inst,
-          );
-          return [result, inst];
-        });
-      },
-    });
-  }
-  return [new DestructuringValue(members), inst];
+  //   if (!prop) continue;
+
+  //   const propKey = prop.key;
+  //   const key =
+  //     propKey.type === "Identifier" && !prop.computed
+  //       ? c.registerValue(new LiteralValue(propKey.name))
+  //       : c.handleCopy(scope, context, propKey);
+  //   const value = c.handle(scope, context, prop.value);
+  //   const hasDefault = value instanceof AssignmentValue;
+
+  //   members.set(key, {
+  //     value: value.toOut(),
+  //     handler(get, propExists, scope) {
+  //       return c.handle(scope, prop, () => {
+  //         const inst = keyInst;
+  //         if (propExists() || !hasDefault) {
+  //           const input = pipeInsts(get(), inst);
+  //           // assigns the output to the target value
+  //           const output = pipeInsts(value["="](scope, input), inst);
+  //           return [output, inst];
+  //         }
+
+  //         const result = pipeInsts(
+  //           value["="](scope, new LiteralValue(null)),
+  //           inst,
+  //         );
+  //         return [result, inst];
+  //       });
+  //     },
+  //   });
+  // }
+  // return [new DestructuringValue(members), inst];
+};
+
+ObjectPattern.handleWrite = (c, scope, context, node: es.ObjectPattern) => {
+  return (value, callerNode) => {
+    for (const prop of node.properties) {
+      if (prop.type === "RestElement")
+        throw new CompilerError("The rest operator is not supported", prop);
+
+      const propKey = prop.key;
+      const key =
+        propKey.type === "Identifier" && !prop.computed
+          ? c.registerValue(new LiteralValue(propKey.name))
+          : c.handle(scope, context, propKey);
+
+      const temp = c.generateId();
+
+      context.addInstruction(new ValueGetInstruction(value, key, temp, node));
+
+      const assign = c.handleWrite(scope, context, prop.value);
+      assign(value, callerNode);
+    }
+  };
 };
 
 // the mlog runtime already does this check for us
 export const OptionalMemberExpression: THandler = (
   c,
   scope,
+  context,
   node: es.OptionalMemberExpression,
-  out,
-) => MemberExpression(c, scope, node, out, true);
+) => MemberExpression(c, scope, context, node, true);
 
-export const AssignmentPattern: THandler<IValue> = (
+export const AssignmentPattern: THandler = (
   c,
   scope,
+  context,
   node: es.AssignmentPattern,
 ) => {
-  const [left, inst] = c.handleValue(scope, node.left);
-  const right = new LazyValue((_, out) => c.handle(scope, node.right, out));
+  // const [left, inst] = c.handleValue(scope, node.left);
+  // const right = new LazyValue((_, out) => c.handle(scope, node.right, out));
 
-  return [new AssignmentValue(left, right), inst];
+  // return [new AssignmentValue(left, right), inst];
+  throw new CompilerError(
+    "AssignmentPattern handler invoked incorrectly",
+    node,
+  );
+};
+
+AssignmentPattern.handleWrite = (
+  c,
+  scope,
+  context,
+  node: es.AssignmentPattern,
+) => {
+  const assignLeft = c.handleWrite(scope, context, node.left);
+
+  return (value, callerNode) => {
+    const consequentBlock = new Block([]);
+    const alternateBlock = new Block([]);
+    const exitBlock = new Block([]);
+
+    const temp = c.generateId();
+    const test = c.generateId();
+    context.addInstruction(
+      new BinaryOperationInstruction("strictEqual", value, nullId, test, node),
+    );
+    context.setEndInstruction(
+      new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+    );
+
+    context.currentBlock = consequentBlock;
+    const defaultValue = c.handle(scope, context, node.right);
+    context.addInstruction(new AssignmentInstruction(temp, defaultValue, node));
+    context.setEndInstruction(new BreakInstruction(exitBlock, node));
+
+    context.currentBlock = alternateBlock;
+    context.addInstruction(new AssignmentInstruction(temp, value, node));
+    context.setEndInstruction(new BreakInstruction(exitBlock, node));
+
+    context.currentBlock = exitBlock;
+    assignLeft(temp, callerNode);
+  };
 };
 
 class ObjectGetSetEntry extends BaseValue {

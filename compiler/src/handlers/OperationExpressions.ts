@@ -127,39 +127,12 @@ export const AssignmentExpression: THandler = (
     operator: AssignementOperator;
   },
 ) => {
-  // TODO: handle object members and other stuff
-  //  TODO: handle other operators
-  const { left } = node;
-  if (left.type !== "Identifier")
-    throw new CompilerError(
-      "Only identifiers are supported for assignment expressions",
-      left,
-    );
+  const assign = c.handleWrite(scope, context, node.left);
 
-  const leftId = c.handle(scope, context, left);
   const value = c.handle(scope, context, node.right);
-  context.addInstruction(new AssignmentInstruction(leftId, value, node));
+
+  assign(value, node);
   return value;
-
-  // type TOp = typeof node["operator"] extends  `${infer T}=` ? T : never;
-  // if (node.left.type === "RestElement") throw "foo";
-  // const leftValue = c.handle(scope, context, node.left);
-  // const assign = handleLval(c, scope, context, node.left);
-
-  // n.loc = node.loc;
-  // const [left, leftInst] = c.handleValue(scope, node.left);
-
-  // const leftOutput = left.toOut();
-  // const [right, rightInst] = !logicalAssignmentOperators.includes(node.operator)
-  //   ? c.handleEval(
-  //       scope,
-  //       node.right,
-  //       node.operator === "=" ? leftOutput : undefined,
-  //     )
-  //   : [new LazyValue((scope, out) => c.handleEval(scope, node.right, out)), []];
-
-  // const [op, opInst] = left[node.operator](scope, right);
-  // return [op, [...leftInst, ...rightInst, ...opInst]];
 };
 
 export const UnaryExpression: THandler = (
@@ -228,32 +201,25 @@ export const UpdateExpression: THandler = (
   context,
   node: es.UpdateExpression,
 ) => {
-  const { argument } = node;
+  const assign = c.handleWrite(scope, context, node.argument);
 
-  //   TODO: handle object members and other stuff
-  if (argument.type !== "Identifier")
-    throw new CompilerError(
-      "Only identifiers are supported for update expressions",
-      argument,
-    );
-
-  const id = c.handle(scope, context, argument);
-  const temp = c.generateId();
+  const oldValue = c.handleCopy(scope, context, node.argument);
+  const newValue = c.generateId();
   const one = c.registerValue(new LiteralValue(1));
-
-  context.addInstruction(new AssignmentInstruction(temp, id, node));
 
   context.addInstruction(
     new BinaryOperationInstruction(
       node.operator === "++" ? "add" : "sub",
-      id,
+      oldValue,
       one,
-      id,
+      newValue,
       node,
     ),
   );
-  if (node.prefix) return id;
-  return temp;
+  assign(newValue, node);
+
+  if (node.prefix) return newValue;
+  return oldValue;
 };
 
 export const ConditionalExpression: THandler = (
@@ -304,111 +270,3 @@ export const SequenceExpression: THandler = (
 
   return c.handle(scope, context, expressions[expressions.length - 1]);
 };
-
-function handleLval(
-  c: ICompilerContext,
-  scope: IScope,
-  context: HandlerContext,
-  node: es.LVal,
-): (value: number, node: es.Node) => void {
-  switch (node.type) {
-    case "Identifier": {
-      const variable = c.handle(scope, context, node);
-      return (value, node) => {
-        context.addInstruction(
-          new AssignmentInstruction(variable, value, node),
-        );
-      };
-    }
-    case "MemberExpression": {
-      const object = c.handle(scope, context, node.object);
-      let key: number;
-      if (node.computed) {
-        key = c.generateId();
-        // storing in temporary variable in case the original key is mutated later
-        const temp = c.handle(scope, context, node.property);
-        context.addInstruction(new AssignmentInstruction(key, temp, node));
-      } else {
-        key = c.registerValue(
-          new LiteralValue((node.property as es.Identifier).name),
-        );
-      }
-      return (value, node) => {
-        context.addInstruction(
-          new ValueSetInstruction(object, key, value, node),
-        );
-      };
-    }
-    case "AssignmentPattern": {
-      const assign = handleLval(c, scope, context, node.left);
-
-      const testBlock = new Block([]);
-      const consequentBlock = new Block([]);
-      const alternateBlock = new Block([]);
-      const exitBlock = new Block([]);
-
-      const { right } = node;
-      return (value, node) => {
-        context.connectBlock(testBlock, node);
-
-        const test = c.generateId();
-        const temp = c.generateId();
-
-        context.addInstruction(
-          new BinaryOperationInstruction(
-            "strictEqual",
-            value,
-            nullId,
-            test,
-            node,
-          ),
-        );
-
-        context.setEndInstruction(
-          new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
-        );
-
-        context.currentBlock = consequentBlock;
-        const rightValue = c.handle(scope, context, right);
-        context.addInstruction(
-          new AssignmentInstruction(temp, rightValue, node),
-        );
-        context.setEndInstruction(new BreakInstruction(exitBlock, node));
-
-        context.currentBlock = alternateBlock;
-        context.addInstruction(new AssignmentInstruction(temp, value, node));
-        context.setEndInstruction(new BreakInstruction(exitBlock, node));
-
-        context.currentBlock = exitBlock;
-
-        assign(temp, node);
-      };
-    }
-
-    case "ArrayPattern": {
-      const { elements } = node;
-      const assign = elements.map(element => {
-        if (!element) return null;
-        return handleLval(c, scope, context, element);
-      });
-      return (value, node) => {
-        for (let i = 0; i < assign.length; i++) {
-          const temp = c.generateId();
-          const key = c.registerValue(new LiteralValue(i));
-          context.addInstruction(
-            new ValueGetInstruction(value, key, temp, node),
-          );
-          assign[i]?.(temp, node);
-        }
-      };
-    }
-    case "ObjectPattern":
-    case "TSParameterProperty":
-    case "TSAsExpression":
-    case "TSSatisfiesExpression":
-    case "TSTypeAssertion":
-    case "TSNonNullExpression":
-    case "RestElement":
-      throw new CompilerError("The operator is not supported");
-  }
-}

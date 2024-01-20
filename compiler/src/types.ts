@@ -45,16 +45,29 @@ export interface IInstruction {
  */
 export type TEOutput = IValue | string;
 
-export type THandler = (
-  compilerContext: ICompilerContext,
-  scope: IScope,
-  handlerContext: HandlerContext,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  node: any,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  arg: any,
-) => number;
+export type TWriteCallback = (value: number, callerNode: es.Node) => void;
 
+export type THandler = {
+  (
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    handlerContext: HandlerContext,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    arg: any,
+  ): number;
+
+  handleWrite?: (
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    handlerContext: HandlerContext,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    arg: any,
+  ) => TWriteCallback;
+};
 /**
  * The scope manages the source code generated variables and their owners, as
  * well as break and continue statements and they also work as function bodies.
