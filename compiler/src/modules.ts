@@ -75,6 +75,7 @@ export function createGlobalScope(): IScope {
 
 export function createWordModule() {
   const module = new ObjectValue({
+    PVars: new NamespaceMacro(),
     getBlock: new commands.GetBlock(),
     setBlock: new commands.SetBlock(),
     spawnUnit: new commands.SpawnUnit(),
