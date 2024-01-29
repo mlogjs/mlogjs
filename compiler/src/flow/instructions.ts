@@ -1,27 +1,51 @@
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { IInstruction, es } from "../types";
+import { EMutability, IInstruction, IValue, es } from "../types";
+import { appendSourceLocations, pipeInsts } from "../utils";
 import { Block, TEdge } from "./block";
+import { GlobalId, ImmutableId } from "./id";
 
-export class ConstBindInstruction {
-  type = "const-bind" as const;
-
+export class LoadInstruction {
+  type = "load" as const;
   source?: es.SourceLocation;
 
   constructor(
-    public target: number,
-    public value: number,
+    public address: GlobalId,
+    public out: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    const target = c.getValue(this.target);
-    const value = c.getValue(this.value);
-    if (!target || !value) throw new CompilerError("Invalid const-bind state");
-    const instruction = new InstructionBase("set", target, value);
+    const value = c.getValueOrTemp(this.address);
+    const out = c.getValueOrTemp(this.out);
+    if (!value) throw new CompilerError("Invalid load state", this.source);
+    const instruction = new InstructionBase("set", out, value);
+    instruction.source = this.source;
+    return [instruction];
+  }
+}
+
+export class StoreInstruction {
+  type = "store" as const;
+  source?: es.SourceLocation;
+
+  constructor(
+    public address: GlobalId,
+    public value: ImmutableId,
+    node?: es.Node,
+  ) {
+    this.source = node?.loc ?? undefined;
+  }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    const value = c.getValueOrTemp(this.value);
+    const address = c.getValueOrTemp(this.address);
+    if (!value || !address)
+      throw new CompilerError("Invalid store state", this.source);
+    const instruction = new InstructionBase("set", address, value);
     instruction.source = this.source;
     return [instruction];
   }
@@ -31,16 +55,21 @@ export class AssignmentInstruction {
   type = "assignment" as const;
   source?: es.SourceLocation;
   constructor(
-    public target: number,
-    public value: number,
+    public target: ImmutableId,
+    public value: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
   }
   toMlog(c: ICompilerContext): IInstruction[] {
-    const target = c.getValue(this.target);
-    const value = c.getValue(this.value);
-    if (!target || !value) throw new CompilerError("Invalid assignment state");
+    const target = c.getValueOrTemp(this.target);
+    const value = c.getValueOrTemp(this.value);
+    if (!target || !value)
+      throw new CompilerError("Invalid assignment state", this.source);
+
+    // this was already optimized out by the compiler context
+    if (value.mutability === EMutability.constant) return [];
+
     const instruction = new InstructionBase("set", target, value);
     instruction.source = this.source;
 
@@ -51,17 +80,40 @@ export class AssignmentInstruction {
 export class ValueGetInstruction {
   type = "value-get" as const;
   source?: es.SourceLocation;
+  object: ImmutableId;
+  key: ImmutableId;
+  out: ImmutableId;
+  optional: boolean;
 
-  constructor(
-    public target: number,
-    public key: number,
-    public out: number,
-    node?: es.Node,
-  ) {
-    this.source = node?.loc ?? undefined;
+  constructor(options: {
+    object: ImmutableId;
+    key: ImmutableId;
+    out: ImmutableId;
+    optional: boolean;
+    node?: es.Node;
+  }) {
+    this.key = options.key;
+    this.object = options.object;
+    this.out = options.out;
+    this.optional = options.optional;
+    this.source = options.node?.loc ?? undefined;
   }
+
   toMlog(c: ICompilerContext): IInstruction[] {
-    throw new CompilerError("Not implemented");
+    const object = c.getValueOrTemp(this.object);
+    const key = c.getValueOrTemp(this.key);
+    const out = c.getValueOrTemp(this.out);
+
+    const inst: IInstruction[] = [];
+    if (!object.hasProperty(c, key) && !this.optional)
+      throw new CompilerError("Property does not exist", this.source);
+    if (object.hasProperty(c, key)) {
+      const value = pipeInsts(object.get(c, key, out), inst);
+      inst.push(new InstructionBase("set", out, value));
+      appendSourceLocations(inst, { loc: this.source });
+    }
+    return inst;
+    throw new CompilerError("Not implemented", this.source);
   }
 }
 
@@ -70,9 +122,9 @@ export class ValueSetInstruction {
   source?: es.SourceLocation;
 
   constructor(
-    public target: number,
-    public key: number,
-    public value: number,
+    public target: ImmutableId,
+    public key: ImmutableId,
+    public value: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
@@ -127,9 +179,9 @@ export class BinaryOperationInstruction {
 
   constructor(
     public operator: TBinaryOperationType,
-    public left: number,
-    public right: number,
-    public out: number,
+    public left: ImmutableId,
+    public right: ImmutableId,
+    public out: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
@@ -164,11 +216,11 @@ export class BinaryOperationInstruction {
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    const left = c.getValue(this.left);
-    const right = c.getValue(this.right);
-    const out = c.getValue(this.out);
+    const left = c.getValueOrTemp(this.left);
+    const right = c.getValueOrTemp(this.right);
+    const out = c.getValueOrTemp(this.out);
     if (!left || !right || !out)
-      throw new CompilerError("Invalid binary operation state");
+      throw new CompilerError("Invalid binary operation state", this.source);
     const op = new InstructionBase("op", this.operator, out, left, right);
     op.source = this.source;
     return [op];
@@ -197,18 +249,18 @@ export class UnaryOperatorInstruction {
 
   constructor(
     public operator: TUnaryOperationType,
-    public value: number,
-    public out: number,
+    public value: ImmutableId,
+    public out: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    const value = c.getValue(this.value);
-    const out = c.getValue(this.out);
+    const value = c.getValueOrTemp(this.value);
+    const out = c.getValueOrTemp(this.out);
     if (!value || !out)
-      throw new CompilerError("Invalid unary operation state");
+      throw new CompilerError("Invalid unary operation state", this.source);
     const op = new InstructionBase("op", this.operator, out, value);
     op.source = this.source;
     return [op];
@@ -236,7 +288,7 @@ export class BreakIfInstruction {
   hasBackEdge = false;
 
   constructor(
-    public condition: number,
+    public condition: ImmutableId,
     consequent: Block | TEdge,
     alternate: Block | TEdge,
     node?: es.Node,
@@ -258,7 +310,7 @@ export class ReturnInstruction {
   source?: es.SourceLocation;
 
   constructor(
-    public value: number,
+    public value: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
@@ -270,16 +322,28 @@ export class CallInstruction {
   source?: es.SourceLocation;
 
   constructor(
-    public callee: number,
-    public args: number[],
-    public out: number,
+    public callee: ImmutableId,
+    public args: ImmutableId[],
+    public out: ImmutableId,
     node?: es.Node,
   ) {
     this.source = node?.loc ?? undefined;
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    throw new CompilerError("Not implemented");
+    const callee = c.getValueOrTemp(this.callee);
+    const out = c.getValueOrTemp(this.out);
+    if (!callee || !out)
+      throw new CompilerError("Invalid call state", this.source);
+    const args = this.args.map(arg => c.getValueOrTemp(arg));
+    if (!args.every((arg): arg is IValue => !!arg))
+      throw new CompilerError("Invalid call state", this.source);
+    // if (callee.mutability === EMutability.constant) {
+    return appendSourceLocations(callee.call(c, args, out)[1], {
+      loc: this.source,
+    } as never);
+    // }
+    // throw new CompilerError("Not implemented");
   }
 }
 
@@ -306,8 +370,9 @@ export type TBlockEndInstruction =
   | EndInstruction;
 
 export type TBlockInstruction =
+  | LoadInstruction
+  | StoreInstruction
   | AssignmentInstruction
-  | ConstBindInstruction
   | ValueGetInstruction
   | ValueSetInstruction
   | BinaryOperationInstruction

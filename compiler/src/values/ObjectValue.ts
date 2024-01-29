@@ -1,5 +1,6 @@
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
+import { ImmutableId } from "../flow/id";
 import {
   EMutability,
   IScope,
@@ -11,7 +12,7 @@ import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData {
-  [k: string]: number;
+  [k: string]: ImmutableId;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -38,13 +39,13 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
+  get(c: ICompilerContext, key: IValue, out?: TEOutput): TValueInstructions {
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
       // avoids naming collisions with keys like
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
         const member = this.data[key.data];
-        return member;
+        return [c.getValueOrTemp(member), []];
       }
     }
 
@@ -53,7 +54,7 @@ export class ObjectValue extends VoidValue {
     );
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     if (prop instanceof LiteralValue && (prop.isNumber() || prop.isString())) {
       const hasMember = Object.prototype.hasOwnProperty.call(
         this.data,

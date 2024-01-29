@@ -1,3 +1,5 @@
+import { ImmutableId } from "../flow/id";
+
 /** The prefix for internal variables inside the compiler output */
 export const internalPrefix = "&";
 export const discardedName = `${internalPrefix}_`;
@@ -38,4 +40,4 @@ export const mathConstants = {
   degToRad: Math.PI / 180,
 };
 
-export const nullId = 0;
+export const nullId = new ImmutableId();

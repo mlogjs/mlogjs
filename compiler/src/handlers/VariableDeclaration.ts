@@ -21,7 +21,6 @@ import { CompilerError } from "../CompilerError";
 import { Compiler } from "../Compiler";
 import { ICompilerContext } from "../CompilerContext";
 import { HandlerContext } from "../HandlerContext";
-import { AssignmentInstruction, ConstBindInstruction } from "../flow";
 
 export const VariableDeclaration: THandler = (
   c,
@@ -43,27 +42,8 @@ export const VariableDeclarator: THandler = (
 ) => {
   const { id, init } = node;
 
-  if (id.type !== "Identifier")
-    throw new CompilerError(
-      "Only identifiers are supported for variable declarations",
-      id,
-    );
-
-  const name = nodeName(id, !c.compactNames && id.name);
-  const valueId = c.generateId();
-
-  scope.set(id.name, valueId);
-  c.setValue(valueId, new StoreValue(name));
-  c.setValueName(valueId, name);
-
-  if (init) {
-    const value = c.handle(scope, context, init);
-    if (kind === "const") {
-      context.addInstruction(new ConstBindInstruction(valueId, value, node));
-    } else {
-      context.addInstruction(new AssignmentInstruction(valueId, value, node));
-    }
-  }
+  const value = init ? c.handle(scope, context, init) : undefined;
+  c.handleDeclaration(scope, context, id, kind, value);
 
   return nullId;
 };
@@ -78,7 +58,8 @@ type TDeclareHandler<T extends es.Node> = (
 
 const Declare: TDeclareHandler<es.LVal | es.VoidPattern> = (
   c,
-  scope, context,
+  scope,
+  context,
   node,
   kind,
 ) => {

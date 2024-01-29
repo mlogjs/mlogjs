@@ -3,6 +3,7 @@ import {
   Block,
   BreakIfInstruction,
   BreakInstruction,
+  ImmutableId,
 } from "../flow";
 import { es, THandler } from "../types";
 import { nullId } from "../utils";
@@ -36,7 +37,7 @@ export const SwitchStatement: THandler = (
       context.currentBlock = testEntry;
 
       const value = c.handle(scope, context, scase.test);
-      const condition = c.generateId();
+      const condition = new ImmutableId();
       context.addInstruction(
         new BinaryOperationInstruction(
           "strictEqual",

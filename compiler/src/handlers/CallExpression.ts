@@ -1,4 +1,5 @@
 import { CallInstruction } from "../flow";
+import { ImmutableId } from "../flow/id";
 import { es, THandler } from "../types";
 import { LiteralValue, ObjectValue } from "../values";
 
@@ -10,10 +11,15 @@ export const CallExpression: THandler = (
 ) => {
   const callee = c.handle(scope, context, node.callee);
 
+  const calleeValue = c.getValue(callee);
+  calleeValue?.preCall(scope);
   const args = node.arguments.map(node => {
-    return c.handleCopy(scope, context, node);
+    return c.handle(scope, context, node);
   });
-  const out = c.generateId();
+  calleeValue?.postCall(scope);
+
+  // TODO: update to load from the function's global return value
+  const out = new ImmutableId();
 
   context.addInstruction(new CallInstruction(callee, args, out, node));
 
@@ -34,25 +40,33 @@ export const TaggedTemplateExpression: THandler = (
   const template = node.quasi;
 
   const stringsObject = ObjectValue.fromArray(
-    template.quasis.map(quasi => new LiteralValue(quasi.value.cooked ?? "")),
+    c,
+    template.quasis.map(quasi =>
+      c.registerValue(new LiteralValue(quasi.value.cooked ?? "")),
+    ),
     {
-      raw: ObjectValue.fromArray(
-        template.quasis.map(quasi => new LiteralValue(quasi.value.raw)),
+      raw: c.registerValue(
+        ObjectValue.fromArray(
+          c,
+          template.quasis.map(quasi =>
+            c.registerValue(new LiteralValue(quasi.value.raw)),
+          ),
+        ),
       ),
     },
   );
 
   const stringsObjectId = c.registerValue(stringsObject);
 
-  const expressions: number[] = [];
+  const expressions: ImmutableId[] = [];
 
   template.expressions.forEach(expression => {
-    const value = c.handleCopy(scope, context, expression);
+    const value = c.handle(scope, context, expression);
 
     expressions.push(value);
   });
 
-  const out = c.generateId();
+  const out = new ImmutableId();
   context.addInstruction(
     new CallInstruction(tag, [stringsObjectId, ...expressions], out, node),
   );

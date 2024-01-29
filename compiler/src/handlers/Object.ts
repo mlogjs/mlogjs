@@ -1,13 +1,15 @@
 import { CompilerError } from "../CompilerError";
 import {
-  AssignmentInstruction,
   BinaryOperationInstruction,
   Block,
   BreakIfInstruction,
   BreakInstruction,
+  LoadInstruction,
+  StoreInstruction,
   ValueGetInstruction,
   ValueSetInstruction,
 } from "../flow";
+import { GlobalId, ImmutableId } from "../flow/id";
 import {
   es,
   IScope,
@@ -47,7 +49,7 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
 
-    const member = c.handleCopy(scope, context, value);
+    const member = c.handle(scope, context, value);
     if (prop.type !== "ObjectMethod" || prop.kind === "method") {
       data[index] = member;
     } /* else {
@@ -73,13 +75,13 @@ export const ArrayExpression: THandler = (
   context,
   node: es.ArrayExpression,
 ) => {
-  const items: number[] = [];
+  const items: ImmutableId[] = [];
   node.elements.forEach(element => {
     if (!element) {
       items.push(nullId);
       return;
     }
-    const value = c.handleCopy(scope, context, element);
+    const value = c.handle(scope, context, element);
     items.push(value);
   });
 
@@ -98,7 +100,7 @@ export const MemberExpression: THandler = (
     ? c.handle(scope, context, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-  const temp = c.generateId();
+  const temp = new ImmutableId();
 
   // TODO: handle optional chaining
   context.addInstruction(
@@ -157,7 +159,7 @@ MemberExpression.handleWrite = (
 ) => {
   const obj = c.handle(scope, context, node.object);
   const key = node.computed
-    ? c.handleCopy(scope, context, node.property)
+    ? c.handle(scope, context, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
   return value => {
@@ -165,12 +167,7 @@ MemberExpression.handleWrite = (
   };
 };
 
-export const ArrayPattern: THandler = (
-  c,
-  scope,
-  context,
-  node: es.ArrayPattern,
-) => {
+export const ArrayPattern: THandler = () => {
   throw new CompilerError("node is not supposed to be evaluated in read mode");
   // const inst: IInstruction[] = [];
   // const members: TDestructuringMembers = new Map();
@@ -205,20 +202,23 @@ ArrayPattern.handleWrite = (c, scope, context, node: es.ArrayPattern) => {
       if (!element) continue;
 
       const key = c.registerValue(new LiteralValue(i));
-      const temp = c.generateId();
-      context.addInstruction(new ValueGetInstruction(value, key, temp, node));
+      const temp = new ImmutableId();
+      context.addInstruction(
+        new ValueGetInstruction({
+          object: value,
+          key,
+          out: temp,
+          optional: element.type === "AssignmentPattern",
+          node,
+        }),
+      );
       const assign = c.handleWrite(scope, context, element);
       assign(temp, callerNode);
     }
   };
 };
 
-export const ObjectPattern: THandler = (
-  c,
-  scope,
-  context,
-  node: es.ObjectPattern,
-) => {
+export const ObjectPattern: THandler = () => {
   throw new CompilerError("node is not supposed to be evaluated in read mode");
   // const inst: IInstruction[] = [];
   // const members: TDestructuringMembers = new Map();
@@ -232,7 +232,7 @@ export const ObjectPattern: THandler = (
   //   const key =
   //     propKey.type === "Identifier" && !prop.computed
   //       ? c.registerValue(new LiteralValue(propKey.name))
-  //       : c.handleCopy(scope, context, propKey);
+  //       : c.handle(scope, context, propKey);
   //   const value = c.handle(scope, context, prop.value);
   //   const hasDefault = value instanceof AssignmentValue;
 
@@ -272,14 +272,60 @@ ObjectPattern.handleWrite = (c, scope, context, node: es.ObjectPattern) => {
           ? c.registerValue(new LiteralValue(propKey.name))
           : c.handle(scope, context, propKey);
 
-      const temp = c.generateId();
+      const temp = new ImmutableId();
 
-      context.addInstruction(new ValueGetInstruction(value, key, temp, node));
+      context.addInstruction(
+        new ValueGetInstruction({
+          object: value,
+          key,
+          out: temp,
+          optional: prop.value.type === "AssignmentPattern",
+          node,
+        }),
+      );
 
       const assign = c.handleWrite(scope, context, prop.value);
       assign(value, callerNode);
     }
   };
+};
+
+ObjectPattern.handleDeclaration = (
+  c,
+  scope,
+  context,
+  node: es.ObjectPattern,
+  kind,
+  init,
+) => {
+  if (!init)
+    throw new CompilerError(
+      "ObjectPattern.handleDeclaration called without init",
+    );
+
+  for (const prop of node.properties) {
+    if (prop.type === "RestElement")
+      throw new CompilerError("The rest operator is not supported", prop);
+
+    const propKey = prop.key;
+    const key =
+      propKey.type === "Identifier" && !prop.computed
+        ? c.registerValue(new LiteralValue(propKey.name))
+        : c.handle(scope, context, propKey);
+
+    const temp = new ImmutableId();
+
+    context.addInstruction(
+      new ValueGetInstruction({
+        object: init,
+        key,
+        out: temp,
+        optional: prop.value.type === "AssignmentPattern",
+        node: prop,
+      }),
+    );
+    c.handleDeclaration(scope, context, prop.value, kind, temp);
+  }
 };
 
 // the mlog runtime already does this check for us
@@ -319,8 +365,9 @@ AssignmentPattern.handleWrite = (
     const alternateBlock = new Block([]);
     const exitBlock = new Block([]);
 
-    const temp = c.generateId();
-    const test = c.generateId();
+    const result = new ImmutableId();
+    const temp = new GlobalId();
+    const test = new ImmutableId();
     context.addInstruction(
       new BinaryOperationInstruction("strictEqual", value, nullId, test, node),
     );
@@ -330,16 +377,60 @@ AssignmentPattern.handleWrite = (
 
     context.currentBlock = consequentBlock;
     const defaultValue = c.handle(scope, context, node.right);
-    context.addInstruction(new AssignmentInstruction(temp, defaultValue, node));
+    context.addInstruction(new StoreInstruction(temp, defaultValue, node));
     context.setEndInstruction(new BreakInstruction(exitBlock, node));
 
     context.currentBlock = alternateBlock;
-    context.addInstruction(new AssignmentInstruction(temp, value, node));
+    context.addInstruction(new StoreInstruction(temp, value, node));
     context.setEndInstruction(new BreakInstruction(exitBlock, node));
 
     context.currentBlock = exitBlock;
-    assignLeft(temp, callerNode);
+    context.addInstruction(new LoadInstruction(temp, result, node));
+    assignLeft(result, callerNode);
   };
+};
+
+AssignmentPattern.handleDeclaration = (
+  c,
+  scope,
+  context,
+  node: es.AssignmentPattern,
+  kind,
+  init,
+) => {
+  if (!init)
+    throw new CompilerError(
+      "AssignmentPattern.handleDeclaration called without init",
+      node,
+    );
+  const consequentBlock = new Block([]);
+  const alternateBlock = new Block([]);
+  const exitBlock = new Block([]);
+
+  const result = new ImmutableId();
+  const temp = new GlobalId();
+  const test = new ImmutableId();
+  context.addInstruction(
+    new BinaryOperationInstruction("strictEqual", init, nullId, test, node),
+  );
+  context.setEndInstruction(
+    new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+  );
+
+  context.currentBlock = consequentBlock;
+  const defaultValue = c.handle(scope, context, node.right);
+  context.addInstruction(new StoreInstruction(temp, defaultValue, node));
+  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+
+  context.currentBlock = alternateBlock;
+  const value = c.handle(scope, context, node.right);
+  context.addInstruction(new StoreInstruction(temp, value, node));
+  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+
+  context.currentBlock = exitBlock;
+  context.addInstruction(new LoadInstruction(temp, result, node));
+
+  c.handleDeclaration(scope, context, node.left, kind, result);
 };
 
 class ObjectGetSetEntry extends BaseValue {

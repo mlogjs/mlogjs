@@ -1,4 +1,3 @@
-import { CompilerError } from "./CompilerError";
 import {
   Block,
   BreakInstruction,

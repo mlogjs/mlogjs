@@ -11,10 +11,11 @@ import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { mathConstants } from "../utils";
+import { ICompilerContext } from "../CompilerContext";
 
 const literalMethods: Record<
   string,
-  (this: LiteralValue<TLiteral | null>, scope: IScope) => LiteralValue
+  (this: LiteralValue<TLiteral | null>, c: ICompilerContext) => LiteralValue
 > = {
   length: function (this: LiteralValue<TLiteral | null>) {
     if (!this.isString())
@@ -68,9 +69,9 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     // (there is no way to escape a " character)
     return JSON.stringify(data.replace(/"/g, "''")).replace(/\\\\/g, "\\"); // "unescape" backslashes
   }
-  get(scope: IScope, name: IValue): TValueInstructions {
+  get(c: ICompilerContext, name: IValue): TValueInstructions {
     if (!(name instanceof LiteralValue && name.isString()))
-      return super.get(scope, name);
+      return super.get(c, name);
     const method = literalMethods[name.data];
     if (
       !method ||
@@ -79,10 +80,10 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
       throw new CompilerError(
         `The member [${name.debugString()}] does not exist on literal values.`,
       );
-    return [method.apply(this, [scope]), []];
+    return [method.apply(this, [c]), []];
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(compilerContext: ICompilerContext, prop: IValue): boolean {
     if (this.isString() && prop instanceof LiteralValue && prop.isString())
       return Object.prototype.hasOwnProperty.call(literalMethods, prop.data);
     return false;
