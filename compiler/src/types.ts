@@ -3,6 +3,7 @@ import * as es from "@babel/types";
 import { Block } from "./flow";
 import { ICompilerContext } from "./CompilerContext";
 import { HandlerContext } from "./HandlerContext";
+import { ImmutableId, ValueId } from "./flow/id";
 
 export enum EInstIntent {
   none,
@@ -45,7 +46,13 @@ export interface IInstruction {
  */
 export type TEOutput = IValue | string;
 
-export type TWriteCallback = (value: number, callerNode: es.Node) => void;
+export type TWriteCallback = (value: ImmutableId, callerNode: es.Node) => void;
+export type TDeclareCallback = (
+  init: ImmutableId | undefined,
+  callerNode: es.Node,
+) => void;
+
+export type TDeclarationKind = "var" | "let" | "const";
 
 export type THandler = {
   (
@@ -56,7 +63,7 @@ export type THandler = {
     node: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     arg: any,
-  ): number;
+  ): ImmutableId;
 
   handleWrite?: (
     compilerContext: ICompilerContext,
@@ -67,6 +74,16 @@ export type THandler = {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     arg: any,
   ) => TWriteCallback;
+
+  handleDeclaration?: (
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    handlerContext: HandlerContext,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    kind: TDeclarationKind,
+    init?: ImmutableId,
+  ) => void;
 };
 /**
  * The scope manages the source code generated variables and their owners, as
@@ -130,7 +147,7 @@ export interface IScope {
   /** Checks if there is an owner registered with the specified identifier */
   has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(identifier: string): number;
+  get(identifier: string): ValueId;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, throws an error if there already is an owner with the same
@@ -139,7 +156,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  set(name: string, id: number): void;
+  set(name: string, id: ValueId): void;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, overriding any preexisting variables with the same identifier.
@@ -147,7 +164,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  hardSet(name: string, value: number): void;
+  hardSet(name: string, value: ValueId): void;
   /**
    * Creates a shallow copy of this scope.
    *
@@ -251,6 +268,7 @@ export enum EMutability {
 }
 
 export interface IValue extends IValueOperators {
+  name?: string;
   // main properties
   mutability: EMutability;
   macro: boolean;
@@ -260,17 +278,21 @@ export interface IValue extends IValueOperators {
    */
   eval(scope: IScope, out?: TEOutput): TValueInstructions;
   call(
-    scope: IScope,
+    c: ICompilerContext,
     args: IValue[],
     out?: TEOutput,
   ): TValueInstructions<IValue | null>;
-  get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
+  get(
+    compilerContext: ICompilerContext,
+    name: IValue,
+    out?: TEOutput,
+  ): TValueInstructions;
 
   /**
    * Wether `this` has a given property. This method is used to know if it's
    * safe to get a field of an object without errors.
    */
-  hasProperty(scope: IScope, prop: IValue): boolean;
+  hasProperty(compilerContext: ICompilerContext, prop: IValue): boolean;
 
   /**
    * A hook that the CallExpression and related handlers call before evaluating

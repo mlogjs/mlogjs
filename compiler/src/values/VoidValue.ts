@@ -8,6 +8,7 @@ import {
 } from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
+import { ICompilerContext } from "../CompilerContext";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
@@ -21,19 +22,19 @@ export class VoidValue implements IValue {
     );
   }
   call(
-    _scope: IScope,
+    _c: ICompilerContext,
     _args: IValue[],
     _out?: TEOutput,
   ): TValueInstructions<IValue | null> {
     throw new CompilerError(`[${this.debugString()}] is not callable.`);
   }
-  get(_scope: IScope, name: IValue): TValueInstructions {
+  get(_compilerContext: ICompilerContext, name: IValue): TValueInstructions {
     throw new CompilerError(
       `The member [${name.debugString()}] does not exist in [${this.debugString()}]`,
     );
   }
 
-  hasProperty(_scope: IScope, _prop: IValue): boolean {
+  hasProperty(_compilerContext: ICompilerContext, _prop: IValue): boolean {
     return false;
   }
 

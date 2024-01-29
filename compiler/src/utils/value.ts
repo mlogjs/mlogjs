@@ -1,5 +1,5 @@
 import { CompilerError } from "../CompilerError";
-import { IValue, TEOutput } from "../types";
+import { GlobalId, IValue, RegisterId, TEOutput } from "../types";
 import {
   DestructuringValue,
   IObjectValueData,
@@ -8,6 +8,14 @@ import {
   StoreValue,
 } from "../values";
 import { discardedName } from "./constants";
+
+export function globalId(id: number): GlobalId {
+  return id as GlobalId;
+}
+
+export function registerId(id: number): RegisterId {
+  return id as RegisterId;
+}
 
 export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
   data: IObjectValueData & {

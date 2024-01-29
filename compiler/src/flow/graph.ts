@@ -9,6 +9,7 @@ import {
 import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
+import { ImmutableId } from "./id";
 import { BinaryOperationInstruction, BreakInstruction } from "./instructions";
 
 // control flow graph internals for the compiler
@@ -261,7 +262,7 @@ export class Graph {
         if (!conditionInst.isInvertible()) return;
         conditionInst.invert();
       } else {
-        const newCondition = c.generateId();
+        const newCondition = new ImmutableId();
         block.instructions.push(
           new BinaryOperationInstruction(
             "equal",
@@ -287,10 +288,12 @@ export class Graph {
     // TODO: fix updating of block parents during
     // the previous optimizations
     this.setParents();
+    console.log(dominators(this.start));
+    console.log(dominanceFrontier(this.start, dominators(this.start)));
   }
 }
 
-function traverse(block: Block, action: (block: Block) => void) {
+export function traverse(block: Block, action: (block: Block) => void) {
   function _traverse(block: Block) {
     action(block);
     for (const edge of block.childEdges) {
@@ -300,4 +303,91 @@ function traverse(block: Block, action: (block: Block) => void) {
   }
 
   _traverse(block);
+}
+
+export function traverseParentsFirst(
+  entry: Block,
+  action: (block: Block) => void,
+) {
+  const visited = new Set<Block>();
+
+  function _traverse(block: Block) {
+    if (!block.forwardParents.every(parent => visited.has(parent))) return;
+
+    visited.add(block);
+    action(block);
+
+    for (const edge of block.childEdges) {
+      if (edge.type === "backward") continue;
+      _traverse(edge.block);
+    }
+  }
+
+  _traverse(entry);
+}
+
+function dominators(entry: Block): Map<Block, Set<Block>> {
+  const doms = new Map<Block, Set<Block>>();
+
+  traverse(entry, block => {
+    doms.set(block, new Set([block]));
+  });
+
+  traverseParentsFirst(entry, block => {
+    const { forwardParents } = block;
+    if (forwardParents.length === 0) return;
+    const d = doms.get(block)!;
+
+    const common = intersectSets(...forwardParents.map(p => doms.get(p)!));
+    for (const c of common) {
+      d.add(c);
+    }
+  });
+
+  return doms;
+}
+
+function dominanceFrontier(
+  entry: Block,
+  doms: Map<Block, Set<Block>>,
+): Map<Block, Set<Block>> {
+  const frontiers = new Map<Block, Set<Block>>();
+
+  function df(x: Block) {
+    console.log("df", x);
+    if (frontiers.has(x)) return frontiers.get(x)!;
+
+    const s = new Set<Block>();
+    const dx = doms.get(x)!;
+    for (const y of x.children) {
+      if (!dx.has(y) && x !== y) {
+        s.add(y);
+      }
+    }
+    for (const k of x.children) {
+      if (!dx.has(k)) continue;
+      for (const y of df(k)) {
+        if (!dx.has(y)) {
+          s.add(y);
+        }
+      }
+    }
+    frontiers.set(x, s);
+    return s;
+  }
+
+  df(entry);
+
+  return frontiers;
+}
+
+function intersectSets<T>(...sets: Set<T>[]) {
+  const result = new Set<T>();
+  const [first, ...rest] = sets;
+  for (const item of first) {
+    if (rest.every(set => set.has(item))) {
+      result.add(item);
+    }
+  }
+  return result;
 }

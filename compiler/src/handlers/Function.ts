@@ -1,4 +1,5 @@
 import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId } from "../flow/id";
 import { THandler, es, IScope } from "../types";
 import { nodeName } from "../utils";
 import { FunctionValue } from "../values/FunctionValue";
@@ -7,7 +8,7 @@ function handleFunctionNode(
   c: ICompilerContext,
   scope: IScope,
   node: es.Function,
-): number {
+): ImmutableId {
   let { params, body } = node;
 
   if (es.isExpression(body)) {

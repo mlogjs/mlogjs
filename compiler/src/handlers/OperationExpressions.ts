@@ -1,19 +1,19 @@
-import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { HandlerContext } from "../HandlerContext";
 import {
   AssignmentInstruction,
   BinaryOperationInstruction,
   Block,
   BreakIfInstruction,
   BreakInstruction,
+  GlobalId,
+  ImmutableId,
+  LoadInstruction,
+  StoreInstruction,
   TBinaryOperationType,
   UnaryOperatorInstruction,
-  ValueGetInstruction,
-  ValueSetInstruction,
 } from "../flow";
 import { AssignementOperator } from "../operators";
-import { THandler, es, IScope } from "../types";
+import { THandler, es } from "../types";
 import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 
@@ -46,13 +46,13 @@ export const BinaryExpression: THandler = (
   context,
   node: es.BinaryExpression,
 ) => {
-  const left = c.handleCopy(scope, context, node.left);
-  const right = c.handleCopy(scope, context, node.right);
+  const left = c.handle(scope, context, node.left);
+  const right = c.handle(scope, context, node.right);
   const operator = node.operator;
-  const out = c.generateId();
+  const out = new ImmutableId();
 
   if (operator === "!==") {
-    const temp = c.generateId();
+    const temp = new ImmutableId();
     const zero = c.registerValue(new LiteralValue(0));
     context.addInstruction(
       new BinaryOperationInstruction("strictEqual", left, right, temp, node),
@@ -80,29 +80,30 @@ export const LogicalExpression: THandler = (
   context,
   node: es.LogicalExpression,
 ) => {
-  const out = c.generateId();
+  const out = new GlobalId();
   const alternateBlock = new Block([]);
   const exitBlock = new Block([]);
 
   const left = c.handle(scope, context, node.left);
-  context.addInstruction(new AssignmentInstruction(out, left, node));
+  context.addInstruction(new StoreInstruction(out, left, node));
   switch (node.operator) {
     case "&&":
       context.setEndInstruction(
-        new BreakIfInstruction(out, alternateBlock, exitBlock, node),
+        new BreakIfInstruction(left, alternateBlock, exitBlock, node),
       );
       break;
     case "||":
       context.setEndInstruction(
-        new BreakIfInstruction(out, exitBlock, alternateBlock, node),
+        new BreakIfInstruction(left, exitBlock, alternateBlock, node),
       );
       break;
     case "??": {
-      const test = c.generateId();
-
+      const test = new ImmutableId();
+      const temp = new ImmutableId();
       context.addInstruction(
-        new BinaryOperationInstruction("strictEqual", out, nullId, test, node),
+        new BinaryOperationInstruction("strictEqual", temp, nullId, test, node),
       );
+      context.addInstruction(new StoreInstruction(out, temp, node));
       context.setEndInstruction(
         new BreakIfInstruction(test, alternateBlock, exitBlock, node),
       );
@@ -111,12 +112,14 @@ export const LogicalExpression: THandler = (
 
   context.currentBlock = alternateBlock;
   const right = c.handle(scope, context, node.right);
-  context.addInstruction(new AssignmentInstruction(out, right, node));
+  context.addInstruction(new StoreInstruction(out, right, node));
   context.setEndInstruction(new BreakInstruction(exitBlock, node));
 
   context.currentBlock = exitBlock;
+  const immutableOut = new ImmutableId();
+  context.addInstruction(new LoadInstruction(out, immutableOut, node));
 
-  return out;
+  return immutableOut;
 };
 
 export const AssignmentExpression: THandler = (
@@ -141,7 +144,7 @@ export const UnaryExpression: THandler = (
   context,
   node: es.UnaryExpression,
 ) => {
-  const out = c.generateId();
+  const out = new ImmutableId();
   const value = c.handle(scope, context, node.argument);
 
   switch (node.operator) {
@@ -203,8 +206,8 @@ export const UpdateExpression: THandler = (
 ) => {
   const assign = c.handleWrite(scope, context, node.argument);
 
-  const oldValue = c.handleCopy(scope, context, node.argument);
-  const newValue = c.generateId();
+  const oldValue = c.handle(scope, context, node.argument);
+  const newValue = new ImmutableId();
   const one = c.registerValue(new LiteralValue(1));
 
   context.addInstruction(
@@ -233,7 +236,7 @@ export const ConditionalExpression: THandler = (
   const alternateBlock = new Block([]);
   const exitBlock = new Block([]);
 
-  const out = c.generateId();
+  const out = new GlobalId();
 
   context.connectBlock(testBlock, node);
   const test = c.handle(scope, context, node.test);
@@ -243,16 +246,19 @@ export const ConditionalExpression: THandler = (
 
   context.currentBlock = consequentBlock;
   const consequent = c.handle(scope, context, node.consequent);
-  context.addInstruction(new AssignmentInstruction(out, consequent, node));
+  context.addInstruction(new StoreInstruction(out, consequent, node));
   context.setEndInstruction(new BreakInstruction(exitBlock, node));
 
   context.currentBlock = alternateBlock;
   const alternate = c.handle(scope, context, node.alternate);
-  context.addInstruction(new AssignmentInstruction(out, alternate, node));
+  context.addInstruction(new StoreInstruction(out, alternate, node));
   context.setEndInstruction(new BreakInstruction(exitBlock, node));
 
   context.currentBlock = exitBlock;
-  return out;
+  const immutableOut = new ImmutableId();
+  context.addInstruction(new LoadInstruction(out, immutableOut, node));
+
+  return immutableOut;
 };
 
 export const SequenceExpression: THandler = (

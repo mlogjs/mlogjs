@@ -1,5 +1,7 @@
 import { BaseValue, LiteralValue } from ".";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
+import { ImmutableId } from "../flow";
 import { InstructionBase, SetInstruction } from "../instructions";
 import {
   EMutability,
@@ -27,9 +29,16 @@ export class StoreValue extends BaseValue implements IValue {
     this.temporary = temporary;
   }
 
-  static from(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {
+  static from(
+    c: ICompilerContext,
+    out?: TEOutput,
+    mutability = EMutability.mutable,
+  ) {
     if (out instanceof StoreValue) return out;
     const hasName = typeof out === "string";
+    if (hasName) return new StoreValue(out, mutability, { temporary: false });
+    const id = new ImmutableId();
+
     const name = hasName ? out : scope.makeTempName();
 
     return new StoreValue(name, mutability, {
@@ -91,7 +100,11 @@ export class StoreValue extends BaseValue implements IValue {
     return [this, []];
   }
 
-  get(scope: IScope, prop: IValue, out?: TEOutput): TValueInstructions<IValue> {
+  get(
+    c: ICompilerContext,
+    prop: IValue,
+    out?: TEOutput,
+  ): TValueInstructions<IValue> {
     const mutability = EMutability.readonly;
 
     const thisCoordName = getThisCoordName(this, prop);
@@ -102,7 +115,9 @@ export class StoreValue extends BaseValue implements IValue {
       ];
 
     if (prop instanceof LiteralValue && prop.isString()) {
-      const result = StoreValue.from(scope, out, mutability);
+      const resultId = new ImmutableId();
+
+      const result = c.getValueOrTemp(resultId);
 
       return [
         result,
@@ -125,7 +140,7 @@ export class StoreValue extends BaseValue implements IValue {
     );
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     return (
       (prop instanceof LiteralValue && prop.isString()) ||
       prop instanceof StoreValue

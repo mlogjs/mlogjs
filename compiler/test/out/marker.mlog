@@ -1,0 +1,27 @@
+radar player any any distance @this 1 player:3:6
+sensor &t0 player:3:6 @x
+sensor &t1 player:3:6 @y
+makemarker shapeText 1 &t0 &t1 1
+print "marker text"
+setmarker autoscale 1 autoscale
+setmarker color 1 color
+setmarker drawLayer 1 drawLayer
+setmarker endPos 1 endX endY
+setmarker flushText 1 fetch
+setmarker fontSize 1 fontSize
+sensor &t2 labelFlags @background
+sensor &t3 labelFlags @outline
+setmarker labelFlags 1 &t2 &t3
+setmarker minimap 1 minimap
+setmarker pos 1 x y
+setmarker radius 1 radius
+setmarker remove 1
+setmarker rotation 1 rotation
+setmarker shape 1 sides radius outline
+setmarker stroke 1 stroke
+setmarker textHeight 1 textHeight
+setmarker texture 1 0 texture
+sensor &t4 textureSize @width
+sensor &t5 textureSize @height
+setmarker textureSize 1 &t4 &t5
+setmarker visibility 1 visible

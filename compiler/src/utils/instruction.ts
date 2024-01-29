@@ -10,7 +10,7 @@ import {
 
 export function appendSourceLocations(
   insts: IInstruction[],
-  node: es.Node,
+  node: Pick<es.Node, "loc">,
 ): IInstruction[] {
   for (const inst of insts) {
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
