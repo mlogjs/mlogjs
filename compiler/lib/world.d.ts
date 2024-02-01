@@ -833,7 +833,7 @@ export namespace effect {
 export interface Marker {
   /** Deletes the marker, making its id available for reuse. */
   remove(): void;
-  set visible(value: boolean);
+  set world(value: boolean);
   /** Wether the marker should be on the minimap or in the world */
   set minimap(value: boolean);
   set autoscale(value: boolean);
@@ -857,6 +857,18 @@ export interface Marker {
   /** Writes the contents of the global text buffer to the marker's texture. */
   flushTexture(): void;
   set textureSize(value: { width: number; height: number });
+  /**
+   * Indexed position, used for line and quad markers with index zero being the
+   * first position.
+   */
+  set posi(value: { index: number; x: number; y: number });
+  /** Texture's position ranging from zero to one, used for quad markers. */
+  set uvi(value: { index: number; x: number; y: number });
+  /**
+   * Indexed position, used for line and quad markers with index zero being the
+   * first color.
+   */
+  set colori(value: { index: number; color: number });
 }
 
 interface MarkerConstructor {
@@ -895,6 +907,7 @@ interface MarkerConstructor {
     y: number;
     replace: boolean;
   }): Marker;
+  quad(options: { id: number; x: number; y: number; replace: boolean }): Marker;
 }
 
 /** Contains methods to create marker objects. */

@@ -14,7 +14,7 @@ export class MarkerConstructor extends ObjectValue {
           named: "options",
           args: ["id", "x", "y", "replace"],
         },
-        minimap: {
+        point: {
           named: "options",
           args: ["id", "x", "y", "replace"],
         },
@@ -31,6 +31,10 @@ export class MarkerConstructor extends ObjectValue {
           args: ["id", "x", "y", "replace"],
         },
         texture: {
+          named: "options",
+          args: ["id", "x", "y", "replace"],
+        },
+        quad: {
           named: "options",
           args: ["id", "x", "y", "replace"],
         },
@@ -67,7 +71,7 @@ class MarkerMacro extends ObjectValue {
   constructor(id: IValue) {
     super({
       remove: new MacroFunction(() => [null, [setmarker(id, "remove")]]),
-      visible: new MarkerMacroSetter(id, "visibility"),
+      world: new MarkerMacroSetter(id, "world"),
       minimap: new MarkerMacroSetter(id, "minimap"),
       autoscale: new MarkerMacroSetter(id, "autoscale"),
       pos: new MarkerMacroSetter(id, "pos", ["x", "y"]),
@@ -98,6 +102,9 @@ class MarkerMacro extends ObjectValue {
         "width",
         "height",
       ]),
+      posi: new MarkerMacroSetter(id, "posi", ["index", "x", "y"]),
+      uvi: new MarkerMacroSetter(id, "uvi", ["index", "x", "y"]),
+      colori: new MarkerMacroSetter(id, "colori", ["index", "color"]),
     });
   }
 }
