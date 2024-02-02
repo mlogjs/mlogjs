@@ -20,17 +20,20 @@ export function useColorPicker({ editorRef, monacoRef }: Params) {
     const colorProvider: languages.DocumentColorProvider = {
       provideColorPresentations(model, colorInfo) {
         const color = colorInfo.color;
+        const originalText = model.getValueInRange(colorInfo.range);
+        // use the same quotes as the original text
+        const q = originalText.includes("'") ? "'" : '"';
+
         const red = Math.round(color.red * 255);
         const green = Math.round(color.green * 255);
         const blue = Math.round(color.blue * 255);
         const alpha = Math.round(color.alpha * 255);
         const c = (color: number) => color.toString(16).padStart(2, "0");
-        let label: string;
-        if (alpha === 255) {
-          label = `getColor("${c(red)}${c(green)}${c(blue)}")`;
-        } else {
-          label = `getColor("${c(red)}${c(green)}${c(blue)}${c(alpha)}")`;
-        }
+        const label =
+          alpha === 255
+            ? `getColor(${q}${c(red)}${c(green)}${c(blue)}${q})`
+            : `getColor(${q}${c(red)}${c(green)}${c(blue)}${c(alpha)}${q})`;
+
         return [{ label }];
       },
       provideDocumentColors(model) {
