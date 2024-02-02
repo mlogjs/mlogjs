@@ -71,4 +71,11 @@ declare global {
    * ```
    */
   function asm(strings: TemplateStringsArray, ...values: unknown[]): void;
+
+  /**
+   * Allows you to use an mlog color literal by specifiying it as a hex string.
+   *
+   * @param hexString
+   */
+  function getColor(hexString: string): number;
 }
