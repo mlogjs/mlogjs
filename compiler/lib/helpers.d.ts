@@ -39,6 +39,20 @@ declare global {
     T
   >;
 
+  /**
+   * Gets a color literal from a hex code.
+   *
+   * ```js
+   * const color = getColor("0e7eba");
+   *
+   * draw.col(color);
+   * draw.rect({ x: 0, y: 0, width: 500, height: 500 });
+   *
+   * drawFlush();
+   * ```
+   */
+  function getColor(hexCode: string): number;
+
   type ConcatLiteral = string | number | boolean | undefined;
 
   /**
@@ -71,11 +85,4 @@ declare global {
    * ```
    */
   function asm(strings: TemplateStringsArray, ...values: unknown[]): void;
-
-  /**
-   * Allows you to use an mlog color literal by specifiying it as a hex string.
-   *
-   * @param hexString
-   */
-  function getColor(hexString: string): number;
 }

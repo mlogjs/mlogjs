@@ -26,6 +26,19 @@ buildings to multiple variables at once.
 const { switch1: toggle, cell1 } = getBuildings();
 ```
 
+## `getColor`
+
+Gets a color literal from a hex code.
+
+```js
+const color = getColor("0e7eba");
+
+draw.col(color);
+draw.rect({ x: 0, y: 0, width: 500, height: 500 });
+
+drawFlush();
+```
+
 ## `getVar`
 
 Allows you to access symbols or variables that are not available through the [namespaces](/guide/namespaces).
