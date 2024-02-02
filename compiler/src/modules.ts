@@ -3,13 +3,14 @@ import {
   Concat,
   DynamicArrayConstructor,
   GetBuildings,
+  GetColor,
+  GetGlobal,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
   Unchecked,
   VarsNamespace,
 } from "./macros";
-import { GetGlobal } from "./macros/GetGlobal";
 import { EMutability, IScope } from "./types";
 import { Asm } from "./macros/Asm";
 import { LiteralValue, ObjectValue } from "./values";
@@ -41,6 +42,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
   scope.hardSet("getBuildings", new GetBuildings());
   scope.hardSet("getVar", new GetGlobal(EMutability.mutable));
+  scope.hardSet("getColor", new GetColor());
   scope.hardSet("concat", new Concat());
   scope.hardSet("asm", new Asm());
 

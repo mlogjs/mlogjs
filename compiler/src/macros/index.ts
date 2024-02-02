@@ -7,3 +7,5 @@ export { NamespaceMacro, VarsNamespace } from "./Namespace";
 export * from "./DynamicArray";
 export * from "./Unchecked";
 export * from "./GetBuildings";
+export * from "./GetGlobal";
+export * from "./GetColor";
