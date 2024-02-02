@@ -27,6 +27,7 @@ import MonacoEditor, {
 } from "@jeanjpnm/monaco-vue";
 import "@jeanjpnm/monaco-vue/style.css";
 import { useMlogWatcherSocket } from "../composables/useMlogWatcherSocket";
+import { useColorPicker } from "../composables/useColorPicker";
 const { isDark } = useData();
 
 const theme = computed(() => (isDark.value ? "vs-dark" : "vs"));
@@ -76,6 +77,7 @@ useSourceMapping({
   sourcemapsRef,
   monacoRef,
 });
+useColorPicker({ editorRef, monacoRef });
 
 const sendToMlogWatcher = useMlogWatcherSocket(settings, compiledRef);
 
