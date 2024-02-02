@@ -39,6 +39,20 @@ declare global {
     T
   >;
 
+  /**
+   * Gets a color literal from a hex code.
+   *
+   * ```js
+   * const color = getColor("0e7eba");
+   *
+   * draw.col(color);
+   * draw.rect({ x: 0, y: 0, width: 500, height: 500 });
+   *
+   * drawFlush();
+   * ```
+   */
+  function getColor(hexCode: string): number;
+
   type ConcatLiteral = string | number | boolean | undefined;
 
   /**
