@@ -3,6 +3,7 @@ import { CompilerError } from "../CompilerError";
 import { ImmutableId } from "../flow/id";
 import {
   EMutability,
+  IInstruction,
   IScope,
   IValue,
   TEOutput,
@@ -39,13 +40,16 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  get(c: ICompilerContext, key: IValue, out?: TEOutput): TValueInstructions {
+  get(c: ICompilerContext, key: IValue, out: ImmutableId): IInstruction[] {
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
       // avoids naming collisions with keys like
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
         const member = this.data[key.data];
-        return [c.getValueOrTemp(member), []];
+        const value = c.getValue(member);
+        if (!value) throw new CompilerError("invalid object state");
+        c.setValue(out, c.getValueOrTemp(member));
+        return [];
       }
     }
 
