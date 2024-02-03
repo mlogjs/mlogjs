@@ -76,14 +76,12 @@ export class ValueGetInstruction {
   toMlog(c: ICompilerContext): IInstruction[] {
     const object = c.getValueOrTemp(this.object);
     const key = c.getValueOrTemp(this.key);
-    const out = c.getValueOrTemp(this.out);
 
     const inst: IInstruction[] = [];
     if (!object.hasProperty(c, key) && !this.optional)
       throw new CompilerError("Property does not exist", this.source);
     if (object.hasProperty(c, key)) {
-      const value = pipeInsts(object.get(c, key, out), inst);
-      inst.push(new InstructionBase("set", out, value));
+      inst.push(...object.get(c, key, this.out));
       appendSourceLocations(inst, { loc: this.source });
     }
     return inst;
@@ -305,7 +303,7 @@ export class CallInstruction {
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    const callee = c.getValueOrTemp(this.callee);
+    const callee = c.getValue(this.callee);
     const out = c.getValueOrTemp(this.out);
     if (!callee || !out)
       throw new CompilerError("Invalid call state", this.source);
@@ -313,7 +311,7 @@ export class CallInstruction {
     if (!args.every((arg): arg is IValue => !!arg))
       throw new CompilerError("Invalid call state", this.source);
     // if (callee.mutability === EMutability.constant) {
-    return appendSourceLocations(callee.call(c, args, out)[1], {
+    return appendSourceLocations(callee.call(c, args, this.out), {
       loc: this.source,
     } as never);
     // }
@@ -324,6 +322,10 @@ export class CallInstruction {
 export class EndInstruction {
   type = "end" as const;
   source?: es.SourceLocation;
+
+  constructor(node?: es.Node) {
+    this.source = node?.loc ?? undefined;
+  }
 }
 
 export class NativeInstruction {

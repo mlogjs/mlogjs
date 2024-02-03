@@ -113,6 +113,24 @@ export const MemberExpression: THandler = (
     }),
   );
 
+  // TODO: hack to use namespace methods
+
+  propagateFunction: {
+    const object = c.getValue(obj);
+    const key = c.getValue(prop);
+    if (
+      !(object instanceof ObjectValue) ||
+      !(key instanceof LiteralValue && (key.isString() || key.isNumber()))
+    )
+      break propagateFunction;
+
+    const memberId = object.data[key.data];
+    const member = c.getValue(memberId);
+    if (member) {
+      c.setValue(temp, member);
+    }
+  }
+
   return temp;
 
   // if (!out) {
