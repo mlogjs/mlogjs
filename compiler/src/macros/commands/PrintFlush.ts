@@ -5,15 +5,15 @@ import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 
 const defaultTargetName = "message1";
-export class PrintFlush extends MacroFunction<null> {
+export class PrintFlush extends MacroFunction {
   constructor() {
-    super((scope, out, target?: IValue) => {
+    super((c, out, target) => {
       if (!target)
-        return [null, [new InstructionBase("printflush", defaultTargetName)]];
+        return [new InstructionBase("printflush", defaultTargetName)];
 
       if (!(target instanceof StoreValue))
         throw new CompilerError("The printflush target must be a store value");
-      return [null, [new InstructionBase("printflush", target)]];
+      return [new InstructionBase("printflush", target)];
     });
   }
 }

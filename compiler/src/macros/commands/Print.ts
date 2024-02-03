@@ -1,12 +1,13 @@
 import { InstructionBase } from "../../instructions";
-import { MacroFunction } from "..";
-import { IInstruction, IValue, TValueInstructions } from "../../types";
+import { IInstruction, IValue } from "../../types";
 import { LiteralValue } from "../../values";
 import { isTemplateObjectArray } from "../../utils";
+import { ImmutableId } from "../../flow";
+import { MacroFunction } from "../Function";
 
 export class Print extends MacroFunction<null> {
   constructor() {
-    super((scope, out, ...values: IValue[]) => {
+    super((c, out, ...values: IValue[]) => {
       const [first] = values;
       const inst: IInstruction[] = [];
 
@@ -15,7 +16,7 @@ export class Print extends MacroFunction<null> {
           inst.push(new InstructionBase("print", value));
         }
 
-        return [null, inst];
+        return inst;
       }
 
       // `first` is likely a template strings array
@@ -23,21 +24,19 @@ export class Print extends MacroFunction<null> {
       const { length } = first.data;
 
       for (let i = 1; i < values.length; i++) {
-        const [string] = first.get(
-          scope,
-          new LiteralValue(i - 1),
-        ) as TValueInstructions<LiteralValue>;
+        const id = new ImmutableId();
+        first.get(c, new LiteralValue(i - 1), id);
+        const string = c.getValue(id) as LiteralValue<string>;
 
         if (string.data) inst.push(new InstructionBase("print", string));
         inst.push(new InstructionBase("print", values[i]));
       }
 
-      const [tail] = first.get(
-        scope,
-        new LiteralValue(length.data - 1),
-      ) as TValueInstructions<LiteralValue>;
+      const tailId = new ImmutableId();
+      first.get(c, new LiteralValue(length.data - 1), tailId);
+      const tail = c.getValue(tailId) as LiteralValue<string>;
       if (tail.data) inst.push(new InstructionBase("print", tail));
-      return [null, inst];
+      return inst;
     });
   }
 }

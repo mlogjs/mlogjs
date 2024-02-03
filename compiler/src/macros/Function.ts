@@ -1,5 +1,10 @@
+import { Node } from "@babel/types";
+import { ICompilerContext } from "../CompilerContext";
+import { HandlerContext } from "../HandlerContext";
+import { ImmutableId } from "../flow";
 import {
   EMutability,
+  IInstruction,
   IScope,
   IValue,
   TEOutput,
@@ -7,27 +12,28 @@ import {
 } from "../types";
 import { VoidValue } from "../values";
 
-type TFunction<T extends IValue | null> = (
-  scope: IScope,
-  out: TEOutput | undefined,
+type TFunction = (
+  c: ICompilerContext,
+  out: ImmutableId,
   ...args: IValue[]
-) => TValueInstructions<T>;
+) => IInstruction[];
 
 export class MacroFunction<
   RT extends IValue | null = IValue,
 > extends VoidValue {
   macro = true;
   mutability = EMutability.constant;
-  fn: TFunction<RT>;
+  fn: TFunction;
   constructor(
-    fn: TFunction<RT>,
+    fn: TFunction,
     public paramOuts?: TEOutput[],
   ) {
     super();
     this.fn = fn;
   }
-  call(scope: IScope, args: IValue[], out?: TEOutput): TValueInstructions<RT> {
-    return this.fn.apply(this, [scope, out, ...args]);
+
+  call(c: ICompilerContext, args: IValue[], out: ImmutableId): IInstruction[] {
+    return this.fn.apply(this, [c, out, ...args]);
   }
   eval(_scope: IScope): TValueInstructions {
     return [this, []];
@@ -46,5 +52,27 @@ export class MacroFunction<
 
   toMlogString(): string {
     return '"[macro MacroFunction]"';
+  }
+}
+
+export class ComptimeMacroFunction extends VoidValue {
+  macro = true;
+  mutability = EMutability.constant;
+
+  constructor(fn: IValue["handleCall"]) {
+    super();
+    this.handleCall = fn;
+  }
+
+  eval(_scope: IScope): TValueInstructions {
+    return [this, []];
+  }
+
+  debugString(): string {
+    return "ComptimeMacroFunction";
+  }
+
+  toMlogString(): string {
+    return '"[macro ComptimeMacroFunction]"';
   }
 }

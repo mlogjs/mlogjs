@@ -277,16 +277,19 @@ export interface IValue extends IValueOperators {
    * `StoreValue` with the instructions required to compute that value
    */
   eval(scope: IScope, out?: TEOutput): TValueInstructions;
-  call(
-    c: ICompilerContext,
-    args: IValue[],
-    out?: TEOutput,
-  ): TValueInstructions<IValue | null>;
+  call(c: ICompilerContext, args: IValue[], out: ImmutableId): IInstruction[];
   get(
     compilerContext: ICompilerContext,
     name: IValue,
-    out?: TEOutput,
-  ): TValueInstructions;
+    out: ImmutableId,
+  ): IInstruction[];
+
+  handleCall(
+    c: ICompilerContext,
+    context: HandlerContext,
+    node: es.Node,
+    args: ImmutableId[],
+  ): ImmutableId | undefined;
 
   /**
    * Wether `this` has a given property. This method is used to know if it's
