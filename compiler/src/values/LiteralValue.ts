@@ -6,12 +6,14 @@ import {
   IValue,
   EMutability,
   TEOutput,
+  IInstruction,
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { mathConstants } from "../utils";
 import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId } from "../flow";
 
 const literalMethods: Record<
   string,
@@ -69,9 +71,9 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     // (there is no way to escape a " character)
     return JSON.stringify(data.replace(/"/g, "''")).replace(/\\\\/g, "\\"); // "unescape" backslashes
   }
-  get(c: ICompilerContext, name: IValue): TValueInstructions {
+  get(c: ICompilerContext, name: IValue, out: ImmutableId): IInstruction[] {
     if (!(name instanceof LiteralValue && name.isString()))
-      return super.get(c, name);
+      return super.get(c, name, out);
     const method = literalMethods[name.data];
     if (
       !method ||
@@ -80,7 +82,8 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
       throw new CompilerError(
         `The member [${name.debugString()}] does not exist on literal values.`,
       );
-    return [method.apply(this, [c]), []];
+    c.setValue(out, method.apply(this, [c]));
+    return [];
   }
 
   hasProperty(compilerContext: ICompilerContext, prop: IValue): boolean {

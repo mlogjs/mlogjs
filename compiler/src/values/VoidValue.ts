@@ -1,14 +1,18 @@
 import {
   EMutability,
+  IInstruction,
   IScope,
   IValue,
   IValueOperators,
   TEOutput,
   TValueInstructions,
+  es,
 } from "../types";
 import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId } from "../flow";
+import { HandlerContext } from "../HandlerContext";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
@@ -24,14 +28,27 @@ export class VoidValue implements IValue {
   call(
     _c: ICompilerContext,
     _args: IValue[],
-    _out?: TEOutput,
-  ): TValueInstructions<IValue | null> {
+    _out: ImmutableId,
+  ): IInstruction[] {
     throw new CompilerError(`[${this.debugString()}] is not callable.`);
   }
-  get(_compilerContext: ICompilerContext, name: IValue): TValueInstructions {
+  get(
+    _compilerContext: ICompilerContext,
+    name: IValue,
+    _out: ImmutableId,
+  ): IInstruction[] {
     throw new CompilerError(
       `The member [${name.debugString()}] does not exist in [${this.debugString()}]`,
     );
+  }
+
+  handleCall(
+    _c: ICompilerContext,
+    _context: HandlerContext,
+    _node: es.Node,
+    _args: ImmutableId[],
+  ): ImmutableId | undefined {
+    return;
   }
 
   hasProperty(_compilerContext: ICompilerContext, _prop: IValue): boolean {

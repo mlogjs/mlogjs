@@ -5,6 +5,7 @@ import { ImmutableId } from "../flow";
 import { InstructionBase, SetInstruction } from "../instructions";
 import {
   EMutability,
+  IInstruction,
   IScope,
   IValue,
   TEOutput,
@@ -100,40 +101,31 @@ export class StoreValue extends BaseValue implements IValue {
     return [this, []];
   }
 
-  get(
-    c: ICompilerContext,
-    prop: IValue,
-    out?: TEOutput,
-  ): TValueInstructions<IValue> {
-    const mutability = EMutability.readonly;
-
+  get(c: ICompilerContext, prop: IValue, out: ImmutableId): IInstruction[] {
     const thisCoordName = getThisCoordName(this, prop);
-    if (thisCoordName)
-      return [
+    if (thisCoordName) {
+      c.setValue(
+        out,
         new StoreValue(`@this${thisCoordName}`, EMutability.constant),
-        [],
-      ];
+      );
+      return [];
+    }
 
     if (prop instanceof LiteralValue && prop.isString()) {
-      const resultId = new ImmutableId();
-
-      const result = c.getValueOrTemp(resultId);
+      const result = c.getValueOrTemp(out);
 
       return [
-        result,
-        [
-          new InstructionBase(
-            "sensor",
-            result,
-            this,
-            formatSenseablePropName(prop.data),
-          ),
-        ],
+        new InstructionBase(
+          "sensor",
+          result,
+          this,
+          formatSenseablePropName(prop.data),
+        ),
       ];
     }
     if (prop instanceof StoreValue) {
-      const temp = StoreValue.from(scope, out, mutability);
-      return [temp, [new InstructionBase("sensor", temp, this, prop)]];
+      const temp = c.getValueOrTemp(out);
+      return [new InstructionBase("sensor", temp, this, prop)];
     }
     throw new CompilerError(
       `The property [${prop.debugString()}] cannot be sensed`,
