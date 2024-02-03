@@ -1,48 +1,50 @@
 import { InstructionBase } from "../../instructions";
-import { MacroFunction } from "..";
-import { IInstruction, IScope, IValue, TValueInstructions } from "../../types";
+import { IInstruction, IValue } from "../../types";
 import { LiteralValue } from "../../values";
 import { isTemplateObjectArray } from "../../utils";
+import { ImmutableId } from "../../flow";
+import { MacroFunction } from "../Function";
 
 export class Print extends MacroFunction<null> {
   constructor() {
-    super((scope, out, ...args: IValue[]) => {
+    super((c, out, ...values: IValue[]) => {
+      const [first] = values;
       const inst: IInstruction[] = [];
 
-      const values = getPrintValues(scope, args).filter(
-        value =>
-          !(value instanceof LiteralValue) ||
-          !value.isString() ||
-          value.data.length > 0,
-      );
+      // const values = getPrintValues(scope, args).filter(
+      //   value =>
+      //     !(value instanceof LiteralValue) ||
+      //     !value.isString() ||
+      //     value.data.length > 0,
+      // );
 
       if (!needsFormatString(values)) {
         for (let i = 0; i < values.length; i++) {
           const value = values[i];
           inst.push(new InstructionBase("print", value));
         }
-      } else {
-        let formatString = "";
-        for (let i = 0; i < values.length; i++) {
-          const value = values[i];
-          if (value instanceof LiteralValue) {
-            formatString += value.data;
-          } else {
-            // mlog replaces the first occurrence of {0}
-            // so we don't need to increment the placeholder
-            // number
-            formatString += "{0}";
-          }
-        }
-        inst.push(new InstructionBase("print", new LiteralValue(formatString)));
-        for (let i = 0; i < values.length; i++) {
-          const value = values[i];
-          if (value instanceof LiteralValue) continue;
-          inst.push(new InstructionBase("format", value));
-        }
+
+        return inst;
       }
 
-      return [null, inst];
+      // `first` is likely a template strings array
+      // maybe this should be checked in another way?
+      const { length } = first.data;
+
+      for (let i = 1; i < values.length; i++) {
+        const id = new ImmutableId();
+        first.get(c, new LiteralValue(i - 1), id);
+        const string = c.getValue(id) as LiteralValue<string>;
+
+        if (string.data) inst.push(new InstructionBase("print", string));
+        inst.push(new InstructionBase("print", values[i]));
+      }
+
+      const tailId = new ImmutableId();
+      first.get(c, new LiteralValue(length.data - 1), tailId);
+      const tail = c.getValue(tailId) as LiteralValue<string>;
+      if (tail.data) inst.push(new InstructionBase("print", tail));
+      return inst;
     });
   }
 }
@@ -63,7 +65,7 @@ function getPrintValues(scope: IScope, args: IValue[]) {
   // into the values array
   for (let i = 0; i <= rest.length; i++) {
     const [string] = first.get(
-      scope,
+      c,
       new LiteralValue(i),
     ) as TValueInstructions<LiteralValue<string>>;
     values.push(string);
