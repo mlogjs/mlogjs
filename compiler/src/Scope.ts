@@ -1,10 +1,10 @@
 import { LiteralValue } from "./values";
 import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
 import { CompilerError } from "./CompilerError";
-import { Block } from "./flow";
+import { Block, ValueId } from "./flow";
 
 export class Scope implements IScope {
-  data: Record<string, number>;
+  data: Record<string, ValueId>;
   parent: IScope | null;
   ntemp: number;
   name: string;
@@ -67,7 +67,7 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(identifier: string): number {
+  get(identifier: string): ValueId {
     const value = this.data[identifier];
     if (value !== undefined) return value;
     if (this.parent) return this.parent.get(identifier);
@@ -83,13 +83,13 @@ export class Scope implements IScope {
     throw new CompilerError(message);
   }
 
-  set(name: string, value: number): void {
+  set(name: string, value: ValueId): void {
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
 
-  hardSet(name: string, value: number): void {
+  hardSet(name: string, value: ValueId): void {
     if (!name)
       throw new CompilerError("Values in a scope must have an identifier");
     this.data[name] = value;
