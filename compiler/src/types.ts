@@ -93,7 +93,7 @@ export interface IScope {
   /** Every scope except the top level one has a parent */
   parent: IScope | null;
   /** The registry of variables contained by this scope */
-  data: Record<string, number>;
+  data: Record<string, ValueId>;
   name: string;
   /**
    * Additional instructions required by this scope, such as the instructions
