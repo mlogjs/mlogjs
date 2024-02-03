@@ -1,6 +1,5 @@
 import { CompilerError } from "../CompilerError";
 import {
-  AssignmentInstruction,
   BinaryOperationInstruction,
   Block,
   BreakIfInstruction,
@@ -148,6 +147,8 @@ export const UnaryExpression: THandler = (
   const value = c.handle(scope, context, node.argument);
 
   switch (node.operator) {
+    case "void":
+      return nullId;
     case "!":
       context.addInstruction(
         new BinaryOperationInstruction(
@@ -185,9 +186,6 @@ export const UnaryExpression: THandler = (
       context.addInstruction(
         new UnaryOperatorInstruction("not", value, out, node),
       );
-      break;
-    case "void":
-      context.addInstruction(new AssignmentInstruction(out, nullId, node));
       break;
     case "throw":
     case "delete":

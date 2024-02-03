@@ -5,14 +5,13 @@ import {
   IScope,
   THandler,
   IValue,
-  EMutability,
   TWriteCallback,
   TDeclarationKind,
 } from "./types";
 import { CompilerOptions } from "./Compiler";
 import { HandlerContext } from "./HandlerContext";
 import { nullId } from "./utils";
-import { Block, traverse } from "./flow";
+import { Block } from "./flow";
 import { LiteralValue, StoreValue } from "./values";
 import { ImmutableId, ValueId } from "./flow/id";
 
@@ -28,7 +27,6 @@ export interface ICompilerContext {
   getValueOrTemp(id: ValueId): IValue;
   setValue(id: ValueId, value: IValue): void;
   registerValue(value: IValue): ImmutableId;
-  resolveTypes(entry: Block): void;
 
   handle(
     scope: IScope,
@@ -98,7 +96,8 @@ export class CompilerContext implements ICompilerContext {
     const value = this.getValue(id);
     if (value) return value;
 
-    const store = new StoreValue(`&t${this.#tempCounter++}`);
+    const name = this.getValueName(id);
+    const store = new StoreValue(name ?? `&t${this.#tempCounter++}`);
     this.setValue(id, store);
     return store;
   }
@@ -123,19 +122,6 @@ export class CompilerContext implements ICompilerContext {
 
   getValueId(name: string): ValueId | undefined {
     return this.#ids.get(name);
-  }
-
-  resolveTypes(entry: Block): void {
-    traverse(entry, block => {
-      for (const inst of block.instructions) {
-        if (inst.type === "assignment") {
-          const value = this.getValue(inst.value);
-          if (value?.mutability === EMutability.constant) {
-            this.setValue(inst.target, value);
-          }
-        }
-      }
-    });
   }
 
   handle(

@@ -53,7 +53,6 @@ export class Compiler {
       c.handle(scope, rootContext, program);
 
       const rootGraph = Graph.from(rootContext.entry, rootContext.exit);
-      c.resolveTypes(rootGraph.start);
 
       const inst = rootGraph.toMlog(c);
 

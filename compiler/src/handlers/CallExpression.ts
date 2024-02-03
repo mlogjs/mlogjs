@@ -19,8 +19,11 @@ export const CallExpression: THandler = (
   calleeValue?.postCall(scope);
 
   // TODO: update to load from the function's global return value
-  const out = new ImmutableId();
 
+  const handleResult = calleeValue?.handleCall(c, context, node, args);
+  if (handleResult) return handleResult;
+
+  const out = new ImmutableId();
   context.addInstruction(new CallInstruction(callee, args, out, node));
 
   return out;
