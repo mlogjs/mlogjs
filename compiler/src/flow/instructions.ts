@@ -1,8 +1,8 @@
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { EMutability, IInstruction, IValue, es } from "../types";
-import { appendSourceLocations, pipeInsts } from "../utils";
+import { IInstruction, IValue, es } from "../types";
+import { appendSourceLocations } from "../utils";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 
@@ -47,32 +47,6 @@ export class StoreInstruction {
       throw new CompilerError("Invalid store state", this.source);
     const instruction = new InstructionBase("set", address, value);
     instruction.source = this.source;
-    return [instruction];
-  }
-}
-
-export class AssignmentInstruction {
-  type = "assignment" as const;
-  source?: es.SourceLocation;
-  constructor(
-    public target: ImmutableId,
-    public value: ImmutableId,
-    node?: es.Node,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
-  toMlog(c: ICompilerContext): IInstruction[] {
-    const target = c.getValueOrTemp(this.target);
-    const value = c.getValueOrTemp(this.value);
-    if (!target || !value)
-      throw new CompilerError("Invalid assignment state", this.source);
-
-    // this was already optimized out by the compiler context
-    if (value.mutability === EMutability.constant) return [];
-
-    const instruction = new InstructionBase("set", target, value);
-    instruction.source = this.source;
-
     return [instruction];
   }
 }
@@ -372,7 +346,6 @@ export type TBlockEndInstruction =
 export type TBlockInstruction =
   | LoadInstruction
   | StoreInstruction
-  | AssignmentInstruction
   | ValueGetInstruction
   | ValueSetInstruction
   | BinaryOperationInstruction

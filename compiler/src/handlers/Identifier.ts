@@ -1,8 +1,5 @@
-import {
-  AssignmentInstruction,
-  LoadInstruction,
-  StoreInstruction,
-} from "../flow";
+import { CompilerError } from "../CompilerError";
+import { LoadInstruction, StoreInstruction } from "../flow";
 import { GlobalId, ImmutableId } from "../flow/id";
 import { es, THandler } from "../types";
 import { nodeName } from "../utils";
@@ -44,20 +41,19 @@ Identifier.handleDeclaration = (
   init,
 ) => {
   const name = nodeName(node, !c.compactNames && node.name);
-  const valueId = kind === "const" ? new ImmutableId() : new GlobalId();
+  if (kind === "const") {
+    if (!init) throw new CompilerError("const must be initialized", node);
+    scope.set(node.name, init);
+    if (!c.getValueName(init)) c.setValueName(init, name);
+    return;
+  }
+
+  const valueId = new GlobalId();
   scope.set(node.name, valueId);
   c.setValue(valueId, new StoreValue(name));
   c.setValueName(valueId, name);
 
   if (!init) return;
 
-  if (kind === "const") {
-    context.addInstruction(
-      new AssignmentInstruction(valueId as ImmutableId, init, node),
-    );
-  } else {
-    context.addInstruction(
-      new StoreInstruction(valueId as GlobalId, init, node),
-    );
-  }
+  context.addInstruction(new StoreInstruction(valueId, init, node));
 };
