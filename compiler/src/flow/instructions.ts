@@ -197,6 +197,35 @@ export class BinaryOperationInstruction {
     op.source = this.source;
     return [op];
   }
+
+  constantFold(c: ICompilerContext): boolean {
+    const left = c.getValue(this.left);
+    const right = c.getValue(this.right);
+    if (!left || !right) return false;
+    if (!(left instanceof LiteralValue) || !(right instanceof LiteralValue))
+      return false;
+    switch (this.operator) {
+      case "equal": {
+        const a = left.data as TLiteral;
+        const b = right.data as TLiteral;
+        if (typeof a !== typeof b) break;
+        c.setValue(this.out, new LiteralValue(a === b ? 1 : 0));
+        return true;
+      }
+      case "notEqual": {
+        const a = left.data as TLiteral;
+        const b = right.data as TLiteral;
+        if (typeof a !== typeof b) break;
+        c.setValue(this.out, new LiteralValue(a !== b ? 1 : 0));
+        return true;
+      }
+    }
+    const value = constantOperationMap[this.operator]?.(left.num, right.num);
+    if (value === undefined) return false;
+
+    c.setValue(this.out, new LiteralValue(value));
+    return true;
+  }
 }
 
 export type TUnaryOperationType =
