@@ -278,11 +278,26 @@ export class Graph {
     });
   }
 
+  foldConstantOperations(c: ICompilerContext) {
+    traverse(this.start, block => {
+      for (let i = 0; i < block.instructions.length; i++) {
+        const inst = block.instructions[i];
+        if (inst.type !== "binary-operation" && inst.type !== "unary-operation")
+          continue;
+
+        if (!inst.constantFold(c)) continue;
+        block.instructions.splice(i, 1);
+        i--;
+      }
+    });
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
     this.canonicalizeBreakIfs(c);
     this.removeCriticalEdges();
+    this.foldConstantOperations(c);
     this.skipBlocks();
 
     // TODO: fix updating of block parents during

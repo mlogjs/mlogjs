@@ -14,10 +14,6 @@ import { mathConstants } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 import { ComptimeMacroFunction } from "./Function";
 
-const toRadians = (degrees: number) => (degrees * Math.PI) / 180;
-const toDegrees = (radians: number) => (radians * 180) / Math.PI;
-const mod = (f: number, n: number) => ((f % n) + n) % n;
-
 function binary(
   context: HandlerContext,
   node: es.Node,
@@ -57,46 +53,6 @@ const forwardedBinaryOperations: TBinaryOperationType[] = [
   "noise",
   "pow",
 ];
-
-// TODO: use as reference for constant operation evaluation
-const mathOperations: Record<
-  string,
-  ((a: number, b?: number) => number) | null
-> = {
-  max: (a, b) => Math.max(a, b!),
-  min: (a, b) => Math.min(a, b!),
-  angle: (x, y) => {
-    const angle = toDegrees(Math.atan2(y!, x));
-    return angle < 0 ? angle + 360 : angle;
-  },
-  angleDiff: (x, y) => {
-    const a = mod(x, 360);
-    const b = mod(y!, 360);
-    return Math.min(
-      a - b < 0 ? a - b + 360 : a - b,
-      b - a < 0 ? b - a + 360 : b - a,
-    );
-  },
-  len: (a, b) => Math.sqrt(a ** 2 + b! ** 2),
-  noise: null,
-  abs: a => Math.abs(a),
-  log: a => Math.log(a),
-  log10: a => Math.log10(a),
-  sin: a => Math.sin(toRadians(a)),
-  cos: a => Math.cos(toRadians(a)),
-  tan: a => Math.tan(toRadians(a)),
-  floor: a => Math.floor(a),
-  ceil: a => Math.ceil(a),
-  sqrt: a => Math.sqrt(a),
-  asin: a => toDegrees(Math.asin(a)),
-  acos: a => toDegrees(Math.acos(a)),
-  atan: a => toDegrees(Math.atan(a)),
-  // yes, this doesn't work with negative numbers
-  // but the game also implements it this way.
-  idiv: (a, b) => Math.floor(a / b!),
-  pow: (a, b) => Math.pow(a, b!),
-  rand: null,
-};
 
 function createMacroMathOperations(c: ICompilerContext) {
   const macroMathMembers: IObjectValueData = {
