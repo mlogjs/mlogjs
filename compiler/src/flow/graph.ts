@@ -278,6 +278,27 @@ export class Graph {
     });
   }
 
+  /**
+   * Puts constants at the right side of binary operations whenever possible
+   *
+   * This reduces the amount of edge cases that need to be handled by other
+   * optimization functions
+   */
+  canonicalizeBinaryOperations(c: ICompilerContext) {
+    traverse(this.start, block => {
+      for (let i = 0; i < block.instructions.length; i++) {
+        const inst = block.instructions[i];
+        if (inst.type !== "binary-operation") continue;
+        if (!inst.isOrderIndependent()) continue;
+        const left = c.getValue(inst.left);
+
+        if (!(left instanceof LiteralValue)) continue;
+
+        [inst.left, inst.right] = [inst.right, inst.left];
+      }
+    });
+  }
+
   foldConstantOperations(c: ICompilerContext) {
     traverse(this.start, block => {
       for (let i = 0; i < block.instructions.length; i++) {
@@ -312,6 +333,7 @@ export class Graph {
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
+    this.canonicalizeBinaryOperations(c);
     this.canonicalizeBreakIfs(c);
     this.removeCriticalEdges();
     this.foldConstantOperations(c);
