@@ -54,7 +54,7 @@ export function createGlobalScope(c: ICompilerContext): IScope {
     concat: new Concat(),
     asm: new Asm(),
 
-    Math: new MlogMath(),
+    Math: new MlogMath(c),
     Memory: new MemoryBuilder(),
     StringView: new StringViewBuilder(),
     MutableArray: new DynamicArrayConstructor(false),
