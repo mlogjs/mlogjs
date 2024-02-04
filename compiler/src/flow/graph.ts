@@ -292,12 +292,30 @@ export class Graph {
     });
   }
 
+  removeConstantBreakIfs(c: ICompilerContext) {
+    traverse(this.start, block => {
+      const { endInstruction } = block;
+      if (endInstruction?.type !== "break-if") return;
+      const condition = c.getValue(endInstruction.condition);
+      if (!(condition instanceof LiteralValue)) return;
+
+      const newBreak = new BreakInstruction(
+        condition.num === 0
+          ? endInstruction.alternate
+          : endInstruction.consequent,
+      );
+      newBreak.source = endInstruction.source;
+      block.endInstruction = newBreak;
+    });
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
     this.canonicalizeBreakIfs(c);
     this.removeCriticalEdges();
     this.foldConstantOperations(c);
+    this.removeConstantBreakIfs(c);
     this.skipBlocks();
 
     // TODO: fix updating of block parents during
