@@ -402,6 +402,43 @@ export class Graph {
     });
   }
 
+  removeUnusedInstructions() {
+    const reads = new ReaderMap();
+    traverse(this.start, block => {
+      for (const inst of block.instructions) {
+        inst.registerReader(reads);
+      }
+      switch (block.endInstruction?.type) {
+        case "break-if":
+          reads.add(block.endInstruction.condition, block.endInstruction);
+          break;
+        case "return":
+          reads.add(block.endInstruction.value, block.endInstruction);
+          break;
+      }
+    });
+
+    traversePostOrder(this.start, block => {
+      for (let i = block.instructions.length - 1; i >= 0; i--) {
+        const inst = block.instructions[i];
+
+        // TODO: remove calls to functions with no side effects
+        // TODO: handle value-get instructions
+        switch (inst.type) {
+          case "load":
+          case "binary-operation":
+          case "unary-operation": {
+            const readers = reads.get(inst.out);
+            if (readers.size !== 0) break;
+            block.instructions.splice(i, 1);
+            inst.unregisterReader(reads);
+            i++;
+          }
+        }
+      }
+    });
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
@@ -410,6 +447,7 @@ export class Graph {
     this.removeCriticalEdges();
     this.foldConstantOperations(c);
     this.transformComparisons(c);
+    this.removeUnusedInstructions();
     this.removeConstantBreakIfs(c);
     this.skipBlocks();
 
@@ -449,6 +487,22 @@ export function traverseParentsFirst(
       if (edge.type === "backward") continue;
       _traverse(edge.block);
     }
+  }
+
+  _traverse(entry);
+}
+
+export function traversePostOrder(
+  entry: Block,
+  action: (block: Block) => void,
+) {
+  function _traverse(block: Block) {
+    for (const edge of block.childEdges) {
+      if (edge.type === "backward") continue;
+      _traverse(edge.block);
+    }
+
+    action(block);
   }
 
   _traverse(entry);
