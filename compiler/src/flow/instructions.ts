@@ -286,8 +286,6 @@ export class BreakIfInstruction {
   consequent: TEdge;
   alternate: TEdge;
 
-  hasBackEdge = false;
-
   constructor(
     public condition: ImmutableId,
     consequent: Block | TEdge,
@@ -296,13 +294,9 @@ export class BreakIfInstruction {
   ) {
     this.source = node?.loc ?? undefined;
     this.consequent =
-      consequent instanceof Block
-        ? { type: "forward", block: consequent }
-        : consequent;
+      consequent instanceof Block ? consequent.toForward() : consequent;
     this.alternate =
-      alternate instanceof Block
-        ? { type: "forward", block: alternate }
-        : alternate;
+      alternate instanceof Block ? alternate.toForward() : alternate;
   }
 }
 
