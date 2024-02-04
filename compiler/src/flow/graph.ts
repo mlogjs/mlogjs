@@ -11,6 +11,7 @@ import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { ImmutableId } from "./id";
 import { BinaryOperationInstruction, BreakInstruction } from "./instructions";
+import { ReaderMap, WriterMap } from "./optimizer";
 
 // control flow graph internals for the compiler
 export class Graph {
@@ -245,6 +246,8 @@ export class Graph {
   }
 
   canonicalizeBreakIfs(c: ICompilerContext) {
+    console.log(this.start);
+
     traverse(this.start, block => {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
@@ -564,4 +567,18 @@ function intersectSets<T>(...sets: Set<T>[]) {
     }
   }
   return result;
+}
+
+// function removeImmediateMoves() {}
+
+function getIdSources(entry: Block): WriterMap {
+  const sources = new WriterMap();
+
+  traverse(entry, block => {
+    for (const inst of block.instructions) {
+      inst.registerWriter(sources);
+    }
+  });
+
+  return sources;
 }
