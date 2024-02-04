@@ -330,6 +330,78 @@ export class Graph {
     });
   }
 
+  transformComparisons(c: ICompilerContext) {
+    const sources = getIdSources(this.start);
+    traverse(this.start, block => {
+      for (let i = 0; i < block.instructions.length; i++) {
+        const inst = block.instructions[i];
+        if (inst.type !== "binary-operation") continue;
+        const invert = (source: BinaryOperationInstruction) => {
+          if (!source.isInvertible()) return;
+          changed = true;
+          inst.operator = source.operator;
+          inst.left = source.left;
+          inst.right = source.right;
+          inst.invert();
+        };
+
+        const duplicate = (source: BinaryOperationInstruction) => {
+          changed = true;
+          // duplicating the source instruction
+          // does is easier because the source
+          // will be marked as unused and removed
+          inst.operator = source.operator;
+          inst.left = source.left;
+          inst.right = source.right;
+        };
+
+        const remove = (value: number) => {
+          changed = true;
+          c.setValue(inst.out, new LiteralValue(value));
+          block.instructions.splice(i, 1);
+          i--;
+        };
+
+        let changed = false;
+        do {
+          changed = false;
+          const source = sources.get(inst.left);
+          const right = c.getValue(inst.right);
+
+          if (
+            !(source instanceof BinaryOperationInstruction) ||
+            !(right instanceof LiteralValue)
+          )
+            break;
+
+          switch (inst.operator) {
+            case "equal":
+            case "strictEqual": {
+              if (right.num === 0) {
+                invert(source);
+              } else if (right.num === 1) {
+                duplicate(source);
+              } else {
+                remove(0);
+              }
+              break;
+            }
+            case "notEqual": {
+              if (right.num === 1) {
+                invert(source);
+              } else if (right.num === 0) {
+                duplicate(source);
+              } else {
+                remove(1);
+              }
+              break;
+            }
+          }
+        } while (changed);
+      }
+    });
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
@@ -337,6 +409,7 @@ export class Graph {
     this.canonicalizeBreakIfs(c);
     this.removeCriticalEdges();
     this.foldConstantOperations(c);
+    this.transformComparisons(c);
     this.removeConstantBreakIfs(c);
     this.skipBlocks();
 
