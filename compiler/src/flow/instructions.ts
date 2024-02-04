@@ -1,10 +1,12 @@
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
-import { IInstruction, IValue, es } from "../types";
+import { IInstruction, IValue, TLiteral, es } from "../types";
 import { appendSourceLocations } from "../utils";
+import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
+import { ReaderMap, WriterMap, constantOperationMap } from "./optimizer";
 
 export class LoadInstruction {
   type = "load" as const;
@@ -26,6 +28,22 @@ export class LoadInstruction {
     instruction.source = this.source;
     return [instruction];
   }
+
+  registerReader(reads: ReaderMap) {
+    reads.add(this.address, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.address, this);
+  }
+
+  registerWriter(writes: WriterMap) {
+    writes.set(this.out, this);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
+  }
 }
 
 export class StoreInstruction {
@@ -39,6 +57,18 @@ export class StoreInstruction {
   ) {
     this.source = node?.loc ?? undefined;
   }
+
+  registerReader(reads: ReaderMap) {
+    reads.add(this.value, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.value, this);
+  }
+
+  registerWriter(writes: WriterMap) {}
+
+  unregisterWriter(writes: WriterMap) {}
 
   toMlog(c: ICompilerContext): IInstruction[] {
     const value = c.getValueOrTemp(this.value);
@@ -73,6 +103,24 @@ export class ValueGetInstruction {
     this.source = options.node?.loc ?? undefined;
   }
 
+  registerReader(reads: ReaderMap) {
+    reads.add(this.object, this);
+    reads.add(this.key, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.object, this);
+    reads.remove(this.key, this);
+  }
+
+  registerWriter(writes: WriterMap) {
+    writes.set(this.out, this);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
+  }
+
   toMlog(c: ICompilerContext): IInstruction[] {
     const object = c.getValueOrTemp(this.object);
     const key = c.getValueOrTemp(this.key);
@@ -101,6 +149,24 @@ export class ValueSetInstruction {
   ) {
     this.source = node?.loc ?? undefined;
   }
+
+  registerReader(reads: ReaderMap) {
+    reads.add(this.target, this);
+    reads.add(this.key, this);
+    reads.add(this.value, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.target, this);
+    reads.remove(this.key, this);
+    reads.remove(this.value, this);
+  }
+
+  // TODO: update after implementing functions
+  registerWriter(writes: WriterMap) {}
+
+  unregisterWriter(writes: WriterMap) {}
+
   toMlog(c: ICompilerContext): IInstruction[] {
     throw new CompilerError("Not implemented");
   }
@@ -178,6 +244,28 @@ export class BinaryOperationInstruction {
     return this.operator in invertedOperatorMap;
   }
 
+  isOrderIndependent() {
+    switch (this.operator) {
+      case "equal":
+      case "notEqual":
+      case "strictEqual":
+      case "add":
+      case "mul":
+      case "land":
+      case "or":
+      case "and":
+      case "xor":
+      case "max":
+      case "min":
+      case "angle":
+      case "angleDiff":
+      case "len":
+        return true;
+      default:
+        return false;
+    }
+  }
+
   invert(): void {
     const operator = invertedOperatorMap[this.operator];
     if (!operator)
@@ -185,6 +273,24 @@ export class BinaryOperationInstruction {
         "Attempted to invert non-invertable binary operation",
       );
     this.operator = operator;
+  }
+
+  registerReader(reads: ReaderMap) {
+    reads.add(this.left, this);
+    reads.add(this.right, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.left, this);
+    reads.remove(this.right, this);
+  }
+
+  registerWriter(writes: WriterMap) {
+    writes.set(this.out, this);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
@@ -257,6 +363,22 @@ export class UnaryOperatorInstruction {
     this.source = node?.loc ?? undefined;
   }
 
+  registerReader(reads: ReaderMap) {
+    reads.add(this.value, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.value, this);
+  }
+
+  registerWriter(writes: WriterMap) {
+    writes.set(this.out, this);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
+  }
+
   toMlog(c: ICompilerContext): IInstruction[] {
     const value = c.getValueOrTemp(this.value);
     const out = c.getValueOrTemp(this.out);
@@ -265,6 +387,16 @@ export class UnaryOperatorInstruction {
     const op = new InstructionBase("op", this.operator, out, value);
     op.source = this.source;
     return [op];
+  }
+
+  constantFold(c: ICompilerContext): boolean {
+    const value = c.getValue(this.value);
+    if (!value) return false;
+    if (!(value instanceof LiteralValue)) return false;
+    const result = constantOperationMap[this.operator]?.(value.num);
+    if (result === undefined) return false;
+    c.setValue(this.out, new LiteralValue(result));
+    return true;
   }
 }
 
@@ -325,6 +457,24 @@ export class CallInstruction {
     this.source = node?.loc ?? undefined;
   }
 
+  registerReader(reads: ReaderMap) {
+    reads.add(this.callee, this);
+    this.args.forEach(arg => reads.add(arg, this));
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.callee, this);
+    this.args.forEach(arg => reads.remove(arg, this));
+  }
+
+  registerWriter(writes: WriterMap) {
+    writes.set(this.out, this);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
+  }
+
   toMlog(c: ICompilerContext): IInstruction[] {
     const callee = c.getValue(this.callee);
     const out = c.getValueOrTemp(this.out);
@@ -356,6 +506,14 @@ export class NativeInstruction {
   source?: es.SourceLocation;
 
   constructor(public instruction: IInstruction) {}
+
+  registerReader(reads: ReaderMap) {}
+
+  unregisterReader(reads: ReaderMap) {}
+
+  registerWriter(writes: WriterMap) {}
+
+  unregisterWriter(writes: WriterMap) {}
 
   toMlog(c: ICompilerContext): IInstruction[] {
     return [this.instruction];

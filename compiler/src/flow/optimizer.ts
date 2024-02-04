@@ -86,3 +86,44 @@ function bitwiseOp(fn: (...args: bigint[]) => bigint) {
     return Number(BigInt.asIntN(64, bigResult));
   };
 }
+
+export class ReaderMap {
+  reads: Map<ValueId, Set<TBlockInstruction | TBlockEndInstruction>> =
+    new Map();
+
+  private ensurePresent(id: ValueId) {
+    if (!this.reads.has(id)) this.reads.set(id, new Set());
+  }
+
+  add(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
+    this.ensurePresent(id);
+    this.reads.get(id)!.add(instruction);
+  }
+
+  remove(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
+    if (!this.reads.has(id)) return;
+
+    this.reads.get(id)!.delete(instruction);
+  }
+
+  get(id: ValueId) {
+    this.ensurePresent(id);
+    return this.reads.get(id)!;
+  }
+}
+
+export class WriterMap {
+  writes: Map<ValueId, TBlockInstruction> = new Map();
+
+  set(id: ImmutableId, instruction: TBlockInstruction) {
+    this.writes.set(id, instruction);
+  }
+
+  remove(id: ValueId) {
+    this.writes.delete(id);
+  }
+
+  get(id: ValueId) {
+    return this.writes.get(id);
+  }
+}
