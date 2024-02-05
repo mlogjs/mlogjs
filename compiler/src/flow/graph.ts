@@ -114,7 +114,8 @@ export class Graph {
 
       while (
         current.block.endInstruction?.type === "break" &&
-        current.block.instructions.length === 0
+        current.block.instructions.length === 0 &&
+        current.block.forwardParents.length === current.block.parents.length
       ) {
         current = current.block.endInstruction.target;
       }
@@ -246,14 +247,18 @@ export class Graph {
   }
 
   canonicalizeBreakIfs(c: ICompilerContext) {
-    console.log(this.start);
-
     traverse(this.start, block => {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
       const { alternate, consequent } = endInstruction;
+
+      // checking like this is required because there are no critical
+      // edges at this point in the optimization pipeline
+      const isBackBreak = (end: TBlockEndInstruction | undefined) =>
+        end?.type === "break" && end?.target.type === "backward";
+
       if (
-        consequent.type === "backward" ||
+        isBackBreak(consequent.block.endInstruction) ||
         alternate.block.instructions.length > 0
       )
         return;
@@ -437,13 +442,16 @@ export class Graph {
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
+    this.skipBlocks();
+    this.setParents();
+    this.removeCriticalEdges();
     this.canonicalizeBinaryOperations(c);
     this.canonicalizeBreakIfs(c);
-    this.removeCriticalEdges();
     this.foldConstantOperations(c);
     this.transformComparisons(c);
     this.removeUnusedInstructions();
     this.removeConstantBreakIfs(c);
+    this.setParents();
     this.skipBlocks();
 
     // TODO: fix updating of block parents during
