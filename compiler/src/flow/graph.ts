@@ -10,7 +10,11 @@ import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { ImmutableId } from "./id";
-import { BinaryOperationInstruction, BreakInstruction } from "./instructions";
+import {
+  BinaryOperationInstruction,
+  BreakInstruction,
+  TBlockEndInstruction,
+} from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
 
 // control flow graph internals for the compiler
