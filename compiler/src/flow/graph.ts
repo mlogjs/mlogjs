@@ -463,7 +463,11 @@ export class Graph {
 }
 
 export function traverse(block: Block, action: (block: Block) => void) {
+  const visited = new Set<Block>();
   function _traverse(block: Block) {
+    if (visited.has(block)) return;
+    visited.add(block);
+
     action(block);
     for (const edge of block.childEdges) {
       if (edge.type === "backward") continue;
@@ -499,7 +503,11 @@ export function traversePostOrder(
   entry: Block,
   action: (block: Block) => void,
 ) {
+  const visited = new Set<Block>();
   function _traverse(block: Block) {
+    if (visited.has(block)) return;
+    visited.add(block);
+
     for (const edge of block.childEdges) {
       if (edge.type === "backward") continue;
       _traverse(edge.block);
