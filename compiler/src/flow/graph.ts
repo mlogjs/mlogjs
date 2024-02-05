@@ -439,7 +439,8 @@ export class Graph {
             if (readers.size !== 0) break;
             block.instructions.splice(i, 1);
             inst.unregisterReader(reads);
-            i++;
+            // necessary because we might remove the last operation of a block
+            i = Math.min(i + 1, block.instructions.length - 1);
           }
         }
       }
