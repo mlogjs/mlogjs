@@ -263,7 +263,10 @@ export class Graph {
 
       if (
         isBackBreak(consequent.block.endInstruction) ||
-        alternate.block.instructions.length > 0
+        alternate.block.instructions.length > 0 ||
+        // don't flip if both targets have zero instructions
+        alternate.block.instructions.length ===
+          consequent.block.instructions.length
       )
         return;
 
