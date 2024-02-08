@@ -286,6 +286,37 @@ export class Graph {
   }
 
   /**
+   * Flip break-if instructions whose condition is a value being falsy.
+   *
+   * This reduces the amount of instructions used to represent the same logic
+   *
+   * Must be called after the break-ifs have been canonicalized and after
+   * operation instructions have been optimized and merged
+   */
+  flipBreakIfs(c: ICompilerContext) {
+    traverse(this.start, block => {
+      const { endInstruction } = block;
+      if (endInstruction?.type !== "break-if") return;
+      const { alternate, consequent } = endInstruction;
+
+      const conditionInst = block.conditionInstruction();
+
+      console.log(conditionInst);
+      if (
+        conditionInst?.operator !== "equal" ||
+        // don't un-canonicalize break-ifs
+        consequent.block.instructions.length === 0
+      )
+        return;
+      const right = c.getValue(conditionInst.right);
+      if (!(right instanceof LiteralValue) || right.data !== 0) return;
+      endInstruction.condition = conditionInst.left;
+      endInstruction.alternate = consequent;
+      endInstruction.consequent = alternate;
+    });
+  }
+
+  /**
    * Puts constants at the right side of binary operations whenever possible
    *
    * This reduces the amount of edge cases that need to be handled by other
@@ -457,6 +488,7 @@ export class Graph {
     this.canonicalizeBreakIfs(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
+    this.flipBreakIfs(c);
     this.removeUnusedInstructions();
     this.removeConstantBreakIfs(c);
     this.setParents();
