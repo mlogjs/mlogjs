@@ -327,12 +327,11 @@ export class Graph {
       for (let i = 0; i < block.instructions.length; i++) {
         const inst = block.instructions[i];
         if (inst.type !== "binary-operation") continue;
-        if (!inst.isOrderIndependent()) continue;
+        if (!inst.isCanonicalizable()) continue;
         const left = c.getValue(inst.left);
-
         if (!(left instanceof LiteralValue)) continue;
 
-        [inst.left, inst.right] = [inst.right, inst.left];
+        inst.canonicalize();
       }
     });
   }
