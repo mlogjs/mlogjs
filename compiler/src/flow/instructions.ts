@@ -244,7 +244,7 @@ export class BinaryOperationInstruction {
     return this.operator in invertedOperatorMap;
   }
 
-  isOrderIndependent() {
+  isCanonicalizable() {
     switch (this.operator) {
       case "equal":
       case "notEqual":
@@ -260,10 +260,32 @@ export class BinaryOperationInstruction {
       case "angle":
       case "angleDiff":
       case "len":
+      case "lessThan":
+      case "lessThanEq":
+      case "greaterThan":
+      case "greaterThanEq":
         return true;
       default:
         return false;
     }
+  }
+
+  canonicalize() {
+    switch (this.operator) {
+      case "greaterThan":
+        this.operator = "lessThan";
+        break;
+      case "greaterThanEq":
+        this.operator = "lessThanEq";
+        break;
+      case "lessThan":
+        this.operator = "greaterThan";
+        break;
+      case "lessThanEq":
+        this.operator = "greaterThanEq";
+        break;
+    }
+    [this.left, this.right] = [this.right, this.left];
   }
 
   invert(): void {
