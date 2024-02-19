@@ -411,6 +411,18 @@ Contains the available symbols for blocks.
 - `tetrativeReconstructor`
 - `repairPoint`
 - `repairTurret`
+- `tankFabricator`
+- `shipFabricator`
+- `mechFabricator`
+- `tankRefabricator`
+- `mechRefabricator`
+- `shipRefabricator`
+- `primeRefabricator`
+- `tankAssembler`
+- `shipAssembler`
+- `mechAssembler`
+- `basicAssemblerModule`
+- `unitRepairTower`
 - `payloadConveyor`
 - `payloadRouter`
 - `reinforcedPayloadConveyor`
@@ -449,6 +461,7 @@ Contains the available symbols for blocks.
 - `worldProcessor`
 - `worldCell`
 - `worldMessage`
+- `worldSwitch`
 - `solid`
 - `air`
 - `spawn`
