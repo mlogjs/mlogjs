@@ -472,6 +472,18 @@ interface BuildingSymbolTable {
   readonly tetrativeReconstructor: unique symbol;
   readonly repairPoint: unique symbol;
   readonly repairTurret: unique symbol;
+  readonly tankFabricator: unique symbol;
+  readonly shipFabricator: unique symbol;
+  readonly mechFabricator: unique symbol;
+  readonly tankRefabricator: unique symbol;
+  readonly mechRefabricator: unique symbol;
+  readonly shipRefabricator: unique symbol;
+  readonly primeRefabricator: unique symbol;
+  readonly tankAssembler: unique symbol;
+  readonly shipAssembler: unique symbol;
+  readonly mechAssembler: unique symbol;
+  readonly basicAssemblerModule: unique symbol;
+  readonly unitRepairTower: unique symbol;
   readonly payloadConveyor: unique symbol;
   readonly payloadRouter: unique symbol;
   readonly reinforcedPayloadConveyor: unique symbol;
@@ -510,6 +522,7 @@ interface BuildingSymbolTable {
   readonly worldProcessor: unique symbol;
   readonly worldCell: unique symbol;
   readonly worldMessage: unique symbol;
+  readonly worldSwitch: unique symbol;
 }
 
 type BuildingSymbol = Blocks[keyof BuildingSymbolTable];
