@@ -464,6 +464,31 @@ export class Graph {
     });
   }
 
+  /**
+   * Optimizes load instructions that are immediately followed by the only
+   * instruction that reads their value.
+   */
+  optimizeImmediateLoads(c: ICompilerContext) {
+    const reads = getReaderMap(this.start);
+
+    traverse(this.start, block => {
+      let lastInstruction = block.instructions[block.instructions.length - 1];
+
+      // start from the second last instruction
+      for (let i = block.instructions.length - 2; i >= 0; i--) {
+        const inst = block.instructions[i];
+        if (inst.type !== "load") {
+          lastInstruction = inst;
+          continue;
+        }
+        const readers = reads.get(inst.out);
+        if (readers.size === 1 && readers.has(lastInstruction)) {
+          c.setGlobalAlias(inst.out, inst.address);
+        }
+      }
+    });
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
@@ -477,6 +502,7 @@ export class Graph {
     this.flipBreakIfs(c);
     this.removeUnusedInstructions();
     this.removeConstantBreakIfs(c);
+    this.optimizeImmediateLoads(c);
     this.setParents();
     this.skipBlocks();
 
