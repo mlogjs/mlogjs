@@ -368,7 +368,7 @@ export class Graph {
   }
 
   transformComparisons(c: ICompilerContext) {
-    const sources = getIdSources(this.start);
+    const writes = getWriterMap(this.start);
     traverse(this.start, block => {
       for (let i = 0; i < block.instructions.length; i++) {
         const inst = block.instructions[i];
@@ -402,7 +402,7 @@ export class Graph {
         let changed = false;
         do {
           changed = false;
-          const source = sources.get(inst.left);
+          const source = writes.get(inst.left);
           const right = c.getValue(inst.right);
 
           if (
@@ -440,20 +440,7 @@ export class Graph {
   }
 
   removeUnusedInstructions() {
-    const reads = new ReaderMap();
-    traverse(this.start, block => {
-      for (const inst of block.instructions) {
-        inst.registerReader(reads);
-      }
-      switch (block.endInstruction?.type) {
-        case "break-if":
-          reads.add(block.endInstruction.condition, block.endInstruction);
-          break;
-        case "return":
-          reads.add(block.endInstruction.value, block.endInstruction);
-          break;
-      }
-    });
+    const reads = getReaderMap(this.start);
 
     traversePostOrder(this.start, block => {
       for (let i = block.instructions.length - 1; i >= 0; i--) {
@@ -624,9 +611,7 @@ function intersectSets<T>(...sets: Set<T>[]) {
   return result;
 }
 
-// function removeImmediateMoves() {}
-
-function getIdSources(entry: Block): WriterMap {
+function getWriterMap(entry: Block): WriterMap {
   const sources = new WriterMap();
 
   traverse(entry, block => {
@@ -636,4 +621,23 @@ function getIdSources(entry: Block): WriterMap {
   });
 
   return sources;
+}
+
+function getReaderMap(entry: Block): ReaderMap {
+  const reads = new ReaderMap();
+  traverse(entry, block => {
+    for (const inst of block.instructions) {
+      inst.registerReader(reads);
+    }
+    switch (block.endInstruction?.type) {
+      case "break-if":
+        reads.add(block.endInstruction.condition, block.endInstruction);
+        break;
+      case "return":
+        reads.add(block.endInstruction.value, block.endInstruction);
+        break;
+    }
+  });
+
+  return reads;
 }
