@@ -113,17 +113,17 @@ export class ReaderMap {
 }
 
 export class WriterMap {
-  writes: Map<ValueId, TBlockInstruction> = new Map();
+  writes: Map<ImmutableId, TBlockInstruction> = new Map();
 
   set(id: ImmutableId, instruction: TBlockInstruction) {
     this.writes.set(id, instruction);
   }
 
-  remove(id: ValueId) {
+  remove(id: ImmutableId) {
     this.writes.delete(id);
   }
 
-  get(id: ValueId) {
+  get(id: ImmutableId) {
     return this.writes.get(id);
   }
 }
