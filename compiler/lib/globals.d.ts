@@ -267,6 +267,53 @@ declare namespace LAccess {
   const color: unique symbol;
 }
 
+/** Contains the built-in game colors. */
+declare namespace Colors {
+  const tan: number;
+  const sky: number;
+  const pink: number;
+  const lightgrey: number;
+  const white: number;
+  const lightgray: number;
+  const magenta: number;
+  const salmon: number;
+  const coral: number;
+  const grey: number;
+  const darkgrey: number;
+  const lime: number;
+  const brown: number;
+  const blue: number;
+  const green: number;
+  const teal: number;
+  const forest: number;
+  const black: number;
+  const gold: number;
+  const brick: number;
+  const gray: number;
+  const cyan: number;
+  const royal: number;
+  const violet: number;
+  const yellow: number;
+  const clear: number;
+  const orange: number;
+  const maroon: number;
+  const red: number;
+  const darkgray: number;
+  const navy: number;
+  const scarlet: number;
+  const slate: number;
+  const olive: number;
+  const purple: number;
+  const acid: number;
+  const goldenrod: number;
+  const crimson: number;
+  const accent: number;
+  const unlaunched: number;
+  const highlight: number;
+  const stat: number;
+  const negstat: number;
+}
+
 interface BuildingSymbolTable {
   readonly graphitePress: unique symbol;
   readonly multiPress: unique symbol;

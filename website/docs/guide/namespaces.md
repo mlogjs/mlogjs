@@ -203,6 +203,54 @@ This namespace contains all symbols that can be used to access properties of ent
 - `config`
 - `color`
 
+## Colors
+
+Contains the built-in game colors
+
+- `tan`
+- `sky`
+- `pink`
+- `lightgrey`
+- `white`
+- `lightgray`
+- `magenta`
+- `salmon`
+- `coral`
+- `grey`
+- `darkgrey`
+- `lime`
+- `brown`
+- `blue`
+- `green`
+- `teal`
+- `forest`
+- `black`
+- `gold`
+- `brick`
+- `gray`
+- `cyan`
+- `royal`
+- `violet`
+- `yellow`
+- `clear`
+- `orange`
+- `maroon`
+- `red`
+- `darkgray`
+- `navy`
+- `scarlet`
+- `slate`
+- `olive`
+- `purple`
+- `acid`
+- `goldenrod`
+- `crimson`
+- `accent`
+- `unlaunched`
+- `highlight`
+- `stat`
+- `negstat`
+
 ## Blocks
 
 Contains the available symbols for blocks.
