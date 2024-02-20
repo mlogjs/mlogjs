@@ -363,6 +363,16 @@ export namespace setRule {
   function buildSpeed(team: TeamIdentifier, multiplier: number): void;
 
   /**
+   * Sets the health multiplier for units on a given team. The multiplier cannot
+   * have a value lower than `0.001`.
+   *
+   * ```js
+   * setRule.unitHealth(Teams.sharded, 1.5);
+   * ```
+   */
+  function unitHealth(team: TeamIdentifier, multiplier: number): void;
+
+  /**
    * Sets the speed multiplier for unit factories. The multiplier will always be
    * clamped between `0` and `50`.
    *

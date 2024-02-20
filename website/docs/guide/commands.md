@@ -802,6 +802,15 @@ Contains the multiple variants of the `setrule` instruction.
   ::: command-example
   :::
 
+- #### `setRule.unitHealth`
+
+Sets the health multiplier for units on a given team. The multiplier cannot
+have a value lower than `0.001`.
+
+```js
+setRule.unitHealth(Teams.sharded, 1.5);
+```
+
 - #### `setRule.unitBuildSpeed`
 
   Sets the speed multiplier for unit factories.

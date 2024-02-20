@@ -21,7 +21,10 @@ export class SetRule extends ObjectValue {
         lighting: { args: ["enabled"] },
         ambientLight: { args: ["rgbaData"] },
         solarMultiplier: { args: ["multiplier"] },
+        ban: { args: ["content"] },
+        unban: { args: ["content"] },
         buildSpeed: { args: ["team", "multiplier"] },
+        unitHealth: { args: ["team", "multiplier"] },
         unitBuildSpeed: { args: ["team", "multiplier"] },
         unitCost: { args: ["team", "multiplier"] },
         unitDamage: { args: ["team", "multiplier"] },
@@ -42,6 +45,7 @@ export class SetRule extends ObjectValue {
             break;
           }
           case "buildSpeed":
+          case "unitHealth":
           case "unitBuildSpeed":
           case "unitCost":
           case "unitDamage":
