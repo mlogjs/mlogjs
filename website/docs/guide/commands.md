@@ -495,7 +495,7 @@ Controls the unit bound to the processor
 
   - `block` - The kind of building to build
   - `rotation` - The rotation of the building, ranges from 0 to 3
-  - `config` - The config of the building
+  - `config` - The configuration value to use, or a building from which the configuration value will be copied.
 
   ::: command-example
   :::

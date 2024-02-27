@@ -898,7 +898,8 @@ declare global {
      *
      * @param options.block The kind of building to build
      * @param options.rotation The rotation of the building, ranges from 0 to 3
-     * @param options.config The config of the building
+     * @param options.config The configuration value to use, or a building from
+     *   which the configuration value will be copied.
      *
      *   ```js
      *   unitControl.build({
@@ -917,8 +918,11 @@ declare global {
       block: BuildingSymbol;
       /** The rotation of the building, ranges from 0 to 3 */
       rotation: number;
-      /** The config of the building */
-      config?: unknown;
+      /**
+       * The configuration value to use, or a building from which the
+       * configuration value will be copied.
+       */
+      config?: symbol | BasicBuilding;
     }): void;
 
     /**
