@@ -30,7 +30,7 @@ interface Vars {
   readonly unit: AnyUnit;
   /** The amount of ticks that happened since the map started */
   readonly tick: number;
-  /** The current UNIX timestamp in milliseconds */
+  /** The amount of milliseconds that passed since the map started */
   readonly time: number;
   /**
    * The amount of seconds that passed since the map started.

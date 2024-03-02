@@ -27,7 +27,7 @@ Allows you to access processor variables.
 - `unitCount` - Total amount of units existent, can be used to check if an unit ID is valid
 - `blockCount` - Total amount of blocks existent, can be used to check if a block ID is valid
 - `tick` - The amount of ticks that happened since the map started
-- `time` - The current UNIX timestamp in milliseconds
+- `time` - The amount of milliseconds that passed since the map started.
 - `second` - The amount of seconds that passed since the map started
 - `minute` - The amount of minutes that passed since the map started
 - `waveNumber` - The number of the current wave, starts at 1;
