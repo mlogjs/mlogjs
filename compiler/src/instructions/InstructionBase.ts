@@ -8,12 +8,16 @@ export class InstructionBase implements IInstruction {
   alwaysRuns = true;
 
   protected _hidden = false;
+
   public get hidden() {
     return this._hidden;
   }
   public set hidden(value) {
     this._hidden = value;
   }
+
+  ignoredByParser = false;
+
   args: (string | IValue | null)[];
 
   source?: SourceLocation;
