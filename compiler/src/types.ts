@@ -23,6 +23,11 @@ export interface IInstruction {
    */
   intentSource?: IValue;
   hidden: boolean;
+  /**
+   * Used to identify pseudo instructions like single line comments and label
+   * declarations created in asm calls.
+   */
+  ignoredByParser: boolean;
   resolve(i: number): void;
   source?: es.SourceLocation;
   /**
