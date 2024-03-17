@@ -42,8 +42,24 @@ export function configureMlogLang(
 ) {
   const jumpUnderlineCollection = editor.createDecorationsCollection();
   const targettedLineCollection = editor.createDecorationsCollection();
+
+  /** Indexes of lines that are either comments or labels */
+  let ignoredIndexes: number[] = [];
+
+  editor.updateOptions({
+    lineNumbers(lineNumber) {
+      if (ignoredIndexes.includes(lineNumber - 1)) return "-";
+      return String(lineNumberToMlogIndex(ignoredIndexes, lineNumber));
+    },
+  });
+
+  editor.onDidChangeModelContent(() => {
+    const lines = editor.getModel()?.getLinesContent() ?? [];
+    ignoredIndexes = findIgnoredIndexes(lines);
+  });
+
   editor.onMouseDown(event => {
-    const jumpLine = getJumpLine(event);
+    const jumpLine = getJumpLine(event, ignoredIndexes);
     if (jumpLine == undefined) return;
 
     editor.revealLineInCenter(jumpLine, monaco.editor.ScrollType.Smooth);
@@ -62,7 +78,7 @@ export function configureMlogLang(
   editor.onMouseMove(event => {
     jumpUnderlineCollection.clear();
     targettedLineCollection.clear();
-    const jumpLine = getJumpLine(event);
+    const jumpLine = getJumpLine(event, ignoredIndexes);
     if (jumpLine == undefined) return;
     // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const line = event.target.position!.lineNumber;
@@ -80,10 +96,10 @@ export function configureMlogLang(
 
   editor.onMouseUp(() => jumpUnderlineCollection.clear());
 
-  function getJumpLine({
-    event,
-    target,
-  }: monaco.editor.IEditorMouseEvent): number | void {
+  function getJumpLine(
+    { event, target }: monaco.editor.IEditorMouseEvent,
+    ignoredIndexes: number[],
+  ): number | void {
     if (!event.ctrlKey) return;
     const { position } = target;
     if (!position) return;
@@ -91,6 +107,48 @@ export function configureMlogLang(
     const lineContent = editor.getModel()!.getLineContent(position.lineNumber);
     const match = /^jump\s+(\d+)/.exec(lineContent);
     if (!match) return;
-    return Number(match[1]) + 1; // mlog lines start at 0
+    const instructionIndex = Number(match[1]);
+    return mlogIndexToLineNumber(ignoredIndexes, instructionIndex);
   }
+}
+
+/**
+ * Returns a sorted array of the indexes of lines that contain labels or
+ * comments
+ */
+function findIgnoredIndexes(lines: string[]): number[] {
+  const indexes: number[] = [];
+
+  const regex = /^\s*(#|\S+:)/;
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (!regex.test(line)) continue;
+    indexes.push(i);
+  }
+
+  return indexes;
+}
+
+function lineNumberToMlogIndex(
+  ignoredIndexes: number[],
+  lineNumber: number,
+): number {
+  const index = lineNumber - 1;
+  let difference = 0;
+  for (const ignoredIndex of ignoredIndexes) {
+    if (ignoredIndex <= index) difference++;
+    else break;
+  }
+
+  return index - difference;
+}
+
+function mlogIndexToLineNumber(ignoredIndexes: number[], index: number) {
+  let difference = 1; // line numbers start at 1
+  for (const ignoredIndex of ignoredIndexes) {
+    if (ignoredIndex <= index) difference++;
+    else break;
+  }
+
+  return index + difference;
 }

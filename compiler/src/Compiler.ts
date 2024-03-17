@@ -74,7 +74,7 @@ export class Compiler {
     let i = 0;
     for (const inst of valueInst[1]) {
       inst.resolve(i);
-      if (!inst.hidden) i++;
+      if (!inst.hidden && !inst.ignoredByParser) i++;
     }
   }
 

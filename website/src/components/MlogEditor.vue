@@ -39,7 +39,7 @@ const editorOptions: EditorOptions = {
 };
 const outEditorOptions: EditorOptions = {
   readOnly: true,
-  lineNumbers: n => `${n - 1}`,
+  // line numbers are handled in monaco/mlog.ts
 };
 
 const settings = useEditorSettings();
