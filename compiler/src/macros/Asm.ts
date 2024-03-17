@@ -108,7 +108,7 @@ class AsmInstruction extends InstructionBase {
 
     const [first] = args;
     if (typeof first === "string") {
-      this.ignoredByParser = /^(\s*#|\S+:)/.test(first);
+      this.ignoredByParser = /^\s*(#|\S+:)/.test(first);
     }
   }
 
