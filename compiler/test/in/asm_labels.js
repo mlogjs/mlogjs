@@ -7,15 +7,17 @@ while (true) {
 }
 
 function foo(counter) {
-  asm`print ${counter}`;
-  asm`jump foo always`;
-  asm`foo:`;
-  asm`printflush message1`;
+  asm`
+    print ${counter}
+    jump foo always
+    foo:
+    printflush message1`;
 }
 
 function bar(counter) {
-  asm`print ${counter}`;
-  asm`jump bar always`;
-  asm`bar:`;
-  asm`printflush message1`;
+  asm`
+    print ${counter}
+    jump bar always
+    bar:
+    printflush message1`;
 }
