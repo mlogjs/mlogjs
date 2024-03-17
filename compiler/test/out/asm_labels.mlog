@@ -1,0 +1,22 @@
+set counter:1:4 0
+set counter:9:13 counter:1:4
+set &rfoo:9:0 4
+jump 10 always
+op add counter:16:13 counter:1:4 1
+set &rbar:16:0 7
+jump 15 always
+op add counter:1:4 counter:1:4 2
+jump 1 always
+end
+print counter:9:13
+jump foo always
+foo:
+printflush message1
+set &ffoo:9:0 null
+set @counter &rfoo:9:0
+print counter:16:13
+jump bar always
+bar:
+printflush message1
+set &fbar:16:0 null
+set @counter &rbar:16:0
