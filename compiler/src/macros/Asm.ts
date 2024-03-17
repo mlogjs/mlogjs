@@ -1,7 +1,7 @@
 import { CompilerError } from "../CompilerError";
-import { ZeroSpaceInstruction } from "../instructions";
+import { InstructionBase } from "../instructions";
 import { IInstruction, IValue } from "../types";
-import { isTemplateObjectArray } from "../utils";
+import { formatInstructionArgs, isTemplateObjectArray } from "../utils";
 import { LiteralValue } from "../values";
 import { MacroFunction } from "./Function";
 
@@ -55,7 +55,7 @@ function formatInstructions(args: (string | IValue)[]) {
     const params = [...buffer, segments[0]];
 
     if (validateInstructionArgs(params)) {
-      instructions.push(new ZeroSpaceInstruction(...params));
+      instructions.push(new AsmInstruction(...params));
       buffer = [];
     }
 
@@ -67,7 +67,7 @@ function formatInstructions(args: (string | IValue)[]) {
     for (let i = 1; i < segments.length - 1; i++) {
       const trimmed = segments[i].trim();
       if (trimmed.length == 0) continue;
-      instructions.push(new ZeroSpaceInstruction(trimmed));
+      instructions.push(new AsmInstruction(trimmed));
     }
 
     if (segments.length > 1) {
@@ -76,7 +76,7 @@ function formatInstructions(args: (string | IValue)[]) {
   }
 
   if (buffer.length > 0 && validateInstructionArgs(buffer)) {
-    instructions.push(new ZeroSpaceInstruction(...buffer));
+    instructions.push(new AsmInstruction(...buffer));
   }
 
   return instructions;
@@ -100,4 +100,19 @@ function validateInstructionArgs(args: (string | IValue)[]) {
   if (typeof first === "string") args[0] = first.trimStart();
   if (typeof last === "string") args[args.length - 1] = last.trimEnd();
   return true;
+}
+
+class AsmInstruction extends InstructionBase {
+  constructor(...args: (string | IValue)[]) {
+    super(...args);
+
+    const [first] = args;
+    if (typeof first === "string") {
+      this.ignoredByParser = /^\s*(#|\S+:)/.test(first);
+    }
+  }
+
+  toString() {
+    return formatInstructionArgs(this.args).join("");
+  }
 }
