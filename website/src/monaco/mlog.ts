@@ -182,8 +182,8 @@ export function configureMlogLang(
     const lineContent = editor.getModel()!.getLineContent(position.lineNumber);
     const match = /^jump\s+(\d+)/.exec(lineContent);
     if (!match) return;
-    const lineIndex = Number(match[1]);
-    return mlogIndexToLineNumber(ignoredIndexes, lineIndex);
+    const instructionIndex = Number(match[1]);
+    return mlogIndexToLineNumber(ignoredIndexes, instructionIndex);
   }
 }
 
