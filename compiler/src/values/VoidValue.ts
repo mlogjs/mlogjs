@@ -14,6 +14,7 @@ export class VoidValue implements IValue {
   name?: string;
   mutability = EMutability.mutable;
   macro = false;
+  volatile = false;
 
   eval(_scope: IScope, _out?: TEOutput): TValueInstructions {
     throw new CompilerError(

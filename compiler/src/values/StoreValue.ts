@@ -21,10 +21,14 @@ export class StoreValue extends BaseValue implements IValue {
   constructor(
     public name: string,
     public mutability = EMutability.mutable,
-    { temporary = false }: Partial<Pick<StoreValue, "temporary">> = {},
+    {
+      temporary = false,
+      volatile = false,
+    }: Partial<Pick<StoreValue, "temporary" | "volatile">> = {},
   ) {
     super();
     this.temporary = temporary;
+    this.volatile = volatile;
   }
 
   static from(scope: IScope, out?: TEOutput, mutability = EMutability.mutable) {

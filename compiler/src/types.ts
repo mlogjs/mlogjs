@@ -287,6 +287,10 @@ export interface IValue extends IValueOperators {
   name?: string;
   mutability: EMutability;
   macro: boolean;
+
+  /** Used by the operation cache to know if an operation can be safely cached. */
+  volatile: boolean;
+
   /**
    * Evaluates `this`, returning it's representation in a more basic value like
    * `StoreValue` with the instructions required to compute that value
