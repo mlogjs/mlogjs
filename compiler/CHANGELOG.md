@@ -49,6 +49,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 
+- Fixed caching of operations that use values that change over time (e.g. `@tick` and `@time`)
 - Fixed labels and comments breaking line resolution.
 - Fixed compile time operation evaluation not working properly on values bigger than 2^31-1.
 - Fixed the online editor parsing declaration files multiple times.
