@@ -138,6 +138,7 @@ export class Scope implements IScope {
     right?: IValue | undefined,
   ): void {
     if (!left.name || !result.name || (right && !right.name)) return;
+    if (result.volatile || left.volatile || right?.volatile) return;
 
     const id = formatCacheId(op, left, right);
 
@@ -155,6 +156,8 @@ export class Scope implements IScope {
     left: IValue,
     right?: IValue | undefined,
   ): IValue | undefined {
+    if (left.volatile || right?.volatile) return;
+
     const id = formatCacheId(op, left, right);
     const result = this.operationCache[id];
     if (result) return result;

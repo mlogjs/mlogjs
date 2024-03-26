@@ -6,15 +6,18 @@ import {
   TEOutput,
   TValueInstructions,
 } from "../types";
-import {
-  IObjectValueData,
-  LiteralValue,
-  ObjectValue,
-  StoreValue,
-} from "../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
 
-const dynamicVars = ["time", "tick"];
+const dynamicVars = [
+  "unit",
+  "tick",
+  "time",
+  "second",
+  "minute",
+  "waveNumber",
+  "waveTime",
+];
 
 interface NamespaceMacroOptions {
   changeCasing?: boolean;
@@ -35,13 +38,16 @@ export class NamespaceMacro extends ObjectValue {
       );
     const symbolName = this.changeCasing ? camelToDashCase(key.data) : key.data;
 
-    const mutability = dynamicVars.includes(symbolName)
-      ? EMutability.readonly
-      : EMutability.constant;
+    if (dynamicVars.includes(symbolName)) {
+      return [
+        new StoreValue(`@${symbolName}`, EMutability.readonly, {
+          volatile: true,
+        }),
+        [],
+      ];
+    }
 
-    const result = new StoreValue(`@${symbolName}`, mutability);
-
-    return [result, []];
+    return [new StoreValue(`@${symbolName}`, EMutability.constant), []];
   }
 
   hasProperty(scope: IScope, prop: IValue): boolean {
@@ -52,9 +58,5 @@ export class NamespaceMacro extends ObjectValue {
 export class VarsNamespace extends NamespaceMacro {
   constructor() {
     super();
-    Object.assign<IObjectValueData, IObjectValueData>(this.data, {
-      unit: new StoreValue("@unit", EMutability.readonly),
-      this: new StoreValue("@this", EMutability.constant),
-    });
   }
 }
