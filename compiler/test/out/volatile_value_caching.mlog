@@ -1,0 +1,7 @@
+op div &t0 @time 1000
+op floor last:2:6 &t0
+op div &t1 @time 1000
+op floor &t2 &t1
+jump 2 equal &t2 last:2:6
+print "This should be reachable"
+printflush message1
