@@ -5,6 +5,7 @@ import {
   GetBuildings,
   GetColor,
   GetGlobal,
+  MarkerConstructor,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
@@ -16,6 +17,7 @@ import { Asm } from "./macros/Asm";
 import { LiteralValue, ObjectValue } from "./values";
 import { Scope } from "./Scope";
 import { worldModuleName } from "./utils";
+import { ColorsNamespace } from "./macros/Namespace";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
@@ -37,6 +39,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
   scope.hardSet("LAccess", new NamespaceMacro());
   scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("Colors", new ColorsNamespace());
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
@@ -76,6 +79,7 @@ export function createGlobalScope(): IScope {
 
 export function createWordModule() {
   const module = new ObjectValue({
+    PVars: new NamespaceMacro(),
     getBlock: new commands.GetBlock(),
     setBlock: new commands.SetBlock(),
     spawnUnit: new commands.SpawnUnit(),
@@ -90,6 +94,10 @@ export function createWordModule() {
     getFlag: new commands.GetFlag(),
     setFlag: new commands.SetFlag(),
     setProp: new commands.SetProp(),
+    sync: new commands.Sync(),
+    effect: new commands.Effect(),
+    localePrint: new commands.LocalePrint(),
+    Marker: new MarkerConstructor(),
   });
   return module;
 }

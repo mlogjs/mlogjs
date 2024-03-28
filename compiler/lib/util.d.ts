@@ -1,5 +1,16 @@
 import { MutableWithSymbols } from "./traits";
 
+export type TDrawPrintAlign =
+  | "center"
+  | "top"
+  | "bottom"
+  | "left"
+  | "right"
+  | "topLeft"
+  | "topRight"
+  | "bottomLeft"
+  | "bottomRight";
+
 export type TRadarFilter =
   | "any"
   | "enemy"
@@ -57,7 +68,7 @@ export type TStatusEffect =
 export type TPermanentStatusEffect = "boss" | "overdrive";
 
 type CommonSettableProps = Record<keyof typeof Items, number> & {
-  team: TeamSymbol | number;
+  team: TeamIdentifier;
   health: number;
 };
 
@@ -69,6 +80,8 @@ interface SettableUnit
       flag: number;
       rotation: number;
       payloadType?: UnitSymbol | BuildingSymbol;
+      speed: number;
+      armor: number;
     }
   > {}
 

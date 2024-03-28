@@ -17,9 +17,10 @@ interface BasicUnit
     PayloadHolder,
     WithSpeed,
     WithColor,
-    WithTeam {}
+    WithTeam,
+    WithArmor {}
 
-interface AnyUnit extends BasicUnit, Boosted {}
+interface AnyUnit extends BasicUnit, Boosted, WithCamera {}
 
 interface BasicBuilding
   extends LiquidHolder,
@@ -44,4 +45,4 @@ interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 // just to make this future proof
 interface AnyTurret extends BasicTurret {}
 
-interface AnyBuilding extends AnyTurret, Heatable, WithShield {}
+interface AnyBuilding extends AnyTurret, Heatable, WithShield, WithCamera {}

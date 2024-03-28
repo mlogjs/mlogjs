@@ -30,7 +30,7 @@ interface Vars {
   readonly unit: AnyUnit;
   /** The amount of ticks that happened since the map started */
   readonly tick: number;
-  /** The current UNIX timestamp in milliseconds */
+  /** The amount of milliseconds that passed since the map started */
   readonly time: number;
   /**
    * The amount of seconds that passed since the map started.
@@ -92,6 +92,7 @@ declare namespace Teams {
 }
 
 type TeamSymbol = (typeof Teams)[keyof typeof Teams];
+type TeamIdentifier = TeamSymbol | number;
 
 declare namespace Items {
   const copper: unique symbol;
@@ -220,6 +221,7 @@ declare namespace LAccess {
   const maxHealth: unique symbol;
   const heat: unique symbol;
   const shield: unique symbol;
+  const armor: unique symbol;
   const efficiency: unique symbol;
   const progress: unique symbol;
   const timescale: unique symbol;
@@ -228,6 +230,10 @@ declare namespace LAccess {
   const y: unique symbol;
   const shootX: unique symbol;
   const shootY: unique symbol;
+  const cameraX: unique symbol;
+  const cameraY: unique symbol;
+  const cameraWidth: unique symbol;
+  const cameraHeight: unique symbol;
   const size: unique symbol;
   const dead: unique symbol;
   const range: unique symbol;
@@ -259,6 +265,53 @@ declare namespace LAccess {
    * - Liquid symbols: the liquid's color.
    */
   const color: unique symbol;
+}
+
+/** Contains the built-in game colors. */
+declare namespace Colors {
+  const tan: number;
+  const sky: number;
+  const pink: number;
+  const lightgrey: number;
+  const white: number;
+  const lightgray: number;
+  const magenta: number;
+  const salmon: number;
+  const coral: number;
+  const grey: number;
+  const darkgrey: number;
+  const lime: number;
+  const brown: number;
+  const blue: number;
+  const green: number;
+  const teal: number;
+  const forest: number;
+  const black: number;
+  const gold: number;
+  const brick: number;
+  const gray: number;
+  const cyan: number;
+  const royal: number;
+  const violet: number;
+  const yellow: number;
+  const clear: number;
+  const orange: number;
+  const maroon: number;
+  const red: number;
+  const darkgray: number;
+  const navy: number;
+  const scarlet: number;
+  const slate: number;
+  const olive: number;
+  const purple: number;
+  const acid: number;
+  const goldenrod: number;
+  const crimson: number;
+  const accent: number;
+  const unlaunched: number;
+  const highlight: number;
+  const stat: number;
+  const negstat: number;
 }
 
 interface BuildingSymbolTable {
@@ -466,6 +519,18 @@ interface BuildingSymbolTable {
   readonly tetrativeReconstructor: unique symbol;
   readonly repairPoint: unique symbol;
   readonly repairTurret: unique symbol;
+  readonly tankFabricator: unique symbol;
+  readonly shipFabricator: unique symbol;
+  readonly mechFabricator: unique symbol;
+  readonly tankRefabricator: unique symbol;
+  readonly mechRefabricator: unique symbol;
+  readonly shipRefabricator: unique symbol;
+  readonly primeRefabricator: unique symbol;
+  readonly tankAssembler: unique symbol;
+  readonly shipAssembler: unique symbol;
+  readonly mechAssembler: unique symbol;
+  readonly basicAssemblerModule: unique symbol;
+  readonly unitRepairTower: unique symbol;
   readonly payloadConveyor: unique symbol;
   readonly payloadRouter: unique symbol;
   readonly reinforcedPayloadConveyor: unique symbol;
@@ -504,6 +569,7 @@ interface BuildingSymbolTable {
   readonly worldProcessor: unique symbol;
   readonly worldCell: unique symbol;
   readonly worldMessage: unique symbol;
+  readonly worldSwitch: unique symbol;
 }
 
 type BuildingSymbol = Blocks[keyof BuildingSymbolTable];

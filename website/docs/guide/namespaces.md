@@ -27,7 +27,7 @@ Allows you to access processor variables.
 - `unitCount` - Total amount of units existent, can be used to check if an unit ID is valid
 - `blockCount` - Total amount of blocks existent, can be used to check if a block ID is valid
 - `tick` - The amount of ticks that happened since the map started
-- `time` - The current UNIX timestamp in milliseconds
+- `time` - The amount of milliseconds that passed since the map started.
 - `second` - The amount of seconds that passed since the map started
 - `minute` - The amount of minutes that passed since the map started
 - `waveNumber` - The number of the current wave, starts at 1;
@@ -202,6 +202,54 @@ This namespace contains all symbols that can be used to access properties of ent
 - `enabled`
 - `config`
 - `color`
+
+## Colors
+
+Contains the built-in game colors
+
+- `tan`
+- `sky`
+- `pink`
+- `lightgrey`
+- `white`
+- `lightgray`
+- `magenta`
+- `salmon`
+- `coral`
+- `grey`
+- `darkgrey`
+- `lime`
+- `brown`
+- `blue`
+- `green`
+- `teal`
+- `forest`
+- `black`
+- `gold`
+- `brick`
+- `gray`
+- `cyan`
+- `royal`
+- `violet`
+- `yellow`
+- `clear`
+- `orange`
+- `maroon`
+- `red`
+- `darkgray`
+- `navy`
+- `scarlet`
+- `slate`
+- `olive`
+- `purple`
+- `acid`
+- `goldenrod`
+- `crimson`
+- `accent`
+- `unlaunched`
+- `highlight`
+- `stat`
+- `negstat`
 
 ## Blocks
 
@@ -411,6 +459,18 @@ Contains the available symbols for blocks.
 - `tetrativeReconstructor`
 - `repairPoint`
 - `repairTurret`
+- `tankFabricator`
+- `shipFabricator`
+- `mechFabricator`
+- `tankRefabricator`
+- `mechRefabricator`
+- `shipRefabricator`
+- `primeRefabricator`
+- `tankAssembler`
+- `shipAssembler`
+- `mechAssembler`
+- `basicAssemblerModule`
+- `unitRepairTower`
 - `payloadConveyor`
 - `payloadRouter`
 - `reinforcedPayloadConveyor`
@@ -449,6 +509,7 @@ Contains the available symbols for blocks.
 - `worldProcessor`
 - `worldCell`
 - `worldMessage`
+- `worldSwitch`
 - `solid`
 - `air`
 - `spawn`

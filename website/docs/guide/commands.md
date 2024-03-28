@@ -18,10 +18,10 @@ command.variant();
 
 ### `print`
 
-Appends the items to the print buffer, calling this function
+Appends the items to the global text buffer, calling this function
 on its own will not print any contents to a message block.
 
-To print the contents of the print buffer and empty it, call `printFlush`.
+To print the contents of the global text buffer and empty it, call `printFlush`.
 
 ::: command-example
 :::
@@ -130,12 +130,15 @@ Nothing is drawn until `drawFlush` is called.
 
 ### `printFlush`
 
-Writes the contents of the print buffer into the target message
+Writes the contents of the global text buffer into the target message
 and clears the buffer afterwards.
 
 - `target` The message building to write to. Writes to `message1` by default.
 
   Note that the default value only applies if you don't pass any parameter to this function.
+
+  If `target` is `undefined`, the contents of the global text buffer will be
+  discarded.
 
 ::: command-example
 :::
@@ -390,6 +393,16 @@ Controls the unit bound to the processor
   ::: command-example
   :::
 
+- #### `unitControl.autoPathfind`
+
+  Makes the unit bound to this processor automatically pathfind to the
+  nearest enemy core or drop point.
+
+  Is the same as standard wave enemy pathfinding.
+
+  ::: command-example
+  :::
+
 - #### `unitControl.boost`
 
   Whether the unit bound to this processor should be boosted (floating).
@@ -482,7 +495,7 @@ Controls the unit bound to the processor
 
   - `block` - The kind of building to build
   - `rotation` - The rotation of the building, ranges from 0 to 3
-  - `config` - The config of the building
+  - `config` - The configuration value to use, or a building from which the configuration value will be copied.
 
   ::: command-example
   :::
@@ -766,6 +779,20 @@ Contains the multiple variants of the `setrule` instruction.
   ::: command-example
   :::
 
+- #### `setRule.ban`
+
+  Bans a block/unit type from the world.
+
+  ::: command-example
+  :::
+
+- #### `setRule.unban`
+
+  Removes the ban of a block/unit type in the world.
+
+  ::: command-example
+  :::
+
 - #### `setRule.buildSpeed`
 
   Sets the build speed multiplier of a team.
@@ -774,6 +801,15 @@ Contains the multiple variants of the `setrule` instruction.
 
   ::: command-example
   :::
+
+- #### `setRule.unitHealth`
+
+Sets the health multiplier for units on a given team. The multiplier cannot
+have a value lower than `0.001`.
+
+```js
+setRule.unitHealth(Teams.sharded, 1.5);
+```
 
 - #### `setRule.unitBuildSpeed`
 
@@ -834,7 +870,7 @@ Contains the multiple variants of the `setrule` instruction.
 
 ### `flushMessage`
 
-Writes the contents of the print buffer in the selected mode
+Writes the contents of the global text buffer in the selected mode
 and clears the buffer afterwards.
 
 ::: command-example
@@ -842,21 +878,27 @@ and clears the buffer afterwards.
 
 - #### `flushMessage.notify`
 
-  Shows a nofication at the top of the screen
+  Shows a nofication at the top of the screen.
+
+  Returns whether the operation was executed successfully.
 
   ::: command-example
   :::
 
 - #### `flushMessage.mission`
 
-  Puts the content on the top left corner of the screen
+  Puts the content on the top left corner of the screen.
+
+  Returns whether the operation was executed successfully.
 
   ::: command-example
   :::
 
 - #### `flushMessage.announce`
 
-  Puts the content on the middle of the screen
+  Puts the content on the middle of the screen.
+
+  Returns whether the operation was executed successfully.
 
   - `duration` - The duration, in seconds
 
@@ -865,7 +907,9 @@ and clears the buffer afterwards.
 
 - #### `flushMessage.toast`
 
-  Puts the content on the middle top of the screen
+  Puts the content on the middle top of the screen.
+
+  Returns whether the operation was executed successfully.
 
   - `duration` - The duration, in seconds
 
@@ -925,6 +969,9 @@ Contains the variants of the `fetch` instruction.
 
   Gets the amount of units existing on a given team.
 
+  - `type` - The type of unit to count.
+    If `type` is not specified, returns the total amount of units
+
   ::: command-example
   :::
 
@@ -973,6 +1020,9 @@ Contains the variants of the `fetch` instruction.
 
   Gets the amount of buildings existing on a given team.
 
+  - `type` - The type of building to count
+    If `type` is not specified, returns the total amount of buildings.
+
   ::: command-example
   :::
 
@@ -993,6 +1043,18 @@ Sets a global flag.
 ### `setProp`
 
 Creates a writable record that allows you to set a property of a building or unit.
+
+::: command-example
+:::
+
+### `localePrint`
+
+Add map locale property value to the global text buffer.
+
+To set map locale bundles in map editor, check Map Info > Locale Bundles.
+
+If client is a mobile device, tries to print a property ending in ".mobile"
+first.
 
 ::: command-example
 :::

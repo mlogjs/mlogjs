@@ -5,6 +5,19 @@ import {
   TStatusEffect,
 } from "./util";
 
+// privileged global variables
+interface PVars {
+  readonly server: boolean;
+  readonly client: boolean;
+  readonly clientLocale: string;
+  readonly clientUnit: AnyUnit;
+  readonly clientName: string;
+  readonly clientTeam: number;
+  readonly clientMobile: boolean;
+}
+
+export var PVars: PVars;
+
 /** Gets block data from the map. */
 export namespace getBlock {
   /**
@@ -109,7 +122,7 @@ export namespace setBlock {
     x: number;
     y: number;
     to: EnvBlockSymbol | BuildingSymbol;
-    team: TeamSymbol;
+    team: TeamIdentifier;
     rotation: number;
   }): void;
 }
@@ -133,7 +146,7 @@ export function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
   type: UnitSymbol;
   x: number;
   y: number;
-  team: TeamSymbol;
+  team: TeamIdentifier;
   /** The initial rotation of the unit in degrees. */
   rotation?: number;
 }): T;
@@ -322,6 +335,24 @@ export namespace setRule {
   function solarMultiplier(multiplier: number): void;
 
   /**
+   * Bans a block/unit type from the world.
+   *
+   * ```js
+   * setRule.ban(Blocks.router);
+   * ```
+   */
+  function ban(content: BlockSymbol | UnitSymbol): void;
+
+  /**
+   * Removes the ban of a block/unit type in the world.
+   *
+   * ```js
+   * setRule.unban(Blocks.router);
+   * ```
+   */
+  function unban(content: BlockSymbol | UnitSymbol): void;
+
+  /**
    * Sets the build speed multiplier of a team. The multiplier will always be
    * clamped between `0.001` and `50`.
    *
@@ -329,7 +360,17 @@ export namespace setRule {
    * setRule.buildSpeed(Teams.sharded, 1.5);
    * ```
    */
-  function buildSpeed(team: TeamSymbol, multiplier: number): void;
+  function buildSpeed(team: TeamIdentifier, multiplier: number): void;
+
+  /**
+   * Sets the health multiplier for units on a given team. The multiplier cannot
+   * have a value lower than `0.001`.
+   *
+   * ```js
+   * setRule.unitHealth(Teams.sharded, 1.5);
+   * ```
+   */
+  function unitHealth(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the speed multiplier for unit factories. The multiplier will always be
@@ -339,7 +380,7 @@ export namespace setRule {
    * setRule.unitBuildSpeed(Teams.sharded, 3);
    * ```
    */
-  function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
+  function unitBuildSpeed(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the build cost multiplier for constructing units.
@@ -348,7 +389,7 @@ export namespace setRule {
    * setRule.unitCost(Teams.sharded, 1.75);
    * ```
    */
-  function unitCost(team: TeamSymbol, multiplier: number): void;
+  function unitCost(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the damage multiplier for units on a given team.
@@ -357,7 +398,7 @@ export namespace setRule {
    * setRule.unitDamage(Teams.sharded, 1.25);
    * ```
    */
-  function unitDamage(team: TeamSymbol, multiplier: number): void;
+  function unitDamage(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the block health multiplier for a given team.
@@ -366,7 +407,7 @@ export namespace setRule {
    * setRule.blockHealth(Teams.crux, 0.75);
    * ```
    */
-  function blockHealth(team: TeamSymbol, multiplier: number): void;
+  function blockHealth(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the block damage multiplier for a given team.
@@ -375,7 +416,7 @@ export namespace setRule {
    * setRule.blockDamage(Teams.crux, 2);
    * ```
    */
-  function blockDamage(team: TeamSymbol, multiplier: number): void;
+  function blockDamage(team: TeamIdentifier, multiplier: number): void;
 
   /**
    * Sets the Real Time Strategy minimum weight for a team.
@@ -388,7 +429,7 @@ export namespace setRule {
    * ```
    */
 
-  function rtsMinWeight(team: TeamSymbol, value: number): void;
+  function rtsMinWeight(team: TeamIdentifier, value: number): void;
 
   /**
    * Sets the Real Time Strategy minimum size of attack squads of a team.
@@ -399,12 +440,12 @@ export namespace setRule {
    * setRule.rtsMinSquad(Teams.sharded, 5);
    * ```
    */
-  function rtsMinSquad(team: TeamSymbol, value: number): void;
+  function rtsMinSquad(team: TeamIdentifier, value: number): void;
 }
 
 /**
- * Writes the contents of the print buffer in the selected mode and clears the
- * buffer afterwards.
+ * Writes the contents of the global text buffer in the selected mode and clears
+ * the buffer afterwards.
  *
  * ```js
  * print("Hello");
@@ -417,25 +458,31 @@ export namespace setRule {
  */
 export namespace flushMessage {
   /**
-   * Shows a nofication at the top of the screen
+   * Shows a nofication at the top of the screen.
+   *
+   * Returns whether the operation was executed successfully.
    *
    * ```js
    * print("something");
    * flushMessage.notify();
    * ```
    */
-  function notify(): void;
+  function notify(): boolean;
   /**
    * Puts the content on the top left corner of the screen
+   *
+   * Returns whether the operation was executed successfully.
    *
    * ```js
    * print("something");
    * flushMessage.mission();
    * ```
    */
-  function mission(): void;
+  function mission(): boolean;
   /**
    * Puts the content on the middle of the screen
+   *
+   * Returns whether the operation was executed successfully.
    *
    * @param duration The duration, in seconds
    *
@@ -444,9 +491,11 @@ export namespace flushMessage {
    *   flushMessage.announce(3);
    *   ```
    */
-  function announce(duration: number): void;
+  function announce(duration: number): boolean;
   /**
    * Puts the content on the middle top of the screen
+   *
+   * Returns whether the operation was executed successfully.
    *
    * @param duration The duration, in seconds
    *
@@ -455,7 +504,7 @@ export namespace flushMessage {
    *   flushMessage.toast(5);
    *   ```
    */
-  function toast(duration: number): void;
+  function toast(duration: number): boolean;
 }
 
 /** Controls the player camera. */
@@ -503,11 +552,12 @@ export namespace cutscene {
  *   air: true,
  *   ground: true,
  *   pierce: true,
+ *   effect: true,
  * });
  * ```
  */
 export function explosion(options: {
-  team: TeamSymbol;
+  team: TeamIdentifier;
   x: number;
   y: number;
   radius: number;
@@ -515,6 +565,7 @@ export function explosion(options: {
   air: boolean;
   ground: boolean;
   pierce: boolean;
+  effect: boolean;
 }): void;
 
 /**
@@ -543,11 +594,13 @@ export namespace fetch {
    * ```
    */
   function unit<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
   ): T;
   /**
    * Gets the amount of units existing on a given team.
+   *
+   * If `type` is not specified, returns the total amount of units
    *
    * ```js
    * const count = fetch.unitCount(Teams.sharded);
@@ -558,7 +611,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function unitCount(team: TeamSymbol): number;
+  function unitCount(team: TeamIdentifier, type?: UnitSymbol): number;
   /**
    * Gets a player from a team.
    *
@@ -574,7 +627,7 @@ export namespace fetch {
    * ```
    */
   function player<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
   ): T;
   /**
@@ -589,7 +642,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function playerCount(team: TeamSymbol): number;
+  function playerCount(team: TeamIdentifier): number;
   /**
    * Gets a core from a team.
    *
@@ -604,7 +657,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function core(team: TeamSymbol, index: number): AnyBuilding;
+  function core(team: TeamIdentifier, index: number): AnyBuilding;
   /**
    * Gets the amount of cores existing on a given team.
    *
@@ -617,7 +670,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function coreCount(team: TeamSymbol): number;
+  function coreCount(team: TeamIdentifier): number;
   /**
    * Gets a building from a team.
    *
@@ -633,12 +686,14 @@ export namespace fetch {
    * ```
    */
   function build<T extends BasicBuilding = AnyBuilding>(
-    team: TeamSymbol,
+    team: TeamIdentifier,
     index: number,
     block: BuildingSymbol,
   ): T;
   /**
    * Gets the amount of buildings existing on a given team.
+   *
+   * If `type` is not specified, returns the total amount of buildings
    *
    * ```js
    * const count = fetch.buildCount(Teams.sharded, Blocks.router);
@@ -649,7 +704,7 @@ export namespace fetch {
    * printFlush();
    * ```
    */
-  function buildCount(team: TeamSymbol, block: BuildingSymbol): number;
+  function buildCount(team: TeamIdentifier, type?: BuildingSymbol): number;
 }
 
 /**
@@ -681,3 +736,203 @@ export function setFlag(flag: string, value: boolean): void;
  */
 export function setProp(target: BasicBuilding): SettableBuilding;
 export function setProp(target: BasicUnit): SettableUnit;
+
+/**
+ * Synchronizes an mlog register with the server. Can be called up to 20 times
+ * per second.
+ */
+export function sync(variable: unknown): void;
+
+export namespace effect {
+  function warn(x: number, y: number): void;
+  function cross(x: number, y: number): void;
+  function blockFall(x: number, y: number, data: BlockSymbol): void;
+  function placeBlock(x: number, y: number, size: number): void;
+  function placeBlockSpark(x: number, y: number, size: number): void;
+  function breakBlock(x: number, y: number, size: number): void;
+  function spawn(x: number, y: number): void;
+  function trail(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function breakPop(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function smokeCloud(x: number, y: number, color: number): void;
+  function vapor(x: number, y: number, color: number): void;
+  function hit(x: number, y: number, color: number): void;
+  function hitSquare(x: number, y: number, color: number): void;
+  function shootSmall(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function shootBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSmall(x: number, y: number, rotation: number): void;
+  function smokeBig(x: number, y: number, rotation: number): void;
+  function smokeColor(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSquare(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function smokeSquareBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function spark(x: number, y: number, color: number): void;
+  function sparkBig(x: number, y: number, color: number): void;
+  function sparkShoot(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function sparkShootBig(options: {
+    x: number;
+    y: number;
+    color: number;
+    rotation: number;
+  }): void;
+  function drill(x: number, y: number, color: number): void;
+  function drillBig(x: number, y: number, color: number): void;
+  function lightBlock(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function explosion(x: number, y: number, size: number): void;
+  function smokePuff(x: number, y: number, color: number): void;
+  function sparkExplosion(x: number, y: number, color: number): void;
+  function crossExplosion(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function wave(options: {
+    x: number;
+    y: number;
+    color: number;
+    size: number;
+  }): void;
+  function bubble(x: number, y: number): void;
+}
+
+/** Represents a maker, invoking the methods or */
+export interface Marker {
+  /** Deletes the marker, making its id available for reuse. */
+  remove(): void;
+  set world(value: boolean);
+  /** Wether the marker should be on the minimap or in the world */
+  set minimap(value: boolean);
+  set autoscale(value: boolean);
+  set pos(value: { x: number; y: number });
+  set endPos(value: { x: number; y: number });
+  set drawLayer(value: number);
+  set color(value: number);
+  set radius(value: number);
+  set stroke(value: number);
+  set rotation(value: number);
+  set shape(value: { sides: number; fill: boolean; outline: boolean });
+  /**
+   * Writes the contents of the global text buffer to the marker's text. Empties
+   * the global text buffer.
+   */
+  flushText(options: { fetch: boolean }): void;
+  set fontSize(value: number);
+  set textHeight(value: number);
+  set labelFlags(value: { background: boolean; outline: boolean });
+  set texture(value: string);
+  /** Writes the contents of the global text buffer to the marker's texture. */
+  flushTexture(): void;
+  set textureSize(value: { width: number; height: number });
+  /**
+   * Indexed position, used for line and quad markers with index zero being the
+   * first position.
+   */
+  set posi(value: { index: number; x: number; y: number });
+  /** Texture's position ranging from zero to one, used for quad markers. */
+  set uvi(value: { index: number; x: number; y: number });
+  /**
+   * Indexed position, used for line and quad markers with index zero being the
+   * first color.
+   */
+  set colori(value: { index: number; color: number });
+}
+
+interface MarkerConstructor {
+  /**
+   * Creates a marker object with the given id.
+   *
+   * This function provides access to existing markers and does not generate a
+   * `makemaker` instruction.
+   */
+  of(id: number): Marker;
+
+  /** Creates a new logic marker in the world. */
+  shapeText(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  minimap(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  shape(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  line(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+  text(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+  texture(options: {
+    id: number;
+    x: number;
+    y: number;
+    replace: boolean;
+  }): Marker;
+  quad(options: { id: number; x: number; y: number; replace: boolean }): Marker;
+}
+
+/** Contains methods to create marker objects. */
+export var Marker: MarkerConstructor;
+
+/**
+ * Add map locale property value to the global text buffer.
+ *
+ * To set map locale bundles in map editor, check Map Info > Locale Bundles.
+ *
+ * If client is a mobile device, tries to print a property ending in ".mobile"
+ * first.
+ *
+ * ```js
+ * localePrint("map.locale.key");
+ * ```
+ */
+export function localePrint(key: string): void;

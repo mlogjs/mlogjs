@@ -1,13 +1,19 @@
 import "./kind";
-import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
+import {
+  TDrawPrintAlign,
+  TRadarFilter,
+  TRadarSort,
+  TUnitLocateBuildingGroup,
+} from "./util";
 declare global {
   /**
-   * Appends the items to the print buffer, calling this function on its own
-   * will not print any contents to a message block.
+   * Appends the items to the global text buffer, calling this function on its
+   * own will not print any contents to a message block.
    *
-   * To print the contents of the print buffer and empty it call, `printFlush`.
+   * To print the contents of the global text buffer and empty it, call
+   * `printFlush`.
    *
-   * @param items The items to be added to the print buffer.
+   * @param items The items to be added to the global text buffer.
    *
    *   ```js
    *   const a = Math.floor(Math.rand(10));
@@ -256,17 +262,31 @@ declare global {
       /** The rotation of the image in degrees. */
       rotation: number;
     }): void;
+
+    /**
+     * Draws text from the global text buffer, clearing it afterwards.
+     *
+     * Only ASCII characters are supported.
+     */
+    function print(options: {
+      x: number;
+      y: number;
+      align: TDrawPrintAlign;
+    }): void;
   }
 
   /**
-   * Writes the contents of the print buffer into the target message and clears
-   * the buffer afterwards.
+   * Writes the contents of the global text buffer into the target message and
+   * clears the buffer afterwards.
    *
    * @param target The message building to write to. Writes to `message1` by
    *   default.
    *
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
+   *
+   *   If `target` is `undefined`, the contents of the global text buffer will be
+   *   discarded.
    *
    *   ```js
    *   const { message2 } = getBuildings();
@@ -275,7 +295,7 @@ declare global {
    *   printFlush(); // defaults to message1
    *   ```
    */
-  function printFlush(target: BasicBuilding): void;
+  function printFlush(target: BasicBuilding | undefined): void;
   function printFlush(): void;
 
   /**
@@ -697,6 +717,18 @@ declare global {
     function pathfind(x: number, y: number): void;
 
     /**
+     * Makes the unit bound to this processor automatically pathfind to the
+     * nearest enemy core or drop point.
+     *
+     * Is the same as standard wave enemy pathfinding.
+     *
+     * ```js
+     * unitControl.autoPathfind();
+     * ```
+     */
+    function autoPathfind(): void;
+
+    /**
      * Whether the unit bound to this processor should be boosted (floating)
      *
      * ```js
@@ -866,7 +898,8 @@ declare global {
      *
      * @param options.block The kind of building to build
      * @param options.rotation The rotation of the building, ranges from 0 to 3
-     * @param options.config The config of the building
+     * @param options.config The configuration value to use, or a building from
+     *   which the configuration value will be copied.
      *
      *   ```js
      *   unitControl.build({
@@ -885,8 +918,11 @@ declare global {
       block: BuildingSymbol;
       /** The rotation of the building, ranges from 0 to 3 */
       rotation: number;
-      /** The config of the building */
-      config?: unknown;
+      /**
+       * The configuration value to use, or a building from which the
+       * configuration value will be copied.
+       */
+      config?: symbol | BasicBuilding;
     }): void;
 
     /**
