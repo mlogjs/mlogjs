@@ -3,8 +3,8 @@ import { es, THandler } from "../types";
 export const BlockStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.BlockStatement,
 ) => {
-  return c.handleMany(scope.createScope(), context, node.body);
+  return c.handleMany(scope.createScope(), cursor, node.body);
 };

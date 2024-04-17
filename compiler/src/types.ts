@@ -2,8 +2,10 @@ export * as es from "@babel/types";
 import * as es from "@babel/types";
 import { Block } from "./flow";
 import { ICompilerContext } from "./CompilerContext";
-import { HandlerContext } from "./HandlerContext";
 import { ImmutableId, ValueId } from "./flow/id";
+import { IBlockCursor } from "./BlockCursor";
+
+export type Location = Pick<es.Node, "loc">;
 
 export enum EInstIntent {
   none,
@@ -63,32 +65,32 @@ export type THandler = {
   (
     compilerContext: ICompilerContext,
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     node: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     arg: any,
   ): ImmutableId;
 
-  handleWrite?: (
+  handleWrite?(
     compilerContext: ICompilerContext,
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     node: any,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     arg: any,
-  ) => TWriteCallback;
+  ): TWriteCallback;
 
-  handleDeclaration?: (
+  handleDeclaration?(
     compilerContext: ICompilerContext,
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     node: any,
     kind: TDeclarationKind,
     init?: ImmutableId,
-  ) => void;
+  ): void;
 };
 /**
  * The scope manages the source code generated variables and their owners, as
@@ -132,7 +134,7 @@ export interface IScope {
    * to the ast node handlers, and it is more appropriate to put this in the
    * scope rather than the compiler object.
    */
-  builtInModules: Record<string, IValue>;
+  builtInModules: Record<string, ImmutableId>;
 
   /** Creates a new scope that has `this` as it's parent. */
   createScope(): IScope;
@@ -152,7 +154,7 @@ export interface IScope {
   /** Checks if there is an owner registered with the specified identifier */
   has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(identifier: string): ValueId;
+  get(c: ICompilerContext, identifier: string): ValueId;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, throws an error if there already is an owner with the same
@@ -180,81 +182,6 @@ export interface IScope {
   copy(): IScope;
 }
 
-// we can't use type maps to define actual methods
-// and if we don't do this we'll get an error [ts(2425)]
-export interface IValueOperators {
-  // unary operators
-  "!"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "u+"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "u-"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "delete"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "typeof"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "void"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "~"(scope: IScope, out?: TEOutput): TValueInstructions;
-
-  // update operators
-  "++"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
-  "--"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
-
-  // left right operators
-  "*"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "**"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "+"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "-"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "/"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "%"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "!="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "!=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "==="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "^"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "|"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  instanceof(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  in(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "??"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "||"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "*="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "**="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "+="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "-="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "/="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "||="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "??="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "^="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "|="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-}
-
 /** Defines the possible types of mutability of a value */
 export enum EMutability {
   /** The value can be changed by the user's code, by the mlog runtime, or us */
@@ -272,33 +199,33 @@ export enum EMutability {
   immutable,
 }
 
-export interface IValue extends IValueOperators {
+export interface IValue {
   name?: string;
   // main properties
   mutability: EMutability;
   macro: boolean;
 
-  /** Used by the operation cache to know if an operation can be safely cached. */
-  volatile: boolean;
-
-  /**
-   * Evaluates `this`, returning it's representation in a more basic value like
-   * `StoreValue` with the instructions required to compute that value
-   */
-  eval(scope: IScope, out?: TEOutput): TValueInstructions;
-  call(c: ICompilerContext, args: IValue[], out: ImmutableId): IInstruction[];
-  get(
-    compilerContext: ICompilerContext,
-    name: IValue,
-    out: ImmutableId,
-  ): IInstruction[];
-
-  handleCall(
+  call(
     c: ICompilerContext,
-    context: HandlerContext,
-    node: es.Node,
+    cursor: IBlockCursor,
+    loc: Location,
     args: ImmutableId[],
-  ): ImmutableId | undefined;
+  ): ImmutableId;
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: Location,
+  ): ImmutableId;
+  set?(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    valueId: ImmutableId,
+    loc: Location,
+  ): void;
 
   /**
    * Wether `this` has a given property. This method is used to know if it's
@@ -323,12 +250,6 @@ export interface IValue extends IValueOperators {
 
   /** The string representation of `this` in the generated mlog code. */
   toMlogString(): string;
-
-  /**
-   * Allows some values to choose alternative representations when they are used
-   * as operation outputs.
-   */
-  toOut(): IValue;
 }
 /** Helper type that is used in some typescript assertions */
 export interface INamedValue extends IValue {

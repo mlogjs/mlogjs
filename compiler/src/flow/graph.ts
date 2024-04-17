@@ -1,3 +1,4 @@
+import { BlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import {
@@ -9,18 +10,20 @@ import {
 import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
-import { ImmutableId } from "./id";
+import { GlobalId, ImmutableId } from "./id";
 import {
   BinaryOperationInstruction,
   BreakInstruction,
   TBlockEndInstruction,
+  isLowerable,
 } from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
 
+//  TODO: handle multiple leaf blocks (necessary because end and stop exist)
 // control flow graph internals for the compiler
 export class Graph {
-  start = new Block([]);
-  end = new Block([]);
+  start = new Block();
+  end = new Block();
 
   static from(entry: Block, exit: Block) {
     const graph = new Graph();
@@ -76,7 +79,7 @@ export class Graph {
       }
 
       if (consequent.block.parents.length > 1) {
-        const newBlock = new Block([], new BreakInstruction(consequent));
+        const newBlock = new Block(new BreakInstruction(consequent));
         newBlock.endInstruction!.source = block.endInstruction.source;
         newBlock.addParent(block);
         consequent.block.removeParent(block);
@@ -85,7 +88,7 @@ export class Graph {
       }
 
       if (alternate.block.parents.length > 1) {
-        const newBlock = new Block([], new BreakInstruction(alternate));
+        const newBlock = new Block(new BreakInstruction(alternate));
         newBlock.endInstruction!.source = block.endInstruction.source;
 
         newBlock.addParent(block);
@@ -101,7 +104,11 @@ export class Graph {
       while (block.endInstruction?.type === "break") {
         const { target } = block.endInstruction;
         if (target.block.parents.length !== 1) break;
-        block.instructions.push(...target.block.instructions);
+
+        for (const inst of target.block.instructions) {
+          block.instructions.add(inst);
+        }
+
         block.endInstruction = target.block.endInstruction;
         target.block.children.forEach(child => {
           child.removeParent(target.block);
@@ -151,7 +158,26 @@ export class Graph {
     });
   }
 
+  lower(c: ICompilerContext) {
+    const cursor = new BlockCursor("edit", this.start);
+
+    traverse(this.start, block => {
+      cursor.currentBlock = block;
+
+      for (const node of block.instructions.nodes()) {
+        const inst = node.instruction;
+        if (isLowerable(inst)) {
+          cursor.position = node;
+          inst.lower(c, cursor);
+          cursor.position = node;
+          cursor.removeInstruction();
+        }
+      }
+    });
+  }
+
   toMlog(c: ICompilerContext) {
+    this.lower(c);
     this.optimize(c);
     const instructions: IInstruction[] = [];
     const visited = new Set<Block>();
@@ -225,12 +251,13 @@ export class Graph {
         //   }
         //   break;
         // }
-        case "return":
-          throw new CompilerError("Not implemented");
-        default:
-          // if (block === this.end && block.parents.length <= 1) break;
-          instructions.push(new InstructionBase("end"));
+        case "end":
+        case "stop":
+          instructions.push(new InstructionBase(endInstruction.type));
           instructions[instructions.length - 1].source = endInstruction?.source;
+          break;
+        default:
+          throw new CompilerError("Not implemented");
       }
 
       // there are at most two children
@@ -271,7 +298,7 @@ export class Graph {
         return;
 
       const newCondition = new ImmutableId();
-      block.instructions.push(
+      block.instructions.add(
         new BinaryOperationInstruction(
           "equal",
           endInstruction.condition,
@@ -301,7 +328,6 @@ export class Graph {
 
       const conditionInst = block.conditionInstruction();
 
-      console.log(conditionInst);
       if (
         conditionInst?.operator !== "equal" ||
         // don't un-canonicalize break-ifs
@@ -324,8 +350,7 @@ export class Graph {
    */
   canonicalizeBinaryOperations(c: ICompilerContext) {
     traverse(this.start, block => {
-      for (let i = 0; i < block.instructions.length; i++) {
-        const inst = block.instructions[i];
+      for (const inst of block.instructions) {
         if (inst.type !== "binary-operation") continue;
         if (!inst.isCanonicalizable()) continue;
         const left = c.getValue(inst.left);
@@ -338,14 +363,26 @@ export class Graph {
 
   foldConstantOperations(c: ICompilerContext) {
     traverse(this.start, block => {
-      for (let i = 0; i < block.instructions.length; i++) {
-        const inst = block.instructions[i];
-        if (inst.type !== "binary-operation" && inst.type !== "unary-operation")
-          continue;
+      let current = block.instructions.head;
 
-        if (!inst.constantFold(c)) continue;
-        block.instructions.splice(i, 1);
-        i--;
+      while (current) {
+        const inst = current.instruction;
+        if (
+          inst.type !== "binary-operation" &&
+          inst.type !== "unary-operation"
+        ) {
+          current = current.next;
+          continue;
+        }
+
+        if (!inst.constantFold(c)) {
+          current = current.next;
+          continue;
+        }
+
+        const { next } = current;
+        block.instructions.remove(current);
+        current = next;
       }
     });
   }
@@ -370,8 +407,12 @@ export class Graph {
   transformComparisons(c: ICompilerContext) {
     const writes = getWriterMap(this.start);
     traverse(this.start, block => {
-      for (let i = 0; i < block.instructions.length; i++) {
-        const inst = block.instructions[i];
+      for (
+        let current = block.instructions.head;
+        current;
+        current = current.next
+      ) {
+        const inst = current.instruction;
         if (inst.type !== "binary-operation") continue;
         const invert = (source: BinaryOperationInstruction) => {
           if (!source.isInvertible()) return;
@@ -395,8 +436,10 @@ export class Graph {
         const remove = (value: number) => {
           changed = true;
           c.setValue(inst.out, new LiteralValue(value));
-          block.instructions.splice(i, 1);
-          i--;
+
+          const previous = current!.previous;
+          block.instructions.remove(current!);
+          current = previous ?? block.instructions.head;
         };
 
         let changed = false;
@@ -443,8 +486,11 @@ export class Graph {
     const reads = getReaderMap(this.start);
 
     traversePostOrder(this.start, block => {
-      for (let i = block.instructions.length - 1; i >= 0; i--) {
-        const inst = block.instructions[i];
+      let current = block.instructions.tail;
+
+      while (current) {
+        const { previous } = current;
+        const inst = current.instruction;
 
         // TODO: remove calls to functions with no side effects
         // TODO: handle value-get instructions
@@ -454,12 +500,77 @@ export class Graph {
           case "unary-operation": {
             const readers = reads.get(inst.out);
             if (readers.size !== 0) break;
-            block.instructions.splice(i, 1);
+            block.instructions.remove(current);
             inst.unregisterReader(reads);
-            // necessary because we might remove the last operation of a block
-            i = Math.min(i + 1, block.instructions.length - 1);
           }
         }
+        current = previous;
+      }
+    });
+  }
+
+  optimizeGlobals(c: ICompilerContext) {
+    const contexts = new Map<Block, Map<GlobalId, ImmutableId>>();
+    traverseParentsFirst(this.start, block => {
+      // const context = new Map<GlobalId, ImmutableId>();
+
+      const context =
+        block.parents.length === 1
+          ? contexts.get(block.parents[0])!
+          : new Map<GlobalId, ImmutableId>();
+
+      contexts.set(block, context);
+
+      let current = block.instructions.head;
+
+      while (current) {
+        const inst = current.instruction;
+        switch (inst.type) {
+          case "store": {
+            const { address, value } = inst;
+            context.set(address, value);
+            current = current.next;
+            break;
+          }
+          case "load": {
+            const { address, out } = inst;
+            const preserved = context.get(address);
+            if (!preserved) break;
+            c.setAlias(out, preserved);
+            const { next } = current;
+            block.instructions.remove(current);
+            current = next;
+            break;
+          }
+          default:
+            current = current.next;
+        }
+      }
+    });
+  }
+
+  /** Must be called at the end of the process */
+  optimizeImmediateStores(c: ICompilerContext) {
+    // const reads = getReaderMap(this.start);
+    const writes = getWriterMap(this.start);
+
+    traverse(this.start, block => {
+      let previousInstruction = block.instructions.head?.instruction;
+      let current = block.instructions.head?.next;
+
+      while (current) {
+        const inst = current.instruction;
+        if (inst.type !== "store") {
+          previousInstruction = inst;
+          current = current.next;
+          continue;
+        }
+
+        const writer = writes.get(inst.value);
+        if (writer === previousInstruction) {
+          c.setGlobalAlias(inst.value, inst.address);
+        }
+        current = current.next;
       }
     });
   }
@@ -472,17 +583,20 @@ export class Graph {
     const reads = getReaderMap(this.start);
 
     traverse(this.start, block => {
-      let lastInstruction = block.instructions[block.instructions.length - 1];
+      let lastInstruction = block.instructions.tail?.instruction;
 
-      // start from the second last instruction
-      for (let i = block.instructions.length - 2; i >= 0; i--) {
-        const inst = block.instructions[i];
+      for (
+        let current = block.instructions.tail?.previous;
+        current;
+        current = current.previous
+      ) {
+        const inst = current.instruction;
         if (inst.type !== "load") {
           lastInstruction = inst;
           continue;
         }
         const readers = reads.get(inst.out);
-        if (readers.size === 1 && readers.has(lastInstruction)) {
+        if (readers.size === 1 && readers.has(lastInstruction!)) {
           c.setGlobalAlias(inst.out, inst.address);
         }
       }
@@ -496,21 +610,24 @@ export class Graph {
     this.setParents();
     this.removeCriticalEdges();
     this.canonicalizeBinaryOperations(c);
+    // this.optimizeGlobals(c);
     this.canonicalizeBreakIfs(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
     this.flipBreakIfs(c);
     this.removeUnusedInstructions();
+    // this.optimizeStoreInstructions(c);
     this.removeConstantBreakIfs(c);
     this.optimizeImmediateLoads(c);
+    this.optimizeImmediateStores(c);
     this.setParents();
     this.skipBlocks();
 
     // TODO: fix updating of block parents during
     // the previous optimizations
     this.setParents();
-    console.log(dominators(this.start));
-    console.log(dominanceFrontier(this.start, dominators(this.start)));
+    // console.log(dominators(this.start));
+    // console.log(dominanceFrontier(this.start, dominators(this.start)));
   }
 }
 
@@ -599,7 +716,7 @@ function dominanceFrontier(
   const frontiers = new Map<Block, Set<Block>>();
 
   function df(x: Block) {
-    console.log("df", x);
+    // console.log("df", x);
     if (frontiers.has(x)) return frontiers.get(x)!;
 
     const s = new Set<Block>();

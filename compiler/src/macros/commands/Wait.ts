@@ -1,11 +1,14 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { nullId } from "../../utils";
+import { NativeInstruction } from "../../flow";
 
-export class Wait extends MacroFunction<null> {
+export class Wait extends MacroFunction {
   constructor() {
-    super((scope, out, seconds) => {
+    super((c, cursor, loc, secondsId) => {
+      const seconds = c.getValue(secondsId);
+
       if (
         !(seconds instanceof StoreValue) &&
         !(seconds instanceof LiteralValue && seconds.isNumber())
@@ -14,7 +17,10 @@ export class Wait extends MacroFunction<null> {
           "The wait seconds must be either a number literal or a store",
         );
 
-      return [null, [new InstructionBase("wait", seconds)]];
+      cursor.addInstruction(
+        new NativeInstruction(["wait", secondsId], [secondsId], [], loc),
+      );
+      return nullId;
     });
   }
 }

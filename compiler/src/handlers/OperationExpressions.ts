@@ -42,21 +42,21 @@ const binaryOperatorMap: Partial<
 export const BinaryExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.BinaryExpression,
 ) => {
-  const left = c.handle(scope, context, node.left);
-  const right = c.handle(scope, context, node.right);
+  const left = c.handle(scope, cursor, node.left);
+  const right = c.handle(scope, cursor, node.right);
   const operator = node.operator;
   const out = new ImmutableId();
 
   if (operator === "!==") {
     const temp = new ImmutableId();
     const zero = c.registerValue(new LiteralValue(0));
-    context.addInstruction(
+    cursor.addInstruction(
       new BinaryOperationInstruction("strictEqual", left, right, temp, node),
     );
-    context.addInstruction(
+    cursor.addInstruction(
       new BinaryOperationInstruction("equal", temp, zero, out, node),
     );
     return out;
@@ -66,7 +66,7 @@ export const BinaryExpression: THandler = (
   if (!type)
     throw new CompilerError(`The operator ${operator} is not supported`);
 
-  context.addInstruction(
+  cursor.addInstruction(
     new BinaryOperationInstruction(type, left, right, out, node),
   );
 
@@ -76,47 +76,47 @@ export const BinaryExpression: THandler = (
 export const LogicalExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.LogicalExpression,
 ) => {
   const out = new GlobalId();
-  const alternateBlock = new Block([]);
-  const exitBlock = new Block([]);
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
 
-  const left = c.handle(scope, context, node.left);
-  context.addInstruction(new StoreInstruction(out, left, node));
+  const left = c.handle(scope, cursor, node.left);
+  cursor.addInstruction(new StoreInstruction(out, left, node));
   switch (node.operator) {
     case "&&":
-      context.setEndInstruction(
+      cursor.setEndInstruction(
         new BreakIfInstruction(left, alternateBlock, exitBlock, node),
       );
       break;
     case "||":
-      context.setEndInstruction(
+      cursor.setEndInstruction(
         new BreakIfInstruction(left, exitBlock, alternateBlock, node),
       );
       break;
     case "??": {
       const test = new ImmutableId();
       const temp = new ImmutableId();
-      context.addInstruction(
+      cursor.addInstruction(
         new BinaryOperationInstruction("strictEqual", temp, nullId, test, node),
       );
-      context.addInstruction(new StoreInstruction(out, temp, node));
-      context.setEndInstruction(
+      cursor.addInstruction(new StoreInstruction(out, temp, node));
+      cursor.setEndInstruction(
         new BreakIfInstruction(test, alternateBlock, exitBlock, node),
       );
     }
   }
 
-  context.currentBlock = alternateBlock;
-  const right = c.handle(scope, context, node.right);
-  context.addInstruction(new StoreInstruction(out, right, node));
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = alternateBlock;
+  const right = c.handle(scope, cursor, node.right);
+  cursor.addInstruction(new StoreInstruction(out, right, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = exitBlock;
+  cursor.currentBlock = exitBlock;
   const immutableOut = new ImmutableId();
-  context.addInstruction(new LoadInstruction(out, immutableOut, node));
+  cursor.addInstruction(new LoadInstruction(out, immutableOut, node));
 
   return immutableOut;
 };
@@ -124,14 +124,15 @@ export const LogicalExpression: THandler = (
 export const AssignmentExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.AssignmentExpression & {
     operator: AssignementOperator;
   },
 ) => {
-  const assign = c.handleWrite(scope, context, node.left);
+  // TODO: support the other assignment operators
+  const assign = c.handleWrite(scope, cursor, node.left);
 
-  const value = c.handle(scope, context, node.right);
+  const value = c.handle(scope, cursor, node.right);
 
   assign(value, node);
   return value;
@@ -140,17 +141,17 @@ export const AssignmentExpression: THandler = (
 export const UnaryExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.UnaryExpression,
 ) => {
   const out = new ImmutableId();
-  const value = c.handle(scope, context, node.argument);
+  const value = c.handle(scope, cursor, node.argument);
 
   switch (node.operator) {
     case "void":
       return nullId;
     case "!":
-      context.addInstruction(
+      cursor.addInstruction(
         new BinaryOperationInstruction(
           "equal",
           value,
@@ -161,7 +162,7 @@ export const UnaryExpression: THandler = (
       );
       break;
     case "+":
-      context.addInstruction(
+      cursor.addInstruction(
         new BinaryOperationInstruction(
           "add",
           value,
@@ -172,7 +173,7 @@ export const UnaryExpression: THandler = (
       );
       break;
     case "-":
-      context.addInstruction(
+      cursor.addInstruction(
         new BinaryOperationInstruction(
           "sub",
           c.registerValue(new LiteralValue(0)),
@@ -183,7 +184,7 @@ export const UnaryExpression: THandler = (
       );
       break;
     case "~":
-      context.addInstruction(
+      cursor.addInstruction(
         new UnaryOperatorInstruction("not", value, out, node),
       );
       break;
@@ -199,16 +200,16 @@ export const UnaryExpression: THandler = (
 export const UpdateExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.UpdateExpression,
 ) => {
-  const assign = c.handleWrite(scope, context, node.argument);
+  const assign = c.handleWrite(scope, cursor, node.argument);
 
-  const oldValue = c.handle(scope, context, node.argument);
+  const oldValue = c.handle(scope, cursor, node.argument);
   const newValue = new ImmutableId();
   const one = c.registerValue(new LiteralValue(1));
 
-  context.addInstruction(
+  cursor.addInstruction(
     new BinaryOperationInstruction(
       node.operator === "++" ? "add" : "sub",
       oldValue,
@@ -227,35 +228,35 @@ export const UpdateExpression: THandler = (
 export const ConditionalExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ConditionalExpression,
 ) => {
-  const testBlock = new Block([]);
-  const consequentBlock = new Block([]);
-  const alternateBlock = new Block([]);
-  const exitBlock = new Block([]);
+  const testBlock = new Block();
+  const consequentBlock = new Block();
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
 
   const out = new GlobalId();
 
-  context.connectBlock(testBlock, node);
-  const test = c.handle(scope, context, node.test);
-  context.setEndInstruction(
+  cursor.connectBlock(testBlock, node);
+  const test = c.handle(scope, cursor, node.test);
+  cursor.setEndInstruction(
     new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
   );
 
-  context.currentBlock = consequentBlock;
-  const consequent = c.handle(scope, context, node.consequent);
-  context.addInstruction(new StoreInstruction(out, consequent, node));
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = consequentBlock;
+  const consequent = c.handle(scope, cursor, node.consequent);
+  cursor.addInstruction(new StoreInstruction(out, consequent, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = alternateBlock;
-  const alternate = c.handle(scope, context, node.alternate);
-  context.addInstruction(new StoreInstruction(out, alternate, node));
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = alternateBlock;
+  const alternate = c.handle(scope, cursor, node.alternate);
+  cursor.addInstruction(new StoreInstruction(out, alternate, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = exitBlock;
+  cursor.currentBlock = exitBlock;
   const immutableOut = new ImmutableId();
-  context.addInstruction(new LoadInstruction(out, immutableOut, node));
+  cursor.addInstruction(new LoadInstruction(out, immutableOut, node));
 
   return immutableOut;
 };
@@ -263,15 +264,15 @@ export const ConditionalExpression: THandler = (
 export const SequenceExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.SequenceExpression,
 ) => {
   const { expressions } = node;
 
   // compute every expression except the last one
   for (let i = 0; i < expressions.length - 1; i++) {
-    c.handle(scope, context, expressions[i]);
+    c.handle(scope, cursor, expressions[i]);
   }
 
-  return c.handle(scope, context, expressions[expressions.length - 1]);
+  return c.handle(scope, cursor, expressions[expressions.length - 1]);
 };

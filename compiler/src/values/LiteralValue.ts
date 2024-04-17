@@ -6,7 +6,7 @@ import {
   IValue,
   EMutability,
   TEOutput,
-  IInstruction,
+  Location,
 } from "../types";
 import { BaseValue } from ".";
 import { BinaryOperator, LogicalOperator, UnaryOperator } from "../operators";
@@ -14,6 +14,7 @@ import { CompilerError } from "../CompilerError";
 import { mathConstants } from "../utils";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId } from "../flow";
+import { IBlockCursor } from "../BlockCursor";
 
 const literalMethods: Record<
   string,
@@ -71,19 +72,25 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     // (there is no way to escape a " character)
     return JSON.stringify(data.replace(/"/g, "''")).replace(/\\\\/g, "\\"); // "unescape" backslashes
   }
-  get(c: ICompilerContext, name: IValue, out: ImmutableId): IInstruction[] {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    nameId: ImmutableId,
+    loc: Location,
+  ): ImmutableId {
+    const name = c.getValue(nameId);
     if (!(name instanceof LiteralValue && name.isString()))
-      return super.get(c, name, out);
-    const method = literalMethods[name.data];
-    if (
-      !method ||
-      !Object.prototype.hasOwnProperty.call(literalMethods, name.data)
-    )
+      return super.get(c, cursor, targetId, nameId, loc);
+
+    if (!Object.prototype.hasOwnProperty.call(literalMethods, name.data))
       throw new CompilerError(
         `The member [${name.debugString()}] does not exist on literal values.`,
       );
+    const method = literalMethods[name.data];
+    const out = new ImmutableId();
     c.setValue(out, method.apply(this, [c]));
-    return [];
+    return out;
   }
 
   hasProperty(compilerContext: ICompilerContext, prop: IValue): boolean {

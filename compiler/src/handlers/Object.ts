@@ -10,26 +10,14 @@ import {
   ValueSetInstruction,
 } from "../flow";
 import { GlobalId, ImmutableId } from "../flow/id";
-import {
-  es,
-  IScope,
-  IValue,
-  TEOutput,
-  THandler,
-  TValueInstructions,
-} from "../types";
+import { es, THandler } from "../types";
 import { nullId } from "../utils";
-import {
-  BaseValue,
-  IObjectValueData,
-  LiteralValue,
-  ObjectValue,
-} from "../values";
+import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 export const ObjectExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ObjectExpression,
 ) => {
   const data: IObjectValueData = {};
@@ -49,7 +37,7 @@ export const ObjectExpression: THandler = (
       throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
     }
 
-    const member = c.handle(scope, context, value);
+    const member = c.handle(scope, cursor, value);
     if (prop.type !== "ObjectMethod" || prop.kind === "method") {
       data[index] = member;
     } /* else {
@@ -72,7 +60,7 @@ export const ObjectExpression: THandler = (
 export const ArrayExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ArrayExpression,
 ) => {
   const items: ImmutableId[] = [];
@@ -81,7 +69,7 @@ export const ArrayExpression: THandler = (
       items.push(nullId);
       return;
     }
-    const value = c.handle(scope, context, element);
+    const value = c.handle(scope, cursor, element);
     items.push(value);
   });
 
@@ -91,97 +79,43 @@ export const ArrayExpression: THandler = (
 export const MemberExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.MemberExpression,
   optional: boolean = false,
 ) => {
-  const obj = c.handle(scope, context, node.object);
-  const prop = node.computed
-    ? c.handle(scope, context, node.property)
+  const object = c.handle(scope, cursor, node.object);
+  const key = node.computed
+    ? c.handle(scope, cursor, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-  const temp = new ImmutableId();
+  const out = new ImmutableId();
 
-  // TODO: handle optional chaining
-  context.addInstruction(
+  cursor.addInstruction(
     new ValueGetInstruction({
-      object: obj,
-      key: prop,
-      out: temp,
+      object,
+      key,
+      out,
+      optionalObject: optional,
       node,
-      optional,
     }),
   );
 
-  // TODO: hack to use namespace methods
-
-  propagateFunction: {
-    const object = c.getValue(obj);
-    const key = c.getValue(prop);
-    if (
-      !(object instanceof ObjectValue) ||
-      !(key instanceof LiteralValue && (key.isString() || key.isNumber()))
-    )
-      break propagateFunction;
-
-    const memberId = object.data[key.data];
-    const member = c.getValue(memberId);
-    if (member) {
-      c.setValue(temp, member);
-    }
-  }
-
-  return temp;
-
-  // if (!out) {
-  //   const [obj, objInst] = c.handle(scope, node.object);
-
-  //   if (optional && obj instanceof LiteralValue && obj.data === null)
-  //     return [obj, [...objInst, ...propInst]];
-
-  //   const [got, gotInst] = obj.get(scope, prop);
-  //   return [got, [...objInst, ...propInst, ...gotInst]];
-  // }
-
-  // const temp = StoreValue.out(scope, out);
-
-  // const objOut = new DestructuringValue(
-  //   new Map([
-  //     [
-  //       prop,
-  //       {
-  //         value: temp,
-  //         // a direct assignment should NOT happen
-  //         handler: () => {
-  //           throw new CompilerError("Unexpected destructuring assignment");
-  //         },
-  //       },
-  //     ],
-  //   ]),
-  // );
-
-  // const [obj, objInst] = c.handle(scope, node.object, objOut);
-
-  // if (optional && obj instanceof LiteralValue && obj.data === null)
-  //   return [obj, [...objInst, ...propInst]];
-
-  // const [got, gotInst] = obj.get(scope, prop, temp);
-  // return [got, [...objInst, ...propInst, ...gotInst]];
+  return out;
 };
 
 MemberExpression.handleWrite = (
   c,
   scope,
-  context,
+  cursor,
   node: es.MemberExpression,
 ) => {
-  const obj = c.handle(scope, context, node.object);
+  const obj = c.handle(scope, cursor, node.object);
   const key = node.computed
-    ? c.handle(scope, context, node.property)
+    ? c.handle(scope, cursor, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
   return value => {
-    context.addInstruction(new ValueSetInstruction(obj, key, value, node));
+    cursor.addInstruction(new ValueSetInstruction(obj, key, value, node));
   };
 };
 
@@ -213,7 +147,7 @@ export const ArrayPattern: THandler = () => {
   // return [new DestructuringValue(members), inst];
 };
 
-ArrayPattern.handleWrite = (c, scope, context, node: es.ArrayPattern) => {
+ArrayPattern.handleWrite = (c, scope, cursor, node: es.ArrayPattern) => {
   return (value, callerNode) => {
     for (let i = 0; i < node.elements.length; i++) {
       const element = node.elements[i];
@@ -221,16 +155,16 @@ ArrayPattern.handleWrite = (c, scope, context, node: es.ArrayPattern) => {
 
       const key = c.registerValue(new LiteralValue(i));
       const temp = new ImmutableId();
-      context.addInstruction(
+      cursor.addInstruction(
         new ValueGetInstruction({
           object: value,
           key,
           out: temp,
-          optional: element.type === "AssignmentPattern",
+          optionalKey: element.type === "AssignmentPattern",
           node,
         }),
       );
-      const assign = c.handleWrite(scope, context, element);
+      const assign = c.handleWrite(scope, cursor, element);
       assign(temp, callerNode);
     }
   };
@@ -250,8 +184,8 @@ export const ObjectPattern: THandler = () => {
   //   const key =
   //     propKey.type === "Identifier" && !prop.computed
   //       ? c.registerValue(new LiteralValue(propKey.name))
-  //       : c.handle(scope, context, propKey);
-  //   const value = c.handle(scope, context, prop.value);
+  //       : c.handle(scope, cursor, propKey);
+  //   const value = c.handle(scope, cursor, prop.value);
   //   const hasDefault = value instanceof AssignmentValue;
 
   //   members.set(key, {
@@ -278,7 +212,7 @@ export const ObjectPattern: THandler = () => {
   // return [new DestructuringValue(members), inst];
 };
 
-ObjectPattern.handleWrite = (c, scope, context, node: es.ObjectPattern) => {
+ObjectPattern.handleWrite = (c, scope, cursor, node: es.ObjectPattern) => {
   return (value, callerNode) => {
     for (const prop of node.properties) {
       if (prop.type === "RestElement")
@@ -288,21 +222,21 @@ ObjectPattern.handleWrite = (c, scope, context, node: es.ObjectPattern) => {
       const key =
         propKey.type === "Identifier" && !prop.computed
           ? c.registerValue(new LiteralValue(propKey.name))
-          : c.handle(scope, context, propKey);
+          : c.handle(scope, cursor, propKey);
 
       const temp = new ImmutableId();
 
-      context.addInstruction(
+      cursor.addInstruction(
         new ValueGetInstruction({
           object: value,
           key,
           out: temp,
-          optional: prop.value.type === "AssignmentPattern",
+          optionalKey: prop.value.type === "AssignmentPattern",
           node,
         }),
       );
 
-      const assign = c.handleWrite(scope, context, prop.value);
+      const assign = c.handleWrite(scope, cursor, prop.value);
       assign(value, callerNode);
     }
   };
@@ -311,7 +245,7 @@ ObjectPattern.handleWrite = (c, scope, context, node: es.ObjectPattern) => {
 ObjectPattern.handleDeclaration = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ObjectPattern,
   kind,
   init,
@@ -329,20 +263,20 @@ ObjectPattern.handleDeclaration = (
     const key =
       propKey.type === "Identifier" && !prop.computed
         ? c.registerValue(new LiteralValue(propKey.name))
-        : c.handle(scope, context, propKey);
+        : c.handle(scope, cursor, propKey);
 
     const temp = new ImmutableId();
 
-    context.addInstruction(
+    cursor.addInstruction(
       new ValueGetInstruction({
         object: init,
         key,
         out: temp,
-        optional: prop.value.type === "AssignmentPattern",
+        optionalKey: prop.value.type === "AssignmentPattern",
         node: prop,
       }),
     );
-    c.handleDeclaration(scope, context, prop.value, kind, temp);
+    c.handleDeclaration(scope, cursor, prop.value, kind, temp);
   }
 };
 
@@ -350,14 +284,14 @@ ObjectPattern.handleDeclaration = (
 export const OptionalMemberExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.OptionalMemberExpression,
-) => MemberExpression(c, scope, context, node, true);
+) => MemberExpression(c, scope, cursor, node, true);
 
 export const AssignmentPattern: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.AssignmentPattern,
 ) => {
   // const [left, inst] = c.handleValue(scope, node.left);
@@ -373,37 +307,37 @@ export const AssignmentPattern: THandler = (
 AssignmentPattern.handleWrite = (
   c,
   scope,
-  context,
+  cursor,
   node: es.AssignmentPattern,
 ) => {
-  const assignLeft = c.handleWrite(scope, context, node.left);
+  const assignLeft = c.handleWrite(scope, cursor, node.left);
 
   return (value, callerNode) => {
-    const consequentBlock = new Block([]);
-    const alternateBlock = new Block([]);
-    const exitBlock = new Block([]);
+    const consequentBlock = new Block();
+    const alternateBlock = new Block();
+    const exitBlock = new Block();
 
     const result = new ImmutableId();
     const temp = new GlobalId();
     const test = new ImmutableId();
-    context.addInstruction(
+    cursor.addInstruction(
       new BinaryOperationInstruction("strictEqual", value, nullId, test, node),
     );
-    context.setEndInstruction(
+    cursor.setEndInstruction(
       new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
     );
 
-    context.currentBlock = consequentBlock;
-    const defaultValue = c.handle(scope, context, node.right);
-    context.addInstruction(new StoreInstruction(temp, defaultValue, node));
-    context.setEndInstruction(new BreakInstruction(exitBlock, node));
+    cursor.currentBlock = consequentBlock;
+    const defaultValue = c.handle(scope, cursor, node.right);
+    cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
+    cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-    context.currentBlock = alternateBlock;
-    context.addInstruction(new StoreInstruction(temp, value, node));
-    context.setEndInstruction(new BreakInstruction(exitBlock, node));
+    cursor.currentBlock = alternateBlock;
+    cursor.addInstruction(new StoreInstruction(temp, value, node));
+    cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-    context.currentBlock = exitBlock;
-    context.addInstruction(new LoadInstruction(temp, result, node));
+    cursor.currentBlock = exitBlock;
+    cursor.addInstruction(new LoadInstruction(temp, result, node));
     assignLeft(result, callerNode);
   };
 };
@@ -411,7 +345,7 @@ AssignmentPattern.handleWrite = (
 AssignmentPattern.handleDeclaration = (
   c,
   scope,
-  context,
+  cursor,
   node: es.AssignmentPattern,
   kind,
   init,
@@ -421,56 +355,56 @@ AssignmentPattern.handleDeclaration = (
       "AssignmentPattern.handleDeclaration called without init",
       node,
     );
-  const consequentBlock = new Block([]);
-  const alternateBlock = new Block([]);
-  const exitBlock = new Block([]);
+  const consequentBlock = new Block();
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
 
   const result = new ImmutableId();
   const temp = new GlobalId();
   const test = new ImmutableId();
-  context.addInstruction(
+  cursor.addInstruction(
     new BinaryOperationInstruction("strictEqual", init, nullId, test, node),
   );
-  context.setEndInstruction(
+  cursor.setEndInstruction(
     new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
   );
 
-  context.currentBlock = consequentBlock;
-  const defaultValue = c.handle(scope, context, node.right);
-  context.addInstruction(new StoreInstruction(temp, defaultValue, node));
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = consequentBlock;
+  const defaultValue = c.handle(scope, cursor, node.right);
+  cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = alternateBlock;
-  const value = c.handle(scope, context, node.right);
-  context.addInstruction(new StoreInstruction(temp, value, node));
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = alternateBlock;
+  const value = c.handle(scope, cursor, node.right);
+  cursor.addInstruction(new StoreInstruction(temp, value, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = exitBlock;
-  context.addInstruction(new LoadInstruction(temp, result, node));
+  cursor.currentBlock = exitBlock;
+  cursor.addInstruction(new LoadInstruction(temp, result, node));
 
-  c.handleDeclaration(scope, context, node.left, kind, result);
+  c.handleDeclaration(scope, cursor, node.left, kind, result);
 };
 
-class ObjectGetSetEntry extends BaseValue {
-  macro = true;
-  getter?: IValue;
-  setter?: IValue;
+// class ObjectGetSetEntry extends BaseValue {
+//   macro = true;
+//   getter?: IValue;
+//   setter?: IValue;
 
-  constructor() {
-    super();
-  }
+//   constructor() {
+//     super();
+//   }
 
-  eval(scope: IScope, out?: TEOutput): TValueInstructions {
-    if (!this.getter)
-      throw new CompilerError("This property does not have a getter");
-    const [value, inst] = this.getter.call(scope, [], out);
-    return [value ?? new LiteralValue(null), inst];
-  }
+//   eval(scope: IScope, out?: TEOutput): TValueInstructions {
+//     if (!this.getter)
+//       throw new CompilerError("This property does not have a getter");
+//     const [value, inst] = this.getter.call(scope, [], out);
+//     return [value ?? new LiteralValue(null), inst];
+//   }
 
-  "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
-    if (!this.setter)
-      throw new CompilerError("This property does not have a setter");
-    const [, inst] = this.setter.call(scope, [value], out);
-    return [value, inst];
-  }
-}
+//   "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions {
+//     if (!this.setter)
+//       throw new CompilerError("This property does not have a setter");
+//     const [, inst] = this.setter.call(scope, [value], out);
+//     return [value, inst];
+//   }
+// }

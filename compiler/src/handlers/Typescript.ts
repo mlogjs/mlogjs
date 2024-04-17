@@ -6,10 +6,10 @@ import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 const TypeCastExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.TSAsExpression | es.TSTypeAssertion,
 ) => {
-  return c.handle(scope, context, node.expression);
+  return c.handle(scope, cursor, node.expression);
 };
 
 export const TSAsExpression = TypeCastExpression;
@@ -25,7 +25,7 @@ export const TSTypeAliasDeclaration = IgnoredHandler;
 export const TSEnumDeclaration: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.TSEnumDeclaration,
 ) => {
   if (!node.const)
@@ -74,15 +74,15 @@ export const TSEnumDeclaration: THandler = (
 export const TSNonNullExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.TSNonNullExpression,
 ) => {
-  return c.handle(scope, context, node.expression);
+  return c.handle(scope, cursor, node.expression);
 };
 
 export const TSSatisfiesExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.TSSatisfiesExpression,
-) => c.handle(scope, context, node.expression);
+) => c.handle(scope, cursor, node.expression);

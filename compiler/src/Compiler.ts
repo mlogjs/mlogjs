@@ -5,7 +5,7 @@ import { createGlobalScope } from "./modules";
 import { es, IInstruction, THandler } from "./types";
 import { hideRedundantJumps } from "./utils";
 import { CompilerContext } from "./CompilerContext";
-import { HandlerContext } from "./HandlerContext";
+import { BlockCursor } from "./BlockCursor";
 import { Block, EndInstruction, Graph } from "./flow";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
@@ -45,14 +45,13 @@ export class Compiler {
       // the script, since it is treated as a module
       const scope = globalScope.createScope();
 
-      const rootContext = new HandlerContext(
-        new Block([]),
-        new Block([], new EndInstruction()),
-      );
+      const entryBlock = new Block();
+      const exitBlock = new Block(new EndInstruction());
+      const cursor = new BlockCursor("create", entryBlock);
 
-      c.handle(scope, rootContext, program);
+      c.handle(scope, cursor, program);
 
-      const rootGraph = Graph.from(rootContext.entry, rootContext.exit);
+      const rootGraph = Graph.from(entryBlock, exitBlock);
 
       const inst = rootGraph.toMlog(c);
 

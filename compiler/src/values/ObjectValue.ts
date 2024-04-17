@@ -1,14 +1,8 @@
+import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { ImmutableId } from "../flow/id";
-import {
-  EMutability,
-  IInstruction,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-} from "../types";
+import { EMutability, IValue, Location, TValueInstructions } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
@@ -23,6 +17,14 @@ export class ObjectValue extends VoidValue {
   constructor(data: IObjectValueData = {}) {
     super();
     this.data = data;
+  }
+
+  static autoRegisterData(c: ICompilerContext, data: Record<string, IValue>) {
+    const result: IObjectValueData = {};
+    for (const key in data) {
+      result[key] = c.registerValue(data[key]);
+    }
+    return result;
   }
 
   static fromArray(
@@ -40,16 +42,19 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  get(c: ICompilerContext, key: IValue, out: ImmutableId): IInstruction[] {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    _loc: Location,
+  ): ImmutableId {
+    const key = c.getValueOrTemp(propId);
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
       // avoids naming collisions with keys like
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
-        const member = this.data[key.data];
-        const value = c.getValue(member);
-        if (!value) throw new CompilerError("invalid object state");
-        c.setValue(out, c.getValueOrTemp(member));
-        return [];
+        return this.data[key.data];
       }
     }
 

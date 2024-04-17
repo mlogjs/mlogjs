@@ -1,11 +1,12 @@
 import { EndInstruction } from "../../flow";
 import { nullId } from "../../utils";
-import { ComptimeMacroFunction } from "../Function";
+import { MacroFunction } from "../Function";
 
-export class End extends ComptimeMacroFunction {
+export class End extends MacroFunction {
   constructor() {
-    super((c, context, node) => {
-      context.setEndInstruction(new EndInstruction(node));
+    super((c, cursor, node) => {
+      cursor.discardFollowing();
+      cursor.setEndInstruction(new EndInstruction(node));
       return nullId;
     });
   }

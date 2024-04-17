@@ -1,12 +1,17 @@
+import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { InstructionBase } from "../instructions";
-import { IInstruction, IValue, TLiteral, es } from "../types";
-import { appendSourceLocations } from "../utils";
+import { InstructionBase, SetInstruction } from "../instructions";
+import { IInstruction, IValue, Location, TLiteral, es } from "../types";
+import { appendSourceLocations, nullId } from "../utils";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import { ReaderMap, WriterMap, constantOperationMap } from "./optimizer";
+
+export interface ILowerableInstruction {
+  lower(c: ICompilerContext, cursor: IBlockCursor): void;
+}
 
 export class LoadInstruction {
   type = "load" as const;
@@ -15,7 +20,7 @@ export class LoadInstruction {
   constructor(
     public address: GlobalId,
     public out: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -23,8 +28,8 @@ export class LoadInstruction {
   toMlog(c: ICompilerContext): IInstruction[] {
     const value = c.getValueOrTemp(this.address);
     const out = c.getValueOrTemp(this.out);
-    if (!value) throw new CompilerError("Invalid load state", this.source);
-    const instruction = new InstructionBase("set", out, value);
+
+    const instruction = new SetInstruction(out, value);
     instruction.source = this.source;
     return [instruction];
   }
@@ -53,7 +58,7 @@ export class StoreInstruction {
   constructor(
     public address: GlobalId,
     public value: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -73,33 +78,35 @@ export class StoreInstruction {
   toMlog(c: ICompilerContext): IInstruction[] {
     const value = c.getValueOrTemp(this.value);
     const address = c.getValueOrTemp(this.address);
-    if (!value || !address)
-      throw new CompilerError("Invalid store state", this.source);
-    const instruction = new InstructionBase("set", address, value);
+
+    const instruction = new SetInstruction(address, value);
     instruction.source = this.source;
     return [instruction];
   }
 }
 
-export class ValueGetInstruction {
+export class ValueGetInstruction implements ILowerableInstruction {
   type = "value-get" as const;
   source?: es.SourceLocation;
   object: ImmutableId;
   key: ImmutableId;
   out: ImmutableId;
-  optional: boolean;
+  optionalObject: boolean;
+  optionalKey: boolean;
 
   constructor(options: {
     object: ImmutableId;
     key: ImmutableId;
     out: ImmutableId;
-    optional: boolean;
-    node?: es.Node;
+    optionalKey?: boolean;
+    optionalObject?: boolean;
+    node?: Location;
   }) {
     this.key = options.key;
     this.object = options.object;
     this.out = options.out;
-    this.optional = options.optional;
+    this.optionalObject = options.optionalObject ?? false;
+    this.optionalKey = options.optionalKey ?? false;
     this.source = options.node?.loc ?? undefined;
   }
 
@@ -121,19 +128,35 @@ export class ValueGetInstruction {
     writes.remove(this.out);
   }
 
-  toMlog(c: ICompilerContext): IInstruction[] {
+  lower(c: ICompilerContext, cursor: IBlockCursor) {
     const object = c.getValueOrTemp(this.object);
     const key = c.getValueOrTemp(this.key);
 
-    const inst: IInstruction[] = [];
-    if (!object.hasProperty(c, key) && !this.optional)
-      throw new CompilerError("Property does not exist", this.source);
-    if (object.hasProperty(c, key)) {
-      inst.push(...object.get(c, key, this.out));
-      appendSourceLocations(inst, { loc: this.source });
+    if (this.optionalObject) {
+      if (object instanceof LiteralValue && object.data === null) {
+        c.setAlias(this.out, nullId);
+        return [];
+      }
     }
-    return inst;
-    throw new CompilerError("Not implemented", this.source);
+
+    if (this.optionalKey) {
+      if (!object.hasProperty(c, key)) {
+        c.setAlias(this.out, nullId);
+        return [];
+      }
+    }
+
+    const result = object.get(c, cursor, this.object, this.key, {
+      loc: this.source,
+    });
+    c.setAlias(this.out, result);
+  }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    throw new CompilerError(
+      "Attempted to convert virtual value-get instruction to mlog",
+      this.source,
+    );
   }
 }
 
@@ -145,7 +168,7 @@ export class ValueSetInstruction {
     public target: ImmutableId,
     public key: ImmutableId,
     public value: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -167,8 +190,25 @@ export class ValueSetInstruction {
 
   unregisterWriter(writes: WriterMap) {}
 
+  lower(c: ICompilerContext, cursor: IBlockCursor) {
+    const target = c.getValueOrTemp(this.target);
+
+    if (!target.set)
+      throw new CompilerError(
+        "This object does not support setting values",
+        this.source,
+      );
+
+    target.set(c, cursor, this.target, this.key, this.value, {
+      loc: this.source,
+    });
+  }
+
   toMlog(c: ICompilerContext): IInstruction[] {
-    throw new CompilerError("Not implemented");
+    throw new CompilerError(
+      "Attempted to convert virtual value-set instruction to mlog",
+      this.source,
+    );
   }
 }
 
@@ -220,7 +260,7 @@ export class BinaryOperationInstruction {
     public left: ImmutableId,
     public right: ImmutableId,
     public out: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -380,7 +420,7 @@ export class UnaryOperatorInstruction {
     public operator: TUnaryOperationType,
     public value: ImmutableId,
     public out: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -427,10 +467,9 @@ export class BreakInstruction {
   type = "break" as const;
   target: TEdge;
   source?: es.SourceLocation;
-  constructor(target: Block | TEdge, node?: es.Node) {
+  constructor(target: Block | TEdge, node?: Location) {
     this.source = node?.loc ?? undefined;
-    this.target =
-      target instanceof Block ? { type: "forward", block: target } : target;
+    this.target = target instanceof Block ? target.toForward() : target;
   }
 }
 
@@ -444,7 +483,7 @@ export class BreakIfInstruction {
     public condition: ImmutableId,
     consequent: Block | TEdge,
     alternate: Block | TEdge,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
     this.consequent =
@@ -460,13 +499,13 @@ export class ReturnInstruction {
 
   constructor(
     public value: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
 }
 
-export class CallInstruction {
+export class CallInstruction implements ILowerableInstruction {
   type = "call" as const;
   source?: es.SourceLocation;
 
@@ -474,7 +513,7 @@ export class CallInstruction {
     public callee: ImmutableId,
     public args: ImmutableId[],
     public out: ImmutableId,
-    node?: es.Node,
+    node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
   }
@@ -497,18 +536,30 @@ export class CallInstruction {
     writes.remove(this.out);
   }
 
+  lower(c: ICompilerContext, cursor: IBlockCursor) {
+    const callee = c.getValueOrTemp(this.callee);
+    const callResult = callee.call(c, cursor, { loc: this.source }, this.args);
+
+    c.setAlias(this.out, callResult);
+  }
+
   toMlog(c: ICompilerContext): IInstruction[] {
-    const callee = c.getValue(this.callee);
-    const out = c.getValueOrTemp(this.out);
-    if (!callee || !out)
-      throw new CompilerError("Invalid call state", this.source);
-    const args = this.args.map(arg => c.getValueOrTemp(arg));
-    if (!args.every((arg): arg is IValue => !!arg))
-      throw new CompilerError("Invalid call state", this.source);
-    // if (callee.mutability === EMutability.constant) {
-    return appendSourceLocations(callee.call(c, args, this.out), {
-      loc: this.source,
-    } as never);
+    throw new CompilerError(
+      "Attempted to convert virtual call instruction to mlog",
+      this.source,
+    );
+    // const callee = c.getValue(this.callee);
+    // const out = c.getValueOrTemp(this.out);
+    // if (!callee || !out)
+    //   throw new CompilerError("Invalid call state", this.source);
+    // const args = this.args.map(arg => c.getValueOrTemp(arg));
+    // if (!args.every((arg): arg is IValue => !!arg))
+    //   throw new CompilerError("Invalid call state", this.source);
+    // // if (callee.mutability === EMutability.constant) {
+    // callee.call(c, cursor, { loc: this.source }, this.args);
+    // return appendSourceLocations(callee.call(c, args), {
+    //   loc: this.source,
+    // } as never);
     // }
     // throw new CompilerError("Not implemented");
   }
@@ -518,7 +569,17 @@ export class EndInstruction {
   type = "end" as const;
   source?: es.SourceLocation;
 
-  constructor(node?: es.Node) {
+  constructor(node?: Location) {
+    this.source = node?.loc ?? undefined;
+  }
+}
+
+export class StopInstruction {
+  type = "stop" as const;
+
+  source?: es.SourceLocation;
+
+  constructor(node?: Location) {
     this.source = node?.loc ?? undefined;
   }
 }
@@ -527,18 +588,80 @@ export class NativeInstruction {
   type = "native" as const;
   source?: es.SourceLocation;
 
-  constructor(public instruction: IInstruction) {}
+  constructor(
+    public args: (ImmutableId | string)[],
+    public inputs: ImmutableId[],
+    public outputs: ImmutableId[],
+    public node?: Location,
+  ) {
+    this.source = node?.loc ?? undefined;
+  }
 
-  registerReader(reads: ReaderMap) {}
+  registerReader(reads: ReaderMap) {
+    this.inputs.forEach(input => reads.add(input, this));
+  }
 
-  unregisterReader(reads: ReaderMap) {}
+  unregisterReader(reads: ReaderMap) {
+    this.inputs.forEach(input => reads.remove(input, this));
+  }
 
-  registerWriter(writes: WriterMap) {}
+  registerWriter(writes: WriterMap) {
+    this.outputs.forEach(output => writes.set(output, this));
+  }
 
-  unregisterWriter(writes: WriterMap) {}
+  unregisterWriter(writes: WriterMap) {
+    this.outputs.forEach(output => writes.remove(output));
+  }
 
   toMlog(c: ICompilerContext): IInstruction[] {
-    return [this.instruction];
+    const inst = new InstructionBase(
+      ...this.args.map(arg =>
+        typeof arg === "string" ? arg : c.getValueOrTemp(arg),
+      ),
+    );
+    inst.source = this.source;
+    return [inst];
+  }
+}
+
+//  TODO: handle variable mutations
+export class AsmInstruction {
+  type = "asm" as const;
+  source?: es.SourceLocation;
+
+  constructor(
+    public lines: (string | ImmutableId)[][],
+    public code: string,
+    public inputs: ImmutableId[],
+    public outputs: ImmutableId[],
+    public node?: Location,
+  ) {
+    this.source = node?.loc ?? undefined;
+  }
+
+  registerReader(reads: ReaderMap) {
+    this.inputs.forEach(input => reads.add(input, this));
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    this.inputs.forEach(input => reads.remove(input, this));
+  }
+
+  registerWriter(writes: WriterMap) {
+    this.outputs.forEach(output => writes.set(output, this));
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    this.outputs.forEach(output => writes.remove(output));
+  }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    return [
+      new InstructionBase(
+        this.code,
+        ...this.inputs.map(input => c.getValueOrTemp(input)),
+      ),
+    ];
   }
 }
 
@@ -546,7 +669,8 @@ export type TBlockEndInstruction =
   | BreakInstruction
   | BreakIfInstruction
   | ReturnInstruction
-  | EndInstruction;
+  | EndInstruction
+  | StopInstruction;
 
 export type TBlockInstruction =
   | LoadInstruction
@@ -556,4 +680,11 @@ export type TBlockInstruction =
   | BinaryOperationInstruction
   | UnaryOperatorInstruction
   | CallInstruction
-  | NativeInstruction;
+  | NativeInstruction
+  | AsmInstruction;
+
+export function isLowerable<T extends TBlockInstruction>(
+  instruction: T,
+): instruction is T & ILowerableInstruction {
+  return "lower" in instruction;
+}

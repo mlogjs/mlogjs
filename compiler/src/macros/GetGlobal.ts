@@ -2,12 +2,12 @@ import { CompilerError } from "../CompilerError";
 import { GlobalId, ImmutableId, LoadInstruction } from "../flow";
 import { EMutability } from "../types";
 import { LiteralValue, StoreValue } from "../values";
-import { ComptimeMacroFunction } from "./Function";
+import { MacroFunction } from "./Function";
 
-export class GetGlobal extends ComptimeMacroFunction {
+export class GetGlobal extends MacroFunction {
   constructor(public mutability: EMutability) {
-    super((c, context, node, args) => {
-      const name = c.getValue(args[0]);
+    super((c, cursor, node, nameId) => {
+      const name = c.getValue(nameId);
       if (!(name instanceof LiteralValue) || !name.isString())
         throw new CompilerError("The name parameter must be a string literal.");
 
@@ -20,7 +20,7 @@ export class GetGlobal extends ComptimeMacroFunction {
           const globalId = new GlobalId();
           const out = new ImmutableId();
           c.setValue(globalId, value);
-          context.addInstruction(new LoadInstruction(globalId, out, node));
+          cursor.addInstruction(new LoadInstruction(globalId, out, node));
           return out;
         }
       }

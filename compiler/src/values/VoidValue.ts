@@ -1,18 +1,15 @@
 import {
   EMutability,
-  IInstruction,
   IScope,
   IValue,
-  IValueOperators,
+  Location,
   TEOutput,
   TValueInstructions,
-  es,
 } from "../types";
-import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId } from "../flow";
-import { HandlerContext } from "../HandlerContext";
+import { IBlockCursor } from "../BlockCursor";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
@@ -28,28 +25,25 @@ export class VoidValue implements IValue {
   }
   call(
     _c: ICompilerContext,
-    _args: IValue[],
-    _out: ImmutableId,
-  ): IInstruction[] {
-    throw new CompilerError(`[${this.debugString()}] is not callable.`);
+    _cursor: IBlockCursor,
+    loc: Location,
+    _args: ImmutableId[],
+  ): ImmutableId {
+    throw new CompilerError(`[${this.debugString()}] is not callable.`, loc);
   }
   get(
-    _compilerContext: ICompilerContext,
-    name: IValue,
-    _out: ImmutableId,
-  ): IInstruction[] {
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    prop: ImmutableId,
+    loc: Location,
+  ): ImmutableId {
     throw new CompilerError(
-      `The member [${name.debugString()}] does not exist in [${this.debugString()}]`,
+      `The member [${c
+        .getValueOrTemp(prop)
+        .debugString()}] does not exist in [${this.debugString()}]`,
+      loc,
     );
-  }
-
-  handleCall(
-    _c: ICompilerContext,
-    _context: HandlerContext,
-    _node: es.Node,
-    _args: ImmutableId[],
-  ): ImmutableId | undefined {
-    return;
   }
 
   hasProperty(_compilerContext: ICompilerContext, _prop: IValue): boolean {
@@ -73,17 +67,4 @@ export class VoidValue implements IValue {
   toMlogString(): string {
     return '"[macro VoidValue]"';
   }
-}
-
-// tells typescript that VoidValue implements value
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
-export interface VoidValue extends IValueOperators {}
-
-for (const key of operators) {
-  VoidValue.prototype[key] = function () {
-    console.log(this);
-    throw new CompilerError(
-      `The operator '${key}' is not defined for [${this.debugString()}].`,
-    );
-  };
 }

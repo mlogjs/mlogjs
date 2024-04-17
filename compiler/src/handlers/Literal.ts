@@ -4,7 +4,7 @@ import { LiteralValue } from "../values";
 
 const Literal: THandler = (
   c,
-  context,
+  cursor,
   scope,
   node: es.StringLiteral | es.NumericLiteral,
 ) => c.registerValue(new LiteralValue(node.value));
@@ -20,7 +20,7 @@ export const NullLiteral: THandler = () => {
 
 export const BooleanLiteral: THandler = (
   c,
-  context,
+  cursor,
   scope,
   node: es.BooleanLiteral,
 ) => c.registerValue(new LiteralValue(+node.value));

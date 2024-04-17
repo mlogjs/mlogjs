@@ -1,4 +1,4 @@
-import { es } from "./types";
+import { Location, es } from "./types";
 
 /**
  * Error thrown by the babel parser.
@@ -15,7 +15,7 @@ export interface ParsingError extends Error {
 }
 
 type CompilerErrorSource =
-  | es.Node
+  | Location
   | es.SourceLocation
   | {
       line: number;
@@ -55,15 +55,15 @@ export class CompilerError extends Error {
 
   set loc(value: CompilerErrorSource | undefined) {
     if (!value) return;
-    if ("type" in value) {
-      this._loc = value.loc as es.SourceLocation;
-    } else if ("start" in value) {
+    if ("start" in value) {
       this._loc = value;
-    } else {
+    } else if ("line" in value) {
       this._loc = {
         start: value,
         end: value,
       };
+    } else {
+      this._loc = value.loc!;
     }
   }
 

@@ -1,15 +1,21 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { nullId } from "../../utils";
+import { NativeInstruction } from "../../flow";
 
-export class UnitBind extends MacroFunction<null> {
+export class UnitBind extends MacroFunction {
   constructor() {
-    super((scope, out, unit) => {
+    super((c, cursor, loc, unitId) => {
+      const unit = c.getValue(unitId);
       if (!(unit instanceof StoreValue))
         throw new CompilerError("The unitBind unit must be a store");
 
-      return [null, [new InstructionBase("ubind", unit)]];
+      cursor.addInstruction(
+        new NativeInstruction(["ubind", unitId], [unitId], [], loc),
+      );
+
+      return nullId;
     });
   }
 }

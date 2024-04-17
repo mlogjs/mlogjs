@@ -5,14 +5,13 @@ import { nullId } from "../utils";
 export const WhileStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.WhileStatement,
 ) => {
-  const testBlock = new Block([]);
-  const bodyBlock = new Block([]);
-  const afterLoopBlock = new Block([]);
+  const testBlock = new Block();
+  const bodyBlock = new Block();
+  const afterLoopBlock = new Block();
   const continueBlock = new Block(
-    [],
     new BreakInstruction(testBlock.toBackward(), node),
   );
 
@@ -20,47 +19,47 @@ export const WhileStatement: THandler = (
   childScope.break = afterLoopBlock;
   childScope.continue = continueBlock;
 
-  context.connectBlock(testBlock, node);
+  cursor.connectBlock(testBlock, node);
 
-  const test = c.handle(scope, context, node.test);
-  context.setEndInstruction(
+  const test = c.handle(scope, cursor, node.test);
+  cursor.setEndInstruction(
     new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
   );
 
-  context.currentBlock = bodyBlock;
-  c.handle(childScope, context, node.body);
-  context.setEndInstruction(new BreakInstruction(continueBlock, node));
+  cursor.currentBlock = bodyBlock;
+  c.handle(childScope, cursor, node.body);
+  cursor.setEndInstruction(new BreakInstruction(continueBlock, node));
 
-  context.currentBlock = afterLoopBlock;
+  cursor.currentBlock = afterLoopBlock;
   return nullId;
 };
 
 export const DoWhileStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.DoWhileStatement,
 ) => {
-  const testBlock = new Block([]);
-  const bodyBlock = new Block([]);
-  const afterLoopBlock = new Block([]);
+  const testBlock = new Block();
+  const bodyBlock = new Block();
+  const afterLoopBlock = new Block();
 
   const childScope = scope.createScope();
   childScope.break = afterLoopBlock;
   childScope.continue = testBlock;
 
-  context.connectBlock(bodyBlock, node);
-  c.handle(childScope, context, node.body);
+  cursor.connectBlock(bodyBlock, node);
+  c.handle(childScope, cursor, node.body);
 
-  context.setEndInstruction(new BreakInstruction(testBlock, node));
+  cursor.setEndInstruction(new BreakInstruction(testBlock, node));
 
-  context.currentBlock = testBlock;
-  const test = c.handle(scope, context, node.test);
+  cursor.currentBlock = testBlock;
+  const test = c.handle(scope, cursor, node.test);
 
-  context.setEndInstruction(
+  cursor.setEndInstruction(
     new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock, node),
   );
 
-  context.currentBlock = afterLoopBlock;
+  cursor.currentBlock = afterLoopBlock;
   return nullId;
 };

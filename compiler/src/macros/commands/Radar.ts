@@ -1,4 +1,3 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
@@ -7,6 +6,8 @@ import {
   assertIsObjectMacro,
   assertLiteralOneOf,
 } from "../../utils";
+import { ImmutableId, NativeInstruction } from "../../flow";
+import { Location } from "../../types";
 
 export const validRadarFilters = [
   "any",
@@ -29,16 +30,23 @@ export const validRadarSorts = [
 
 export class Radar extends MacroFunction {
   constructor() {
-    super((scope, out, options) => {
+    super((c, cursor, loc, optionsId) => {
+      const options = c.getValue(optionsId);
       assertIsObjectMacro(options, "The radar options");
 
-      const { building, filters, order, sort } = options.data;
+      const buildingId = options.data.building;
+      const building = c.getValueOrTemp(buildingId);
+      const filters = c.getValue(options.data.filters);
+      const orderId = options.data.order;
+      const order = c.getValueOrTemp(orderId);
+      const sort = c.getValueOrTemp(options.data.sort);
+
       if (!(building instanceof StoreValue))
         throw new CompilerError("The building must a store value");
 
-      assertIsArrayMacro(filters, "filters");
+      assertIsArrayMacro(c, filters, "filters");
 
-      const { length } = filters.data;
+      const length = c.getValue(filters.data.length);
 
       if (!(length instanceof LiteralValue) || !length.isNumber())
         throw new CompilerError("The length of an array macro must be");
@@ -47,7 +55,10 @@ export class Radar extends MacroFunction {
         throw new CompilerError("The filters array must have 3 items");
 
       // data is not an array
-      const { 0: filter1, 1: filter2, 2: filter3 } = filters.data;
+
+      const filter1 = c.getValueOrTemp(filters.data[0]);
+      const filter2 = c.getValueOrTemp(filters.data[1]);
+      const filter3 = c.getValueOrTemp(filters.data[2]);
 
       assertLiteralOneOf(filter1, validRadarFilters, "The first filter");
       assertLiteralOneOf(filter2, validRadarFilters, "The second filter");
@@ -58,22 +69,44 @@ export class Radar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = StoreValue.from(scope, out);
-      return [
-        outUnit,
-        [
-          new InstructionBase(
-            "radar",
-            filter1.data,
-            filter2.data,
-            filter3.data,
-            sort.data,
-            building,
-            order,
-            outUnit,
-          ),
-        ],
-      ];
+      const out = new ImmutableId();
+      cursor.addInstruction(
+        new NativeRadarInstruction({
+          building: buildingId,
+          filters: [filter1.data, filter2.data, filter3.data],
+          order: orderId,
+          sort: sort.data,
+          out,
+          loc,
+        }),
+      );
+
+      return out;
     });
+  }
+}
+
+class NativeRadarInstruction extends NativeInstruction {
+  constructor({
+    building,
+    filters,
+    order,
+    out,
+    sort,
+    loc,
+  }: {
+    filters: [string, string, string];
+    sort: string;
+    building: ImmutableId;
+    order: ImmutableId;
+    out: ImmutableId;
+    loc: Location;
+  }) {
+    super(
+      ["radar", ...filters, sort, building, order, out],
+      [building, order],
+      [out],
+      loc,
+    );
   }
 }

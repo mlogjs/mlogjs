@@ -1,17 +1,13 @@
-import { InstructionBase } from "../../instructions";
-import { EInstIntent } from "../../types";
-import { assign } from "../../utils";
+import { StopInstruction } from "../../flow";
+import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
-export class Stop extends MacroFunction<null> {
+export class Stop extends MacroFunction {
   constructor() {
-    super(() => [
-      null,
-      [
-        assign(new InstructionBase("stop"), {
-          intent: EInstIntent.exit,
-        }),
-      ],
-    ]);
+    super((c, cursor, loc) => {
+      cursor.discardFollowing();
+      cursor.setEndInstruction(new StopInstruction(loc));
+      return nullId;
+    });
   }
 }

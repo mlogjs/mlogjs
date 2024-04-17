@@ -35,7 +35,7 @@ function handleFunctionNode(
 export const ArrowFunctionExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ArrowFunctionExpression,
 ) => {
   return handleFunctionNode(c, scope, node);
@@ -44,7 +44,7 @@ export const ArrowFunctionExpression: THandler = (
 export const FunctionDeclaration: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.FunctionDeclaration,
 ) => {
   const identifier = (node.id as es.Identifier).name;

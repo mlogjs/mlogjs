@@ -20,30 +20,30 @@ import { nodeName, nullId, pipeInsts } from "../utils";
 import { CompilerError } from "../CompilerError";
 import { Compiler } from "../Compiler";
 import { ICompilerContext } from "../CompilerContext";
-import { HandlerContext } from "../HandlerContext";
+import { IBlockCursor } from "../BlockCursor";
 
 export const VariableDeclaration: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.VariableDeclaration,
 ) => {
-  return c.handleMany(scope, context, node.declarations, child =>
-    VariableDeclarator(c, scope, context, child, node.kind),
+  return c.handleMany(scope, cursor, node.declarations, child =>
+    VariableDeclarator(c, scope, cursor, child, node.kind),
   );
 };
 
 export const VariableDeclarator: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.VariableDeclarator,
   kind: "let" | "var" | "const" = "let",
 ) => {
   const { id, init } = node;
 
-  const value = init ? c.handle(scope, context, init) : undefined;
-  c.handleDeclaration(scope, context, id, kind, value);
+  const value = init ? c.handle(scope, cursor, init) : undefined;
+  c.handleDeclaration(scope, cursor, id, kind, value);
 
   return nullId;
 };
@@ -51,18 +51,12 @@ export const VariableDeclarator: THandler = (
 type TDeclareHandler<T extends es.Node> = (
   c: ICompilerContext,
   scope: IScope,
-  context: HandlerContext,
+  cursor: IBlockCursor,
   node: T,
   kind: "let" | "const" | "var",
 ) => number;
 
-const Declare: TDeclareHandler<es.LVal | es.VoidPattern> = (
-  c,
-  scope,
-  context,
-  node,
-  kind,
-) => {
+const Declare: TDeclareHandler<es.LVal> = (c, scope, cursor, node, kind) => {
   return c.handle(scope, node, () => {
     switch (node.type) {
       case "Identifier":
@@ -84,7 +78,7 @@ const Declare: TDeclareHandler<es.LVal | es.VoidPattern> = (
 const DeclareIdentifier: TDeclareHandler<es.Identifier> = (
   c,
   scope,
-  context,
+  cursor,
   node,
   kind,
 ) => {

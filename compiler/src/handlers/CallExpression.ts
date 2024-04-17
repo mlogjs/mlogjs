@@ -6,25 +6,20 @@ import { LiteralValue, ObjectValue } from "../values";
 export const CallExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.CallExpression,
 ) => {
-  const callee = c.handle(scope, context, node.callee);
+  const callee = c.handle(scope, cursor, node.callee);
 
   const calleeValue = c.getValue(callee);
   calleeValue?.preCall(scope);
   const args = node.arguments.map(node => {
-    return c.handle(scope, context, node);
+    return c.handle(scope, cursor, node);
   });
   calleeValue?.postCall(scope);
 
-  // TODO: update to load from the function's global return value
-
-  const handleResult = calleeValue?.handleCall(c, context, node, args);
-  if (handleResult) return handleResult;
-
   const out = new ImmutableId();
-  context.addInstruction(new CallInstruction(callee, args, out, node));
+  cursor.addInstruction(new CallInstruction(callee, args, out, node));
 
   return out;
 };
@@ -34,11 +29,11 @@ export const NewExpression = CallExpression;
 export const TaggedTemplateExpression: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.TaggedTemplateExpression,
 ) => {
   //  TODO: handle nested properties of object values
-  const tag = c.handle(scope, context, node.tag);
+  const tag = c.handle(scope, cursor, node.tag);
 
   const template = node.quasi;
 
@@ -64,13 +59,13 @@ export const TaggedTemplateExpression: THandler = (
   const expressions: ImmutableId[] = [];
 
   template.expressions.forEach(expression => {
-    const value = c.handle(scope, context, expression);
+    const value = c.handle(scope, cursor, expression);
 
     expressions.push(value);
   });
 
   const out = new ImmutableId();
-  context.addInstruction(
+  cursor.addInstruction(
     new CallInstruction(tag, [stringsObjectId, ...expressions], out, node),
   );
 

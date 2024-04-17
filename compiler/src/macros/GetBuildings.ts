@@ -1,36 +1,43 @@
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import {
-  EMutability,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-} from "../types";
+import { ImmutableId } from "../flow";
+import { EMutability, IValue, Location } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
 export class GetBuildings extends MacroFunction {
   constructor() {
-    super(() => [new BuildingsMacro(), []]);
+    super(c => c.registerValue(new BuildingsMacro()));
   }
 }
 
 class BuildingsMacro extends ObjectValue {
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     if (isKeyBuildingName(prop)) {
       return true;
     }
-    return super.hasProperty(scope, prop);
+    return super.hasProperty(c, prop);
   }
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
-    if (super.hasProperty(scope, key)) return super.get(scope, key, out);
+
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: Location,
+  ): ImmutableId {
+    const key = c.getValueOrTemp(propId);
+    if (super.hasProperty(c, key))
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (!isKeyBuildingName(key)) {
       throw new CompilerError(
         `[${key.debugString()}] is not a valid building name`,
       );
     }
-    return [new StoreValue(key.data, EMutability.constant), []];
+
+    return c.registerValue(new StoreValue(key.data, EMutability.constant));
   }
 }
 

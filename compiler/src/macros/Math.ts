@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { HandlerContext } from "../HandlerContext";
 import {
   BinaryOperationInstruction,
   ImmutableId,
@@ -9,21 +9,21 @@ import {
   TUnaryOperationType,
   UnaryOperatorInstruction,
 } from "../flow";
-import { IValue, es } from "../types";
+import { IValue, Location } from "../types";
 import { mathConstants } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
-import { ComptimeMacroFunction } from "./Function";
+import { MacroFunction } from "./Function";
 
 function binary(
-  context: HandlerContext,
-  node: es.Node,
+  cursor: IBlockCursor,
+  loc: Location,
   operator: TBinaryOperationType,
   a: ImmutableId,
   b: ImmutableId,
 ) {
   const out = new ImmutableId();
-  context.addInstruction(
-    new BinaryOperationInstruction(operator, a, b, out, node),
+  cursor.addInstruction(
+    new BinaryOperationInstruction(operator, a, b, out, loc),
   );
   return out;
 }
@@ -62,7 +62,7 @@ function createMacroMathOperations(c: ICompilerContext) {
     radToDeg: c.registerValue(new LiteralValue(mathConstants.radToDeg)),
   };
   const macroMathOperations: Record<string, IValue> = {
-    sign: new ComptimeMacroFunction((c, context, node, [x]) => {
+    sign: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // inspired by the branchless sign function from
@@ -71,12 +71,12 @@ function createMacroMathOperations(c: ICompilerContext) {
       // return (a > 0) - (a < 0);
       const zero = c.registerValue(new LiteralValue(0));
 
-      const gt = binary(context, node, "greaterThan", x, zero);
-      const lt = binary(context, node, "lessThan", x, zero);
-      const result = binary(context, node, "sub", gt, lt);
+      const gt = binary(cursor, node, "greaterThan", x, zero);
+      const lt = binary(cursor, node, "lessThan", x, zero);
+      const result = binary(cursor, node, "sub", gt, lt);
       return result;
     }),
-    round: new ComptimeMacroFunction((c, context, node, [x]) => {
+    round: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return Math.floor(a + 0.5);
@@ -84,11 +84,11 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { floor } = macroMathOperations;
       const half = c.registerValue(new LiteralValue(0.5));
 
-      const incremented = binary(context, node, "add", x, half);
-      const result = floor.handleCall(c, context, node, [incremented])!;
+      const incremented = binary(cursor, node, "add", x, half);
+      const result = floor.call(c, cursor, node, [incremented])!;
       return result;
     }),
-    trunc: new ComptimeMacroFunction((c, context, node, [x]) => {
+    trunc: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // subtracts the decimal part of a number from itself
@@ -97,32 +97,32 @@ function createMacroMathOperations(c: ICompilerContext) {
 
       // return a - (a % 1);
       const one = c.registerValue(new LiteralValue(1));
-      const rest = binary(context, node, "mod", x, one);
-      const result = binary(context, node, "sub", x, rest);
+      const rest = binary(cursor, node, "mod", x, one);
+      const result = binary(cursor, node, "sub", x, rest);
       return result;
     }),
-    exp: new ComptimeMacroFunction((c, context, node, [x]) => {
+    exp: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return Math.E ** x;
 
       const { E } = macroMathMembers;
 
-      const result = binary(context, node, "pow", E, x);
+      const result = binary(cursor, node, "pow", E, x);
       return result;
     }),
-    expm1: new ComptimeMacroFunction((c, context, node, [x]) => {
+    expm1: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return Math.exp(x) - 1;
       const { exp } = macroMathOperations;
-      const ex = exp.handleCall(c, context, node, [x])!;
+      const ex = exp.call(c, cursor, node, [x])!;
       const one = c.registerValue(new LiteralValue(1));
-      const subtracted = binary(context, node, "sub", ex, one);
+      const subtracted = binary(cursor, node, "sub", ex, one);
 
       return subtracted;
     }),
-    cosh: new ComptimeMacroFunction((c, context, node, [degrees]) => {
+    cosh: new MacroFunction((c, cursor, node, degrees) => {
       assertArgumentCount(+!!degrees, 1);
 
       // const x = degrees * Math.degToRad;
@@ -130,7 +130,7 @@ function createMacroMathOperations(c: ICompilerContext) {
 
       // const inst: IInstruction[] = [];
       // const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      // const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      // const expx = pipeInsts(exp.call(scope, x), [])!;
       // const negativeX = pipeInsts(x["u-"](scope), inst);
       // const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       // const sum = pipeInsts(expx["+"](scope, expnegx), inst);
@@ -141,15 +141,15 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { degToRad } = macroMathMembers;
       const two = c.registerValue(new LiteralValue(2));
       const zero = c.registerValue(new LiteralValue(0));
-      const x = binary(context, node, "mul", degrees, degToRad);
-      const expx = exp.handleCall(c, context, node, [x])!;
-      const negativeX = binary(context, node, "sub", zero, x);
-      const expnegx = exp.handleCall(c, context, node, [negativeX])!;
-      const sum = binary(context, node, "add", expx, expnegx);
-      const result = binary(context, node, "div", sum, two);
+      const x = binary(cursor, node, "mul", degrees, degToRad);
+      const expx = exp.call(c, cursor, node, [x])!;
+      const negativeX = binary(cursor, node, "sub", zero, x);
+      const expnegx = exp.call(c, cursor, node, [negativeX])!;
+      const sum = binary(cursor, node, "add", expx, expnegx);
+      const result = binary(cursor, node, "div", sum, two);
       return result;
     }),
-    acosh: new ComptimeMacroFunction((c, context, node, [x]) => {
+    acosh: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return Math.log(x + Math.sqrt(x ** 2 - 1)) * Math.radToDeg;
@@ -167,15 +167,15 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { radToDeg } = macroMathMembers;
       const one = c.registerValue(new LiteralValue(1));
       const two = c.registerValue(new LiteralValue(2));
-      const x2 = binary(context, node, "pow", x, two);
-      const x2minus1 = binary(context, node, "sub", x2, one);
-      const sqrtx2minus1 = sqrt.handleCall(c, context, node, [x2minus1])!;
-      const sum = binary(context, node, "add", x, sqrtx2minus1);
-      const radians = log.handleCall(c, context, node, [sum])!;
-      const degrees = binary(context, node, "mul", radians, radToDeg);
+      const x2 = binary(cursor, node, "pow", x, two);
+      const x2minus1 = binary(cursor, node, "sub", x2, one);
+      const sqrtx2minus1 = sqrt.call(c, cursor, node, [x2minus1])!;
+      const sum = binary(cursor, node, "add", x, sqrtx2minus1);
+      const radians = log.call(c, cursor, node, [sum])!;
+      const degrees = binary(cursor, node, "mul", radians, radToDeg);
       return degrees;
     }),
-    sinh: new ComptimeMacroFunction((c, context, node, [degrees]) => {
+    sinh: new MacroFunction((c, cursor, node, degrees) => {
       assertArgumentCount(+!!degrees, 1);
 
       // const x = degrees * Math.degToRad;
@@ -183,7 +183,7 @@ function createMacroMathOperations(c: ICompilerContext) {
 
       // const inst: IInstruction[] = [];
       // const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      // const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      // const expx = pipeInsts(exp.call(scope, x), [])!;
       // const negativeX = pipeInsts(x["u-"](scope), inst);
       // const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       // const sub = pipeInsts(expx["-"](scope, expnegx), inst);
@@ -194,15 +194,15 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { degToRad } = macroMathMembers;
       const zero = c.registerValue(new LiteralValue(0));
       const two = c.registerValue(new LiteralValue(2));
-      const x = binary(context, node, "mul", degrees, degToRad);
-      const expx = exp.handleCall(c, context, node, [x])!;
-      const negativeX = binary(context, node, "sub", zero, x);
-      const expnegx = exp.handleCall(c, context, node, [negativeX])!;
-      const sub = binary(context, node, "sub", expx, expnegx);
-      const result = binary(context, node, "div", sub, two);
+      const x = binary(cursor, node, "mul", degrees, degToRad);
+      const expx = exp.call(c, cursor, node, [x])!;
+      const negativeX = binary(cursor, node, "sub", zero, x);
+      const expnegx = exp.call(c, cursor, node, [negativeX])!;
+      const sub = binary(cursor, node, "sub", expx, expnegx);
+      const result = binary(cursor, node, "div", sub, two);
       return result;
     }),
-    asinh: new ComptimeMacroFunction((c, context, node, [x]) => {
+    asinh: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return Math.log(x + Math.sqrt(x ** 2 + 1)) * Math.radToDeg;
@@ -220,15 +220,15 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { radToDeg } = macroMathMembers;
       const one = c.registerValue(new LiteralValue(1));
       const two = c.registerValue(new LiteralValue(2));
-      const x2 = binary(context, node, "pow", x, two);
-      const x2plus1 = binary(context, node, "add", x2, one);
-      const sqrtx2plus1 = sqrt.handleCall(c, context, node, [x2plus1])!;
-      const sum = binary(context, node, "add", x, sqrtx2plus1);
-      const radians = log.handleCall(c, context, node, [sum])!;
-      const degrees = binary(context, node, "mul", radians, radToDeg);
+      const x2 = binary(cursor, node, "pow", x, two);
+      const x2plus1 = binary(cursor, node, "add", x2, one);
+      const sqrtx2plus1 = sqrt.call(c, cursor, node, [x2plus1])!;
+      const sum = binary(cursor, node, "add", x, sqrtx2plus1);
+      const radians = log.call(c, cursor, node, [sum])!;
+      const degrees = binary(cursor, node, "mul", radians, radToDeg);
       return degrees;
     }),
-    tanh: new ComptimeMacroFunction((c, context, node, [degrees]) => {
+    tanh: new MacroFunction((c, cursor, node, degrees) => {
       assertArgumentCount(+!!degrees, 1);
 
       // const x = degrees * Math.degToRad;
@@ -237,7 +237,7 @@ function createMacroMathOperations(c: ICompilerContext) {
       // const { exp, degToRad } = macroMathOperations;
       // const inst: IInstruction[] = [];
       // const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      // const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      // const expx = pipeInsts(exp.call(scope, x), [])!;
       // const negativeX = pipeInsts(x["u-"](scope), inst);
       // const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       // const sub = pipeInsts(expx["-"](scope, expnegx), inst);
@@ -248,16 +248,16 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { exp } = macroMathOperations;
       const { degToRad } = macroMathMembers;
       const zero = c.registerValue(new LiteralValue(0));
-      const x = binary(context, node, "mul", degrees, degToRad);
-      const expx = exp.handleCall(c, context, node, [x])!;
-      const negativeX = binary(context, node, "sub", zero, x);
-      const expnegx = exp.handleCall(c, context, node, [negativeX])!;
-      const sub = binary(context, node, "sub", expx, expnegx);
-      const sum = binary(context, node, "add", expx, expnegx);
-      const result = binary(context, node, "div", sub, sum);
+      const x = binary(cursor, node, "mul", degrees, degToRad);
+      const expx = exp.call(c, cursor, node, [x])!;
+      const negativeX = binary(cursor, node, "sub", zero, x);
+      const expnegx = exp.call(c, cursor, node, [negativeX])!;
+      const sub = binary(cursor, node, "sub", expx, expnegx);
+      const sum = binary(cursor, node, "add", expx, expnegx);
+      const result = binary(cursor, node, "div", sub, sum);
       return result;
     }),
-    atanh: new ComptimeMacroFunction((c, context, node, [x]) => {
+    atanh: new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
 
       // return (Math.log((1 + x) / (1 - x)) / 2) * Math.radToDeg;
@@ -278,36 +278,30 @@ function createMacroMathOperations(c: ICompilerContext) {
       const { radToDeg } = macroMathMembers;
       const one = c.registerValue(new LiteralValue(1));
       const two = c.registerValue(new LiteralValue(2));
-      const sum = binary(context, node, "add", one, x);
-      const sub = binary(context, node, "sub", one, x);
-      const div = binary(context, node, "div", sum, sub);
-      const logOfDiv = log.handleCall(c, context, node, [div])!;
-      const radians = binary(context, node, "div", logOfDiv, two);
-      const degrees = binary(context, node, "mul", radians, radToDeg);
+      const sum = binary(cursor, node, "add", one, x);
+      const sub = binary(cursor, node, "sub", one, x);
+      const div = binary(cursor, node, "div", sum, sub);
+      const logOfDiv = log.call(c, cursor, node, [div])!;
+      const radians = binary(cursor, node, "div", logOfDiv, two);
+      const degrees = binary(cursor, node, "mul", radians, radToDeg);
       return degrees;
     }),
   };
 
   for (const op of forwardedUnaryOperations) {
-    macroMathOperations[op] = new ComptimeMacroFunction(
-      (c, context, node, [x]) => {
-        assertArgumentCount(+!!x, 1);
-        const result = new ImmutableId();
-        context.addInstruction(
-          new UnaryOperatorInstruction(op, x, result, node),
-        );
-        return result;
-      },
-    );
+    macroMathOperations[op] = new MacroFunction((c, cursor, node, x) => {
+      assertArgumentCount(+!!x, 1);
+      const result = new ImmutableId();
+      cursor.addInstruction(new UnaryOperatorInstruction(op, x, result, node));
+      return result;
+    });
   }
 
   for (const op of forwardedBinaryOperations) {
-    macroMathOperations[op] = new ComptimeMacroFunction(
-      (c, context, node, [a, b]) => {
-        assertArgumentCount(+!!a + +!!b, 2);
-        return binary(context, node, op, a, b);
-      },
-    );
+    macroMathOperations[op] = new MacroFunction((c, cursor, node, a, b) => {
+      assertArgumentCount(+!!a + +!!b, 2);
+      return binary(cursor, node, op, a, b);
+    });
   }
 
   for (const key in macroMathOperations) {

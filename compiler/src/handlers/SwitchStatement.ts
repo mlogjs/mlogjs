@@ -11,34 +11,34 @@ import { nullId } from "../utils";
 export const SwitchStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.SwitchStatement,
 ) => {
   const innerScope = scope.createScope();
-  const refBlock = new Block([]);
-  const exitBlock = new Block([]);
-  context.connectBlock(refBlock, node);
+  const refBlock = new Block();
+  const exitBlock = new Block();
+  cursor.connectBlock(refBlock, node);
   innerScope.break = exitBlock;
 
-  const ref = c.handle(scope, context, node.discriminant);
+  const ref = c.handle(scope, cursor, node.discriminant);
 
-  let nextBodyBlock = new Block([]);
-  let nextTestBlock = new Block([]);
-  let defaultCaseEntry = new Block([], new BreakInstruction(exitBlock, node));
-  context.connectBlock(nextTestBlock, node);
+  let nextBodyBlock = new Block();
+  let nextTestBlock = new Block();
+  let defaultCaseEntry = new Block(new BreakInstruction(exitBlock, node));
+  cursor.connectBlock(nextTestBlock, node);
 
   for (const scase of node.cases) {
     const bodyEntry = nextBodyBlock;
     const testEntry = nextTestBlock;
-    nextBodyBlock = new Block([]);
+    nextBodyBlock = new Block();
 
     if (scase.test) {
-      nextTestBlock = new Block([]);
-      context.currentBlock = testEntry;
+      nextTestBlock = new Block();
+      cursor.currentBlock = testEntry;
 
-      const value = c.handle(scope, context, scase.test);
+      const value = c.handle(scope, cursor, scase.test);
       const condition = new ImmutableId();
-      context.addInstruction(
+      cursor.addInstruction(
         new BinaryOperationInstruction(
           "strictEqual",
           ref,
@@ -47,7 +47,7 @@ export const SwitchStatement: THandler = (
           scase,
         ),
       );
-      context.setEndInstruction(
+      cursor.setEndInstruction(
         new BreakIfInstruction(condition, bodyEntry, nextTestBlock, scase),
       );
     } else {
@@ -55,16 +55,16 @@ export const SwitchStatement: THandler = (
       defaultCaseEntry = bodyEntry;
     }
 
-    context.currentBlock = bodyEntry;
+    cursor.currentBlock = bodyEntry;
 
-    c.handleMany(innerScope, context, scase.consequent);
+    c.handleMany(innerScope, cursor, scase.consequent);
 
-    context.setEndInstruction(new BreakInstruction(nextBodyBlock, node));
+    cursor.setEndInstruction(new BreakInstruction(nextBodyBlock, node));
   }
 
   nextTestBlock.endInstruction = new BreakInstruction(defaultCaseEntry, node);
   nextBodyBlock.endInstruction = new BreakInstruction(exitBlock, node);
 
-  context.currentBlock = exitBlock;
+  cursor.currentBlock = exitBlock;
   return nullId;
 };

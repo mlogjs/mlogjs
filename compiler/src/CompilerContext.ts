@@ -9,11 +9,10 @@ import {
   TDeclarationKind,
 } from "./types";
 import { CompilerOptions } from "./Compiler";
-import { HandlerContext } from "./HandlerContext";
 import { nullId } from "./utils";
-import { Block } from "./flow";
 import { LiteralValue, StoreValue } from "./values";
-import { ImmutableId, ValueId } from "./flow/id";
+import { GlobalId, ImmutableId, ValueId } from "./flow/id";
+import { IBlockCursor } from "./BlockCursor";
 
 export interface ICompilerContext {
   readonly compactNames: boolean;
@@ -23,14 +22,16 @@ export interface ICompilerContext {
   setValueName(id: ValueId, name: string): void;
   getValueId(name: string): ValueId | undefined;
 
-  getValue(id: ValueId): IValue | undefined;
+  getValue(id: ValueId | undefined): IValue | undefined;
   getValueOrTemp(id: ValueId): IValue;
   setValue(id: ValueId, value: IValue): void;
   registerValue(value: IValue): ImmutableId;
+  setAlias(alias: ImmutableId, original: ImmutableId): void;
+  setGlobalAlias(alias: ImmutableId, original: GlobalId): void;
 
   handle(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     handler?: THandler,
     arg?: unknown,
@@ -38,7 +39,7 @@ export interface ICompilerContext {
 
   handleWrite(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     handler?: THandler,
     arg?: unknown,
@@ -46,7 +47,7 @@ export interface ICompilerContext {
 
   handleDeclaration(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     kind: TDeclarationKind,
     init?: ImmutableId,
@@ -63,7 +64,7 @@ export interface ICompilerContext {
    */
   handleMany<T extends es.Node>(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     nodes: T[],
     handler?: (node: T) => ValueId,
   ): ImmutableId;
@@ -71,11 +72,11 @@ export interface ICompilerContext {
 
 export class CompilerContext implements ICompilerContext {
   protected handlers: Partial<Record<es.Node["type"], THandler>> = handlers;
-  // 0 is reserved for LiteralValue(null)
-  #tempCounter = 1;
+  #tempCounter = 0;
   #names = new Map<ValueId, string>();
   #ids = new Map<string, ValueId>();
   #values = new Map<ValueId, IValue>();
+  #aliases = new Map<ImmutableId, ValueId>();
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
@@ -88,8 +89,15 @@ export class CompilerContext implements ICompilerContext {
     this.sourcemap = sourcemap;
     this.setValue(nullId, new LiteralValue(null));
   }
-  getValue(id: ValueId): IValue | undefined {
-    return this.#values.get(id);
+
+  #resolveId(id: ValueId): ValueId {
+    if (id.type === "global") return id;
+    return this.#aliases.get(id) ?? id;
+  }
+
+  getValue(id: ValueId | undefined): IValue | undefined {
+    if (!id) return;
+    return this.#values.get(this.#resolveId(id));
   }
 
   getValueOrTemp(id: ValueId): IValue {
@@ -102,7 +110,7 @@ export class CompilerContext implements ICompilerContext {
     return store;
   }
   setValue(id: ValueId, value: IValue): void {
-    this.#values.set(id, value);
+    this.#values.set(this.#resolveId(id), value);
   }
 
   registerValue(value: IValue): ImmutableId {
@@ -111,11 +119,22 @@ export class CompilerContext implements ICompilerContext {
     return id;
   }
 
+  setAlias(alias: ImmutableId, original: ImmutableId): void {
+    const id = this.#aliases.get(original) ?? original;
+    this.#aliases.set(alias, id);
+  }
+
+  setGlobalAlias(alias: ImmutableId, original: GlobalId): void {
+    // const id = this.#aliases.get(original) ?? original;
+    this.#aliases.set(alias, original);
+  }
+
   getValueName(id: ValueId): string | undefined {
-    return this.#names.get(id);
+    return this.#names.get(this.#resolveId(id));
   }
 
   setValueName(id: ValueId, name: string): void {
+    id = this.#resolveId(id);
     this.#names.set(id, name);
     this.#ids.set(name, id);
   }
@@ -126,14 +145,14 @@ export class CompilerContext implements ICompilerContext {
 
   handle(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     handler = this.handlers[node.type],
     arg?: unknown,
   ): ImmutableId {
     try {
       if (!handler) throw new CompilerError("Missing handler for " + node.type);
-      const result = handler(this, scope, handlerContext, node, arg);
+      const result = handler(this, scope, cursor, node, arg);
       // if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {
@@ -146,7 +165,7 @@ export class CompilerContext implements ICompilerContext {
 
   handleWrite(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     handler = this.handlers[node.type],
     arg?: unknown,
@@ -154,13 +173,7 @@ export class CompilerContext implements ICompilerContext {
     try {
       if (!handler?.handleWrite)
         throw new CompilerError("Missing handler for " + node.type);
-      const result = handler.handleWrite(
-        this,
-        scope,
-        handlerContext,
-        node,
-        arg,
-      );
+      const result = handler.handleWrite(this, scope, cursor, node, arg);
       // if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {
@@ -173,7 +186,7 @@ export class CompilerContext implements ICompilerContext {
 
   handleDeclaration(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     node: es.Node,
     kind: TDeclarationKind,
     init?: ImmutableId,
@@ -182,7 +195,7 @@ export class CompilerContext implements ICompilerContext {
     try {
       if (!handler?.handleDeclaration)
         throw new CompilerError("Missing handler for " + node.type);
-      handler.handleDeclaration(this, scope, handlerContext, node, kind, init);
+      handler.handleDeclaration(this, scope, cursor, node, kind, init);
     } catch (error) {
       if (error instanceof CompilerError) {
         error.loc ??= node.loc as es.SourceLocation;
@@ -201,17 +214,12 @@ export class CompilerContext implements ICompilerContext {
    */
   handleMany<T extends es.Node>(
     scope: IScope,
-    handlerContext: HandlerContext,
+    cursor: IBlockCursor,
     nodes: T[],
     handler?: (node: T) => ImmutableId,
   ): ImmutableId {
     for (const node of hoistedFunctionNodes(nodes)) {
-      this.handle(
-        scope,
-        handlerContext,
-        node,
-        handler && (() => handler(node)),
-      );
+      this.handle(scope, cursor, node, handler && (() => handler(node)));
     }
     return nullId;
   }

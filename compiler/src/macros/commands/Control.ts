@@ -1,11 +1,14 @@
-import { InstructionBase } from "../../instructions";
+import { ICompilerContext } from "../../CompilerContext";
+import { NativeInstruction } from "../../flow";
+import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class Control extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     super(
       createOverloadNamespace({
+        c,
         overloads: {
           enabled: { args: ["building", "value"] },
           shoot: {
@@ -19,8 +22,11 @@ export class Control extends ObjectValue {
           config: { args: ["building", "value"] },
           color: { args: ["building", "rgbaData"] },
         },
-        handler(scope, overload, out, ...args) {
-          return [null, [new InstructionBase("control", overload, ...args)]];
+        handler(c, overload, cursor, loc, ...args) {
+          const params = ["control", overload, ...args];
+          const inputs = filterIds(args);
+          cursor.addInstruction(new NativeInstruction(params, inputs, [], loc));
+          return nullId;
         },
       }),
     );

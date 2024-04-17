@@ -28,7 +28,7 @@ import { ColorsNamespace, SoundsNamespace } from "./macros/Namespace";
 export function createGlobalScope(c: ICompilerContext): IScope {
   const scope = new Scope({
     builtInModules: {
-      [worldModuleName]: createWordModule(),
+      [worldModuleName]: c.registerValue(createWordModule(c)),
     },
   });
 
@@ -61,31 +61,30 @@ export function createGlobalScope(c: ICompilerContext): IScope {
     DynamicArray: new DynamicArrayConstructor(true),
     unchecked: new Unchecked(),
     Align: new NamespaceMacro(),
-    Weathers: new NamespaceMacro({changeCasing: true}),
+    Weathers: new NamespaceMacro({ changeCasing: true }),
     Sounds: new SoundsNamespace(),
 
-
     // commands
-    draw: new commands.Draw(),
+    draw: new commands.Draw(c),
     print: new commands.Print(),
     format: new commands.Format(),
     printChar: new commands.PrintChar(),
     printFlush: new commands.PrintFlush(),
     drawFlush: new commands.DrawFlush(),
     getLink: new commands.GetLink(),
-    control: new commands.Control(),
+    control: new commands.Control(c),
     radar: new commands.Radar(),
     sensor: new commands.Sensor(),
     wait: new commands.Wait(),
-    lookup: new commands.Lookup(),
+    lookup: new commands.Lookup(c),
     packColor: new commands.PackColor(),
     unpackColor: new commands.UnpackColor(),
     endScript: new commands.End(),
     stopScript: new commands.Stop(),
     unitBind: new commands.UnitBind(),
-    unitControl: new commands.UnitControl(),
+    unitControl: new commands.UnitControl(c),
     unitRadar: new commands.UnitRadar(),
-    unitLocate: new commands.UnitLocate(),
+    unitLocate: new commands.UnitLocate(c),
   };
 
   for (const name in data) {
@@ -122,5 +121,33 @@ export function createWordModule() {
     setWeather: new commands.WeatherSet(),
     playSound: new commands.PlaySound(),
   });
+}
+export function createWordModule(c: ICompilerContext) {
+  const module = new ObjectValue(
+    ObjectValue.autoRegisterData(c, {
+      PVars: new NamespaceMacro(),
+      getBlock: new commands.GetBlock(),
+      setBlock: new commands.SetBlock(),
+      spawnUnit: new commands.SpawnUnit(),
+      applyStatus: new commands.ApplyStatus(),
+      spawnWave: new commands.SpawnWave(),
+      setRule: new commands.SetRule(),
+      flushMessage: new commands.FlushMessage(),
+      cutscene: new commands.Cutscene(),
+      explosion: new commands.Explosion(),
+      setRate: new commands.SetRate(),
+      fetch: new commands.Fetch(),
+      getFlag: new commands.GetFlag(),
+      setFlag: new commands.SetFlag(),
+      setProp: new commands.SetProp(),
+      SyncLock: new commands.SyncLockConstructor(),
+      effect: new commands.Effect(),
+      localePrint: new commands.LocalePrint(),
+      Marker: new MarkerConstructor(),
+      senseWeather: new commands.WeatherSense(),
+      setWeather: new commands.WeatherSet(),
+      playSound: new commands.PlaySound(),
+    }),
+  );
   return module;
 }

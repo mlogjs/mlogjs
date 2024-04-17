@@ -1,14 +1,18 @@
 import { CompilerError } from "../../CompilerError";
-import { InstructionBase } from "../../instructions";
+import { NativeInstruction } from "../../flow";
+import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
-export class SetFlag extends MacroFunction<null> {
+export class SetFlag extends MacroFunction {
   constructor() {
-    super((scope, out, flag, value) => {
+    super((c, cursor, loc, flag, value) => {
       if (!flag) throw new CompilerError("Missing flag argument");
       if (!value) throw new CompilerError("Missing flag value");
 
-      return [null, [new InstructionBase("setflag", flag, value)]];
+      cursor.addInstruction(
+        new NativeInstruction(["setflag", flag, value], [flag, value], [], loc),
+      );
+      return nullId;
     });
   }
 }

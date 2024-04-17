@@ -1,4 +1,5 @@
 import { CompilerError } from "../CompilerError";
+import { ImmutableId, ValueGetInstruction } from "../flow";
 import { THandler, es } from "../types";
 import { nullId } from "../utils";
 import { LiteralValue } from "../values";
@@ -9,7 +10,7 @@ const noExternalModuleErrorMessage =
 export const ImportDeclaration: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ImportDeclaration,
 ) => {
   if (node.importKind === "type") return nullId;
@@ -18,7 +19,7 @@ export const ImportDeclaration: THandler = (
     throw new CompilerError(noExternalModuleErrorMessage);
 
   for (const specifier of node.specifiers) {
-    c.handle(scope, context, specifier, undefined, node.source.value);
+    c.handle(scope, cursor, specifier, undefined, node.source.value);
   }
   return nullId;
 };
@@ -26,7 +27,7 @@ export const ImportDeclaration: THandler = (
 export const ImportDefaultSpecifier: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ImportDefaultSpecifier,
   source: string,
 ) => {
@@ -37,7 +38,7 @@ export const ImportDefaultSpecifier: THandler = (
 export const ImportNamespaceSpecifier: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ImportDefaultSpecifier,
   source: string,
 ) => {
@@ -49,27 +50,41 @@ export const ImportNamespaceSpecifier: THandler = (
 export const ImportSpecifier: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ImportSpecifier,
   source: string,
 ) => {
   if (node.importKind === "type") return nullId;
 
-  const module = scope.builtInModules[source];
+  const moduleId = scope.builtInModules[source];
+  const module = c.getValue(moduleId)!;
   const { imported, local } = node;
   const importedName =
     imported.type === "Identifier" ? imported.name : imported.value;
 
   const key = new LiteralValue(importedName);
+  const keyId = c.registerValue(key);
 
-  if (!module.hasProperty(scope, key)) {
+  if (!module?.hasProperty(c, key)) {
     throw new CompilerError(
       `The requested module '${source}' does not provide an export named '${importedName}'`,
     );
   }
 
+  const out = new ImmutableId();
+
+  cursor.addInstruction(
+    new ValueGetInstruction({
+      key: keyId,
+      object: moduleId,
+      out,
+      node,
+    }),
+  );
+
   //  TODO: update after dealing with object members
-  const [value] = module.get(scope, key);
-  scope.set(local.name, value as any as number);
+  // const [value] = module.get(c,  key, );
+  // scope.set(local.name, value as any as number);
+  scope.set(local.name, out);
   return nullId;
 };

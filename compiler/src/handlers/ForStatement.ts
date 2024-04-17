@@ -1,4 +1,10 @@
-import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
+import {
+  BinaryOperationInstruction,
+  Block,
+  BreakIfInstruction,
+  BreakInstruction,
+  ImmutableId,
+} from "../flow";
 import { es, THandler } from "../types";
 import { nullId } from "../utils";
 import { LiteralValue } from "../values";
@@ -6,46 +12,55 @@ import { LiteralValue } from "../values";
 export const ForStatement: THandler = (
   c,
   parentScope,
-  context,
+  cursor,
   node: es.ForStatement,
 ) => {
-  const initLoopBlock = new Block([]);
-  const afterLoopBlock = new Block([]);
-  const testBlock = new Block([]);
-  const bodyBlock = new Block([]);
-  const incrementBlock = new Block([]);
+  const initLoopBlock = new Block();
+  const afterLoopBlock = new Block();
+  const testBlock = new Block();
+  const bodyBlock = new Block();
+  const incrementBlock = new Block();
 
   const scope = parentScope.createScope();
   scope.break = afterLoopBlock;
   scope.continue = incrementBlock;
 
-  context.connectBlock(initLoopBlock, node);
+  cursor.connectBlock(initLoopBlock, node);
   if (node.init) {
-    c.handle(scope, context, node.init);
+    c.handle(scope, cursor, node.init);
   }
 
-  context.connectBlock(testBlock, node);
+  cursor.connectBlock(testBlock, node);
 
   const test = node.test
-    ? c.handle(scope, context, node.test)
+    ? c.handle(scope, cursor, node.test)
     : c.registerValue(new LiteralValue(1));
 
-  context.setEndInstruction(
-    new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
+  const invertedTest = new ImmutableId();
+  const zero = c.registerValue(new LiteralValue(0));
+
+  cursor.addInstruction(
+    new BinaryOperationInstruction("equal", test, zero, invertedTest, node),
   );
+  cursor.setEndInstruction(
+    new BreakIfInstruction(invertedTest, afterLoopBlock, bodyBlock, node),
+  );
+  // cursor.setEndInstruction(
+  //   new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
+  // );
 
-  context.currentBlock = bodyBlock;
-  c.handle(scope, context, node.body);
+  cursor.currentBlock = bodyBlock;
+  c.handle(scope, cursor, node.body);
 
-  context.connectBlock(incrementBlock, node);
+  cursor.connectBlock(incrementBlock, node);
 
   if (node.update) {
-    c.handle(scope, context, node.update);
+    c.handle(scope, cursor, node.update);
   }
 
-  context.setEndInstruction(new BreakInstruction(testBlock.toBackward(), node));
+  cursor.setEndInstruction(new BreakInstruction(testBlock.toBackward(), node));
 
-  context.currentBlock = afterLoopBlock;
+  cursor.currentBlock = afterLoopBlock;
 
   return nullId;
 };

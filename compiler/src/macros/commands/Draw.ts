@@ -1,10 +1,13 @@
-import { InstructionBase } from "../../instructions";
+import { ICompilerContext } from "../../CompilerContext";
+import { NativeInstruction } from "../../flow";
+import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class Draw extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         clear: {
           args: ["r", "g", "b"],
@@ -59,8 +62,16 @@ export class Draw extends ObjectValue {
         reset: { args: [] },
       },
 
-      handler(scope, overload, out, ...args) {
-        return [null, [new InstructionBase("draw", overload, ...args)]];
+      handler(c, overload, cursor, loc, ...args) {
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["draw", overload, ...args],
+            filterIds(args),
+            [],
+            loc,
+          ),
+        );
+        return nullId;
       },
     });
 

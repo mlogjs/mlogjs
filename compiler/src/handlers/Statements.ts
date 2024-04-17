@@ -1,27 +1,27 @@
 import { CompilerError } from "../CompilerError";
-import { Block, BreakInstruction } from "../flow";
+import { Block, BreakInstruction, ReturnInstruction } from "../flow";
 import { es, IScope, THandler } from "../types";
 import { nullId } from "../utils";
 
 export const ExpressionStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ExpressionStatement,
 ) => {
-  return c.handle(scope, context, node.expression);
+  return c.handle(scope, cursor, node.expression);
 };
 
 export const BreakStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.BreakStatement,
 ) => {
   const label = node.label?.name;
 
   const target = findScopeLabel(scope, label);
-  context.setEndInstruction(new BreakInstruction(target.break, node));
+  cursor.setEndInstruction(new BreakInstruction(target.break, node));
 
   return nullId;
 };
@@ -29,13 +29,13 @@ export const BreakStatement: THandler = (
 export const ContinueStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ContinueStatement,
 ) => {
   const label = node.label?.name;
 
   const target = findScopeLabel(scope, label);
-  context.setEndInstruction(new BreakInstruction(target.continue, node));
+  cursor.setEndInstruction(new BreakInstruction(target.continue, node));
 
   return nullId;
 };
@@ -43,14 +43,13 @@ export const ContinueStatement: THandler = (
 export const ReturnStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.ReturnStatement,
 ) => {
-  const arg = node.argument ? c.handle(scope, context, node.argument) : nullId;
+  const arg = node.argument ? c.handle(scope, cursor, node.argument) : nullId;
 
   // TODO: handle return value
-  // context.setEndInstruction(new ReturnInstruction(arg));
-  context.setEndInstruction(new BreakInstruction(context.exit, node));
+  cursor.setEndInstruction(new ReturnInstruction(arg));
   return nullId;
 };
 
@@ -59,18 +58,18 @@ export const EmptyStatement: THandler = () => nullId;
 export const LabeledStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.LabeledStatement,
 ) => {
-  const afterLabelBlock = new Block([]);
+  const afterLabelBlock = new Block();
 
   const inner = scope.createScope();
   inner.label = node.label.name;
   inner.break = afterLabelBlock;
 
-  c.handle(inner, context, node.body);
+  c.handle(inner, cursor, node.body);
 
-  context.connectBlock(afterLabelBlock, node);
+  cursor.connectBlock(afterLabelBlock, node);
 
   return nullId;
 };

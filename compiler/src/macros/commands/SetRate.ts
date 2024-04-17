@@ -1,8 +1,14 @@
-import { InstructionBase } from "../../instructions";
+import { NativeInstruction } from "../../flow";
+import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
-export class SetRate extends MacroFunction<null> {
+export class SetRate extends MacroFunction {
   constructor() {
-    super((scope, out, ipt) => [null, [new InstructionBase("setrate", ipt)]]);
+    super((c, cursor, loc, ipt) => {
+      cursor.addInstruction(
+        new NativeInstruction(["setrate", ipt], [ipt], [], loc),
+      );
+      return nullId;
+    });
   }
 }

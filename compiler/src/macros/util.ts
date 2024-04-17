@@ -1,13 +1,18 @@
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import { ImmutableId } from "../flow";
+import { Location } from "../types";
 import {
   assertIsObjectMacro,
   assertObjectFields,
   IParameterDescriptor,
 } from "../utils";
+import { ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
 
 interface IOverloadNamespaceOptions<K extends string> {
+  c: ICompilerContext;
   overloads: Record<
     K,
     {
@@ -22,11 +27,12 @@ interface IOverloadNamespaceOptions<K extends string> {
 
   handler(
     this: void,
-    scope: IScope,
+    c: ICompilerContext,
     overload: K,
-    out: TEOutput | undefined,
-    ...args: (IValue | string)[]
-  ): TValueInstructions<IValue | null>;
+    cursor: IBlockCursor,
+    loc: Location,
+    ...args: (ImmutableId | string)[]
+  ): ImmutableId;
 }
 
 /**
@@ -34,45 +40,57 @@ interface IOverloadNamespaceOptions<K extends string> {
  * instructions
  */
 export function createOverloadNamespace<K extends string>({
+  c,
   overloads,
   handler,
 }: IOverloadNamespaceOptions<K>) {
-  const result: Record<string, MacroFunction<IValue | null>> = {};
+  const result: Record<string, MacroFunction> = {};
 
   for (const key in overloads) {
     const { named, args } = overloads[key];
     if (named) {
-      result[key] = new MacroFunction((scope, out, options) => {
+      result[key] = new MacroFunction((c, cursor, loc, optionsId) => {
+        const options = c.getValue(optionsId);
         assertIsObjectMacro(options, named);
 
-        return handler(scope, key, out, ...assertObjectFields(options, args));
+        return handler(
+          c,
+          key,
+          cursor,
+          loc,
+          ...assertObjectFields(c, options, args),
+        );
       });
       continue;
     }
 
-    result[key] = new MacroFunction((scope, out, ...params) => {
-      const handlerParams: (IValue | string)[] = [];
+    result[key] = new MacroFunction((c, cursor, loc, ...params) => {
+      const handlerParams: (ImmutableId | string)[] = [];
       // validate the paramters
       for (let i = 0; i < args.length; i++) {
         let arg = args[i];
         if (typeof arg === "string") arg = { key: arg };
 
-        const param = params[i];
+        const paramId = params[i];
 
-        if (!param) {
+        if (!paramId) {
           if (arg.default == undefined)
             throw new CompilerError(`Missing argument: ${arg.name ?? arg.key}`);
           handlerParams.push(arg.default);
           continue;
         }
 
-        arg.validate?.(param);
-        handlerParams.push(param);
+        arg.validate?.(c.getValueOrTemp(paramId));
+        handlerParams.push(paramId);
       }
 
-      return handler(scope, key, out, ...handlerParams);
+      return handler(c, key, cursor, loc, ...handlerParams);
     });
   }
 
-  return result;
+  return ObjectValue.autoRegisterData(c, result);
+}
+
+export function filterIds(args: (ImmutableId | string)[]): ImmutableId[] {
+  return args.filter((arg): arg is ImmutableId => typeof arg !== "string");
 }

@@ -16,10 +16,9 @@ export type TEdge = IForwardEdge | IBackwardEdge;
 
 export class Block {
   parents: Block[] = [];
-  constructor(
-    public instructions: TBlockInstruction[],
-    public endInstruction?: TBlockEndInstruction,
-  ) {}
+
+  instructions = new InstructionList();
+  constructor(public endInstruction?: TBlockEndInstruction) {}
 
   get forwardParents(): Block[] {
     return this.parents.filter(parent =>
@@ -59,8 +58,8 @@ export class Block {
   conditionInstruction() {
     if (this.endInstruction?.type !== "break-if") return;
     const { condition } = this.endInstruction;
-    for (let i = this.instructions.length - 1; i >= 0; i--) {
-      const inst = this.instructions[i];
+
+    for (const inst of this.instructions.inReverse()) {
       if (
         inst.type === "binary-operation" &&
         inst.out === condition &&
@@ -89,10 +88,110 @@ export class Block {
     const inst: IInstruction[] = [];
 
     const conditionInst = this.conditionInstruction();
-    this.instructions.forEach(instruction => {
-      if (instruction === conditionInst) return;
+
+    for (const instruction of this.instructions) {
+      if (instruction === conditionInst) continue;
       inst.push(...instruction.toMlog(c));
-    });
+    }
     return inst;
+  }
+}
+
+export class InstructionNode {
+  previous?: InstructionNode;
+  next?: InstructionNode;
+
+  constructor(public instruction: TBlockInstruction) {}
+}
+
+export class InstructionList {
+  length = 0;
+  head?: InstructionNode;
+  tail?: InstructionNode;
+
+  add(instruction: TBlockInstruction) {
+    const node = new InstructionNode(instruction);
+    this.length++;
+    if (!this.head) {
+      this.head = node;
+      this.tail = node;
+      return;
+    }
+
+    const tail = this.tail!;
+    tail.next = node;
+
+    node.previous = tail;
+    this.tail = node;
+  }
+
+  insertAfter(before: InstructionNode, instruction: TBlockInstruction) {
+    this.length++;
+    const after = before.next;
+    const middle = new InstructionNode(instruction);
+    middle.previous = before;
+    middle.next = after;
+
+    before.next = middle;
+    if (after) {
+      after.previous = middle;
+    }
+
+    if (this.tail === before) {
+      this.tail = middle;
+    }
+  }
+
+  remove(node: InstructionNode) {
+    this.length--;
+    if (node === this.head && node === this.tail) {
+      this.head = undefined;
+      this.tail = undefined;
+      return;
+    }
+
+    if (node === this.head) {
+      this.head = node.next;
+      this.head!.previous = undefined;
+      return;
+    }
+
+    if (node === this.tail) {
+      this.tail = node.previous;
+      this.tail!.next = undefined;
+      return;
+    }
+
+    if (node.previous) node.previous.next = node.next;
+    if (node.next) node.next.previous = node.previous;
+  }
+
+  removeLast() {
+    if (!this.tail) return;
+    this.remove(this.tail);
+  }
+
+  *[Symbol.iterator]() {
+    let current = this.head;
+    while (current) {
+      yield current.instruction;
+      current = current.next;
+    }
+  }
+
+  *inReverse() {
+    let current = this.tail;
+    while (current) {
+      yield current.instruction;
+      current = current.previous;
+    }
+  }
+
+  *nodes() {
+    let current = this.head;
+    while (current) {
+      yield current;
+      current = current.next;
+    }
   }
 }

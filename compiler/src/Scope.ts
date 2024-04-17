@@ -1,7 +1,8 @@
 import { LiteralValue } from "./values";
-import { IFunctionValue, IInstruction, IScope, IValue } from "./types";
+import { IFunctionValue, IInstruction, IScope } from "./types";
 import { CompilerError } from "./CompilerError";
-import { Block, ValueId } from "./flow";
+import { Block, ImmutableId, ValueId } from "./flow";
+import { ICompilerContext } from "./CompilerContext";
 
 export class Scope implements IScope {
   data: Record<string, ValueId>;
@@ -15,7 +16,7 @@ export class Scope implements IScope {
   label?: string;
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
-  builtInModules: Record<string, IValue>;
+  builtInModules: Record<string, ImmutableId>;
 
   constructor({
     data = {},
@@ -67,16 +68,17 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(identifier: string): ValueId {
+  get(c: ICompilerContext, identifier: string): ValueId {
     const value = this.data[identifier];
     if (value !== undefined) return value;
-    if (this.parent) return this.parent.get(identifier);
+    if (this.parent) return this.parent.get(c, identifier);
     let message = `${identifier} is not declared.`;
 
     const name = new LiteralValue(identifier);
     for (const moduleName in this.builtInModules) {
-      const module = this.builtInModules[moduleName];
-      if (module.hasProperty(this, name)) {
+      const moduleId = this.builtInModules[moduleName];
+      const module = c.getValue(moduleId)!;
+      if (module.hasProperty(c, name)) {
         message += ` Did you mean to use "${identifier}" exported from "${moduleName}"?`;
       }
     }

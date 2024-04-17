@@ -1,36 +1,53 @@
-import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
+import {
+  BinaryOperationInstruction,
+  Block,
+  BreakIfInstruction,
+  BreakInstruction,
+  ImmutableId,
+} from "../flow";
 import { THandler, es } from "../types";
 import { nullId } from "../utils";
+import { LiteralValue } from "../values";
 
 export const IfStatement: THandler = (
   c,
   scope,
-  context,
+  cursor,
   node: es.IfStatement,
 ) => {
-  const test = c.handle(scope, context, node.test);
+  const test = c.handle(scope, cursor, node.test);
 
-  const consequentBlock = new Block([]);
-  const alternateBlock = new Block([]);
-  const exitBlock = new Block([]);
+  const consequentBlock = new Block();
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
 
-  context.setEndInstruction(
-    new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+  // usually results in better ordering of the generated mlog instructions
+  const invertedTest = new ImmutableId();
+  const zero = c.registerValue(new LiteralValue(0));
+
+  cursor.addInstruction(
+    new BinaryOperationInstruction("equal", test, zero, invertedTest, node),
   );
+  cursor.setEndInstruction(
+    new BreakIfInstruction(invertedTest, alternateBlock, consequentBlock, node),
+  );
+  // cursor.setEndInstruction(
+  //   new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+  // );
 
-  context.currentBlock = consequentBlock;
-  c.handle(scope, context, node.consequent);
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.currentBlock = consequentBlock;
+  c.handle(scope, cursor, node.consequent);
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = alternateBlock;
+  cursor.currentBlock = alternateBlock;
   if (node.alternate) {
-    c.handle(scope, context, node.alternate);
+    c.handle(scope, cursor, node.alternate);
   }
   // this has to be done regardless because
   // the alternate block has to be connected to the exit block
-  context.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-  context.currentBlock = exitBlock;
+  cursor.currentBlock = exitBlock;
 
   return nullId;
 };
