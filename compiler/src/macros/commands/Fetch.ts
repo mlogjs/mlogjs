@@ -1,11 +1,13 @@
+import { ICompilerContext } from "../../CompilerContext";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
-import { ObjectValue, StoreValue } from "../../values";
+import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Fetch extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         unit: { args: ["team", "index"] },
         unitCount: { args: ["team"] },
@@ -16,8 +18,8 @@ export class Fetch extends ObjectValue {
         build: { args: ["team", "index", "block"] },
         buildCount: { args: ["team", "block"] },
       },
-      handler(scope, overload, out, team, ...rest) {
-        const output = StoreValue.from(scope, out);
+      handler(c, overload, out, team, ...rest) {
+        const output = c.getValueOrTemp(out);
 
         const params: (IValue | string)[] = ["0", "@conveyor"];
 
@@ -28,8 +30,7 @@ export class Fetch extends ObjectValue {
         }
 
         return [
-          output,
-          [new InstructionBase("fetch", overload, output, team, ...params)],
+          new InstructionBase("fetch", overload, output, team, ...params),
         ];
       },
     });

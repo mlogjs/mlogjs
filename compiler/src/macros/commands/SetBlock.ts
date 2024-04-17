@@ -1,10 +1,13 @@
+import { ICompilerContext } from "../../CompilerContext";
 import { InstructionBase } from "../../instructions";
+import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class SetBlock extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         floor: { args: ["x", "y", "to"] },
         ore: { args: ["x", "y", "to"] },
@@ -13,20 +16,18 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(scope, overload, out, x, y, to, team, rotation) {
+      handler(c, overload, out, x, y, to, team, rotation) {
+        c.setAlias(out, nullId);
         return [
-          null,
-          [
-            new InstructionBase(
-              "setblock",
-              overload,
-              to,
-              x,
-              y,
-              team ?? "@derelict",
-              rotation ?? "0",
-            ),
-          ],
+          new InstructionBase(
+            "setblock",
+            overload,
+            to,
+            x,
+            y,
+            team ?? "@derelict",
+            rotation ?? "0",
+          ),
         ];
       },
     });

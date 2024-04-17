@@ -1,3 +1,5 @@
+import { ICompilerContext } from "../../CompilerContext";
+import { ImmutableId } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { extractDestrucuringOut } from "../../utils";
@@ -5,8 +7,9 @@ import { LiteralValue, ObjectValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class UnitControl extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         idle: { args: [] },
         stop: { args: [] },
@@ -39,25 +42,28 @@ export class UnitControl extends ObjectValue {
           args: [],
         },
       },
-      handler(scope, overload, out, ...args) {
+      handler(c, overload, out, ...args) {
         let result: IValue | null = null;
         let extraArgs: IValue[] = [];
         switch (overload) {
           case "getBlock": {
-            const outType = StoreValue.from(
-              scope,
-              extractDestrucuringOut(out, 0),
-            );
-            const outBuilding = StoreValue.from(
-              scope,
-              extractDestrucuringOut(out, 1),
-            );
-            const outFloor = StoreValue.from(
-              scope,
-              extractDestrucuringOut(out, 2),
-            );
+            const outType = new ImmutableId()
+            const outBuilding = new ImmutableId()
+            const outFloor = new ImmutableId()
+            // const outType = StoreValue.from(
+            //   scope,
+            //   extractDestrucuringOut(out, 0),
+            // );
+            // const outBuilding = StoreValue.from(
+            //   scope,
+            //   extractDestrucuringOut(out, 1),
+            // );
+            // const outFloor = StoreValue.from(
+            //   scope,
+            //   extractDestrucuringOut(out, 2),
+            // );
 
-            result = ObjectValue.fromArray([outType, outBuilding, outFloor]);
+            result = ObjectValue.fromArray(c, [outType, outBuilding, outFloor]);
             extraArgs = [outType, outBuilding, outFloor];
             break;
           }
@@ -68,8 +74,7 @@ export class UnitControl extends ObjectValue {
           }
         }
         return [
-          result,
-          [new InstructionBase("ucontrol", overload, ...args, ...extraArgs)],
+          new InstructionBase("ucontrol", overload, ...args, ...extraArgs),
         ];
       },
     });

@@ -11,10 +11,10 @@ import { MacroFunction } from "../Function";
 
 export class SetProp extends MacroFunction {
   constructor() {
-    super((scope, out, target) => {
+    super((c, out, target) => {
       if (!target) throw new CompilerError("Missing argument: target");
-
-      return [new Settable(target), []];
+      c.setValue(out, new Settable(target));
+      return [];
     });
   }
 }

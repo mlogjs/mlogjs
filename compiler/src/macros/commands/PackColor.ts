@@ -5,7 +5,7 @@ import { MacroFunction } from "../Function";
 
 export class PackColor extends MacroFunction {
   constructor() {
-    super((scope, out, ...args) => {
+    super((c, out, ...args) => {
       if (args.length !== 4) {
         throw new CompilerError(
           `Expected 4 arguments, received ${args.length}`,
@@ -24,8 +24,8 @@ export class PackColor extends MacroFunction {
         );
       }
 
-      const output = StoreValue.from(scope, out);
-      return [output, [new InstructionBase("packcolor", output, ...args)]];
+      const output = c.getValueOrTemp(out);
+      return [new InstructionBase("packcolor", output, ...args)];
     });
   }
 }

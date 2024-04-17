@@ -2,45 +2,53 @@ import { CompilerError } from "../CompilerError";
 import { InstructionBase } from "../instructions";
 import { IInstruction, IValue } from "../types";
 import { formatInstructionArgs, isTemplateObjectArray } from "../utils";
+import { AsmInstruction, ImmutableId } from "../flow";
+import { isTemplateObjectArray, nullId } from "../utils";
 import { LiteralValue } from "../values";
 import { MacroFunction } from "./Function";
 
-export class Asm extends MacroFunction<null> {
+export class Asm extends MacroFunction {
   constructor() {
-    super((scope, out, stringsArray, ...values) => {
-      if (!isTemplateObjectArray(stringsArray))
+    super((c, cursor, node, arrayId, ...ids) => {
+      const stringsArray = c.getValue(arrayId);
+
+      if (!isTemplateObjectArray(c, stringsArray))
         throw new CompilerError("Expected to receive a template strings array");
 
-      const args: (string | IValue)[] = [];
+      const args: (string | ImmutableId)[] = [];
 
-      for (let i = 0; i < values.length; i++) {
-        const [item] = stringsArray.get(scope, new LiteralValue(i)) as [
-          LiteralValue<string>,
-          never,
-        ];
-
+      for (let i = 0; i < ids.length; i++) {
+        const itemId = stringsArray.data[i];
+        const item = c.getValue(itemId) as LiteralValue<string>;
         args.push(item.data);
-        args.push(values[i]);
+        args.push(ids[i]);
       }
 
       const { length } = stringsArray.data;
 
-      const [tail] = stringsArray.get(
-        scope,
-        new LiteralValue(length.data - 1),
-      ) as [LiteralValue<string>, never];
+      const tailId = stringsArray.data[length.data - 1];
+      const tail = c.getValue(tailId) as LiteralValue<string>;
+      // const [tail] = stringsArray.get(
+      //   scope,
+      //   new LiteralValue(length.data - 1),
+      // ) as [LiteralValue<string>, never];
       args.push(tail.data);
 
-      return [null, formatInstructions(args)];
+      // cursor.addInstruction(new AsmInstruction());
+
+      const lines = formatInstructions(args);
+
+      // return [null, formatInstructions(args)];
+      return nullId;
     });
   }
 }
 
 /** Splits multiline asm calls and formats each line. */
-function formatInstructions(args: (string | IValue)[]) {
-  const instructions: IInstruction[] = [];
+function formatInstructions(args: (string | ImmutableId)[]) {
+  const instructions: (string | ImmutableId)[][] = [];
 
-  let buffer: (string | IValue)[] = [];
+  let buffer: (string | ImmutableId)[] = [];
 
   for (let i = 0; i < args.length; i++) {
     const arg = args[i];
@@ -86,7 +94,7 @@ function formatInstructions(args: (string | IValue)[]) {
  * Determines if an asm line should be generated and trims it at the start and
  * end
  */
-function validateInstructionArgs(args: (string | IValue)[]) {
+function validateInstructionArgs(args: (string | ImmutableId)[]) {
   if (args.length === 0) return false;
   if (args.length === 1) {
     const item = args[0];

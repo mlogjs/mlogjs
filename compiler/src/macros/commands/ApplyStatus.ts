@@ -1,6 +1,7 @@
+import { ICompilerContext } from "../../CompilerContext";
 import { CompilerError } from "../../CompilerError";
 import { InstructionBase } from "../../instructions";
-import { assertLiteralOneOf } from "../../utils";
+import { assertLiteralOneOf, nullId } from "../../utils";
 import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -29,8 +30,9 @@ const validEffects = [
 ] as const;
 
 export class ApplyStatus extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         apply: {
           args: ["status", "unit", { key: "duration", default: "10" }],
@@ -42,17 +44,15 @@ export class ApplyStatus extends ObjectValue {
           throw new CompilerError("The status effect must be a string literal");
         assertLiteralOneOf(effect, validEffects, "The status effect");
 
+        c.setAlias(out, nullId);
         return [
-          null,
-          [
-            new InstructionBase(
-              "status",
-              String(overload !== "apply"),
-              effect.data,
-              unit,
-              duration,
-            ),
-          ],
+          new InstructionBase(
+            "status",
+            String(overload !== "apply"),
+            effect.data,
+            unit,
+            duration,
+          ),
         ];
       },
     });

@@ -11,14 +11,16 @@ import {
 
 export class UnitRadar extends MacroFunction {
   constructor() {
-    super((scope, out, options) => {
+    super((c, out, options) => {
       assertIsObjectMacro(options, "The radar options");
 
-      const { filters, order, sort } = options.data;
+      const filters = c.getValue(options.data.filters);
+      const order = c.getValue(options.data.order);
+      const sort = c.getValue(options.data.sort);
 
-      assertIsArrayMacro(filters, "filters");
+      assertIsArrayMacro(c, filters, "filters");
 
-      const { length } = filters.data;
+      const length = c.getValue(filters.data.length);
 
       if (!(length instanceof LiteralValue) || !length.isNumber())
         throw new CompilerError("The length of an array macro must be");
@@ -27,7 +29,9 @@ export class UnitRadar extends MacroFunction {
         throw new CompilerError("The filters array must have 3 items");
 
       // data is not an array
-      const { 0: filter1, 1: filter2, 2: filter3 } = filters.data;
+      const filter1 = c.getValue(filters.data[0]);
+      const filter2 = c.getValue(filters.data[1]);
+      const filter3 = c.getValue(filters.data[2]);
 
       assertLiteralOneOf(filter1, validRadarFilters, "The first filter");
       assertLiteralOneOf(filter2, validRadarFilters, "The second filter");
@@ -38,22 +42,19 @@ export class UnitRadar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = StoreValue.from(scope, out);
+      const outUnit = c.getValueOrTemp(out);
 
       return [
-        outUnit,
-        [
-          new InstructionBase(
-            "uradar",
-            filter1.data,
-            filter2.data,
-            filter3.data,
-            sort.data,
-            "0", // I don't know why, but mindustry requires this extra parameter
-            order,
-            outUnit,
-          ),
-        ],
+        new InstructionBase(
+          "uradar",
+          filter1.data,
+          filter2.data,
+          filter3.data,
+          sort.data,
+          "0", // I don't know why, but mindustry requires this extra parameter
+          order,
+          outUnit,
+        ),
       ];
     });
   }

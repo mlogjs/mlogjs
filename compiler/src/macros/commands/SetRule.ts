@@ -1,11 +1,14 @@
+import { ICompilerContext } from "../../CompilerContext";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
+import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class SetRule extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         currentWaveTime: { args: ["seconds"] },
         waveTimer: { args: ["enabled"] },
@@ -36,7 +39,8 @@ export class SetRule extends ObjectValue {
         rtsMinWeight: { args: ["team", "value"] },
         rtsMinSquad: { args: ["team", "value"] },
       },
-      handler(scope, overload, out, ...args) {
+      handler(c, overload, out, ...args) {
+        c.setAlias(out, nullId);
         const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
         switch (overload) {
           case "mapArea": {
@@ -65,7 +69,7 @@ export class SetRule extends ObjectValue {
             params[0] = args[0]; // the general value
         }
 
-        return [null, [new InstructionBase("setrule", overload, ...params)]];
+        return [new InstructionBase("setrule", overload, ...params)];
       },
     });
     super(data);

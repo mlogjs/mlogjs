@@ -5,6 +5,7 @@ import { assertLiteralOneOf } from "../../utils";
 import { createOverloadNamespace } from "../util";
 import { CompilerError } from "../../CompilerError";
 import { discardedName, extractDestrucuringOut } from "../../utils";
+import { ICompilerContext } from "../../CompilerContext";
 
 const validBuildingGroups = [
   "core",
@@ -19,8 +20,9 @@ const validBuildingGroups = [
 ] as const;
 
 export class UnitLocate extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         ore: {
           args: ["ore"],

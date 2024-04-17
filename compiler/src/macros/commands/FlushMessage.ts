@@ -1,11 +1,13 @@
+import { ICompilerContext } from "../../CompilerContext";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { ObjectValue, StoreValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class FlushMessage extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         notify: { args: [] },
         mission: { args: [] },
@@ -16,7 +18,7 @@ export class FlushMessage extends ObjectValue {
         announceSync: { args: ["duration"] },
         toastSync: { args: ["duration"] },
       },
-      handler(scope, overload, out, duration) {
+      handler(c, overload, out, duration) {
         let result: IValue | null = null;
         let arg: IValue | string = "0";
 
