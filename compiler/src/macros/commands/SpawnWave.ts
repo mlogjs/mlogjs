@@ -8,16 +8,6 @@ export class SpawnWave extends MacroFunction {
   constructor() {
     super((c, cursor, loc, ...args) => {
       const [natural, x, y] = args;
-      const naturalValue = c.getValue(args[0]);
-
-      if (
-        !(naturalValue instanceof LiteralValue) ||
-        (naturalValue.data !== 1 && naturalValue.data !== 0)
-      )
-        throw new CompilerError(
-          "The 'natural' argument must be a boolean literal",
-          loc,
-        );
 
       cursor.addInstruction(
         new NativeInstruction(
