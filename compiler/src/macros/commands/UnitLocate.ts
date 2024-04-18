@@ -1,11 +1,9 @@
-import { InstructionBase } from "../../instructions";
-import { IValue } from "../../types";
-import { LiteralValue, ObjectValue, StoreValue } from "../../values";
+import { LiteralValue, ObjectValue } from "../../values";
 import { assertLiteralOneOf } from "../../utils";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 import { CompilerError } from "../../CompilerError";
-import { discardedName, extractDestrucuringOut } from "../../utils";
 import { ICompilerContext } from "../../CompilerContext";
+import { ImmutableId, NativeInstruction } from "../../flow";
 
 const validBuildingGroups = [
   "core",
@@ -35,26 +33,29 @@ export class UnitLocate extends ObjectValue {
           args: [],
         },
       },
-      handler(scope, overload, out, ...args) {
-        const outFound = StoreValue.from(scope, extractDestrucuringOut(out, 0));
+      handler(scope, overload, cursor, loc, ...args) {
+        const outFound = new ImmutableId();
+        const outX = new ImmutableId();
+        const outY = new ImmutableId();
+        const outBuilding = new ImmutableId();
 
-        const outX = StoreValue.from(scope, extractDestrucuringOut(out, 1));
-        const outY = StoreValue.from(scope, extractDestrucuringOut(out, 2));
-        const outBuilding = StoreValue.from(
-          scope,
-          overload === "ore" ? discardedName : extractDestrucuringOut(out, 3),
-        );
         const outArgs = [outX, outY, outFound, outBuilding];
-        let inputArgs: (IValue | string)[] = [];
+        const inputArgs: (string | ImmutableId)[] = [
+          overload,
+          "core",
+          "true",
+          "@copper",
+        ];
         switch (overload) {
           case "ore": {
             const [ore] = args;
-            inputArgs = [overload, "core", "true", ore];
+            inputArgs[3] = ore;
             break;
           }
           case "building": {
-            const [group, enemy] = args;
+            const [groupId, enemy] = args;
 
+            const group = c.getValue(groupId as ImmutableId);
             if (!(group instanceof LiteralValue))
               throw new CompilerError(
                 "The building group must be a string literal",
@@ -66,24 +67,30 @@ export class UnitLocate extends ObjectValue {
               "The building group",
             );
 
-            inputArgs = [overload, group.data, enemy, "@copper"];
-            break;
-          }
-          case "spawn":
-          case "damaged": {
-            inputArgs = [overload, "core", "true", "@copper"];
+            inputArgs[1] = group.data;
+            inputArgs[2] = enemy;
+
             break;
           }
         }
-        return [
-          ObjectValue.fromArray([
+
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["ulocate", ...inputArgs, ...outArgs],
+            filterIds(inputArgs),
+            outArgs,
+            loc,
+          ),
+        );
+
+        return c.registerValue(
+          ObjectValue.fromArray(c, [
             outFound,
             outX,
             outY,
             ...(overload !== "ore" ? [outBuilding] : []),
           ]),
-          [new InstructionBase("ulocate", ...inputArgs, ...outArgs)],
-        ];
+        );
       },
     });
     super(data);

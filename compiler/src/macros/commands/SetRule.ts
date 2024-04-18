@@ -1,9 +1,8 @@
 import { ICompilerContext } from "../../CompilerContext";
-import { InstructionBase } from "../../instructions";
-import { IValue } from "../../types";
+import { ImmutableId, NativeInstruction } from "../../flow";
 import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class SetRule extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -39,9 +38,8 @@ export class SetRule extends ObjectValue {
         rtsMinWeight: { args: ["team", "value"] },
         rtsMinSquad: { args: ["team", "value"] },
       },
-      handler(c, overload, out, ...args) {
-        c.setAlias(out, nullId);
-        const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
+      handler(c, overload, cursor, loc, ...args) {
+        const params: (ImmutableId | string)[] = ["10", "0", "0", "100", "100"];
         switch (overload) {
           case "mapArea": {
             const [x, y, width, height] = args;
@@ -69,7 +67,15 @@ export class SetRule extends ObjectValue {
             params[0] = args[0]; // the general value
         }
 
-        return [new InstructionBase("setrule", overload, ...params)];
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["setrule", overload, ...params],
+            filterIds(params),
+            [],
+            loc,
+          ),
+        );
+        return nullId;
       },
     });
     super(data);

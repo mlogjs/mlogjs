@@ -1,4 +1,3 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
 import { LiteralValue, StoreValue } from "../../values";
 import { validRadarFilters, validRadarSorts } from "./Radar";
@@ -7,16 +6,24 @@ import {
   assertIsArrayMacro,
   assertIsObjectMacro,
   assertLiteralOneOf,
+  assertObjectFields,
 } from "../../utils";
+import { ImmutableId, NativeInstruction } from "../../flow";
 
 export class UnitRadar extends MacroFunction {
   constructor() {
-    super((c, out, options) => {
+    super((c, cursor, loc, optionsId) => {
+      const options = c.getValue(optionsId);
       assertIsObjectMacro(options, "The radar options");
 
-      const filters = c.getValue(options.data.filters);
-      const order = c.getValue(options.data.order);
-      const sort = c.getValue(options.data.sort);
+      const [filtersId, orderId, sortId] = assertObjectFields(c, options, [
+        "filters",
+        "order",
+        "sort",
+      ]) as ImmutableId[];
+      const filters = c.getValue(filtersId);
+      const order = c.getValueOrTemp(orderId);
+      const sort = c.getValue(sortId);
 
       assertIsArrayMacro(c, filters, "filters");
 
@@ -28,7 +35,6 @@ export class UnitRadar extends MacroFunction {
       if (length.data !== 3)
         throw new CompilerError("The filters array must have 3 items");
 
-      // data is not an array
       const filter1 = c.getValue(filters.data[0]);
       const filter2 = c.getValue(filters.data[1]);
       const filter3 = c.getValue(filters.data[2]);
@@ -42,20 +48,29 @@ export class UnitRadar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const outUnit = c.getValueOrTemp(out);
+      const out = new ImmutableId();
 
-      return [
-        new InstructionBase(
-          "uradar",
-          filter1.data,
-          filter2.data,
-          filter3.data,
-          sort.data,
-          "0", // I don't know why, but mindustry requires this extra parameter
-          order,
-          outUnit,
+      cursor.addInstruction(
+        new NativeInstruction(
+          [
+            "uradar",
+            filter1.data,
+            filter2.data,
+            filter3.data,
+            sort.data,
+            // uradar uses the same parser as radar, but discards this parameter
+            // that indicates the building to use in the radar instruction
+            "0",
+            orderId,
+            out,
+          ],
+          [orderId],
+          [out],
+          loc,
         ),
-      ];
+      );
+
+      return out;
     });
   }
 }

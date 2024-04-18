@@ -92,5 +92,5 @@ export function createOverloadNamespace<K extends string>({
 }
 
 export function filterIds(args: (ImmutableId | string)[]): ImmutableId[] {
-  return args.filter((arg): arg is ImmutableId => typeof arg !== "string");
+  return args.filter((arg): arg is ImmutableId => typeof arg === "object");
 }

@@ -1,5 +1,5 @@
 import { ICompilerContext } from "../../CompilerContext";
-import { InstructionBase } from "../../instructions";
+import { ImmutableId, NativeInstruction } from "../../flow";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
@@ -14,9 +14,17 @@ export class Lookup extends ObjectValue {
         liquid: { args: ["index"] },
         team: { args: ["index"] },
       },
-      handler(c, overload, out, index) {
-        const output = c.getValueOrTemp(out);
-        return [new InstructionBase("lookup", overload, output, index)];
+      handler(c, overload, cursor, loc, index) {
+        const out = new ImmutableId();
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["lookup", overload, out, index],
+            [index as ImmutableId],
+            [out],
+            loc,
+          ),
+        );
+        return out;
       },
     });
     super(data);

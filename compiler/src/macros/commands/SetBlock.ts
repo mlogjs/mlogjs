@@ -1,8 +1,8 @@
 import { ICompilerContext } from "../../CompilerContext";
-import { InstructionBase } from "../../instructions";
+import { NativeInstruction } from "../../flow";
 import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class SetBlock extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -16,19 +16,24 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(c, overload, out, x, y, to, team, rotation) {
-        c.setAlias(out, nullId);
-        return [
-          new InstructionBase(
-            "setblock",
-            overload,
-            to,
-            x,
-            y,
-            team ?? "@derelict",
-            rotation ?? "0",
+      handler(c, overload, cursor, loc, x, y, to, team, rotation) {
+        cursor.addInstruction(
+          new NativeInstruction(
+            [
+              "setblock",
+              overload,
+              to,
+              x,
+              y,
+              team ?? "@derelict",
+              rotation ?? "0",
+            ],
+            filterIds([x, y, to, team, rotation]),
+            [],
+            loc,
           ),
-        ];
+        );
+        return nullId;
       },
     });
     super(data);

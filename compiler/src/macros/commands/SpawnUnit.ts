@@ -1,36 +1,34 @@
-import { InstructionBase } from "../../instructions";
-import { assertIsObjectMacro, assertIsRuntimeValue } from "../../utils";
-import { StoreValue } from "../../values";
+import { ImmutableId, NativeInstruction } from "../../flow";
+import { assertIsObjectMacro, assertObjectFields } from "../../utils";
 import { MacroFunction } from "../Function";
+import { filterIds } from "../util";
 
 export class SpawnUnit extends MacroFunction {
   constructor() {
-    super((scope, out, options) => {
+    super((c, cursor, loc, optionsId) => {
+      const options = c.getValue(optionsId);
       assertIsObjectMacro(options, "The options");
 
-      const { type, x, y, team, rotation } = options.data;
+      const [type, x, y, team, rotation] = assertObjectFields(c, options, [
+        "type",
+        "x",
+        "y",
+        "team",
+        { key: "rotation", default: "0" },
+      ]);
 
-      assertIsRuntimeValue(type, "type");
-      assertIsRuntimeValue(x, "x");
-      assertIsRuntimeValue(y, "y");
-      assertIsRuntimeValue(team, "team");
+      const out = new ImmutableId();
+      const params = [type, x, y, team, rotation ?? "0"];
+      cursor.addInstruction(
+        new NativeInstruction(
+          ["spawn", ...params, out],
+          filterIds(params),
+          [out],
+          loc,
+        ),
+      );
 
-      const output = StoreValue.from(scope, out);
-
-      return [
-        output,
-        [
-          new InstructionBase(
-            "spawn",
-            type,
-            x,
-            y,
-            rotation ?? "0",
-            team,
-            output,
-          ),
-        ],
-      ];
+      return out;
     });
   }
 }
