@@ -5,8 +5,8 @@ import {
   IScope,
   THandler,
   IValue,
-  TWriteCallback,
   TDeclarationKind,
+  IWriteableHandler,
 } from "./types";
 import { CompilerOptions } from "./Compiler";
 import { nullId } from "./utils";
@@ -37,13 +37,13 @@ export interface ICompilerContext {
     arg?: unknown,
   ): ImmutableId;
 
-  handleWrite(
+  handleWriteable(
     scope: IScope,
     cursor: IBlockCursor,
     node: es.Node,
     handler?: THandler,
     arg?: unknown,
-  ): TWriteCallback;
+  ): IWriteableHandler;
 
   handleDeclaration(
     scope: IScope,
@@ -163,17 +163,17 @@ export class CompilerContext implements ICompilerContext {
     }
   }
 
-  handleWrite(
+  handleWriteable(
     scope: IScope,
     cursor: IBlockCursor,
     node: es.Node,
     handler = this.handlers[node.type],
     arg?: unknown,
-  ): TWriteCallback {
+  ): IWriteableHandler {
     try {
-      if (!handler?.handleWrite)
+      if (!handler?.handleWriteable)
         throw new CompilerError("Missing handler for " + node.type);
-      const result = handler.handleWrite(this, scope, cursor, node, arg);
+      const result = handler.handleWriteable(this, scope, cursor, node, arg);
       // if (this.sourcemap) return appendSourceLocations(result, node);
       return result;
     } catch (error) {

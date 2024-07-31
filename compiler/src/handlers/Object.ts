@@ -103,19 +103,40 @@ export const MemberExpression: THandler = (
   return out;
 };
 
-MemberExpression.handleWrite = (
+MemberExpression.handleWriteable = (
   c,
   scope,
   cursor,
   node: es.MemberExpression,
+  optional: boolean = false,
 ) => {
   const obj = c.handle(scope, cursor, node.object);
   const key = node.computed
     ? c.handle(scope, cursor, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-  return value => {
-    cursor.addInstruction(new ValueSetInstruction(obj, key, value, node));
+  return {
+    read() {
+      const out = new ImmutableId();
+
+      cursor.addInstruction(
+        new ValueGetInstruction({
+          object: obj,
+          key,
+          out,
+          optionalObject: optional,
+          node,
+        }),
+      );
+
+      return out;
+    },
+
+    write(value, callerNode) {
+      cursor.addInstruction(
+        new ValueSetInstruction(obj, key, value, callerNode),
+      );
+    },
   };
 };
 
@@ -147,26 +168,31 @@ export const ArrayPattern: THandler = () => {
   // return [new DestructuringValue(members), inst];
 };
 
-ArrayPattern.handleWrite = (c, scope, cursor, node: es.ArrayPattern) => {
-  return (value, callerNode) => {
-    for (let i = 0; i < node.elements.length; i++) {
-      const element = node.elements[i];
-      if (!element) continue;
+ArrayPattern.handleWriteable = (c, scope, cursor, node: es.ArrayPattern) => {
+  return {
+    read(): never {
+      throw new CompilerError("Attempted to read an ArrayPattern node");
+    },
+    write(value, callerNode) {
+      for (let i = 0; i < node.elements.length; i++) {
+        const element = node.elements[i];
+        if (!element) continue;
 
-      const key = c.registerValue(new LiteralValue(i));
-      const temp = new ImmutableId();
-      cursor.addInstruction(
-        new ValueGetInstruction({
-          object: value,
-          key,
-          out: temp,
-          optionalKey: element.type === "AssignmentPattern",
-          node,
-        }),
-      );
-      const assign = c.handleWrite(scope, cursor, element);
-      assign(temp, callerNode);
-    }
+        const key = c.registerValue(new LiteralValue(i));
+        const temp = new ImmutableId();
+        cursor.addInstruction(
+          new ValueGetInstruction({
+            object: value,
+            key,
+            out: temp,
+            optionalKey: element.type === "AssignmentPattern",
+            node,
+          }),
+        );
+        const handler = c.handleWriteable(scope, cursor, element);
+        handler.write(temp, callerNode);
+      }
+    },
   };
 };
 
@@ -212,33 +238,38 @@ export const ObjectPattern: THandler = () => {
   // return [new DestructuringValue(members), inst];
 };
 
-ObjectPattern.handleWrite = (c, scope, cursor, node: es.ObjectPattern) => {
-  return (value, callerNode) => {
-    for (const prop of node.properties) {
-      if (prop.type === "RestElement")
-        throw new CompilerError("The rest operator is not supported", prop);
+ObjectPattern.handleWriteable = (c, scope, cursor, node: es.ObjectPattern) => {
+  return {
+    read() {
+      throw new CompilerError("Attempted to read an ObjectPattern node");
+    },
+    write(value, callerNode) {
+      for (const prop of node.properties) {
+        if (prop.type === "RestElement")
+          throw new CompilerError("The rest operator is not supported", prop);
 
-      const propKey = prop.key;
-      const key =
-        propKey.type === "Identifier" && !prop.computed
-          ? c.registerValue(new LiteralValue(propKey.name))
-          : c.handle(scope, cursor, propKey);
+        const propKey = prop.key;
+        const key =
+          propKey.type === "Identifier" && !prop.computed
+            ? c.registerValue(new LiteralValue(propKey.name))
+            : c.handle(scope, cursor, propKey);
 
-      const temp = new ImmutableId();
+        const temp = new ImmutableId();
 
-      cursor.addInstruction(
-        new ValueGetInstruction({
-          object: value,
-          key,
-          out: temp,
-          optionalKey: prop.value.type === "AssignmentPattern",
-          node,
-        }),
-      );
+        cursor.addInstruction(
+          new ValueGetInstruction({
+            object: value,
+            key,
+            out: temp,
+            optionalKey: prop.value.type === "AssignmentPattern",
+            node,
+          }),
+        );
 
-      const assign = c.handleWrite(scope, cursor, prop.value);
-      assign(value, callerNode);
-    }
+        const handler = c.handleWriteable(scope, cursor, prop.value);
+        handler.write(value, callerNode);
+      }
+    },
   };
 };
 
@@ -304,41 +335,52 @@ export const AssignmentPattern: THandler = (
   );
 };
 
-AssignmentPattern.handleWrite = (
+AssignmentPattern.handleWriteable = (
   c,
   scope,
   cursor,
   node: es.AssignmentPattern,
 ) => {
-  const assignLeft = c.handleWrite(scope, cursor, node.left);
+  const leftHandler = c.handleWriteable(scope, cursor, node.left);
 
-  return (value, callerNode) => {
-    const consequentBlock = new Block();
-    const alternateBlock = new Block();
-    const exitBlock = new Block();
+  return {
+    read() {
+      throw new CompilerError("Attempted to read an AssignmentPattern node");
+    },
+    write(value, callerNode) {
+      const consequentBlock = new Block();
+      const alternateBlock = new Block();
+      const exitBlock = new Block();
 
-    const result = new ImmutableId();
-    const temp = new GlobalId();
-    const test = new ImmutableId();
-    cursor.addInstruction(
-      new BinaryOperationInstruction("strictEqual", value, nullId, test, node),
-    );
-    cursor.setEndInstruction(
-      new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
-    );
+      const result = new ImmutableId();
+      const temp = new GlobalId();
+      const test = new ImmutableId();
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "strictEqual",
+          value,
+          nullId,
+          test,
+          node,
+        ),
+      );
+      cursor.setEndInstruction(
+        new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+      );
 
-    cursor.currentBlock = consequentBlock;
-    const defaultValue = c.handle(scope, cursor, node.right);
-    cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
-    cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+      cursor.currentBlock = consequentBlock;
+      const defaultValue = c.handle(scope, cursor, node.right);
+      cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
+      cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-    cursor.currentBlock = alternateBlock;
-    cursor.addInstruction(new StoreInstruction(temp, value, node));
-    cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+      cursor.currentBlock = alternateBlock;
+      cursor.addInstruction(new StoreInstruction(temp, value, node));
+      cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
-    cursor.currentBlock = exitBlock;
-    cursor.addInstruction(new LoadInstruction(temp, result, node));
-    assignLeft(result, callerNode);
+      cursor.currentBlock = exitBlock;
+      cursor.addInstruction(new LoadInstruction(temp, result, node));
+      leftHandler.write(result, callerNode);
+    },
   };
 };
 

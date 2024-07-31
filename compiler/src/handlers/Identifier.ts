@@ -18,11 +18,16 @@ export const Identifier: THandler = (c, scope, cursor, node: es.Identifier) => {
   }
 };
 
-Identifier.handleWrite = (c, scope, cursor, node: es.Identifier) => {
-  const id = scope.get(c, node.name);
-  if (id.type !== "global") throw new Error("Cannot assign to constants");
-  return (value, callerNode) => {
-    cursor.addInstruction(new StoreInstruction(id, value, callerNode));
+Identifier.handleWriteable = (c, scope, cursor, node: es.Identifier) => {
+  return {
+    read() {
+      return Identifier(c, scope, cursor, node, null);
+    },
+    write(value, callerNode) {
+      const id = scope.get(c, node.name);
+      if (id.type !== "global") throw new Error("Cannot assign to constants");
+      cursor.addInstruction(new StoreInstruction(id, value, callerNode));
+    },
   };
 };
 

@@ -130,11 +130,11 @@ export const AssignmentExpression: THandler = (
   },
 ) => {
   // TODO: support the other assignment operators
-  const assign = c.handleWrite(scope, cursor, node.left);
+  const handler = c.handleWriteable(scope, cursor, node.left);
 
   const value = c.handle(scope, cursor, node.right);
 
-  assign(value, node);
+  handler.write(value, node);
   return value;
 };
 
@@ -203,9 +203,9 @@ export const UpdateExpression: THandler = (
   cursor,
   node: es.UpdateExpression,
 ) => {
-  const assign = c.handleWrite(scope, cursor, node.argument);
+  const handler = c.handleWriteable(scope, cursor, node.argument);
 
-  const oldValue = c.handle(scope, cursor, node.argument);
+  const oldValue = handler.read();
   const newValue = new ImmutableId();
   const one = c.registerValue(new LiteralValue(1));
 
@@ -218,7 +218,7 @@ export const UpdateExpression: THandler = (
       node,
     ),
   );
-  assign(newValue, node);
+  handler.write(newValue, node);
 
   if (node.prefix) return newValue;
   return oldValue;
