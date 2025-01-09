@@ -39,6 +39,8 @@ export class Block {
         return [this.endInstruction.target];
       case "break-if":
         return [this.endInstruction.consequent, this.endInstruction.alternate];
+      case "end-if":
+        return [this.endInstruction.alternate];
       default:
         return [];
     }
@@ -56,7 +58,11 @@ export class Block {
   }
 
   conditionInstruction() {
-    if (this.endInstruction?.type !== "break-if") return;
+    if (
+      this.endInstruction?.type !== "break-if" &&
+      this.endInstruction?.type !== "end-if"
+    )
+      return;
     const { condition } = this.endInstruction;
 
     for (const inst of this.instructions.inReverse()) {

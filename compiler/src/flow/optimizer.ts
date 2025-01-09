@@ -1,3 +1,4 @@
+import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId, ValueId } from "./id";
 import {
   TBinaryOperationType,
@@ -91,22 +92,28 @@ export class ReaderMap {
   reads: Map<ValueId, Set<TBlockInstruction | TBlockEndInstruction>> =
     new Map();
 
+  constructor(public c: ICompilerContext) {}
+
   private ensurePresent(id: ValueId) {
+    id = this.c.resolveId(id);
     if (!this.reads.has(id)) this.reads.set(id, new Set());
   }
 
   add(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
+    id = this.c.resolveId(id);
     this.ensurePresent(id);
     this.reads.get(id)!.add(instruction);
   }
 
   remove(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
+    id = this.c.resolveId(id);
     if (!this.reads.has(id)) return;
 
     this.reads.get(id)!.delete(instruction);
   }
 
   get(id: ValueId) {
+    id = this.c.resolveId(id);
     this.ensurePresent(id);
     return this.reads.get(id)!;
   }
@@ -115,15 +122,23 @@ export class ReaderMap {
 export class WriterMap {
   writes: Map<ImmutableId, TBlockInstruction> = new Map();
 
+  constructor(public c: ICompilerContext) {}
+
   set(id: ImmutableId, instruction: TBlockInstruction) {
+    id = this.c.resolveImmutableId(id);
     this.writes.set(id, instruction);
   }
 
   remove(id: ImmutableId) {
+    id = this.c.resolveImmutableId(id);
+    console.log(id.debugName);
+
     this.writes.delete(id);
   }
 
   get(id: ImmutableId) {
+    id = this.c.resolveImmutableId(id);
+
     return this.writes.get(id);
   }
 }

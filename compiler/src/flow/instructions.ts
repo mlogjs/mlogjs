@@ -2,8 +2,8 @@ import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase, SetInstruction } from "../instructions";
-import { IInstruction, IValue, Location, TLiteral, es } from "../types";
-import { appendSourceLocations, nullId } from "../utils";
+import { IInstruction, Location, TLiteral, es } from "../types";
+import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
@@ -467,6 +467,7 @@ export class BreakInstruction {
   type = "break" as const;
   target: TEdge;
   source?: es.SourceLocation;
+  // TODO: why do we even require node when we could just ask for .loc directly?
   constructor(target: Block | TEdge, node?: Location) {
     this.source = node?.loc ?? undefined;
     this.target = target instanceof Block ? target.toForward() : target;
@@ -574,6 +575,22 @@ export class EndInstruction {
   }
 }
 
+export class EndIfInstruction {
+  type = "end-if" as const;
+  source?: es.SourceLocation;
+  alternate: TEdge;
+
+  constructor(
+    public condition: ImmutableId,
+    alternate: Block | TEdge,
+    node?: Location,
+  ) {
+    this.source = node?.loc ?? undefined;
+    this.alternate =
+      alternate instanceof Block ? alternate.toForward() : alternate;
+  }
+}
+
 export class StopInstruction {
   type = "stop" as const;
 
@@ -670,6 +687,7 @@ export type TBlockEndInstruction =
   | BreakIfInstruction
   | ReturnInstruction
   | EndInstruction
+  | EndIfInstruction
   | StopInstruction;
 
 export type TBlockInstruction =

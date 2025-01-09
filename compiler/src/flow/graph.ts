@@ -14,6 +14,8 @@ import { GlobalId, ImmutableId } from "./id";
 import {
   BinaryOperationInstruction,
   BreakInstruction,
+  EndIfInstruction,
+  EndInstruction,
   TBlockEndInstruction,
   isLowerable,
 } from "./instructions";
@@ -158,6 +160,25 @@ export class Graph {
     });
   }
 
+  /**
+   * Transforms blocks whose only purpose is to jump into an empty leaf node
+   * (that ends with end or stop) into leaf nodes themselves. This enables the
+   * creation of end-if instructions.
+   */
+  splitLeaves() {
+    traverse(this.start, block => {
+      if (block.endInstruction?.type !== "break") return;
+      const target = block.endInstruction.target.block;
+      if (!target.instructions.isEmpty) return;
+      switch (target.endInstruction?.type) {
+        case "end":
+        case "stop":
+          block.endInstruction = target.endInstruction;
+          break;
+      }
+    });
+  }
+
   lower(c: ICompilerContext) {
     const cursor = new BlockCursor("edit", this.start);
 
@@ -243,14 +264,33 @@ export class Graph {
           instructions[instructions.length - 2].source = source;
           break;
         }
-        // case "end": {
-        //   if (block !== this.end || true) {
-        //     instructions.push(new InstructionBase("end"));
-        //     instructions[instructions.length - 1].source =
-        //       endInstruction?.source;
-        //   }
-        //   break;
-        // }
+        case "end-if": {
+          const condition = c.getValue(endInstruction.condition);
+          const conditionInst = block.conditionInstruction();
+          const { source } = endInstruction;
+          if (conditionInst) {
+            instructions.push(
+              new JumpInstruction(
+                new LiteralValue(0),
+                conditionInst.operator as EJumpKind,
+                c.getValue(conditionInst.left),
+                c.getValue(conditionInst.right),
+              ),
+            );
+          } else {
+            instructions.push(
+              new JumpInstruction(
+                new LiteralValue(0),
+                EJumpKind.NotEqual,
+                condition,
+                new LiteralValue(0),
+              ),
+            );
+          }
+
+          instructions[instructions.length - 1].source = source;
+          break;
+        }
         case "end":
         case "stop":
           instructions.push(new InstructionBase(endInstruction.type));
@@ -277,6 +317,14 @@ export class Graph {
     return instructions;
   }
 
+  /**
+   * Attempts to put empty instruction blocks on the consequent side of break-if
+   * instructions in order to reduce the amount of jumps present in the
+   * generated code. This is done because an empty block usually contains a jump
+   * or an end instruction, and in the first case that jump being on the
+   * alternate side of the break-if neutralizes the benefit of eliminating a
+   * jump caused by placing alternate blocks first.
+   */
   canonicalizeBreakIfs(c: ICompilerContext) {
     traverse(this.start, block => {
       const { endInstruction } = block;
@@ -289,13 +337,24 @@ export class Graph {
         end?.type === "break" && end?.target.type === "backward";
 
       if (
-        isBackBreak(consequent.block.endInstruction) ||
-        !alternate.block.instructions.isEmpty ||
-        // don't flip if both targets have zero instructions
-        alternate.block.instructions.length ===
-          consequent.block.instructions.length
+        // TODO: figure out why this line was used before
+        // isBackBreak(consequent.block.endInstruction) ||
+        !alternate.block.instructions.isEmpty
       )
         return;
+
+      // canonicalization doesn't really outside these cases
+      // so it just makes the generated code harder to read
+      switch (alternate.block.endInstruction?.type) {
+        case "break":
+        case "end":
+          break;
+        default:
+          return;
+      }
+
+      // don't flip if both targets have zero instructions
+      if (consequent.block.instructions.isEmpty) return;
 
       const newCondition = new ImmutableId();
       block.instructions.add(
@@ -339,6 +398,27 @@ export class Graph {
       endInstruction.condition = conditionInst.left;
       endInstruction.alternate = consequent;
       endInstruction.consequent = alternate;
+    });
+  }
+
+  /**
+   * Transforms break-if instructions into end-if instructions when the
+   * consequent block consists of a single end instruction. Since end
+   * instructions are essentially jumps to the beginning of the script, this
+   * optimization removes an unnecessary jump, which may also improve the
+   * instruction layout of the resulting code.
+   */
+  createEndIfs(c: ICompilerContext) {
+    traverse(this.start, block => {
+      const { endInstruction } = block;
+      if (endInstruction?.type !== "break-if") return;
+      const { condition, alternate, consequent } = endInstruction;
+
+      if (!consequent.block.instructions.isEmpty) return;
+      if (consequent.block.endInstruction?.type !== "end") return;
+
+      block.endInstruction = new EndIfInstruction(condition, alternate);
+      block.endInstruction.source = endInstruction.source;
     });
   }
 
@@ -404,8 +484,26 @@ export class Graph {
     });
   }
 
+  removeConstantEndIfs(c: ICompilerContext) {
+    traverse(this.start, block => {
+      const { endInstruction } = block;
+      if (endInstruction?.type !== "end-if") return;
+      const condition = c.getValue(endInstruction.condition);
+      if (!(condition instanceof LiteralValue)) return;
+
+      const loc = block.endInstruction?.source;
+      if (condition.num) {
+        block.endInstruction = new EndInstruction({ loc });
+      } else {
+        block.endInstruction = new BreakInstruction(endInstruction.alternate, {
+          loc,
+        });
+      }
+    });
+  }
+
   transformComparisons(c: ICompilerContext) {
-    const writes = getWriterMap(this.start);
+    const writes = getWriterMap(c, this.start);
     traverse(this.start, block => {
       for (
         let current = block.instructions.head;
@@ -482,8 +580,8 @@ export class Graph {
     });
   }
 
-  removeUnusedInstructions() {
-    const reads = getReaderMap(this.start);
+  removeUnusedInstructions(c: ICompilerContext) {
+    const reads = getReaderMap(c, this.start);
 
     traversePostOrder(this.start, block => {
       let current = block.instructions.tail;
@@ -580,7 +678,7 @@ export class Graph {
    * instruction that reads their value.
    */
   optimizeImmediateLoads(c: ICompilerContext) {
-    const reads = getReaderMap(this.start);
+    const reads = getReaderMap(c, this.start);
 
     traverse(this.start, block => {
       let lastInstruction = block.instructions.tail?.instruction;
@@ -609,15 +707,18 @@ export class Graph {
     this.skipBlocks();
     this.setParents();
     this.removeCriticalEdges();
+    this.splitLeaves();
     this.canonicalizeBinaryOperations(c);
     // this.optimizeGlobals(c);
     this.canonicalizeBreakIfs(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
     this.flipBreakIfs(c);
-    this.removeUnusedInstructions();
+    this.createEndIfs(c);
+
     // this.optimizeStoreInstructions(c);
     this.removeConstantBreakIfs(c);
+    this.removeConstantEndIfs(c);
     this.optimizeImmediateLoads(c);
     this.optimizeImmediateStores(c);
     this.setParents();

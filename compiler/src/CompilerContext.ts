@@ -18,6 +18,8 @@ export interface ICompilerContext {
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
 
+  resolveImmutableId(id: ImmutableId): ImmutableId;
+  resolveId(id: ValueId): ValueId;
   getValueName(id: ValueId): string | undefined;
   setValueName(id: ValueId, name: string): void;
   getValueId(name: string): ValueId | undefined;
@@ -76,7 +78,7 @@ export class CompilerContext implements ICompilerContext {
   #names = new Map<ValueId, string>();
   #ids = new Map<string, ValueId>();
   #values = new Map<ValueId, IValue>();
-  #aliases = new Map<ImmutableId, ValueId>();
+  aliases = new Map<ImmutableId, ValueId>();
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
@@ -90,14 +92,20 @@ export class CompilerContext implements ICompilerContext {
     this.setValue(nullId, new LiteralValue(null));
   }
 
-  #resolveId(id: ValueId): ValueId {
+  resolveId(id: ValueId): ValueId {
     if (id.type === "global") return id;
-    return this.#aliases.get(id) ?? id;
+    return this.aliases.get(id) ?? id;
+  }
+
+  resolveImmutableId(id: ImmutableId): ImmutableId {
+    const resolved = this.aliases.get(id);
+    if (resolved?.type === "immutable") return resolved;
+    return id;
   }
 
   getValue(id: ValueId | undefined): IValue | undefined {
     if (!id) return;
-    return this.#values.get(this.#resolveId(id));
+    return this.#values.get(this.resolveId(id));
   }
 
   getValueOrTemp(id: ValueId): IValue {
@@ -110,7 +118,7 @@ export class CompilerContext implements ICompilerContext {
     return store;
   }
   setValue(id: ValueId, value: IValue): void {
-    this.#values.set(this.#resolveId(id), value);
+    this.#values.set(this.resolveId(id), value);
   }
 
   registerValue(value: IValue): ImmutableId {
@@ -120,21 +128,21 @@ export class CompilerContext implements ICompilerContext {
   }
 
   setAlias(alias: ImmutableId, original: ImmutableId): void {
-    const id = this.#aliases.get(original) ?? original;
-    this.#aliases.set(alias, id);
+    const id = this.aliases.get(original) ?? original;
+    this.aliases.set(alias, id);
   }
 
   setGlobalAlias(alias: ImmutableId, original: GlobalId): void {
     // const id = this.#aliases.get(original) ?? original;
-    this.#aliases.set(alias, original);
+    this.aliases.set(alias, original);
   }
 
   getValueName(id: ValueId): string | undefined {
-    return this.#names.get(this.#resolveId(id));
+    return this.#names.get(this.resolveId(id));
   }
 
   setValueName(id: ValueId, name: string): void {
-    id = this.#resolveId(id);
+    id = this.resolveId(id);
     this.#names.set(id, name);
     this.#ids.set(name, id);
   }
