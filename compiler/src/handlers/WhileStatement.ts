@@ -1,4 +1,5 @@
 import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
+import { negateValue } from "../flow/helper";
 import { es, THandler } from "../types";
 import { nullId } from "../utils";
 
@@ -22,8 +23,11 @@ export const WhileStatement: THandler = (
   cursor.connectBlock(testBlock, node);
 
   const test = c.handle(scope, cursor, node.test);
+
+  const notTest = negateValue(c, cursor, test, node);
+
   cursor.setEndInstruction(
-    new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
+    new BreakIfInstruction(notTest, afterLoopBlock, bodyBlock, node),
   );
 
   cursor.currentBlock = bodyBlock;
@@ -55,9 +59,15 @@ export const DoWhileStatement: THandler = (
 
   cursor.currentBlock = testBlock;
   const test = c.handle(scope, cursor, node.test);
+  const notTest = negateValue(c, cursor, test, node);
 
   cursor.setEndInstruction(
-    new BreakIfInstruction(test, bodyBlock.toBackward(), afterLoopBlock, node),
+    new BreakIfInstruction(
+      notTest,
+      afterLoopBlock,
+      bodyBlock.toBackward(),
+      node,
+    ),
   );
 
   cursor.currentBlock = afterLoopBlock;

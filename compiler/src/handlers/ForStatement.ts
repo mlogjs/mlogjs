@@ -1,10 +1,5 @@
-import {
-  BinaryOperationInstruction,
-  Block,
-  BreakIfInstruction,
-  BreakInstruction,
-  ImmutableId,
-} from "../flow";
+import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
+import { negateValue } from "../flow/helper";
 import { es, THandler } from "../types";
 import { nullId } from "../utils";
 import { LiteralValue } from "../values";
@@ -36,18 +31,10 @@ export const ForStatement: THandler = (
     ? c.handle(scope, cursor, node.test)
     : c.registerValue(new LiteralValue(1));
 
-  const invertedTest = new ImmutableId();
-  const zero = c.registerValue(new LiteralValue(0));
-
-  cursor.addInstruction(
-    new BinaryOperationInstruction("equal", test, zero, invertedTest, node),
-  );
+  const notTest = negateValue(c, cursor, test, node);
   cursor.setEndInstruction(
-    new BreakIfInstruction(invertedTest, afterLoopBlock, bodyBlock, node),
+    new BreakIfInstruction(notTest, afterLoopBlock, bodyBlock, node),
   );
-  // cursor.setEndInstruction(
-  //   new BreakIfInstruction(test, bodyBlock, afterLoopBlock, node),
-  // );
 
   cursor.currentBlock = bodyBlock;
   c.handle(scope, cursor, node.body);
