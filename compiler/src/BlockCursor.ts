@@ -89,7 +89,7 @@ export class BlockCursor implements IBlockCursor {
       throw new CompilerError(
         "Attempted to discard instructions without a position",
       );
-    this.position.next = undefined;
-    this.currentBlock.instructions.tail = this.position;
+
+    this.currentBlock.instructions.removeAllAfter(this.position);
   }
 }

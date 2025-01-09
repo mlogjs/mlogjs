@@ -98,8 +98,8 @@ export class Block {
 }
 
 export class InstructionNode {
-  previous?: InstructionNode;
-  next?: InstructionNode;
+  previous?: InstructionNode = undefined;
+  next?: InstructionNode = undefined;
 
   constructor(public instruction: TBlockInstruction) {}
 }
@@ -108,6 +108,10 @@ export class InstructionList {
   length = 0;
   head?: InstructionNode;
   tail?: InstructionNode;
+
+  get isEmpty() {
+    return this.length === 0;
+  }
 
   add(instruction: TBlockInstruction) {
     const node = new InstructionNode(instruction);
@@ -193,5 +197,21 @@ export class InstructionList {
       yield current;
       current = current.next;
     }
+  }
+
+  removeAllAfter(node: InstructionNode) {
+    // needs to update the length
+    // TODO: is knowing the exact length necessary?
+    // we may only need to know if the list is empty or not
+    let count = 0;
+    let current = node;
+    while (current.next) {
+      current = current.next;
+      count++;
+    }
+
+    this.length -= count;
+    node.next = undefined;
+    this.tail = node;
   }
 }

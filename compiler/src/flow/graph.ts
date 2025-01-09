@@ -125,7 +125,7 @@ export class Graph {
 
       while (
         current.block.endInstruction?.type === "break" &&
-        current.block.instructions.length === 0 &&
+        current.block.instructions.isEmpty &&
         current.block.forwardParents.length === current.block.parents.length
       ) {
         current = current.block.endInstruction.target;
@@ -290,7 +290,7 @@ export class Graph {
 
       if (
         isBackBreak(consequent.block.endInstruction) ||
-        alternate.block.instructions.length > 0 ||
+        !alternate.block.instructions.isEmpty ||
         // don't flip if both targets have zero instructions
         alternate.block.instructions.length ===
           consequent.block.instructions.length
