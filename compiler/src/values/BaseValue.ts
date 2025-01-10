@@ -21,7 +21,6 @@ import {
 } from "../types";
 import { LiteralValue, VoidValue, StoreValue } from ".";
 import { isDiscardedOut, pipeInsts } from "../utils";
-import { JumpOutValue } from "./JumpOutValue";
 
 export class BaseValue extends VoidValue implements IValue {
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions {
@@ -93,12 +92,6 @@ export class BaseValue extends VoidValue implements IValue {
   }
 
   "!=="(scope: IScope, other: IValue, out?: TEOutput): TValueInstructions {
-    if (out instanceof JumpOutValue && out.canHandle("!==")) {
-      const [left, leftInst] = this.eval(scope);
-      const [right, rightInst] = other.eval(scope);
-      return [out, [...leftInst, ...rightInst, out.handle("!==", left, right)]];
-    }
-
     const [equal, equalInst] = this["==="](scope, other);
     const [result, resultInst] = equal["!"](scope, out);
 
@@ -179,11 +172,6 @@ for (const k in operatorMap) {
   ): TValueInstructions {
     const [left, leftInst] = this.eval(scope);
     const [right, rightInst] = value.eval(scope);
-
-    if (out instanceof JumpOutValue && out.canHandle(key)) {
-      const jump = out.handle(key, left, right);
-      return [out, [...leftInst, ...rightInst, jump]];
-    }
 
     const temp = StoreValue.from(scope, out);
     return [
