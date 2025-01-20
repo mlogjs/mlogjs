@@ -88,7 +88,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
         `The member [${name.debugString()}] does not exist on literal values.`,
       );
     const method = literalMethods[name.data];
-    const out = new ImmutableId();
+    const out = c.createImmutableId();
     c.setValue(out, method.apply(this, [c]));
     return out;
   }

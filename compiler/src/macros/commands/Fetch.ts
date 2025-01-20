@@ -1,8 +1,7 @@
 import { ICompilerContext } from "../../CompilerContext";
-import { InstructionBase } from "../../instructions";
-import { IValue } from "../../types";
+import { ImmutableId, NativeInstruction } from "../../flow";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class Fetch extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -18,10 +17,10 @@ export class Fetch extends ObjectValue {
         build: { args: ["team", "index", "block"] },
         buildCount: { args: ["team", "block"] },
       },
-      handler(c, overload, out, team, ...rest) {
-        const output = c.getValueOrTemp(out);
+      handler(c, overload, cursor, loc, team, ...rest) {
+        const output = c.createImmutableId();
 
-        const params: (IValue | string)[] = ["0", "@conveyor"];
+        const params: (ImmutableId | string)[] = ["0", "@conveyor"];
 
         if (overload === "buildCount") {
           params[1] = rest[0];
@@ -29,9 +28,16 @@ export class Fetch extends ObjectValue {
           Object.assign(params, rest);
         }
 
-        return [
-          new InstructionBase("fetch", overload, output, team, ...params),
-        ];
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["fetch", overload, output, team, ...params],
+            filterIds([team, ...rest]),
+            [output],
+            loc,
+          ),
+        );
+
+        return c.nullId;
       },
     });
     super(data);

@@ -3,10 +3,8 @@ import {
   Block,
   BreakIfInstruction,
   BreakInstruction,
-  ImmutableId,
 } from "../flow";
 import { es, THandler } from "../types";
-import { nullId } from "../utils";
 
 export const SwitchStatement: THandler = (
   c,
@@ -37,7 +35,7 @@ export const SwitchStatement: THandler = (
       cursor.currentBlock = testEntry;
 
       const value = c.handle(scope, cursor, scase.test);
-      const condition = new ImmutableId();
+      const condition = c.createImmutableId();
       cursor.addInstruction(
         new BinaryOperationInstruction(
           "strictEqual",
@@ -66,5 +64,5 @@ export const SwitchStatement: THandler = (
   nextBodyBlock.endInstruction = new BreakInstruction(exitBlock, node);
 
   cursor.currentBlock = exitBlock;
-  return nullId;
+  return c.nullId;
 };

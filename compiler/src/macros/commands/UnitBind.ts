@@ -1,7 +1,6 @@
 import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { nullId } from "../../utils";
 import { NativeInstruction } from "../../flow";
 
 export class UnitBind extends MacroFunction {
@@ -15,7 +14,7 @@ export class UnitBind extends MacroFunction {
         new NativeInstruction(["ubind", unitId], [unitId], [], loc),
       );
 
-      return nullId;
+      return c.nullId;
     });
   }
 }

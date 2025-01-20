@@ -4,11 +4,22 @@
  */
 export class GlobalId {
   type = "global" as const;
+
+  constructor(public number: number) {}
+
+  toString() {
+    return `GlobalId(${this.number})`;
+  }
 }
 
 /** Identifier for immutable variables or constants. */
 export class ImmutableId {
   type = "immutable" as const;
+  constructor(public number: number) {}
+
+  toString() {
+    return `ImmutableId(${this.number})`;
+  }
 }
 
 export type ValueId = GlobalId | ImmutableId;

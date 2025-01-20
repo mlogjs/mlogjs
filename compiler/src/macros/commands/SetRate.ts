@@ -1,5 +1,4 @@
 import { NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
 export class SetRate extends MacroFunction {
@@ -8,7 +7,7 @@ export class SetRate extends MacroFunction {
       cursor.addInstruction(
         new NativeInstruction(["setrate", ipt], [ipt], [], loc),
       );
-      return nullId;
+      return c.nullId;
     });
   }
 }

@@ -10,7 +10,7 @@ import {
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
 import { ICompilerContext } from "../CompilerContext";
-import { GlobalId, ImmutableId, LoadInstruction } from "../flow";
+import { ImmutableId, LoadInstruction } from "../flow";
 import { IBlockCursor } from "../BlockCursor";
 
 const dynamicVars = [
@@ -59,11 +59,11 @@ export class NamespaceMacro extends ObjectValue {
     //   ];
     // }
 
-    const out = new ImmutableId();
+    const out = c.createImmutableId();
     if (!dynamicVars.includes(symbolName)) {
       c.setValue(out, new StoreValue(`@${symbolName}`, EMutability.constant));
     } else {
-      const globalId = new GlobalId();
+      const globalId = c.createGlobalId();
       c.setValue(
         globalId,
         new StoreValue(`@${symbolName}`, EMutability.readonly),

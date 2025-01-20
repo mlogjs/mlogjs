@@ -9,9 +9,8 @@ import {
   ValueGetInstruction,
   ValueSetInstruction,
 } from "../flow";
-import { GlobalId, ImmutableId } from "../flow/id";
+import { ImmutableId } from "../flow/id";
 import { es, THandler } from "../types";
-import { nullId } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 export const ObjectExpression: THandler = (
@@ -66,7 +65,7 @@ export const ArrayExpression: THandler = (
   const items: ImmutableId[] = [];
   node.elements.forEach(element => {
     if (!element) {
-      items.push(nullId);
+      items.push(c.nullId);
       return;
     }
     const value = c.handle(scope, cursor, element);
@@ -88,7 +87,7 @@ export const MemberExpression: THandler = (
     ? c.handle(scope, cursor, node.property)
     : c.registerValue(new LiteralValue((node.property as es.Identifier).name));
 
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
 
   cursor.addInstruction(
     new ValueGetInstruction({
@@ -117,7 +116,7 @@ MemberExpression.handleWriteable = (
 
   return {
     read() {
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
 
       cursor.addInstruction(
         new ValueGetInstruction({
@@ -179,7 +178,7 @@ ArrayPattern.handleWriteable = (c, scope, cursor, node: es.ArrayPattern) => {
         if (!element) continue;
 
         const key = c.registerValue(new LiteralValue(i));
-        const temp = new ImmutableId();
+        const temp = c.createImmutableId();
         cursor.addInstruction(
           new ValueGetInstruction({
             object: value,
@@ -254,7 +253,7 @@ ObjectPattern.handleWriteable = (c, scope, cursor, node: es.ObjectPattern) => {
             ? c.registerValue(new LiteralValue(propKey.name))
             : c.handle(scope, cursor, propKey);
 
-        const temp = new ImmutableId();
+        const temp = c.createImmutableId();
 
         cursor.addInstruction(
           new ValueGetInstruction({
@@ -296,7 +295,7 @@ ObjectPattern.handleDeclaration = (
         ? c.registerValue(new LiteralValue(propKey.name))
         : c.handle(scope, cursor, propKey);
 
-    const temp = new ImmutableId();
+    const temp = c.createImmutableId();
 
     cursor.addInstruction(
       new ValueGetInstruction({
@@ -352,14 +351,14 @@ AssignmentPattern.handleWriteable = (
       const alternateBlock = new Block();
       const exitBlock = new Block();
 
-      const result = new ImmutableId();
-      const temp = new GlobalId();
-      const test = new ImmutableId();
+      const result = c.createImmutableId();
+      const temp = c.createGlobalId();
+      const test = c.createImmutableId();
       cursor.addInstruction(
         new BinaryOperationInstruction(
           "strictEqual",
           value,
-          nullId,
+          c.nullId,
           test,
           node,
         ),
@@ -401,11 +400,11 @@ AssignmentPattern.handleDeclaration = (
   const alternateBlock = new Block();
   const exitBlock = new Block();
 
-  const result = new ImmutableId();
-  const temp = new GlobalId();
-  const test = new ImmutableId();
+  const result = c.createImmutableId();
+  const temp = c.createGlobalId();
+  const test = c.createImmutableId();
   cursor.addInstruction(
-    new BinaryOperationInstruction("strictEqual", init, nullId, test, node),
+    new BinaryOperationInstruction("strictEqual", init, c.nullId, test, node),
   );
   cursor.setEndInstruction(
     new BreakIfInstruction(test, consequentBlock, alternateBlock, node),

@@ -1,7 +1,6 @@
 import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { nullId } from "../../utils";
 import { ImmutableId, NativeInstruction } from "../../flow";
 import { EMutability, Location } from "../../types";
 
@@ -16,7 +15,7 @@ export class PrintFlush extends MacroFunction {
         cursor.addInstruction(
           new NativePrintFlushInstruction(defaultTarget, node),
         );
-        return nullId;
+        return c.nullId;
       }
 
       const target = c.getValueOrTemp(targetId);
@@ -24,7 +23,7 @@ export class PrintFlush extends MacroFunction {
       if (!(target instanceof StoreValue))
         throw new CompilerError("The printflush target must be a store value");
       cursor.addInstruction(new NativePrintFlushInstruction(targetId, node));
-      return nullId;
+      return c.nullId;
     });
   }
 }

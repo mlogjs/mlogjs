@@ -37,7 +37,7 @@ class MemoryMacro extends ObjectValue {
         `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
       );
 
-    const out = new ImmutableId();
+    const out = c.createImmutableId();
 
     cursor.addInstruction(
       new NativeReadInstruction(this.cell, propId, out, node),

@@ -1,5 +1,5 @@
 import { LiteralValue } from "../../values";
-import { isTemplateObjectArray, nullId } from "../../utils";
+import { isTemplateObjectArray } from "../../utils";
 import { NativePrintInstruction } from "../../flow";
 import { MacroFunction } from "../Function";
 
@@ -11,7 +11,7 @@ export class Print extends MacroFunction {
         for (const value of values) {
           cursor.addInstruction(new NativePrintInstruction(value, loc));
         }
-        return nullId;
+        return c.nullId;
       }
 
       // `first` is likely a template strings array
@@ -32,7 +32,7 @@ export class Print extends MacroFunction {
       if (tail.data)
         cursor.addInstruction(new NativePrintInstruction(tailId, loc));
 
-      return nullId;
+      return c.nullId;
     });
   }
 }

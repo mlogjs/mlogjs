@@ -1,5 +1,5 @@
 import { CompilerError } from "../../CompilerError";
-import { ImmutableId, NativeInstruction } from "../../flow";
+import { NativeInstruction } from "../../flow";
 import { MacroFunction } from "../Function";
 
 export class PackColor extends MacroFunction {
@@ -11,7 +11,7 @@ export class PackColor extends MacroFunction {
         );
       }
 
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
       cursor.addInstruction(
         new NativeInstruction(["packcolor", out, ...args], args, [out], loc),
       );

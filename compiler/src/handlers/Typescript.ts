@@ -1,6 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { es, THandler } from "../types";
-import { nodeName, nullId } from "../utils";
+import { nodeName } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 const TypeCastExpression: THandler = (
@@ -16,7 +16,7 @@ export const TSAsExpression = TypeCastExpression;
 
 export const TSTypeAssertion = TypeCastExpression;
 
-const IgnoredHandler: THandler = () => nullId;
+const IgnoredHandler: THandler = c => c.nullId;
 
 export const TSInterfaceDeclaration = IgnoredHandler;
 

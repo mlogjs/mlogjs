@@ -1,7 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { Block, BreakInstruction, ReturnInstruction } from "../flow";
 import { es, IScope, THandler } from "../types";
-import { nullId } from "../utils";
 
 export const ExpressionStatement: THandler = (
   c,
@@ -23,7 +22,7 @@ export const BreakStatement: THandler = (
   const target = findScopeLabel(scope, label);
   cursor.setEndInstruction(new BreakInstruction(target.break, node));
 
-  return nullId;
+  return c.nullId;
 };
 
 export const ContinueStatement: THandler = (
@@ -37,7 +36,7 @@ export const ContinueStatement: THandler = (
   const target = findScopeLabel(scope, label);
   cursor.setEndInstruction(new BreakInstruction(target.continue, node));
 
-  return nullId;
+  return c.nullId;
 };
 
 export const ReturnStatement: THandler = (
@@ -46,14 +45,14 @@ export const ReturnStatement: THandler = (
   cursor,
   node: es.ReturnStatement,
 ) => {
-  const arg = node.argument ? c.handle(scope, cursor, node.argument) : nullId;
+  const arg = node.argument ? c.handle(scope, cursor, node.argument) : c.nullId;
 
   // TODO: handle return value
   cursor.setEndInstruction(new ReturnInstruction(arg));
-  return nullId;
+  return c.nullId;
 };
 
-export const EmptyStatement: THandler = () => nullId;
+export const EmptyStatement: THandler = c => c.nullId;
 
 export const LabeledStatement: THandler = (
   c,
@@ -71,7 +70,7 @@ export const LabeledStatement: THandler = (
 
   cursor.connectBlock(afterLabelBlock, node);
 
-  return nullId;
+  return c.nullId;
 };
 
 function findScopeLabel(scope: IScope, label: string | undefined) {

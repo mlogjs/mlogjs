@@ -1,5 +1,4 @@
 import { THandler, es } from "../types";
-import { nullId } from "../utils";
 
 export const VariableDeclaration: THandler = (
   c,
@@ -24,5 +23,5 @@ export const VariableDeclarator: THandler = (
   const value = init ? c.handle(scope, cursor, init) : undefined;
   c.handleDeclaration(scope, cursor, id, kind, value);
 
-  return nullId;
+  return c.nullId;
 };

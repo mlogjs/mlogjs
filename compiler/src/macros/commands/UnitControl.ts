@@ -1,6 +1,5 @@
 import { ICompilerContext } from "../../CompilerContext";
 import { ImmutableId, NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace, filterIds } from "../util";
 
@@ -43,15 +42,15 @@ export class UnitControl extends ObjectValue {
       handler(c, overload, cursor, loc, ...args) {
         // let result: IValue | null = null;
         // let extraArgs: IValue[] = [];
-        let result = nullId;
+        let result = c.nullId;
         let extraArgs: (string | ImmutableId)[] = [];
         let outputs: ImmutableId[] = [];
 
         switch (overload) {
           case "getBlock": {
-            const outType = new ImmutableId();
-            const outBuilding = new ImmutableId();
-            const outFloor = new ImmutableId();
+            const outType = c.createImmutableId();
+            const outBuilding = c.createImmutableId();
+            const outFloor = c.createImmutableId();
 
             result = c.registerValue(
               ObjectValue.fromArray(c, [outType, outBuilding, outFloor]),
@@ -61,7 +60,7 @@ export class UnitControl extends ObjectValue {
             break;
           }
           case "within": {
-            result = new ImmutableId();
+            result = c.createImmutableId();
             extraArgs = [result, "0"];
             outputs = [result];
             break;

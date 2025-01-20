@@ -1,7 +1,7 @@
 import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { ImmutableId, NativeInstruction } from "../../flow";
+import { NativeInstruction } from "../../flow";
 
 export class Sensor extends MacroFunction {
   constructor() {
@@ -14,7 +14,7 @@ export class Sensor extends MacroFunction {
       if (!(target instanceof StoreValue))
         throw new CompilerError("The sensor target must be a store value");
 
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
 
       cursor.addInstruction(
         new NativeInstruction(

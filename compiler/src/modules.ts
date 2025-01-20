@@ -17,7 +17,7 @@ import { EMutability, IScope, IValue } from "./types";
 import { Asm } from "./macros/Asm";
 import { ObjectValue } from "./values";
 import { Scope } from "./Scope";
-import { nullId, worldModuleName } from "./utils";
+import { worldModuleName } from "./utils";
 import { ICompilerContext } from "./CompilerContext";
 import { ColorsNamespace, SoundsNamespace } from "./macros/Namespace";
 
@@ -32,7 +32,7 @@ export function createGlobalScope(c: ICompilerContext): IScope {
     },
   });
 
-  scope.hardSet("undefined", nullId);
+  scope.hardSet("undefined", c.nullId);
 
   const data: Record<string, IValue> = {
     // namespaces

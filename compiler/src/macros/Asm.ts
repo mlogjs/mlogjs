@@ -3,7 +3,7 @@ import { InstructionBase } from "../instructions";
 import { IInstruction, IValue } from "../types";
 import { formatInstructionArgs, isTemplateObjectArray } from "../utils";
 import { AsmInstruction, ImmutableId } from "../flow";
-import { isTemplateObjectArray, nullId } from "../utils";
+import { isTemplateObjectArray } from "../utils";
 import { LiteralValue } from "../values";
 import { MacroFunction } from "./Function";
 
@@ -39,7 +39,7 @@ export class Asm extends MacroFunction {
       const lines = formatInstructions(args);
 
       // return [null, formatInstructions(args)];
-      return nullId;
+      return c.nullId;
     });
   }
 }

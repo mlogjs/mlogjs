@@ -1,5 +1,5 @@
 import { CompilerError } from "../CompilerError";
-import { GlobalId, ImmutableId, LoadInstruction } from "../flow";
+import { LoadInstruction } from "../flow";
 import { EMutability } from "../types";
 import { LiteralValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
@@ -17,8 +17,8 @@ export class GetGlobal extends MacroFunction {
         case EMutability.immutable:
           return c.registerValue(value);
         default: {
-          const globalId = new GlobalId();
-          const out = new ImmutableId();
+          const globalId = c.createGlobalId();
+          const out = c.createImmutableId();
           c.setValue(globalId, value);
           cursor.addInstruction(new LoadInstruction(globalId, out, node));
           return out;

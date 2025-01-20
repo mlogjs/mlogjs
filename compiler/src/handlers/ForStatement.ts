@@ -1,7 +1,6 @@
 import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
 import { negateValue } from "../flow/helper";
 import { es, THandler } from "../types";
-import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 
 export const ForStatement: THandler = (
@@ -49,5 +48,5 @@ export const ForStatement: THandler = (
 
   cursor.currentBlock = afterLoopBlock;
 
-  return nullId;
+  return c.nullId;
 };

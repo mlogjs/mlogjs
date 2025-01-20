@@ -14,20 +14,6 @@ import { mathConstants } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
 
-function binary(
-  cursor: IBlockCursor,
-  loc: Location,
-  operator: TBinaryOperationType,
-  a: ImmutableId,
-  b: ImmutableId,
-) {
-  const out = new ImmutableId();
-  cursor.addInstruction(
-    new BinaryOperationInstruction(operator, a, b, out, loc),
-  );
-  return out;
-}
-
 const forwardedUnaryOperations: TUnaryOperationType[] = [
   "abs",
   "acos",
@@ -55,6 +41,20 @@ const forwardedBinaryOperations: TBinaryOperationType[] = [
 ];
 
 function createMacroMathOperations(c: ICompilerContext) {
+  function binary(
+    cursor: IBlockCursor,
+    loc: Location,
+    operator: TBinaryOperationType,
+    a: ImmutableId,
+    b: ImmutableId,
+  ) {
+    const out = c.createImmutableId();
+    cursor.addInstruction(
+      new BinaryOperationInstruction(operator, a, b, out, loc),
+    );
+    return out;
+  }
+
   const macroMathMembers: IObjectValueData = {
     PI: c.registerValue(new LiteralValue(mathConstants.PI)),
     E: c.registerValue(new LiteralValue(mathConstants.E)),
@@ -291,7 +291,7 @@ function createMacroMathOperations(c: ICompilerContext) {
   for (const op of forwardedUnaryOperations) {
     macroMathOperations[op] = new MacroFunction((c, cursor, node, x) => {
       assertArgumentCount(+!!x, 1);
-      const result = new ImmutableId();
+      const result = c.createImmutableId();
       cursor.addInstruction(new UnaryOperatorInstruction(op, x, result, node));
       return result;
     });

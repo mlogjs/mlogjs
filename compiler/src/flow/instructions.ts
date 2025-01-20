@@ -134,15 +134,15 @@ export class ValueGetInstruction implements ILowerableInstruction {
 
     if (this.optionalObject) {
       if (object instanceof LiteralValue && object.data === null) {
-        c.setAlias(this.out, nullId);
-        return [];
+        c.setAlias(this.out, c.nullId);
+        return;
       }
     }
 
     if (this.optionalKey) {
       if (!object.hasProperty(c, key)) {
-        c.setAlias(this.out, nullId);
-        return [];
+        c.setAlias(this.out, c.nullId);
+        return;
       }
     }
 

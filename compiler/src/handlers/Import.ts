@@ -1,7 +1,6 @@
 import { CompilerError } from "../CompilerError";
-import { ImmutableId, ValueGetInstruction } from "../flow";
+import { ValueGetInstruction } from "../flow";
 import { THandler, es } from "../types";
-import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 
 const noExternalModuleErrorMessage =
@@ -13,7 +12,7 @@ export const ImportDeclaration: THandler = (
   cursor,
   node: es.ImportDeclaration,
 ) => {
-  if (node.importKind === "type") return nullId;
+  if (node.importKind === "type") return c.nullId;
 
   if (!(node.source.value in scope.builtInModules))
     throw new CompilerError(noExternalModuleErrorMessage);
@@ -21,7 +20,7 @@ export const ImportDeclaration: THandler = (
   for (const specifier of node.specifiers) {
     c.handle(scope, cursor, specifier, undefined, node.source.value);
   }
-  return nullId;
+  return c.nullId;
 };
 
 export const ImportDefaultSpecifier: THandler = (
@@ -31,7 +30,7 @@ export const ImportDefaultSpecifier: THandler = (
   node: es.ImportDefaultSpecifier,
   source: string,
 ) => {
-  if (!(source in scope.builtInModules)) return nullId;
+  if (!(source in scope.builtInModules)) return c.nullId;
   throw new CompilerError(`"${source}" does not have a default export`);
 };
 
@@ -44,7 +43,7 @@ export const ImportNamespaceSpecifier: THandler = (
 ) => {
   scope.set(node.local.name, scope.builtInModules[source]);
 
-  return nullId;
+  return c.nullId;
 };
 
 export const ImportSpecifier: THandler = (
@@ -54,7 +53,7 @@ export const ImportSpecifier: THandler = (
   node: es.ImportSpecifier,
   source: string,
 ) => {
-  if (node.importKind === "type") return nullId;
+  if (node.importKind === "type") return c.nullId;
 
   const moduleId = scope.builtInModules[source];
   const module = c.getValue(moduleId)!;
@@ -71,7 +70,7 @@ export const ImportSpecifier: THandler = (
     );
   }
 
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
 
   cursor.addInstruction(
     new ValueGetInstruction({
@@ -86,5 +85,5 @@ export const ImportSpecifier: THandler = (
   // const [value] = module.get(c,  key, );
   // scope.set(local.name, value as any as number);
   scope.set(local.name, out);
-  return nullId;
+  return c.nullId;
 };

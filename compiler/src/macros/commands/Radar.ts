@@ -69,7 +69,7 @@ export class Radar extends MacroFunction {
 
       assertLiteralOneOf(sort, validRadarSorts, "The radar sort");
 
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
       cursor.addInstruction(
         new NativeRadarInstruction({
           building: buildingId,

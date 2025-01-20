@@ -1,6 +1,5 @@
 import { ICompilerContext } from "../../CompilerContext";
 import { NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace, filterIds } from "../util";
 
@@ -26,7 +25,7 @@ export class Control extends ObjectValue {
           const params = ["control", overload, ...args];
           const inputs = filterIds(args);
           cursor.addInstruction(new NativeInstruction(params, inputs, [], loc));
-          return nullId;
+          return c.nullId;
         },
       }),
     );

@@ -9,7 +9,6 @@ import {
   IWriteableHandler,
 } from "./types";
 import { CompilerOptions } from "./Compiler";
-import { nullId } from "./utils";
 import { LiteralValue, StoreValue } from "./values";
 import { GlobalId, ImmutableId, ValueId } from "./flow/id";
 import { IBlockCursor } from "./BlockCursor";
@@ -17,9 +16,10 @@ import { IBlockCursor } from "./BlockCursor";
 export interface ICompilerContext {
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
+  readonly nullId: ImmutableId;
 
-  resolveImmutableId(id: ImmutableId): ImmutableId;
-  resolveId(id: ValueId): ValueId;
+  createImmutableId(): ImmutableId;
+  createGlobalId(): GlobalId;
   getValueName(id: ValueId): string | undefined;
   setValueName(id: ValueId, name: string): void;
   getValueId(name: string): ValueId | undefined;
@@ -75,13 +75,14 @@ export interface ICompilerContext {
 export class CompilerContext implements ICompilerContext {
   protected handlers: Partial<Record<es.Node["type"], THandler>> = handlers;
   #tempCounter = 0;
-  #names = new Map<ValueId, string>();
+  #idCounter = 0;
+  #names = new Map<number, string>();
   #ids = new Map<string, ValueId>();
-  #values = new Map<ValueId, IValue>();
-  aliases = new Map<ImmutableId, ValueId>();
+  #values = new Map<number, IValue>();
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
+  readonly nullId: ImmutableId;
 
   constructor({
     compactNames = false,
@@ -89,23 +90,21 @@ export class CompilerContext implements ICompilerContext {
   }: Required<CompilerOptions>) {
     this.compactNames = compactNames;
     this.sourcemap = sourcemap;
-    this.setValue(nullId, new LiteralValue(null));
+
+    this.nullId = this.registerValue(new LiteralValue(null));
   }
 
-  resolveId(id: ValueId): ValueId {
-    if (id.type === "global") return id;
-    return this.aliases.get(id) ?? id;
+  createImmutableId() {
+    return new ImmutableId(this.#idCounter++);
   }
 
-  resolveImmutableId(id: ImmutableId): ImmutableId {
-    const resolved = this.aliases.get(id);
-    if (resolved?.type === "immutable") return resolved;
-    return id;
+  createGlobalId() {
+    return new GlobalId(this.#idCounter++);
   }
 
   getValue(id: ValueId | undefined): IValue | undefined {
     if (!id) return;
-    return this.#values.get(this.resolveId(id));
+    return this.#values.get(id.number);
   }
 
   getValueOrTemp(id: ValueId): IValue {
@@ -118,32 +117,33 @@ export class CompilerContext implements ICompilerContext {
     return store;
   }
   setValue(id: ValueId, value: IValue): void {
-    this.#values.set(this.resolveId(id), value);
+    this.#values.set(id.number, value);
   }
 
   registerValue(value: IValue): ImmutableId {
-    const id = new ImmutableId();
-    this.#values.set(id, value);
+    const id = this.createImmutableId();
+    this.#values.set(id.number, value);
     return id;
   }
 
   setAlias(alias: ImmutableId, original: ImmutableId): void {
-    const id = this.aliases.get(original) ?? original;
-    this.aliases.set(alias, id);
+    // prevents losing the names of const-declared variables
+    if (this.#names.has(alias.number) && !this.#names.has(original.number)) {
+      this.setValueName(original, this.getValueName(alias)!);
+    }
+    alias.number = original.number;
   }
 
   setGlobalAlias(alias: ImmutableId, original: GlobalId): void {
-    // const id = this.#aliases.get(original) ?? original;
-    this.aliases.set(alias, original);
+    alias.number = original.number;
   }
 
   getValueName(id: ValueId): string | undefined {
-    return this.#names.get(this.resolveId(id));
+    return this.#names.get(id.number);
   }
 
   setValueName(id: ValueId, name: string): void {
-    id = this.resolveId(id);
-    this.#names.set(id, name);
+    this.#names.set(id.number, name);
     this.#ids.set(name, id);
   }
 
@@ -229,7 +229,7 @@ export class CompilerContext implements ICompilerContext {
     for (const node of hoistedFunctionNodes(nodes)) {
       this.handle(scope, cursor, node, handler && (() => handler(node)));
     }
-    return nullId;
+    return this.nullId;
   }
 }
 

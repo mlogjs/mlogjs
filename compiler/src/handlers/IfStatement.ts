@@ -1,7 +1,6 @@
 import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
 import { negateValue } from "../flow/helper";
 import { THandler, es } from "../types";
-import { nullId } from "../utils";
 
 export const IfStatement: THandler = (
   c,
@@ -36,5 +35,5 @@ export const IfStatement: THandler = (
 
   cursor.currentBlock = exitBlock;
 
-  return nullId;
+  return c.nullId;
 };

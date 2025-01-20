@@ -1,6 +1,5 @@
 import { ICompilerContext } from "../../CompilerContext";
 import { NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace, filterIds } from "../util";
 
@@ -71,7 +70,7 @@ export class Draw extends ObjectValue {
             loc,
           ),
         );
-        return nullId;
+        return c.nullId;
       },
     });
 

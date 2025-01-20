@@ -1,3 +1,4 @@
+import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId } from "../flow/id";
 import { CompilerError } from "../CompilerError";
@@ -8,6 +9,7 @@ import { FunctionValue } from "../values/FunctionValue";
 function handleFunctionNode(
   c: ICompilerContext,
   scope: IScope,
+  cursor: IBlockCursor,
   node: es.Function,
 ): ImmutableId {
   let { params, body } = node;
@@ -20,16 +22,20 @@ function handleFunctionNode(
     body.loc = loc;
   }
 
-  // const inlineType = getInlineType(body.directives);
+  const id = c.createImmutableId();
 
-  return c.registerValue(
+  c.setValue(
+    id,
     new FunctionValue({
       scope,
       params,
+      id,
       body,
       c,
     }),
   );
+
+  return id;
 }
 
 export const ArrowFunctionExpression: THandler = (
@@ -38,7 +44,7 @@ export const ArrowFunctionExpression: THandler = (
   cursor,
   node: es.ArrowFunctionExpression,
 ) => {
-  return handleFunctionNode(c, scope, node);
+  return handleFunctionNode(c, scope, cursor, node);
 };
 
 export const FunctionDeclaration: THandler = (
@@ -50,7 +56,7 @@ export const FunctionDeclaration: THandler = (
   const identifier = (node.id as es.Identifier).name;
   const name = nodeName(node, !c.compactNames && identifier);
 
-  const functionId = handleFunctionNode(c, scope, node);
+  const functionId = handleFunctionNode(c, scope, cursor, node);
   scope.set(name, functionId);
   c.setValueName(functionId, name);
   return functionId;

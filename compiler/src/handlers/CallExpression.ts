@@ -18,7 +18,7 @@ export const CallExpression: THandler = (
   });
   calleeValue?.postCall(scope);
 
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
   cursor.addInstruction(new CallInstruction(callee, args, out, node));
 
   return out;
@@ -64,7 +64,7 @@ export const TaggedTemplateExpression: THandler = (
     expressions.push(value);
   });
 
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
   cursor.addInstruction(
     new CallInstruction(tag, [stringsObjectId, ...expressions], out, node),
   );

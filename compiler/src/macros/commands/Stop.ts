@@ -1,5 +1,4 @@
 import { StopInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
 export class Stop extends MacroFunction {
@@ -7,7 +6,7 @@ export class Stop extends MacroFunction {
     super((c, cursor, loc) => {
       cursor.discardFollowing();
       cursor.setEndInstruction(new StopInstruction(loc));
-      return nullId;
+      return c.nullId;
     });
   }
 }

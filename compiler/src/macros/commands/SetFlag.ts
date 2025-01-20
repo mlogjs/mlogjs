@@ -1,6 +1,5 @@
 import { CompilerError } from "../../CompilerError";
 import { NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { MacroFunction } from "../Function";
 
 export class SetFlag extends MacroFunction {
@@ -12,7 +11,7 @@ export class SetFlag extends MacroFunction {
       cursor.addInstruction(
         new NativeInstruction(["setflag", flag, value], [flag, value], [], loc),
       );
-      return nullId;
+      return c.nullId;
     });
   }
 }

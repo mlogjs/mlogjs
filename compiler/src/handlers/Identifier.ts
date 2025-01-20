@@ -1,6 +1,5 @@
 import { CompilerError } from "../CompilerError";
 import { LoadInstruction, StoreInstruction } from "../flow";
-import { GlobalId, ImmutableId } from "../flow/id";
 import { es, THandler } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";
@@ -11,7 +10,7 @@ export const Identifier: THandler = (c, scope, cursor, node: es.Identifier) => {
     case "immutable":
       return id;
     case "global": {
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
       cursor.addInstruction(new LoadInstruction(id, out, node));
       return out;
     }
@@ -47,7 +46,7 @@ Identifier.handleDeclaration = (
     return;
   }
 
-  const valueId = new GlobalId();
+  const valueId = c.createGlobalId();
   scope.set(node.name, valueId);
   c.setValue(valueId, new StoreValue(name));
   c.setValueName(valueId, name);

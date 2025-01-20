@@ -1,7 +1,6 @@
 import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
 import { negateValue } from "../flow/helper";
 import { es, THandler } from "../types";
-import { nullId } from "../utils";
 
 export const WhileStatement: THandler = (
   c,
@@ -35,7 +34,7 @@ export const WhileStatement: THandler = (
   cursor.setEndInstruction(new BreakInstruction(continueBlock, node));
 
   cursor.currentBlock = afterLoopBlock;
-  return nullId;
+  return c.nullId;
 };
 
 export const DoWhileStatement: THandler = (
@@ -71,5 +70,5 @@ export const DoWhileStatement: THandler = (
   );
 
   cursor.currentBlock = afterLoopBlock;
-  return nullId;
+  return c.nullId;
 };

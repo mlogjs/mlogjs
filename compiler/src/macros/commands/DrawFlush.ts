@@ -1,7 +1,6 @@
 import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { nullId } from "../../utils";
 import { NativeInstruction } from "../../flow";
 
 const defaultTargetName = "display1";
@@ -13,7 +12,7 @@ export class DrawFlush extends MacroFunction {
         cursor.addInstruction(
           new NativeInstruction(["drawflush", defaultTargetName], [], [], loc),
         );
-        return nullId;
+        return c.nullId;
       }
 
       const target = c.getValueOrTemp(targetId);
@@ -24,7 +23,7 @@ export class DrawFlush extends MacroFunction {
         new NativeInstruction(["drawflush", targetId], [targetId], [], loc),
       );
 
-      return nullId;
+      return c.nullId;
     });
   }
 }

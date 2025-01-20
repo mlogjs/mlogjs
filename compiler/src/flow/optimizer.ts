@@ -89,56 +89,45 @@ function bitwiseOp(fn: (...args: bigint[]) => bigint) {
 }
 
 export class ReaderMap {
-  reads: Map<ValueId, Set<TBlockInstruction | TBlockEndInstruction>> =
-    new Map();
+  reads: Map<number, Set<TBlockInstruction | TBlockEndInstruction>> = new Map();
 
   constructor(public c: ICompilerContext) {}
 
   private ensurePresent(id: ValueId) {
-    id = this.c.resolveId(id);
-    if (!this.reads.has(id)) this.reads.set(id, new Set());
+    if (!this.reads.has(id.number)) this.reads.set(id.number, new Set());
   }
 
   add(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
-    id = this.c.resolveId(id);
     this.ensurePresent(id);
-    this.reads.get(id)!.add(instruction);
+    this.reads.get(id.number)!.add(instruction);
   }
 
   remove(id: ValueId, instruction: TBlockInstruction | TBlockEndInstruction) {
-    id = this.c.resolveId(id);
-    if (!this.reads.has(id)) return;
+    if (!this.reads.has(id.number)) return;
 
-    this.reads.get(id)!.delete(instruction);
+    this.reads.get(id.number)!.delete(instruction);
   }
 
   get(id: ValueId) {
-    id = this.c.resolveId(id);
     this.ensurePresent(id);
-    return this.reads.get(id)!;
+    return this.reads.get(id.number)!;
   }
 }
 
 export class WriterMap {
-  writes: Map<ImmutableId, TBlockInstruction> = new Map();
+  writes: Map<number, TBlockInstruction> = new Map();
 
   constructor(public c: ICompilerContext) {}
 
   set(id: ImmutableId, instruction: TBlockInstruction) {
-    id = this.c.resolveImmutableId(id);
-    this.writes.set(id, instruction);
+    this.writes.set(id.number, instruction);
   }
 
   remove(id: ImmutableId) {
-    id = this.c.resolveImmutableId(id);
-    console.log(id.debugName);
-
-    this.writes.delete(id);
+    this.writes.delete(id.number);
   }
 
   get(id: ImmutableId) {
-    id = this.c.resolveImmutableId(id);
-
-    return this.writes.get(id);
+    return this.writes.get(id.number);
   }
 }

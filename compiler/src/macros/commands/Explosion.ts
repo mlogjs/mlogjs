@@ -1,5 +1,5 @@
 import { NativeInstruction } from "../../flow";
-import { assertIsObjectMacro, assertObjectFields, nullId } from "../../utils";
+import { assertIsObjectMacro, assertObjectFields } from "../../utils";
 import { MacroFunction } from "../Function";
 import { filterIds } from "../util";
 
@@ -28,7 +28,7 @@ export class Explosion extends MacroFunction {
           loc,
         ),
       );
-      return nullId;
+      return c.nullId;
     });
   }
 }

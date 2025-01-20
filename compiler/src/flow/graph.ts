@@ -357,7 +357,7 @@ export class Graph {
       )
         return;
 
-      const newCondition = new ImmutableId();
+      const newCondition = c.createImmutableId();
       block.instructions.add(
         new BinaryOperationInstruction(
           "equal",
@@ -651,7 +651,7 @@ export class Graph {
   /** Must be called at the end of the process */
   optimizeImmediateStores(c: ICompilerContext) {
     // const reads = getReaderMap(this.start);
-    const writes = getWriterMap(this.start);
+    const writes = getWriterMap(c, this.start);
 
     traverse(this.start, block => {
       let previousInstruction = block.instructions.head?.instruction;
@@ -717,6 +717,7 @@ export class Graph {
     this.flipBreakIfs(c);
     this.createEndIfs(c);
 
+    this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
@@ -856,8 +857,8 @@ function intersectSets<T>(...sets: Set<T>[]) {
   return result;
 }
 
-function getWriterMap(entry: Block): WriterMap {
-  const sources = new WriterMap();
+function getWriterMap(c: ICompilerContext, entry: Block): WriterMap {
+  const sources = new WriterMap(c);
 
   traverse(entry, block => {
     for (const inst of block.instructions) {
@@ -868,14 +869,15 @@ function getWriterMap(entry: Block): WriterMap {
   return sources;
 }
 
-function getReaderMap(entry: Block): ReaderMap {
-  const reads = new ReaderMap();
+function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
+  const reads = new ReaderMap(c);
   traverse(entry, block => {
     for (const inst of block.instructions) {
       inst.registerReader(reads);
     }
     switch (block.endInstruction?.type) {
       case "break-if":
+      case "end-if":
         reads.add(block.endInstruction.condition, block.endInstruction);
         break;
       case "return":

@@ -1,4 +1,4 @@
-import { ImmutableId, NativeInstruction } from "../../flow";
+import { NativeInstruction } from "../../flow";
 import { assertIsObjectMacro, assertObjectFields } from "../../utils";
 import { MacroFunction } from "../Function";
 import { filterIds } from "../util";
@@ -17,7 +17,7 @@ export class SpawnUnit extends MacroFunction {
         { key: "rotation", default: "0" },
       ]);
 
-      const out = new ImmutableId();
+      const out = c.createImmutableId();
       const params = [type, x, y, team, rotation ?? "0"];
       cursor.addInstruction(
         new NativeInstruction(

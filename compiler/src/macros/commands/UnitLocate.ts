@@ -34,10 +34,10 @@ export class UnitLocate extends ObjectValue {
         },
       },
       handler(scope, overload, cursor, loc, ...args) {
-        const outFound = new ImmutableId();
-        const outX = new ImmutableId();
-        const outY = new ImmutableId();
-        const outBuilding = new ImmutableId();
+        const outFound = c.createImmutableId();
+        const outX = c.createImmutableId();
+        const outY = c.createImmutableId();
+        const outBuilding = c.createImmutableId();
 
         const outArgs = [outX, outY, outFound, outBuilding];
         const inputArgs: (string | ImmutableId)[] = [

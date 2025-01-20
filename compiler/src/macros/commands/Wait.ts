@@ -1,7 +1,6 @@
 import { MacroFunction } from "..";
 import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
-import { nullId } from "../../utils";
 import { NativeInstruction } from "../../flow";
 
 export class Wait extends MacroFunction {
@@ -20,7 +19,7 @@ export class Wait extends MacroFunction {
       cursor.addInstruction(
         new NativeInstruction(["wait", secondsId], [secondsId], [], loc),
       );
-      return nullId;
+      return c.nullId;
     });
   }
 }

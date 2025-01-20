@@ -4,8 +4,6 @@ import {
   Block,
   BreakIfInstruction,
   BreakInstruction,
-  GlobalId,
-  ImmutableId,
   LoadInstruction,
   StoreInstruction,
   TBinaryOperationType,
@@ -13,7 +11,6 @@ import {
 } from "../flow";
 import { AssignementOperator } from "../operators";
 import { THandler, es } from "../types";
-import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 
 const binaryOperatorMap: Partial<
@@ -48,10 +45,10 @@ export const BinaryExpression: THandler = (
   const left = c.handle(scope, cursor, node.left);
   const right = c.handle(scope, cursor, node.right);
   const operator = node.operator;
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
 
   if (operator === "!==") {
-    const temp = new ImmutableId();
+    const temp = c.createImmutableId();
     const zero = c.registerValue(new LiteralValue(0));
     cursor.addInstruction(
       new BinaryOperationInstruction("strictEqual", left, right, temp, node),
@@ -79,7 +76,7 @@ export const LogicalExpression: THandler = (
   cursor,
   node: es.LogicalExpression,
 ) => {
-  const out = new GlobalId();
+  const out = c.createGlobalId();
   const alternateBlock = new Block();
   const exitBlock = new Block();
 
@@ -97,10 +94,16 @@ export const LogicalExpression: THandler = (
       );
       break;
     case "??": {
-      const test = new ImmutableId();
-      const temp = new ImmutableId();
+      const test = c.createImmutableId();
+      const temp = c.createImmutableId();
       cursor.addInstruction(
-        new BinaryOperationInstruction("strictEqual", temp, nullId, test, node),
+        new BinaryOperationInstruction(
+          "strictEqual",
+          temp,
+          c.nullId,
+          test,
+          node,
+        ),
       );
       cursor.addInstruction(new StoreInstruction(out, temp, node));
       cursor.setEndInstruction(
@@ -115,7 +118,7 @@ export const LogicalExpression: THandler = (
   cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
   cursor.currentBlock = exitBlock;
-  const immutableOut = new ImmutableId();
+  const immutableOut = c.createImmutableId();
   cursor.addInstruction(new LoadInstruction(out, immutableOut, node));
 
   return immutableOut;
@@ -144,12 +147,12 @@ export const UnaryExpression: THandler = (
   cursor,
   node: es.UnaryExpression,
 ) => {
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
   const value = c.handle(scope, cursor, node.argument);
 
   switch (node.operator) {
     case "void":
-      return nullId;
+      return c.nullId;
     case "!":
       cursor.addInstruction(
         new BinaryOperationInstruction(
@@ -206,7 +209,7 @@ export const UpdateExpression: THandler = (
   const handler = c.handleWriteable(scope, cursor, node.argument);
 
   const oldValue = handler.read();
-  const newValue = new ImmutableId();
+  const newValue = c.createImmutableId();
   const one = c.registerValue(new LiteralValue(1));
 
   cursor.addInstruction(
@@ -236,7 +239,7 @@ export const ConditionalExpression: THandler = (
   const alternateBlock = new Block();
   const exitBlock = new Block();
 
-  const out = new GlobalId();
+  const out = c.createGlobalId();
 
   cursor.connectBlock(testBlock, node);
   const test = c.handle(scope, cursor, node.test);
@@ -255,7 +258,7 @@ export const ConditionalExpression: THandler = (
   cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
 
   cursor.currentBlock = exitBlock;
-  const immutableOut = new ImmutableId();
+  const immutableOut = c.createImmutableId();
   cursor.addInstruction(new LoadInstruction(out, immutableOut, node));
 
   return immutableOut;

@@ -18,7 +18,7 @@ export function negateValue(
   value: ImmutableId,
   node?: Location,
 ) {
-  const out = new ImmutableId();
+  const out = c.createImmutableId();
   cursor.addInstruction(
     new BinaryOperationInstruction(
       "equal",

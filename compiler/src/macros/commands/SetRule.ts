@@ -1,6 +1,5 @@
 import { ICompilerContext } from "../../CompilerContext";
 import { ImmutableId, NativeInstruction } from "../../flow";
-import { nullId } from "../../utils";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace, filterIds } from "../util";
 
@@ -75,7 +74,7 @@ export class SetRule extends ObjectValue {
             loc,
           ),
         );
-        return nullId;
+        return c.nullId;
       },
     });
     super(data);
