@@ -336,12 +336,7 @@ export class Graph {
       const isBackBreak = (end: TBlockEndInstruction | undefined) =>
         end?.type === "break" && end?.target.type === "backward";
 
-      if (
-        // TODO: figure out why this line was used before
-        // isBackBreak(consequent.block.endInstruction) ||
-        !alternate.block.instructions.isEmpty
-      )
-        return;
+      if (!alternate.block.instructions.isEmpty) return;
 
       // canonicalization doesn't really outside these cases
       // so it just makes the generated code harder to read
@@ -353,8 +348,14 @@ export class Graph {
           return;
       }
 
-      // don't flip if both targets have zero instructions
-      if (consequent.block.instructions.isEmpty) return;
+      // keep back edges on the consequent block
+      // because they usually generate less instructions
+      // than if they were on the alternate side
+      if (
+        consequent.block.instructions.isEmpty &&
+        isBackBreak(consequent.block.endInstruction)
+      )
+        return;
 
       const newCondition = new ImmutableId();
       block.instructions.add(
