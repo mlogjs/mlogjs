@@ -3,7 +3,6 @@ import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase, SetInstruction } from "../instructions";
 import { IInstruction, Location, TLiteral, es } from "../types";
-import { nullId } from "../utils";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";

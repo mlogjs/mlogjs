@@ -187,12 +187,12 @@ export class Graph {
 
       for (const node of block.instructions.nodes()) {
         const inst = node.instruction;
-        if (isLowerable(inst)) {
-          cursor.position = node;
-          inst.lower(c, cursor);
-          cursor.position = node;
-          cursor.removeInstruction();
-        }
+        if (!isLowerable(inst)) continue;
+
+        cursor.position = node;
+        inst.lower(c, cursor);
+        cursor.position = node;
+        cursor.removeInstruction();
       }
     });
   }

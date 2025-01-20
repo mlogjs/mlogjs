@@ -6,7 +6,6 @@ import {
   nodeName,
   pipeInsts,
 } from "../utils";
-import { Compiler } from "../Compiler";
 import { CompilerError } from "../CompilerError";
 import {
   AddressResolver,
@@ -36,6 +35,7 @@ import {
   TDestructuringMembers,
 } from "./DestructuringValue";
 import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId } from "../flow";
 
 export type TFunctionValueInitParams = (childScope: IScope) => {
   paramStores: StoreValue[];
@@ -83,11 +83,13 @@ export class FunctionValue extends VoidValue implements IFunctionValue {
     c,
     out,
     inlineType,
+    id,
   }: {
     scope: IScope;
     body: es.BlockStatement;
     c: ICompilerContext;
     params: es.Identifier[];
+    id: ImmutableId;
     out?: TEOutput;
     inlineType: EInlineType;
   }) {
