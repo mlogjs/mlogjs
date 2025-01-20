@@ -4,7 +4,6 @@ import { ImmutableId } from "../flow";
 import { IValue, TEOutput } from "../types";
 import {
   DestructuringValue,
-  IObjectValueData,
   LiteralValue,
   ObjectValue,
   StoreValue,
@@ -14,16 +13,7 @@ import { discardedName } from "./constants";
 export function isTemplateObjectArray(
   c: ICompilerContext,
   value: IValue | undefined,
-): value is ObjectValue & {
-  data: IObjectValueData & {
-    raw: ObjectValue & {
-      data: IObjectValueData & {
-        length: LiteralValue<number>;
-      };
-    };
-    length: LiteralValue<number>;
-  };
-} {
+): value is ObjectValue {
   if (!(value instanceof ObjectValue)) return false;
   const length = c.getValue(value.data.length);
   if (!(length instanceof LiteralValue) || !length.isNumber()) return false;
