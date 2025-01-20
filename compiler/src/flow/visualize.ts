@@ -1,15 +1,21 @@
 import { ICompilerContext } from "../CompilerContext";
-import { digraph } from "../graphviz";
-import { Node } from "../graphviz/node";
 import { Block } from "./block";
 import { traverse } from "./graph";
 import { ValueId } from "./id";
 import { TBlockInstruction, TBlockEndInstruction } from "./instructions";
 
+/**
+ * Debug function that you can use to visualize the compiler's intermediate
+ * representation during compilation as a directed graph in DOT notation.
+ */
 export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
+  let result = "digraph mlogjs_cfg {\n";
   const ids = new Map<Block, string>();
-  const nodes = new Map<Block, Node>();
-  const graph = digraph("G");
+
+  traverse(entry, block => {
+    const id = `block${ids.size}`;
+    ids.set(block, id);
+  });
 
   const n = (id: ValueId) => c.getValueOrTemp(id)?.toMlogString();
   function instToString(
@@ -51,9 +57,12 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
         return "end";
       case "stop":
         return "stop";
+      case "end-if":
+        return `end-if ${n(inst.condition)} ${ids.get(inst.alternate.block)}`;
       default:
         throw new Error(
           `Missing representation for instruction of type ${
+            // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access, @typescript-eslint/no-explicit-any
             (inst as any).type
           }`,
         );
@@ -61,28 +70,22 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
   }
 
   traverse(entry, block => {
-    const id = `block${ids.size}`;
-    ids.set(block, id);
-    nodes.set(block, graph.addNode(id));
-  });
-
-  traverse(entry, block => {
     const id = ids.get(block)!;
-    const node = nodes.get(block)!;
-    node.set(
-      "label",
-      `${id}\n\n${[...block.instructions, block.endInstruction]
-        .filter((value): value is NonNullable<typeof value> => !!value)
-        .map(instToString)
-        .join("\n")
-        .replace(/"/g, "'")}`,
-    );
+    result += `${id} [label="${id}\n\n${[
+      ...block.instructions,
+      block.endInstruction,
+    ]
+      .filter((value): value is NonNullable<typeof value> => !!value)
+      .map(instToString)
+      .join("\n")
+      .replace(/"/g, "'")}"];\n`;
+
     for (const edge of block.childEdges) {
-      const target = ids.get(edge.block);
-      console.log(target);
-      graph.addEdge(id, ids.get(edge.block)!, undefined);
+      result += `${id} -> ${ids.get(edge.block)};\n`;
     }
   });
 
-  return graph.to_dot();
+  result += "}\n";
+
+  return result;
 }
