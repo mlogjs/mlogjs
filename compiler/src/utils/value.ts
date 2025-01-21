@@ -135,9 +135,9 @@ export function assertObjectFields(
       typeof field === "object" ? field : { key: field };
 
     const itemId = value.data[param.key];
-    const item = c.getValue(value.data[param.key]);
 
-    if (item) {
+    if (itemId) {
+      const item = c.getValueOrTemp(itemId);
       param.validate?.(item);
       result.push(itemId);
       continue;
