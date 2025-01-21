@@ -9,7 +9,7 @@ import { TBlockInstruction, TBlockEndInstruction } from "./instructions";
  * representation during compilation as a directed graph in DOT notation.
  */
 export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
-  let result = "digraph mlogjs_cfg {\n";
+  let result = "digraph mlogjs_cfg {\n" + "node [shape=rectangle];\n";
   const ids = new Map<Block, string>();
 
   traverse(entry, block => {
@@ -71,14 +71,14 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
 
   traverse(entry, block => {
     const id = ids.get(block)!;
-    result += `${id} [label="${id}\n\n${[
+    result += `${id} [label="${id}\\l\\l${[
       ...block.instructions,
       block.endInstruction,
     ]
       .filter((value): value is NonNullable<typeof value> => !!value)
       .map(instToString)
-      .join("\n")
-      .replace(/"/g, "'")}"];\n`;
+      .join("\\l")
+      .replace(/"/g, "'")}\\l"];\n`;
 
     for (const edge of block.childEdges) {
       result += `${id} -> ${ids.get(edge.block)};\n`;
