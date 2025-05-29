@@ -200,6 +200,7 @@ declare module "mlogjs:world" {
    */
   export function spawnWave(natural: true): void;
   export function spawnWave(natural: false, x: number, y: number): void;
+  export function spawnWave(natural: boolean, x?: number, y?: number): void;
 
   /** Contains the multiple variants of the `set rule` instruction. */
   export namespace setRule {
