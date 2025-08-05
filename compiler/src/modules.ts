@@ -9,6 +9,7 @@ import {
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
+  StringNamespace,
   Unchecked,
   VarsNamespace,
 } from "./macros";
@@ -54,7 +55,9 @@ export function createGlobalScope(): IScope {
   scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
   scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
   scope.hardSet("unchecked", new Unchecked());
-  scope.hardSet("Align", new AlignNamespace());
+  scope.hardSet("Align", new NamespaceMacro());
+  scope.hardSet("Weathers", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("String", new StringNamespace());
 
   // commands
   scope.hardSet("draw", new commands.Draw());
@@ -99,6 +102,8 @@ export function createWordModule() {
     effect: new commands.Effect(),
     localePrint: new commands.LocalePrint(),
     Marker: new MarkerConstructor(),
+    senseWeather: new commands.WeatherSense(),
+    setWeather: new commands.WeatherSet(),
   });
   return module;
 }

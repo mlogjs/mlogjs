@@ -155,6 +155,10 @@ declare module "mlogjs:world" {
     rotation?: number;
   }): T;
 
+  export function senseWeather(weather: WeatherSymbol): boolean;
+
+  export function setWeather(weather: WeatherSymbol, state: boolean): void;
+
   /** Contains the variants for the `applyStatus` instruction. */
   export namespace applyStatus {
     /**

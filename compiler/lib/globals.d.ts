@@ -326,6 +326,17 @@ declare namespace Colors {
   const negstat: number;
 }
 
+declare namespace Weathers {
+  const snowing: unique symbol;
+  const rain: unique symbol;
+  const sandstorm: unique symbol;
+  const sporestorm: unique symbol;
+  const fog: unique symbol;
+  const suspendParticles: unique symbol;
+}
+
+type WeatherSymbol = (typeof Weathers)[keyof typeof Weathers];
+
 interface BuildingSymbolTable {
   readonly graphitePress: unique symbol;
   readonly multiPress: unique symbol;

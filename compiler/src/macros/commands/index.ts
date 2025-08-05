@@ -32,3 +32,5 @@ export * from "./SetProp";
 export * from "./Sync";
 export * from "./Effect";
 export * from "./LocalePrint";
+export * from "./WeatherSense";
+export * from "./WeatherSet";
