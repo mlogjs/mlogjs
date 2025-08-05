@@ -54,6 +54,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
   scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
   scope.hardSet("unchecked", new Unchecked());
+  scope.hardSet("Align", new AlignNamespace());
 
   // commands
   scope.hardSet("draw", new commands.Draw());

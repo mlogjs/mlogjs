@@ -80,3 +80,18 @@ export class ColorsNamespace extends NamespaceMacro {
     return [result, []];
   }
 }
+
+export class AlignNamespace extends NamespaceMacro {
+  constructor() {
+    super({ changeCasing: true });
+  }
+
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    if (!(key instanceof LiteralValue) || !key.isString())
+      return super.get(scope, key, out);
+
+    const name = `@${key.data}`;
+    const result = new StoreValue(name, EMutability.constant);
+    return [result, []];
+  }
+}

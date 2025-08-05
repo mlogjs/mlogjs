@@ -13,17 +13,6 @@ declare module "mlogjs:types" {
   export type WithSymbols<T extends Record<string, unknown>> = T &
     Readonly<AsSymbolRecord<T>>;
 
-  export type TDrawPrintAlign =
-    | "center"
-    | "top"
-    | "bottom"
-    | "left"
-    | "right"
-    | "topLeft"
-    | "topRight"
-    | "bottomLeft"
-    | "bottomRight";
-
   export type TRadarFilter =
     | "any"
     | "enemy"

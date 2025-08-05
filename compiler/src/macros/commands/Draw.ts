@@ -1,19 +1,6 @@
 import { InstructionBase } from "../../instructions";
-import { assertLiteralOneOf } from "../../utils";
-import { LiteralValue, ObjectValue } from "../../values";
+import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
-
-const validAlignValues = [
-  "center",
-  "top",
-  "bottom",
-  "left",
-  "right",
-  "topLeft",
-  "topRight",
-  "bottomLeft",
-  "bottomRight",
-];
 
 export class Draw extends ObjectValue {
   constructor() {
@@ -60,17 +47,19 @@ export class Draw extends ObjectValue {
           named: "options",
           args: ["x", "y", "align"],
         },
+        translate: {
+          args: ["x", "y"],
+        },
+        scale: {
+          args: ["x", "y"],
+        },
+        rotate: {
+          args: ["degrees"],
+        },
+        reset: { args: [] },
       },
 
       handler(scope, overload, out, ...args) {
-        if (overload === "print") {
-          const align = args[2];
-          const literal =
-            typeof align === "string" ? new LiteralValue(align) : align;
-          assertLiteralOneOf(literal, validAlignValues, "align");
-
-          args[2] = literal.data;
-        }
         return [null, [new InstructionBase("draw", overload, ...args)]];
       },
     });

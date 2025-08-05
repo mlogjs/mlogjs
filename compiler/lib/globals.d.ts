@@ -67,6 +67,18 @@ interface Vars {
 
 declare const Vars: Vars;
 
+declare enum Align {
+  left,
+  center,
+  right,
+  topLeft,
+  top,
+  topRight,
+  bottomLeft,
+  bottom,
+  bottomRight,
+}
+
 /** Contains the base game teams. */
 declare namespace Teams {
   /** The gray team. */

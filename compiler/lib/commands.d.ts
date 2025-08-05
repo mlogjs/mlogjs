@@ -1,6 +1,5 @@
 import "./kinds";
 import {
-  TDrawPrintAlign,
   TRadarFilter,
   TRadarSort,
   TUnitLocateBuildingGroup,
@@ -268,12 +267,36 @@ declare global {
      * Draws text from the global text buffer, clearing it afterwards.
      *
      * Only ASCII characters are supported.
+     *
+     * ```js
+     * draw.print({
+     *   x: 10,
+     *   y: 10,
+     *   align: Align.topLeft,
+     * });
+     * ```
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
      */
-    function print(options: {
-      x: number;
-      y: number;
-      align: TDrawPrintAlign;
-    }): void;
+    function print(options: { x: number; y: number; align: Align }): void;
+
+    /**
+     * Applies a translation to the next drawing operations.
+     *
+     * ```js
+     * draw.translate(10, 20);
+     * ```
+     */
+    function translate(x: number, y: number): void;
+
+    /** Applies a scaling to the next drawing operations. */
+    function scale(x: number, y: number): void;
+
+    /** Applies a rotation to the next drawing operations. */
+    function rotate(degrees: number): void;
+
+    /** Removes all applied transformations. */
+    function reset(): void;
   }
 
   /**
