@@ -83,6 +83,7 @@ declare module "mlogjs:types" {
         rotation: number;
         payloadType?: UnitSymbol | BuildingSymbol;
         speed: number;
+        shield: number;
         armor: number;
       }
     > {}
