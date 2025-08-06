@@ -257,4 +257,9 @@ declare global {
       readonly cameraWidth: number;
       readonly cameraHeight: number;
     }> {}
+
+  interface WithSolid
+    extends WithSymbols<{
+      readonly solid: boolean;
+    }> {}
 }

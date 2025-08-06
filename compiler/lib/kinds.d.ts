@@ -38,7 +38,8 @@ interface BasicBuilding
     WithEnable,
     WithConfig,
     WithColor,
-    WithTeam {}
+    WithTeam,
+    WithSolid {}
 
 interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 

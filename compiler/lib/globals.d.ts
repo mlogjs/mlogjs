@@ -247,6 +247,7 @@ declare namespace LAccess {
   const cameraWidth: unique symbol;
   const cameraHeight: unique symbol;
   const size: unique symbol;
+  const solid: unique symbol;
   const dead: unique symbol;
   const range: unique symbol;
   const shooting: unique symbol;
@@ -701,8 +702,6 @@ interface BuildingSymbolTable {
 type BuildingSymbol = Blocks[keyof BuildingSymbolTable];
 
 interface EnvBlockSymbolTable {
-  // used by some instructions to represent any env block
-  readonly solid: EnvBlockSymbolTable["stoneWall"];
   readonly air: unique symbol;
   readonly spawn: unique symbol;
   readonly cliff: unique symbol;
