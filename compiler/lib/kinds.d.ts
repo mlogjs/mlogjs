@@ -18,7 +18,8 @@ interface BasicUnit
     WithSpeed,
     WithColor,
     WithTeam,
-    WithArmor {}
+    WithArmor,
+    WithVelocity {}
 
 interface AnyUnit extends BasicUnit, Boosted, WithCamera {}
 

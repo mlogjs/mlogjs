@@ -57,6 +57,7 @@ declare global {
       readonly shootY: number;
       readonly ammo: number;
       readonly ammoCapacity: number;
+      readonly currentAmmoType?: ItemSymbol | LiquidSymbol;
     }> {}
 
   interface WithHealth
@@ -261,5 +262,11 @@ declare global {
   interface WithSolid
     extends WithSymbols<{
       readonly solid: boolean;
+    }> {}
+
+  interface WithVelocity
+    extends WithSymbols<{
+      readonly velocityX: number;
+      readonly velocityY: number;
     }> {}
 }

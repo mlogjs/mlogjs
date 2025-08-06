@@ -85,6 +85,8 @@ declare module "mlogjs:types" {
         speed: number;
         shield: number;
         armor: number;
+        velocityX: number;
+        velocityY: number;
       }
     > {}
 

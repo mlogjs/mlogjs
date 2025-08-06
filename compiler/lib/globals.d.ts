@@ -229,6 +229,7 @@ declare namespace LAccess {
   const powerNetOut: unique symbol;
   const ammo: unique symbol;
   const ammoCapacity: unique symbol;
+  const currentAmmoType: unique symbol;
   const health: unique symbol;
   const maxHealth: unique symbol;
   const heat: unique symbol;
@@ -240,6 +241,8 @@ declare namespace LAccess {
   const rotation: unique symbol;
   const x: unique symbol;
   const y: unique symbol;
+  const velocityX: unique symbol;
+  const velocityY: unique symbol;
   const shootX: unique symbol;
   const shootY: unique symbol;
   const cameraX: unique symbol;
