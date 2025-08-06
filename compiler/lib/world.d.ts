@@ -864,6 +864,25 @@ declare module "mlogjs:world" {
     function bubble(x: number, y: number): void;
   }
 
+  export namespace playSound {
+    function positional(options: {
+      sound: number;
+      volume: number;
+      pitch: number;
+      x: number;
+      y: number;
+      limit: boolean;
+    }): void;
+
+    function global(options: {
+      sound: number;
+      volume: number;
+      pitch: number;
+      pan: number;
+      limit: boolean;
+    }): void;
+  }
+
   /** Represents a maker, invoking the methods or */
   export interface Marker {
     /** Deletes the marker, making its id available for reuse. */

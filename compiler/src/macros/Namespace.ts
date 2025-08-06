@@ -80,3 +80,22 @@ export class ColorsNamespace extends NamespaceMacro {
     return [result, []];
   }
 }
+
+export class SoundsNamespace extends NamespaceMacro {
+  constructor() {
+    super();
+  }
+
+  get(
+    scope: IScope,
+    key: IValue,
+    out?: TEOutput | undefined,
+  ): TValueInstructions<IValue> {
+    if (!(key instanceof LiteralValue) || !key.isString())
+      return super.get(scope, key, out);
+
+    const result = new StoreValue(`@sfx-${key.data}`, EMutability.constant);
+
+    return [result, []];
+  }
+}

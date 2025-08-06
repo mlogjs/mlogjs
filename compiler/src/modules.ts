@@ -18,7 +18,7 @@ import { Asm } from "./macros/Asm";
 import { LiteralValue, ObjectValue } from "./values";
 import { Scope } from "./Scope";
 import { worldModuleName } from "./utils";
-import { ColorsNamespace } from "./macros/Namespace";
+import { ColorsNamespace, SoundsNamespace } from "./macros/Namespace";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
@@ -57,7 +57,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("unchecked", new Unchecked());
   scope.hardSet("Align", new NamespaceMacro());
   scope.hardSet("Weathers", new NamespaceMacro({ changeCasing: true }));
-  scope.hardSet("String", new StringNamespace());
+  scope.hardSet("Sounds", new SoundsNamespace());
 
   // commands
   scope.hardSet("draw", new commands.Draw());
@@ -104,6 +104,7 @@ export function createWordModule() {
     Marker: new MarkerConstructor(),
     senseWeather: new commands.WeatherSense(),
     setWeather: new commands.WeatherSet(),
+    playSound: new commands.PlaySound(),
   });
   return module;
 }
