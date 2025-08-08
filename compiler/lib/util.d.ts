@@ -42,9 +42,10 @@ declare module "mlogjs:types" {
     | "turret"
     | "factory"
     | "repair"
-    | "rally"
     | "battery"
-    | "reactor";
+    | "reactor"
+    | "drill"
+    | "shield";
 
   export type TStatusEffect =
     | "burning"
