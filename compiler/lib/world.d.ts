@@ -392,6 +392,8 @@ declare module "mlogjs:world" {
      */
     function unitBuildSpeed(team: TeamIdentifier, multiplier: number): void;
 
+    function unitMineSpeed(team: TeamIdentifier, multiplier: number): void;
+
     /**
      * Sets the build cost multiplier for constructing units.
      *

@@ -27,6 +27,7 @@ export class SetRule extends ObjectValue {
         buildSpeed: { args: ["team", "multiplier"] },
         unitHealth: { args: ["team", "multiplier"] },
         unitBuildSpeed: { args: ["team", "multiplier"] },
+        unitMineSpeed: { args: ["team", "multiplier"] },
         unitCost: { args: ["team", "multiplier"] },
         unitDamage: { args: ["team", "multiplier"] },
         blockHealth: { args: ["team", "multiplier"] },
