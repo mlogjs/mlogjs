@@ -343,6 +343,7 @@ declare module "mlogjs:world" {
      */
     function solarMultiplier(multiplier: number): void;
 
+    function dragMultiplier(multiplier: number): void;
     /**
      * Bans a block/unit type from the world.
      *
