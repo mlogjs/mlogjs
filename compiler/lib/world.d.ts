@@ -515,6 +515,56 @@ declare module "mlogjs:world" {
      *   ```
      */
     function toast(duration: number): boolean;
+
+    /**
+     * Shows a nofication at the top of the screen.
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.notify();
+     * ```
+     */
+    function notifySync(): void;
+    /**
+     * Puts the content on the top left corner of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.mission();
+     * ```
+     */
+    function missionSync(): void;
+    /**
+     * Puts the content on the middle of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.announce(3);
+     *   ```
+     */
+    function announceSync(duration: number): void;
+
+    /**
+     * Puts the content on the middle top of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.toast(5);
+     *   ```
+     */
+    function toastSync(duration: number): void;
   }
 
   /** Controls the player camera. */
