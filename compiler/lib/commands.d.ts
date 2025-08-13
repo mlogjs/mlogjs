@@ -30,6 +30,8 @@ declare global {
    */
   function print(...items: unknown[]): void;
 
+  function printChar(character: number): void;
+
   /** Contains the multiple variants of the `draw` instruction */
   namespace draw {
     /**

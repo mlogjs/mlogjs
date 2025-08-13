@@ -10,3 +10,4 @@ export * from "./GetBuildings";
 export * from "./GetGlobal";
 export * from "./GetColor";
 export * from "./Marker";
+export * from "./StringView";

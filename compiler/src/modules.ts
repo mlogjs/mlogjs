@@ -9,7 +9,7 @@ import {
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
-  StringNamespace,
+  StringViewBuilder,
   Unchecked,
   VarsNamespace,
 } from "./macros";
@@ -52,6 +52,7 @@ export function createGlobalScope(): IScope {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
+  scope.hardSet("StringView", new StringViewBuilder());
   scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
   scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
   scope.hardSet("unchecked", new Unchecked());
@@ -62,6 +63,7 @@ export function createGlobalScope(): IScope {
   // commands
   scope.hardSet("draw", new commands.Draw());
   scope.hardSet("print", new commands.Print());
+  scope.hardSet("printChar", new commands.PrintChar());
   scope.hardSet("printFlush", new commands.PrintFlush());
   scope.hardSet("drawFlush", new commands.DrawFlush());
   scope.hardSet("getLink", new commands.GetLink());

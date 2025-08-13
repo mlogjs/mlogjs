@@ -149,3 +149,16 @@ declare class DynamicArray<T> extends MutableArray<T> {
  * ```
  */
 declare function unchecked<T>(expression: T): T;
+
+declare class StringView {
+  /**
+   * Creates a view of the given string, allowing you to access its characters
+   * by index.
+   */
+  constructor(string: string);
+
+  [index: number]: number;
+
+  /** The length of the string. */
+  readonly length: number;
+}

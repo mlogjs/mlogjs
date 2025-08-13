@@ -108,6 +108,9 @@ export class StoreValue extends BaseValue implements IValue {
     if (prop instanceof LiteralValue && prop.isString()) {
       const result = StoreValue.from(scope, out, mutability);
 
+      // handle string length property
+      const propName = prop.data === "length" ? "size" : prop.data;
+
       return [
         result,
         [
@@ -115,7 +118,7 @@ export class StoreValue extends BaseValue implements IValue {
             "sensor",
             result,
             this,
-            formatSenseablePropName(prop.data),
+            formatSenseablePropName(propName),
           ),
         ],
       ];
