@@ -622,6 +622,21 @@ declare global {
      * ```
      */
     function liquid(index: number): LiquidSymbol | undefined;
+
+    /**
+     * Looks up a team symbol by its index on the content registry.
+     *
+     * Example:
+     *
+     * ```js
+     * const first = lookup.team(0);
+     *
+     * print`first team type: ${first}`;
+     *
+     * printFlush();
+     * ```
+     */
+    function team(index: number): TeamSymbol | undefined;
   }
 
   /**
