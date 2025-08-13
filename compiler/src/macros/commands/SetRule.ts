@@ -19,6 +19,7 @@ export class SetRule extends ObjectValue {
         unitCap: { args: ["cap"] },
         mapArea: { named: "options", args: ["x", "y", "width", "height"] },
         lighting: { args: ["enabled"] },
+        canGameOver: { args: ["enabled"] },
         ambientLight: { args: ["rgbaData"] },
         solarMultiplier: { args: ["multiplier"] },
         dragMultiplier: { args: ["multiplier"] },

@@ -321,6 +321,9 @@ declare module "mlogjs:world" {
     /** Sets wether ambient lighting is enabled */
     function lighting(enabled: boolean): void;
 
+    /** Sets wether the game can end when all cores of a team are destroyed. */
+    function canGameOver(enabled: boolean): void;
+
     /**
      * Sets the ambient light color.
      *
