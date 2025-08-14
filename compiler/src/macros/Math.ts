@@ -36,13 +36,20 @@ const mathOperations: Record<
   len: (a, b) => Math.sqrt(a ** 2 + b! ** 2),
   noise: null,
   abs: a => Math.abs(a),
+  sign: a => {
+    if (a > 0) return 1;
+    if (a < 0) return -1;
+    return 0;
+  },
   log: a => Math.log(a),
+  logn: (a, b) => Math.log(a) / Math.log(b!),
   log10: a => Math.log10(a),
   sin: a => Math.sin(toRadians(a)),
   cos: a => Math.cos(toRadians(a)),
   tan: a => Math.tan(toRadians(a)),
   floor: a => Math.floor(a),
   ceil: a => Math.ceil(a),
+  round: a => Math.round(a),
   sqrt: a => Math.sqrt(a),
   asin: a => toDegrees(Math.asin(a)),
   acos: a => toDegrees(Math.acos(a)),
@@ -50,6 +57,7 @@ const mathOperations: Record<
   // yes, this doesn't work with negative numbers
   // but the game also implements it this way.
   idiv: (a, b) => Math.floor(a / b!),
+  emod: (a, b) => mod(a, b!),
   pow: (a, b) => Math.pow(a, b!),
   rand: null,
 };
@@ -62,31 +70,6 @@ function createMacroMathOperations() {
     E: new LiteralValue(mathConstants.E),
     degToRad: new LiteralValue(mathConstants.degToRad),
     radToDeg: new LiteralValue(mathConstants.radToDeg),
-    sign: new MacroFunction((scope, out, x) => {
-      assertArgumentCount(+!!x, 1);
-
-      // inspired by the branchless sign function from
-      // https://stackoverflow.com/a/14612943/13745435
-
-      // return (a > 0) - (a < 0);
-      const inst: IInstruction[] = [];
-      const zero = new LiteralValue(0);
-      const gt = pipeInsts(x[">"](scope, zero), inst);
-      const lt = pipeInsts(x["<"](scope, zero), inst);
-      const result = pipeInsts(gt["-"](scope, lt, out), inst);
-      return [result, inst];
-    }),
-    round: new MacroFunction((scope, out, x) => {
-      assertArgumentCount(+!!x, 1);
-
-      // return Math.floor(a + 0.5);
-      const inst: IInstruction[] = [];
-      const half = new LiteralValue(0.5);
-      const incremented = pipeInsts(x["+"](scope, half), inst);
-      const { floor } = macroMathOperations;
-      const result = pipeInsts(floor.call(scope, [incremented], out), inst)!;
-      return [result, inst];
-    }),
     trunc: new MacroFunction((scope, out, x) => {
       assertArgumentCount(+!!x, 1);
 

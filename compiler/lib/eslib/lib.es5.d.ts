@@ -148,6 +148,13 @@ interface Math {
   log(x: number): number;
 
   /**
+   * Returns the logarithm of a number with a specified base.
+   * @param x The value to compute the logarithm of.
+   * @param base The base of the logarithm.
+   */
+  logn(x: number, base: number): number;
+
+  /**
    * Returns the logarithm (base 10) of a number
    * @param x
    */
@@ -193,6 +200,8 @@ interface Math {
    * @param y
    */
   idiv(x: number, y: number): number;
+
+  emod(x: number, y: number): number;
 
   /**
    * Returns the value of a base expression taken to a specified power.

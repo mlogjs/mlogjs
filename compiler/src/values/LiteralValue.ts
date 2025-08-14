@@ -135,10 +135,11 @@ const operatorMap = {
   "^": bitwiseOp((a, b) => a ^ b),
   ">>": bitwiseOp((a, b) => a >> b),
   "<<": bitwiseOp((a, b) => a << b),
+  ">>>": bitwiseOp((a, b) => BigInt.asUintN(64, a) >> b),
   "&&": (a, b) => +(a && b),
   "||": (a, b) => +(a || b),
 } as const satisfies Record<
-  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??" | ">>>">,
+  Exclude<BinaryOperator | LogicalOperator, "instanceof" | "in" | "??">,
   TBinOperationFn
 >;
 
