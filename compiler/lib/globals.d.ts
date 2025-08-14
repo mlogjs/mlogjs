@@ -267,6 +267,8 @@ declare namespace LAccess {
   const name: unique symbol;
   const payloadCount: unique symbol;
   const payloadType: unique symbol;
+  const totalPayload: unique symbol;
+  const payloadCapacity: unique symbol;
   const id: unique symbol;
   const enabled: unique symbol;
   const config: unique symbol;
