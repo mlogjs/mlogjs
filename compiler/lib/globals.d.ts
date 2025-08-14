@@ -252,7 +252,7 @@ declare namespace LAccess {
   const cameraHeight: unique symbol;
   const displayWidth: unique symbol;
   const displayHeight: unique symbol;
-  const bufferUsage: unique symbol;
+  const bufferSize: unique symbol;
   const size: unique symbol;
   const solid: unique symbol;
   const dead: unique symbol;

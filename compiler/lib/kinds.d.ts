@@ -53,5 +53,5 @@ interface AnyBuilding
     WithShield,
     WithCamera,
     WithMemory,
-    WithBufferUsage,
+    WithBufferSize,
     WithDisplay {}

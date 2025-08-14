@@ -276,9 +276,9 @@ declare global {
       readonly memoryCapacity: number;
     }> {}
 
-  interface WithBufferUsage
+  interface WithBufferSize
     extends WithSymbols<{
-      readonly bufferUsage: number;
+      readonly bufferSize: number;
     }> {}
 
   interface WithSolid
