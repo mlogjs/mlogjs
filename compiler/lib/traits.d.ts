@@ -265,6 +265,11 @@ declare global {
       readonly cameraHeight: number;
     }> {}
 
+  interface WithMemory
+    extends WithSymbols<{
+      readonly memoryCapacity: number;
+    }> {}
+
   interface WithSolid
     extends WithSymbols<{
       readonly solid: boolean;

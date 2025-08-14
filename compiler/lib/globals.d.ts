@@ -230,6 +230,7 @@ declare namespace LAccess {
   const ammo: unique symbol;
   const ammoCapacity: unique symbol;
   const currentAmmoType: unique symbol;
+  const memoryCapacity: unique symbol;
   const health: unique symbol;
   const maxHealth: unique symbol;
   const heat: unique symbol;

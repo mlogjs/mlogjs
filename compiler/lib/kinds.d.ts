@@ -47,4 +47,9 @@ interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 // just to make this future proof
 interface AnyTurret extends BasicTurret {}
 
-interface AnyBuilding extends AnyTurret, Heatable, WithShield, WithCamera {}
+interface AnyBuilding
+  extends AnyTurret,
+    Heatable,
+    WithShield,
+    WithCamera,
+    WithMemory {}
