@@ -291,4 +291,9 @@ declare global {
       readonly velocityX: number;
       readonly velocityY: number;
     }> {}
+
+  interface WithOperations
+    extends WithSymbols<{
+      readonly operations: number;
+    }> {}
 }

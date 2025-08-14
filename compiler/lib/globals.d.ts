@@ -253,6 +253,7 @@ declare namespace LAccess {
   const displayWidth: unique symbol;
   const displayHeight: unique symbol;
   const bufferSize: unique symbol;
+  const operations: unique symbol;
   const size: unique symbol;
   const solid: unique symbol;
   const dead: unique symbol;

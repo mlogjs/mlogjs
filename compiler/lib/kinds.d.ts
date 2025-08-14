@@ -54,4 +54,5 @@ interface AnyBuilding
     WithCamera,
     WithMemory,
     WithBufferSize,
-    WithDisplay {}
+    WithDisplay,
+    WithOperations {}
