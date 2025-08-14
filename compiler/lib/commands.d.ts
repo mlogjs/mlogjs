@@ -659,6 +659,25 @@ declare global {
   function packColor(r: number, g: number, b: number, a: number): number;
 
   /**
+   * Unpacks RGBA color information from a color.
+   *
+   * ```js
+   * const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+   *
+   * const { r, g, b, a } = unpackColor(colorData);
+   *
+   * print`r: ${r}, g: ${g}, b: ${b}, a: ${a}`;
+   * printFlush();
+   * ```
+   */
+  function unpackColor(color: number): {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  };
+
+  /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
    *
    * If an unit symbol is received, the processor will pick an unit of the given

@@ -73,6 +73,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("wait", new commands.Wait());
   scope.hardSet("lookup", new commands.Lookup());
   scope.hardSet("packColor", new commands.PackColor());
+  scope.hardSet("unpackColor", new commands.UnpackColor());
   scope.hardSet("endScript", new commands.End());
   scope.hardSet("stopScript", new commands.Stop());
   scope.hardSet("unitBind", new commands.UnitBind());

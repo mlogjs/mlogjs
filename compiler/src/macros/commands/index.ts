@@ -36,3 +36,4 @@ export * from "./WeatherSense";
 export * from "./WeatherSet";
 export * from "./PlaySound";
 export * from "./PrintChar";
+export * from "./UnpackColor";
