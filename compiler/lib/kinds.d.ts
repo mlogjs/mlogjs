@@ -52,4 +52,6 @@ interface AnyBuilding
     Heatable,
     WithShield,
     WithCamera,
-    WithMemory {}
+    WithMemory,
+    WithBufferUsage,
+    WithDisplay {}
