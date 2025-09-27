@@ -227,6 +227,7 @@ export const UpdateExpression: THandler = (
   return [op, [...argInst, ...opInst]];
 };
 
+// TODO: use the select instruction once we have an optimizer
 export const ConditionalExpression: THandler = (
   c,
   scope,
