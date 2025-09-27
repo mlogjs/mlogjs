@@ -962,6 +962,7 @@ declare module "mlogjs:world" {
     flushText(options: { fetch: boolean }): void;
     set fontSize(value: number);
     set textHeight(value: number);
+    set outline(value: boolean);
     set labelFlags(value: { background: boolean; outline: boolean });
     set texture(value: string);
     /** Writes the contents of the global text buffer to the marker's texture. */

@@ -89,6 +89,7 @@ class MarkerMacro extends ObjectValue {
       }),
       fontSize: new MarkerMacroSetter(id, "fontSize"),
       textHeight: new MarkerMacroSetter(id, "textHeight"),
+      outline: new MarkerMacroSetter(id, "outline"),
       labelFlags: new MarkerMacroSetter(id, "labelFlags", [
         "background",
         "outline",
