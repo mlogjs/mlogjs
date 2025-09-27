@@ -961,6 +961,8 @@ declare module "mlogjs:world" {
      */
     flushText(options: { fetch: boolean }): void;
     set fontSize(value: number);
+    set textAlign(value: Align);
+    set lineAlign(value: Align);
     set textHeight(value: number);
     set outline(value: boolean);
     set labelFlags(value: { background: boolean; outline: boolean });

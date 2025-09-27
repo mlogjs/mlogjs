@@ -88,6 +88,8 @@ class MarkerMacro extends ObjectValue {
         return [null, [setmarker(id, "flushText", fetch)]];
       }),
       fontSize: new MarkerMacroSetter(id, "fontSize"),
+      textAlign: new MarkerMacroSetter(id, "textAlign"),
+      lineAlign: new MarkerMacroSetter(id, "lineAlign"),
       textHeight: new MarkerMacroSetter(id, "textHeight"),
       outline: new MarkerMacroSetter(id, "outline"),
       labelFlags: new MarkerMacroSetter(id, "labelFlags", [
