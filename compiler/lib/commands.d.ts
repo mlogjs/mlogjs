@@ -42,6 +42,16 @@ declare global {
    */
   function format(value: unknown): void;
 
+  /**
+   * Adds a character to the global text buffer using the provided using the
+   * provided UTF-16 code unit or the icon of the provided game content type.
+   *
+   * ```js
+   * printChar(128073); // "👉" emoji
+   * printChar(Blocks.router);
+   * printFlush();
+   * ```
+   */
   function printChar(character: number | symbol): void;
 
   /** Contains the multiple variants of the `draw` instruction */
