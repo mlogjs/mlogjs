@@ -3,8 +3,8 @@ jump 3 lessThanEq &t0 0.5
 end
 set i:3:9 0
 jump 9 greaterThanEq i:3:9 10
-print i:3:9
-print "\n"
+print "{0}\n"
+format i:3:9
 op add i:3:9 i:3:9 1
 jump 4 always
 printflush message1

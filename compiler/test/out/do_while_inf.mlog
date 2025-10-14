@@ -1,6 +1,6 @@
 set i:1:4 0
-print i:1:4
-print "\n"
+print "{0}\n"
+format i:1:4
 op rand &t0 1
 jump 7 lessThanEq &t0 0.5
 set &t1 2

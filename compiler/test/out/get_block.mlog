@@ -2,14 +2,10 @@ getblock block block:3:6 10 10
 getblock building building:4:6 10 10
 getblock floor floor:5:6 10 10
 getblock ore ore:6:6 10 10
-print "there is a "
-print block:3:6
-print " on top of a "
-print floor:5:6
-print " and "
-print ore:6:6
-print "\n"
+print "there is a {0} on top of a {0} and {0}\n"
+format block:3:6
+format floor:5:6
+format ore:6:6
 sensor &t0 building:4:6 @health
-print "the building has "
-print &t0
-print " health"
+print "the building has {0} health"
+format &t0

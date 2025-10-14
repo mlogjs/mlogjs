@@ -1,12 +1,9 @@
 print "single"
-print "first"
-print "second"
-print "third"
+print "firstsecondthird"
 set variable:4:6 @foo
 print variable:4:6
-print "variable "
-print variable:4:6
-print "\nusing\ntagged\ntemplates"
-print variable:4:6
-print " emty start and emtpy end "
-print variable:4:6
+print "variable {0}\nusing\ntagged\ntemplates"
+format variable:4:6
+print "{0} emty start and emtpy end {0}"
+format variable:4:6
+format variable:4:6

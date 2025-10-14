@@ -6,6 +6,6 @@ cutscene pan 10 10 0.02 0
 wait 0.5
 cutscene zoom 4 100 0.06 0
 print "Camera controls!"
-message announce 4
+message announce 4 &_
 wait 5
 cutscene stop 100 100 0.06 0

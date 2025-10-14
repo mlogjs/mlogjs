@@ -113,7 +113,7 @@ function createMacroMathOperations() {
       const { exp, degToRad } = macroMathOperations;
       const inst: IInstruction[] = [];
       const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      const expx = pipeInsts(exp.call(scope, [x]), inst)!;
       const negativeX = pipeInsts(x["u-"](scope), inst);
       const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       const sum = pipeInsts(expx["+"](scope, expnegx), inst);
@@ -143,7 +143,7 @@ function createMacroMathOperations() {
       const { exp, degToRad } = macroMathOperations;
       const inst: IInstruction[] = [];
       const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      const expx = pipeInsts(exp.call(scope, [x]), inst)!;
       const negativeX = pipeInsts(x["u-"](scope), inst);
       const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       const sub = pipeInsts(expx["-"](scope, expnegx), inst);
@@ -172,7 +172,7 @@ function createMacroMathOperations() {
       const { exp, degToRad } = macroMathOperations;
       const inst: IInstruction[] = [];
       const x = pipeInsts(degrees["*"](scope, degToRad), inst);
-      const expx = pipeInsts(exp.call(scope, [x]), [])!;
+      const expx = pipeInsts(exp.call(scope, [x]), inst)!;
       const negativeX = pipeInsts(x["u-"](scope), inst);
       const expnegx = pipeInsts(exp.call(scope, [negativeX]), inst)!;
       const sub = pipeInsts(expx["-"](scope, expnegx), inst);

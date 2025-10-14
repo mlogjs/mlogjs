@@ -1,7 +1,7 @@
 set dynamicFlag:3:4 "someFlag"
 getflag &t0 "foo"
 getflag &t1 dynamicFlag:3:4
-print &t0
-print "\n"
-print &t1
+print "{0}\n{0}"
+format &t0
+format &t1
 printflush message1

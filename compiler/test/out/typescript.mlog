@@ -1,8 +1,4 @@
-print 10
-print 11
-print "off"
-print 13
-print 14
+print "1011off1314"
 set foo:17:4 @unknown
 set bar:19:4 foo:17:4
 set baz:21:4 foo:17:4

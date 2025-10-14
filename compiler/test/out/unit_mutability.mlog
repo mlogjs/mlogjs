@@ -2,8 +2,8 @@ ubind @poly
 set first:2:6 @unit
 ubind @mega
 set second:4:6 @unit
-print "first is a "
-print first:2:6
-print "second is a "
-print second:4:6
+print "first is a {0}"
+format first:2:6
+print "second is a {0}"
+format second:4:6
 printflush message1

@@ -1,6 +1,4 @@
-print "Processort at: ("
-print @thisx
-print ", "
-print @thisy
-print ")\n"
+print "Processort at: ({0}, {0})\n"
+format @thisx
+format @thisy
 printflush message1

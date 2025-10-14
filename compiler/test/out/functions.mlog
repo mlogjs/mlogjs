@@ -5,27 +5,26 @@ set type:26:12 type:5:4
 set a:26:18 a:6:4
 set b:26:21 b:7:4
 set &rop:26:0 8
-jump 14 always
+jump 13 always
 set result:9:4 &fop:26:0
-print "The result is: "
-print result:9:4
-print "."
+print "The result is: {0}."
+format result:9:4
 printflush message1
 end
 op strictEqual &t0:op:26:0 type:26:12 0
-jump 18 equal &t0:op:26:0 0
+jump 17 equal &t0:op:26:0 0
 op add &fop:26:0 a:26:18 b:26:21
 set @counter &rop:26:0
 op strictEqual &t1:op:26:0 type:26:12 1
-jump 22 equal &t1:op:26:0 0
+jump 21 equal &t1:op:26:0 0
 op sub &fop:26:0 a:26:18 b:26:21
 set @counter &rop:26:0
 op strictEqual &t2:op:26:0 type:26:12 2
-jump 26 equal &t2:op:26:0 0
+jump 25 equal &t2:op:26:0 0
 op mul &fop:26:0 a:26:18 b:26:21
 set @counter &rop:26:0
 op strictEqual &t3:op:26:0 type:26:12 3
-jump 30 equal &t3:op:26:0 0
+jump 29 equal &t3:op:26:0 0
 op div &fop:26:0 a:26:18 b:26:21
 set @counter &rop:26:0
 set &fop:26:0 null
