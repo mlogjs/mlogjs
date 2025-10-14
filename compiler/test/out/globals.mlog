@@ -116,7 +116,6 @@ print @payloadType
 print @enabled
 print @color
 print @air
-print @solid
 print @silicon-smelter
 print @silicon-crucible
 print @kiln

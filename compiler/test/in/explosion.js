@@ -15,4 +15,5 @@ explosion({
   air: true,
   ground: true,
   pierce: true,
+  effect: true,
 });
