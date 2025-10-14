@@ -201,6 +201,13 @@ interface Math {
    */
   idiv(x: number, y: number): number;
 
+  /**
+   * Returns the Euclidean modulus of `x` and `y`. This is similar to the modulo operator (`%`), but
+   * ensures a non-negative result.
+   *
+   * @param x
+   * @param y
+   */
   emod(x: number, y: number): number;
 
   /**
