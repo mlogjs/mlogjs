@@ -30,7 +30,19 @@ declare global {
    */
   function print(...items: unknown[]): void;
 
-  function printChar(character: number): void;
+  /**
+   * Replaces the first placeholder with lowest value in the global text buffer.
+   *
+   * ```js
+   * print("{1} {0}");
+   * format("world!");
+   * format("Hello");
+   * printFlush(); // prints "Hello world!"
+   * ```
+   */
+  function format(value: unknown): void;
+
+  function printChar(character: number | symbol): void;
 
   /** Contains the multiple variants of the `draw` instruction */
   namespace draw {

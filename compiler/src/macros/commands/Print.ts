@@ -16,40 +16,31 @@ export class Print extends MacroFunction<null> {
           value.data.length > 0,
       );
 
-      let start = 0;
-
-      do {
-        const end = getChunkEnd(values, start);
-
-        if (!needsFormatString(values, start, end)) {
-          for (let i = start; i < end; i++) {
-            const value = values[i];
-            inst.push(new InstructionBase("print", value));
-          }
-        } else {
-          let counter = 0;
-          let formatString = "";
-          for (let i = start; i < end; i++) {
-            const value = values[i];
-            if (value instanceof LiteralValue) {
-              formatString += value.data;
-            } else {
-              formatString += `{${counter}}`;
-              counter++;
-            }
-          }
-          inst.push(
-            new InstructionBase("print", new LiteralValue(formatString)),
-          );
-          for (let i = start; i < end; i++) {
-            const value = values[i];
-            if (value instanceof LiteralValue) continue;
-            inst.push(new InstructionBase("format", value));
+      if (!needsFormatString(values)) {
+        for (let i = 0; i < values.length; i++) {
+          const value = values[i];
+          inst.push(new InstructionBase("print", value));
+        }
+      } else {
+        let formatString = "";
+        for (let i = 0; i < values.length; i++) {
+          const value = values[i];
+          if (value instanceof LiteralValue) {
+            formatString += value.data;
+          } else {
+            // mlog replaces the first occurrence of {0}
+            // so we don't need to increment the placeholder
+            // number
+            formatString += "{0}";
           }
         }
-
-        start = end;
-      } while (start < values.length);
+        inst.push(new InstructionBase("print", new LiteralValue(formatString)));
+        for (let i = 0; i < values.length; i++) {
+          const value = values[i];
+          if (value instanceof LiteralValue) continue;
+          inst.push(new InstructionBase("format", value));
+        }
+      }
 
       return [null, inst];
     });
@@ -82,26 +73,11 @@ function getPrintValues(scope: IScope, args: IValue[]) {
   return values;
 }
 
-function needsFormatString(values: IValue[], start: number, end: number) {
-  for (let i = start; i < end; i++) {
+function needsFormatString(values: IValue[]) {
+  for (let i = 0; i < values.length; i++) {
     const value = values[i];
     if (!(value instanceof LiteralValue)) continue;
     if (!value.isString() || value.data.length > 0) return true;
   }
   return false;
-}
-
-function getChunkEnd(values: IValue[], start: number) {
-  let end = start;
-  for (let counter = 0; end < values.length && counter <= 10; end++) {
-    const value = values[end];
-
-    // this arrangement allows us to still append literal
-    // values to the chunk even if we already have 10
-    // pending interpalations
-    if (value instanceof LiteralValue) continue;
-    if (counter >= 10) break;
-    counter++;
-  }
-  return end;
 }

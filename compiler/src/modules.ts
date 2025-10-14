@@ -63,6 +63,7 @@ export function createGlobalScope(): IScope {
   // commands
   scope.hardSet("draw", new commands.Draw());
   scope.hardSet("print", new commands.Print());
+  scope.hardSet("format", new commands.Format());
   scope.hardSet("printChar", new commands.PrintChar());
   scope.hardSet("printFlush", new commands.PrintFlush());
   scope.hardSet("drawFlush", new commands.DrawFlush());
