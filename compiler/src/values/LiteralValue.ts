@@ -133,9 +133,10 @@ const operatorMap = {
   "|": bitwiseOp((a, b) => a | b),
   "&": bitwiseOp((a, b) => a & b),
   "^": bitwiseOp((a, b) => a ^ b),
-  ">>": bitwiseOp((a, b) => a >> b),
-  "<<": bitwiseOp((a, b) => a << b),
-  ">>>": bitwiseOp((a, b) => BigInt.asUintN(64, a) >> b),
+  // bit shifting only takes the lower 6 bits of the right operand
+  ">>": bitwiseOp((a, b) => a >> (b & 63n)),
+  "<<": bitwiseOp((a, b) => a << (b & 63n)),
+  ">>>": bitwiseOp((a, b) => BigInt.asUintN(64, a) >> (b & 63n)),
   "&&": (a, b) => +(a && b),
   "||": (a, b) => +(a || b),
 } as const satisfies Record<
