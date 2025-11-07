@@ -21,8 +21,20 @@ type CompilerErrorSource =
       line: number;
       column: number;
     };
+
+export interface CompilerErrorLoc {
+  start: {
+    line: number;
+    column: number;
+  };
+  end: {
+    line: number;
+    column: number;
+  };
+}
+
 export class CompilerError extends Error {
-  protected _loc?: es.SourceLocation;
+  protected _loc?: CompilerErrorLoc;
   /**
    * The error that preceded this `CompilerError`.
    *
@@ -37,7 +49,7 @@ export class CompilerError extends Error {
     this.loc = source;
   }
 
-  get loc(): es.SourceLocation | undefined {
+  get loc(): CompilerErrorLoc | undefined {
     return this._loc;
   }
 
