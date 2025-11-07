@@ -39,6 +39,13 @@ export const VariableDeclarator: THandler<null> = (
 ) => {
   const { init } = node;
 
+  if (es.isVoidPattern(node.id)) {
+    throw new CompilerError(
+      `Cannot declare a variable with a void pattern`,
+      node.id,
+    );
+  }
+
   const [value, inst] = Declare(c, scope, node.id, kind);
 
   if (init) {
@@ -58,7 +65,12 @@ type TDeclareHandler<T extends es.Node> = (
   kind: "let" | "const" | "var",
 ) => TValueInstructions<DeclarationValue>;
 
-const Declare: TDeclareHandler<es.LVal> = (c, scope, node, kind) => {
+const Declare: TDeclareHandler<es.LVal | es.VoidPattern> = (
+  c,
+  scope,
+  node,
+  kind,
+) => {
   return c.handle(scope, node, () => {
     switch (node.type) {
       case "Identifier":
