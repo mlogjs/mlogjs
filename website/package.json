@@ -15,7 +15,7 @@
   "devDependencies": {
     "@babel/parser": "^7.22.7",
     "@babel/types": "^7.22.5",
-    "@types/node": "^18.16.19",
+    "@types/node": "^20.19.24",
     "@types/splitpanes": "^2.2.2",
     "markdown-it": "^13.0.1",
     "vite": "^5.2.11",
