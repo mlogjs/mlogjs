@@ -1,16 +1,4 @@
-import "./globals";
-
-type LogicSymbols = typeof Items & typeof Liquids & typeof LAccess;
-
-type AsSymbolRecord<T extends Record<string, unknown>> = {
-  -readonly [K in keyof (LogicSymbols | T) as LogicSymbols[K]]: T[K];
-};
-
-export type MutableWithSymbols<T extends Record<string, unknown>> = T &
-  AsSymbolRecord<T>;
-
-export type WithSymbols<T extends Record<string, unknown>> = T &
-  Readonly<AsSymbolRecord<T>>;
+import { WithSymbols } from "mlogjs:types";
 
 declare global {
   interface LiquidHolder
@@ -69,6 +57,7 @@ declare global {
       readonly shootY: number;
       readonly ammo: number;
       readonly ammoCapacity: number;
+      readonly currentAmmoType?: ItemSymbol | LiquidSymbol;
     }> {}
 
   interface WithHealth
@@ -219,10 +208,16 @@ declare global {
     }> {}
 
   interface PayloadHolder
-    extends WithSymbols<{
-      readonly payloadCount: number;
-      readonly payloadType?: UnitSymbol | BlockSymbol;
-    }> {}
+    extends WithSymbols<
+      {
+        readonly [T in UnitSymbol | BlockSymbol]: number;
+      } & {
+        readonly payloadCount: number;
+        readonly payloadType?: UnitSymbol | BlockSymbol;
+        readonly totalPayload: number;
+        readonly payloadCapacity: number;
+      }
+    > {}
 
   interface WithEnable
     extends WithSymbols<{
@@ -255,5 +250,50 @@ declare global {
     extends WithSymbols<{
       /** The team id of `this`. */
       readonly team: number;
+    }> {}
+
+  interface WithArmor
+    extends WithSymbols<{
+      readonly armor: number;
+    }> {}
+
+  interface WithCamera
+    extends WithSymbols<{
+      readonly cameraX: number;
+      readonly cameraY: number;
+      readonly cameraWidth: number;
+      readonly cameraHeight: number;
+    }> {}
+
+  interface WithDisplay
+    extends WithSymbols<{
+      readonly displayHeight: number;
+      readonly displayWidth: number;
+    }> {}
+
+  interface WithMemory
+    extends WithSymbols<{
+      readonly memoryCapacity: number;
+    }> {}
+
+  interface WithBufferSize
+    extends WithSymbols<{
+      readonly bufferSize: number;
+    }> {}
+
+  interface WithSolid
+    extends WithSymbols<{
+      readonly solid: boolean;
+    }> {}
+
+  interface WithVelocity
+    extends WithSymbols<{
+      readonly velocityX: number;
+      readonly velocityY: number;
+    }> {}
+
+  interface WithOperations
+    extends WithSymbols<{
+      readonly operations: number;
     }> {}
 }

@@ -10,6 +10,7 @@ export class Lookup extends ObjectValue {
         unit: { args: ["index"] },
         item: { args: ["index"] },
         liquid: { args: ["index"] },
+        team: { args: ["index"] },
       },
       handler(scope, overload, out, index) {
         const output = StoreValue.from(scope, out);

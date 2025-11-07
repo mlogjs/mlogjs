@@ -2,6 +2,6 @@ set i:1:4 0
 print "data"
 op mod &t0 i:1:4 10
 jump 6 notEqual &t0 0
-print i:1:4
-print " ends on zero"
+print "{0} ends on zero"
+format i:1:4
 jump 1 always

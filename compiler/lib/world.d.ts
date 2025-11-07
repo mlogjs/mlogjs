@@ -1,683 +1,1057 @@
-import {
-  SettableBuilding,
-  SettableUnit,
-  TPermanentStatusEffect,
-  TStatusEffect,
-} from "./util";
+/// <reference path="./util.d.ts" />
+/// <reference path="./globals.d.ts" />
 
-/** Gets block data from the map. */
-export namespace getBlock {
-  /**
-   * Gets the floor type on the given location
-   *
-   * ```js
-   * const floorType = getBlock.floor(10, 20);
-   * ```
-   */
-  function floor(x: number, y: number): EnvBlockSymbol;
+declare module "mlogjs:world" {
+  import {
+    SettableBuilding,
+    SettableUnit,
+    TPermanentStatusEffect,
+    TStatusEffect,
+  } from "mlogjs:types";
 
-  /**
-   * Gets the ore type on the given location. `Blocks.air` if there is no ore
-   *
-   * ```js
-   * const oreType = getBlock.ore(10, 20);
-   *
-   * if (oreType != Blocks.air) {
-   *   print("found ", oreType);
-   * } else {
-   *   print("no ore found");
-   * }
-   * printFlush();
-   * ```
-   */
-  function ore(x: number, y: number): OreSymbol | typeof Blocks.air;
+  // privileged global variables
+  interface PVars {
+    readonly server: boolean;
+    readonly client: boolean;
+    readonly clientLocale: string;
+    readonly clientUnit: AnyUnit;
+    readonly clientName: string;
+    readonly clientTeam: number;
+    readonly clientMobile: boolean;
+  }
 
-  /**
-   * Gets the block type on the give location. `Blocks.air` if there is no
-   * block.
-   *
-   * ```js
-   * const blockType = getBlock.block(10, 20);
-   *
-   * if (blockType != Blocks.air) {
-   *   print("found ", blockType);
-   * } else {
-   *   print("no block found");
-   * }
-   * printFlush();
-   * ```
-   */
-  function block(x: number, y: number): BlockSymbol;
+  export var PVars: PVars;
 
-  /**
-   * Gets the building on the given location. `undefined` if there is no
-   * building.
-   *
-   * ```js
-   * const building = getBlock.building(10, 20);
-   *
-   * if (building != undefined) {
-   *   print("found ", building, "");
-   * } else {
-   *   print("no building found");
-   * }
-   * printFlush();
-   * ```
-   */
-  function building<T extends BasicBuilding = AnyBuilding>(
-    x: number,
-    y: number,
-  ): T | undefined;
-}
+  /** Gets block data from the map. */
+  export namespace getBlock {
+    /**
+     * Gets the floor type on the given location
+     *
+     * ```js
+     * const floorType = getBlock.floor(10, 20);
+     * ```
+     */
+    function floor(x: number, y: number): EnvBlockSymbol;
 
-/** Sets block data on a given location. */
-export namespace setBlock {
-  // TODO: maybe have a separate floor symbol type?
-  /**
-   * Sets the floor of the tile at the given location.
-   *
-   * ```js
-   * setBlock.floor(10, 20, Blocks.metalFloor5);
-   * ```
-   */
-  function floor(x: number, y: number, to: EnvBlockSymbol): void;
+    /**
+     * Gets the ore type on the given location. `Blocks.air` if there is no ore
+     *
+     * ```js
+     * const oreType = getBlock.ore(10, 20);
+     *
+     * if (oreType != Blocks.air) {
+     *   print("found ", oreType);
+     * } else {
+     *   print("no ore found");
+     * }
+     * printFlush();
+     * ```
+     */
+    function ore(x: number, y: number): OreSymbol | typeof Blocks.air;
 
-  /**
-   * Sets the ore at the given location. Use `Blocks.air` to remove any ore.
-   *
-   * ```js
-   * setBlock.ore(10, 20, Blocks.oreCopper);
-   * ```
-   */
-  function ore(x: number, y: number, to: OreSymbol | typeof Blocks.air): void;
+    /**
+     * Gets the block type on the give location. `Blocks.air` if there is no
+     * block.
+     *
+     * ```js
+     * const blockType = getBlock.block(10, 20);
+     *
+     * if (blockType != Blocks.air) {
+     *   print("found ", blockType);
+     * } else {
+     *   print("no block found");
+     * }
+     * printFlush();
+     * ```
+     */
+    function block(x: number, y: number): BlockSymbol;
 
-  /**
-   * Sets the block at a given location, it can be a regular building or an
-   * environment block.
-   *
-   * ```js
-   * setBlock.block({
-   *   x: 10,
-   *   y: 20,
-   *   to: Blocks.router,
-   *   rotation: 0,
-   *   team: Teams.sharded,
-   * });
-   * ```
-   */
-  function block(options: {
-    x: number;
-    y: number;
-    to: EnvBlockSymbol | BuildingSymbol;
-    team: TeamSymbol;
-    rotation: number;
-  }): void;
-}
+    /**
+     * Gets the building on the given location. `undefined` if there is no
+     * building.
+     *
+     * ```js
+     * const building = getBlock.building(10, 20);
+     *
+     * if (building != undefined) {
+     *   print("found ", building, "");
+     * } else {
+     *   print("no building found");
+     * }
+     * printFlush();
+     * ```
+     */
+    function building<T extends BasicBuilding = AnyBuilding>(
+      x: number,
+      y: number,
+    ): T | undefined;
+  }
 
-/**
- * Spawns an unit at the given location.
- *
- * @param options.rotation The initial rotation of the unit in degrees.
- *
- *   ```js
- *   spawnUnit({
- *     team: Teams.sharded,
- *     type: Units.flare,
- *     x: 10,
- *     y: 20,
- *     rotation: 90,
- *   });
- *   ```
- */
-export function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
-  type: UnitSymbol;
-  x: number;
-  y: number;
-  team: TeamSymbol;
-  /** The initial rotation of the unit in degrees. */
-  rotation?: number;
-}): T;
+  /** Sets block data on a given location. */
+  export namespace setBlock {
+    // TODO: maybe have a separate floor symbol type?
+    /**
+     * Sets the floor of the tile at the given location.
+     *
+     * ```js
+     * setBlock.floor(10, 20, Blocks.metalFloor5);
+     * ```
+     */
+    function floor(x: number, y: number, to: EnvBlockSymbol): void;
 
-/** Contains the variants for the `applyStatus` instruction. */
-export namespace applyStatus {
-  /**
-   * Applies a status effect to the given unit.
-   *
-   * The only status effects that don't require a duration are `overdrive` and
-   * `boss`.
-   *
-   * ```js
-   * applyStatus.apply("burning", Vars.unit, 10);
-   * applyStatus.apply("boss", Vars.unit);
-   * ```
-   */
-  function apply(
-    status: Exclude<TStatusEffect, TPermanentStatusEffect>,
-    unit: BasicUnit,
-    duration: number,
-  ): void;
+    /**
+     * Sets the ore at the given location. Use `Blocks.air` to remove any ore.
+     *
+     * ```js
+     * setBlock.ore(10, 20, Blocks.oreCopper);
+     * ```
+     */
+    function ore(x: number, y: number, to: OreSymbol | typeof Blocks.air): void;
 
-  function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
+    /**
+     * Sets the block at a given location, it can be a regular building or an
+     * environment block.
+     *
+     * ```js
+     * setBlock.block({
+     *   x: 10,
+     *   y: 20,
+     *   to: Blocks.router,
+     *   rotation: 0,
+     *   team: Teams.sharded,
+     * });
+     * ```
+     */
+    function block(options: {
+      x: number;
+      y: number;
+      to: EnvBlockSymbol | BuildingSymbol;
+      team: TeamIdentifier;
+      rotation: number;
+    }): void;
+  }
 
   /**
-   * Removes a status effect to the given unit.
+   * Spawns an unit at the given location.
    *
-   * ```js
-   * applyStatus.clear("burning", Vars.unit);
-   * applyStatus.clear("boss", Vars.unit);
-   * ```
-   */
-  function clear(status: TStatusEffect, unit: BasicUnit): void;
-}
-
-/**
- * Spawns an enemy wave, can be used even if there is an already active wave.
- *
- * ```js
- * // natural wave, units appear on the enemy spawn
- * spawnWave(true);
- *
- * // syntethic wave, units appear on the given coordinates
- * spawnWave(false, 10, 20);
- * ```
- */
-export function spawnWave(natural: true): void;
-export function spawnWave(natural: false, x: number, y: number): void;
-
-/** Contains the multiple variants of the `set rule` instruction. */
-export namespace setRule {
-  /**
-   * Sets the wave countdown in seconds.
-   *
-   * ```js
-   * setRule.currentWaveTime(10);
-   * ```
-   */
-  function currentWaveTime(seconds: number): void;
-
-  /**
-   * Enables/disables the wave timer.
-   *
-   * ```js
-   * setRule.waveTimer(true);
-   * ```
-   */
-  function waveTimer(enabled: boolean): void;
-
-  /**
-   * Allows or prevents waves from spawning.
-   *
-   * ```js
-   * setRule.waves(true);
-   * ```
-   */
-  function waves(enabled: boolean): void;
-
-  /**
-   * Sets the current wave number.
-   *
-   * ```js
-   * setRule.wave(10);
-   * ```
-   */
-  function wave(number: number): void;
-
-  /**
-   * Sets the time between waves in seconds.
-   *
-   * ```js
-   * setRule.waveSpacing(180);
-   * ```
-   */
-  function waveSpacing(seconds: number): void;
-
-  /**
-   * Sets wether waves can be manually summoned by pressing the play button.
-   *
-   * ```js
-   * setRule.waveSending(true);
-   * ```
-   */
-  function waveSending(enabled: boolean): void;
-
-  /**
-   * Sets wether the gamemode is the attack mode
-   *
-   * ```js
-   * setRule.attackMode(true);
-   * ```
-   */
-  function attackMode(enabled: boolean): void;
-
-  /**
-   * Sets the radius of the no-build zone around enemy cores.
-   *
-   * ```js
-   * setRule.enemyCoreBuildRadius(150);
-   * ```
-   */
-  function enemyCoreBuildRadius(radius: number): void;
-
-  /**
-   * Sets the radius around enemy wave drop zones.
-   *
-   * ```js
-   * setRule.dropZoneRadius(20);
-   * ```
-   */
-  function dropZoneRadius(radius: number): void;
-
-  /**
-   * Sets the base unit cap.
-   *
-   * ```js
-   * setRule.unitCap(40);
-   * ```
-   */
-  function unitCap(cap: number): void;
-
-  /**
-   * Sets the playable map area. Blocks that are out of the new bounds will be
-   * removed.
-   *
-   * ```js
-   * setRule.mapArea({
-   *   x: 0,
-   *   y: 0,
-   *   width: 500,
-   *   height: 500,
-   * });
-   * ```
-   */
-  function mapArea(options: {
-    x: number;
-    y: number;
-    width: number;
-    height: number;
-  }): void;
-
-  /** Sets wether ambient lighting is enabled */
-  function lighting(enabled: boolean): void;
-
-  /**
-   * Sets the ambient light color.
-   *
-   * `packColor` can be used to get the rgba data recevied by this function.
-   *
-   * ```js
-   * // enables lighting and sets the color to gray
-   * setRule.lighting(true);
-   * setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
-   * ```
-   */
-  function ambientLight(rgbaData: number): void;
-
-  /**
-   * Sets the multiplier for the energy output of solar panels.
-   *
-   * ```js
-   * setRule.solarMultiplier(10);
-   * ```
-   */
-  function solarMultiplier(multiplier: number): void;
-
-  /**
-   * Sets the build speed multiplier of a team. The multiplier will always be
-   * clamped between `0.001` and `50`.
-   *
-   * ```js
-   * setRule.buildSpeed(Teams.sharded, 1.5);
-   * ```
-   */
-  function buildSpeed(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the speed multiplier for unit factories. The multiplier will always be
-   * clamped between `0` and `50`.
-   *
-   * ```js
-   * setRule.unitBuildSpeed(Teams.sharded, 3);
-   * ```
-   */
-  function unitBuildSpeed(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the build cost multiplier for constructing units.
-   *
-   * ```js
-   * setRule.unitCost(Teams.sharded, 1.75);
-   * ```
-   */
-  function unitCost(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the damage multiplier for units on a given team.
-   *
-   * ```js
-   * setRule.unitDamage(Teams.sharded, 1.25);
-   * ```
-   */
-  function unitDamage(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the block health multiplier for a given team.
-   *
-   * ```js
-   * setRule.blockHealth(Teams.crux, 0.75);
-   * ```
-   */
-  function blockHealth(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the block damage multiplier for a given team.
-   *
-   * ```js
-   * setRule.blockDamage(Teams.crux, 2);
-   * ```
-   */
-  function blockDamage(team: TeamSymbol, multiplier: number): void;
-
-  /**
-   * Sets the Real Time Strategy minimum weight for a team.
-   *
-   * In other words it, sets the minimum "advantage" needed for a squad to
-   * attack. The higher the value, the more cautious the squad is.
-   *
-   * ```js
-   * setRule.rtsMinWeight(Teams.sharded, 3);
-   * ```
-   */
-
-  function rtsMinWeight(team: TeamSymbol, value: number): void;
-
-  /**
-   * Sets the Real Time Strategy minimum size of attack squads of a team.
-   *
-   * The higher the value, the more units are required before a squad attacks.
-   *
-   * ```js
-   * setRule.rtsMinSquad(Teams.sharded, 5);
-   * ```
-   */
-  function rtsMinSquad(team: TeamSymbol, value: number): void;
-}
-
-/**
- * Writes the contents of the print buffer in the selected mode and clears the
- * buffer afterwards.
- *
- * ```js
- * print("Hello");
- * flushMessage.announce(4); // lasts 4 seconds
- * wait(5);
- * print("World");
- * flushMessage.toast(4);
- * wait(5);
- * ```
- */
-export namespace flushMessage {
-  /**
-   * Shows a nofication at the top of the screen
-   *
-   * ```js
-   * print("something");
-   * flushMessage.notify();
-   * ```
-   */
-  function notify(): void;
-  /**
-   * Puts the content on the top left corner of the screen
-   *
-   * ```js
-   * print("something");
-   * flushMessage.mission();
-   * ```
-   */
-  function mission(): void;
-  /**
-   * Puts the content on the middle of the screen
-   *
-   * @param duration The duration, in seconds
+   * @param options.rotation The initial rotation of the unit in degrees.
    *
    *   ```js
-   *   print("something");
-   *   flushMessage.announce(3);
+   *   spawnUnit({
+   *     team: Teams.sharded,
+   *     type: Units.flare,
+   *     x: 10,
+   *     y: 20,
+   *     rotation: 90,
+   *   });
    *   ```
    */
-  function announce(duration: number): void;
-  /**
-   * Puts the content on the middle top of the screen
-   *
-   * @param duration The duration, in seconds
-   *
-   *   ```js
-   *   print("something");
-   *   flushMessage.toast(5);
-   *   ```
-   */
-  function toast(duration: number): void;
-}
+  export function spawnUnit<T extends BasicUnit = AnyUnit>(options: {
+    type: UnitSymbol;
+    x: number;
+    y: number;
+    team: TeamIdentifier;
+    /** The initial rotation of the unit in degrees. */
+    rotation?: number;
+  }): T;
 
-/** Controls the player camera. */
-export namespace cutscene {
+  export function senseWeather(weather: WeatherSymbol): boolean;
+
+  export function setWeather(weather: WeatherSymbol, state: boolean): void;
+
+  /** Contains the variants for the `applyStatus` instruction. */
+  export namespace applyStatus {
+    /**
+     * Applies a status effect to the given unit.
+     *
+     * The only status effects that don't require a duration are `overdrive` and
+     * `boss`.
+     *
+     * ```js
+     * applyStatus.apply("burning", Vars.unit, 10);
+     * applyStatus.apply("boss", Vars.unit);
+     * ```
+     */
+    function apply(
+      status: Exclude<TStatusEffect, TPermanentStatusEffect>,
+      unit: BasicUnit,
+      duration: number,
+    ): void;
+
+    function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
+
+    /**
+     * Removes a status effect to the given unit.
+     *
+     * ```js
+     * applyStatus.clear("burning", Vars.unit);
+     * applyStatus.clear("boss", Vars.unit);
+     * ```
+     */
+    function clear(status: TStatusEffect, unit: BasicUnit): void;
+  }
+
   /**
-   * Moves the player's camera to the given location.
+   * Spawns an enemy wave, can be used even if there is an already active wave.
    *
    * ```js
-   * cutscene.pan({
-   *   x: 10,
-   *   y: 20,
-   *   speed: 15,
+   * // natural wave, units appear on the enemy spawn
+   * spawnWave(true);
+   *
+   * // syntethic wave, units appear on the given coordinates
+   * spawnWave(false, 10, 20);
+   * ```
+   */
+  export function spawnWave(natural: true): void;
+  export function spawnWave(natural: false, x: number, y: number): void;
+  export function spawnWave(natural: boolean, x?: number, y?: number): void;
+
+  /** Contains the multiple variants of the `set rule` instruction. */
+  export namespace setRule {
+    /**
+     * Sets the wave countdown in seconds.
+     *
+     * ```js
+     * setRule.currentWaveTime(10);
+     * ```
+     */
+    function currentWaveTime(seconds: number): void;
+
+    /**
+     * Enables/disables the wave timer.
+     *
+     * ```js
+     * setRule.waveTimer(true);
+     * ```
+     */
+    function waveTimer(enabled: boolean): void;
+
+    /**
+     * Allows or prevents waves from spawning.
+     *
+     * ```js
+     * setRule.waves(true);
+     * ```
+     */
+    function waves(enabled: boolean): void;
+
+    /**
+     * Sets the current wave number.
+     *
+     * ```js
+     * setRule.wave(10);
+     * ```
+     */
+    function wave(number: number): void;
+
+    /**
+     * Sets the time between waves in seconds.
+     *
+     * ```js
+     * setRule.waveSpacing(180);
+     * ```
+     */
+    function waveSpacing(seconds: number): void;
+
+    /**
+     * Sets wether waves can be manually summoned by pressing the play button.
+     *
+     * ```js
+     * setRule.waveSending(true);
+     * ```
+     */
+    function waveSending(enabled: boolean): void;
+
+    /**
+     * Sets wether the gamemode is the attack mode
+     *
+     * ```js
+     * setRule.attackMode(true);
+     * ```
+     */
+    function attackMode(enabled: boolean): void;
+
+    /**
+     * Sets the radius of the no-build zone around enemy cores.
+     *
+     * ```js
+     * setRule.enemyCoreBuildRadius(150);
+     * ```
+     */
+    function enemyCoreBuildRadius(radius: number): void;
+
+    /**
+     * Sets the radius around enemy wave drop zones.
+     *
+     * ```js
+     * setRule.dropZoneRadius(20);
+     * ```
+     */
+    function dropZoneRadius(radius: number): void;
+
+    /**
+     * Sets the base unit cap.
+     *
+     * ```js
+     * setRule.unitCap(40);
+     * ```
+     */
+    function unitCap(cap: number): void;
+
+    /**
+     * Sets the playable map area. Blocks that are out of the new bounds will be
+     * removed.
+     *
+     * ```js
+     * setRule.mapArea({
+     *   x: 0,
+     *   y: 0,
+     *   width: 500,
+     *   height: 500,
+     * });
+     * ```
+     */
+    function mapArea(options: {
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }): void;
+
+    /** Sets wether ambient lighting is enabled */
+    function lighting(enabled: boolean): void;
+
+    /** Sets wether the game can end when all cores of a team are destroyed. */
+    function canGameOver(enabled: boolean): void;
+
+    /**
+     * Sets the ambient light color.
+     *
+     * `packColor` can be used to get the rgba data recevied by this function.
+     *
+     * ```js
+     * // enables lighting and sets the color to gray
+     * setRule.lighting(true);
+     * setRule.ambientLight(packColor(0.5, 0.5, 0.5, 1));
+     * ```
+     */
+    function ambientLight(rgbaData: number): void;
+
+    /**
+     * Sets the multiplier for the energy output of solar panels.
+     *
+     * ```js
+     * setRule.solarMultiplier(10);
+     * ```
+     */
+    function solarMultiplier(multiplier: number): void;
+
+    function dragMultiplier(multiplier: number): void;
+    /**
+     * Bans a block/unit type from the world.
+     *
+     * ```js
+     * setRule.ban(Blocks.router);
+     * ```
+     */
+    function ban(content: BlockSymbol | UnitSymbol): void;
+
+    /**
+     * Removes the ban of a block/unit type in the world.
+     *
+     * ```js
+     * setRule.unban(Blocks.router);
+     * ```
+     */
+    function unban(content: BlockSymbol | UnitSymbol): void;
+
+    /**
+     * Sets the build speed multiplier of a team. The multiplier will always be
+     * clamped between `0.001` and `50`.
+     *
+     * ```js
+     * setRule.buildSpeed(Teams.sharded, 1.5);
+     * ```
+     */
+    function buildSpeed(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the health multiplier for units on a given team. The multiplier
+     * cannot have a value lower than `0.001`.
+     *
+     * ```js
+     * setRule.unitHealth(Teams.sharded, 1.5);
+     * ```
+     */
+    function unitHealth(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the speed multiplier for unit factories. The multiplier will always
+     * be clamped between `0` and `50`.
+     *
+     * ```js
+     * setRule.unitBuildSpeed(Teams.sharded, 3);
+     * ```
+     */
+    function unitBuildSpeed(team: TeamIdentifier, multiplier: number): void;
+
+    function unitMineSpeed(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the build cost multiplier for constructing units.
+     *
+     * ```js
+     * setRule.unitCost(Teams.sharded, 1.75);
+     * ```
+     */
+    function unitCost(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the damage multiplier for units on a given team.
+     *
+     * ```js
+     * setRule.unitDamage(Teams.sharded, 1.25);
+     * ```
+     */
+    function unitDamage(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the block health multiplier for a given team.
+     *
+     * ```js
+     * setRule.blockHealth(Teams.crux, 0.75);
+     * ```
+     */
+    function blockHealth(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the block damage multiplier for a given team.
+     *
+     * ```js
+     * setRule.blockDamage(Teams.crux, 2);
+     * ```
+     */
+    function blockDamage(team: TeamIdentifier, multiplier: number): void;
+
+    /**
+     * Sets the Real Time Strategy minimum weight for a team.
+     *
+     * In other words it, sets the minimum "advantage" needed for a squad to
+     * attack. The higher the value, the more cautious the squad is.
+     *
+     * ```js
+     * setRule.rtsMinWeight(Teams.sharded, 3);
+     * ```
+     */
+
+    function rtsMinWeight(team: TeamIdentifier, value: number): void;
+
+    /**
+     * Sets the Real Time Strategy minimum size of attack squads of a team.
+     *
+     * The higher the value, the more units are required before a squad attacks.
+     *
+     * ```js
+     * setRule.rtsMinSquad(Teams.sharded, 5);
+     * ```
+     */
+    function rtsMinSquad(team: TeamIdentifier, value: number): void;
+  }
+
+  /**
+   * Writes the contents of the global text buffer in the selected mode and
+   * clears the buffer afterwards.
+   *
+   * ```js
+   * print("Hello");
+   * flushMessage.announce(4); // lasts 4 seconds
+   * wait(5);
+   * print("World");
+   * flushMessage.toast(4);
+   * wait(5);
+   * ```
+   */
+  export namespace flushMessage {
+    /**
+     * Shows a nofication at the top of the screen.
+     *
+     * Returns whether the operation was executed successfully.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.notify();
+     * ```
+     */
+    function notify(): boolean;
+    /**
+     * Puts the content on the top left corner of the screen
+     *
+     * Returns whether the operation was executed successfully.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.mission();
+     * ```
+     */
+    function mission(): boolean;
+    /**
+     * Puts the content on the middle of the screen
+     *
+     * Returns whether the operation was executed successfully.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.announce(3);
+     *   ```
+     */
+    function announce(duration: number): boolean;
+    /**
+     * Puts the content on the middle top of the screen
+     *
+     * Returns whether the operation was executed successfully.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.toast(5);
+     *   ```
+     */
+    function toast(duration: number): boolean;
+
+    /**
+     * Shows a nofication at the top of the screen.
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.notify();
+     * ```
+     */
+    function notifySync(): void;
+    /**
+     * Puts the content on the top left corner of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * ```js
+     * print("something");
+     * flushMessage.mission();
+     * ```
+     */
+    function missionSync(): void;
+    /**
+     * Puts the content on the middle of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.announce(3);
+     *   ```
+     */
+    function announceSync(duration: number): void;
+
+    /**
+     * Puts the content on the middle top of the screen
+     *
+     * Blocks execution until the message is displayed.
+     *
+     * @param duration The duration, in seconds
+     *
+     *   ```js
+     *   print("something");
+     *   flushMessage.toast(5);
+     *   ```
+     */
+    function toastSync(duration: number): void;
+  }
+
+  /** Controls the player camera. */
+  export namespace cutscene {
+    /**
+     * Moves the player's camera to the given location.
+     *
+     * ```js
+     * cutscene.pan({
+     *   x: 10,
+     *   y: 20,
+     *   speed: 15,
+     * });
+     * ```
+     */
+    function pan(options: { x: number; y: number; speed: number }): void;
+    /**
+     * Zooms the player camera to the desired level
+     *
+     * ```js
+     * cutscene.zoom(3);
+     * ```
+     */
+    function zoom(level: number): void;
+    /**
+     * Gives the camera control back to the player
+     *
+     * ```js
+     * cutscene.stop();
+     * ```
+     */
+    function stop(): void;
+  }
+
+  /**
+   * Creates an explosion.
+   *
+   * ```js
+   * explosion({
+   *   team: Teams.crux,
+   *   x: 5,
+   *   y: 15,
+   *   radius: 20,
+   *   damage: 100,
+   *   air: true,
+   *   ground: true,
+   *   pierce: true,
+   *   effect: true,
    * });
    * ```
    */
-  function pan(options: { x: number; y: number; speed: number }): void;
+  export function explosion(options: {
+    team: TeamIdentifier;
+    x: number;
+    y: number;
+    radius: number;
+    damage: number;
+    air: boolean;
+    ground: boolean;
+    pierce: boolean;
+    effect: boolean;
+  }): void;
+
   /**
-   * Zooms the player camera to the desired level
+   * Sets the speed of this world processor in instructions per tick.
    *
    * ```js
-   * cutscene.zoom(3);
+   * setRate(20);
    * ```
    */
-  function zoom(level: number): void;
+  export function setRate(ipt: number): void;
+
+  /** Contains the variants of the `fetch` instruction. */
+  export namespace fetch {
+    /**
+     * Gets an unit from the given team
+     *
+     * The index starts at 0.
+     *
+     * ```js
+     * const count = fetch.unitCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const unit = fetch.unit(Teams.sharded, i);
+     *   print`x: ${unit.x}, y: ${unit.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function unit<T extends BasicUnit = AnyUnit>(
+      team: TeamIdentifier,
+      index: number,
+    ): T;
+    /**
+     * Gets the amount of units existing on a given team.
+     *
+     * If `type` is not specified, returns the total amount of units
+     *
+     * ```js
+     * const count = fetch.unitCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const unit = fetch.unit(Teams.sharded, i);
+     *   print`x: ${unit.x}, y: ${unit.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function unitCount(team: TeamIdentifier, type?: UnitSymbol): number;
+    /**
+     * Gets a player from a team.
+     *
+     * The index starts at 0.
+     *
+     * ```js
+     * const count = fetch.playerCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const player = fetch.player(Teams.sharded, i);
+     *   print`x: ${player.x}, y: ${player.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function player<T extends BasicUnit = AnyUnit>(
+      team: TeamIdentifier,
+      index: number,
+    ): T;
+    /**
+     * Gets the amount of players existing on a given team.
+     *
+     * ```js
+     * const count = fetch.playerCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const player = fetch.player(Teams.sharded, i);
+     *   print`x: ${player.x}, y: ${player.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function playerCount(team: TeamIdentifier): number;
+    /**
+     * Gets a core from a team.
+     *
+     * The index of the starts at 0.
+     *
+     * ```js
+     * const count = fetch.coreCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const core = fetch.core(Teams.sharded, i);
+     *   print`x: ${core.x}, y: ${core.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function core(team: TeamIdentifier, index: number): AnyBuilding;
+    /**
+     * Gets the amount of cores existing on a given team.
+     *
+     * ```js
+     * const count = fetch.coreCount(Teams.sharded);
+     * for (let i = 0; i < count; i++) {
+     *   const core = fetch.core(Teams.sharded, i);
+     *   print`x: ${core.x}, y: ${core.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function coreCount(team: TeamIdentifier): number;
+    /**
+     * Gets a building from a team.
+     *
+     * The index starts at 0.
+     *
+     * ```js
+     * const count = fetch.buildCount(Teams.sharded, Blocks.router);
+     * for (let i = 0; i < count; i++) {
+     *   const router = fetch.build(Teams.sharded, i, Blocks.router);
+     *   print`x: ${router.x}, y: ${router.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function build<T extends BasicBuilding = AnyBuilding>(
+      team: TeamIdentifier,
+      index: number,
+      block: BuildingSymbol,
+    ): T;
+    /**
+     * Gets the amount of buildings existing on a given team.
+     *
+     * If `type` is not specified, returns the total amount of buildings
+     *
+     * ```js
+     * const count = fetch.buildCount(Teams.sharded, Blocks.router);
+     * for (let i = 0; i < count; i++) {
+     *   const router = fetch.build(Teams.sharded, i, Blocks.router);
+     *   print`x: ${router.x}, y: ${router.y}\n`;
+     * }
+     * printFlush();
+     * ```
+     */
+    function buildCount(team: TeamIdentifier, type?: BuildingSymbol): number;
+  }
+
   /**
-   * Gives the camera control back to the player
+   * Checks if a global flag is set.
    *
    * ```js
-   * cutscene.stop();
+   * const flagEnabled = getFlag("foo");
    * ```
    */
-  function stop(): void;
+  export function getFlag(flag: string): boolean;
+
+  /**
+   * Sets a global flag.
+   *
+   * ```js
+   * setFlag("foo", true);
+   * ```
+   */
+  export function setFlag(flag: string, value: boolean): void;
+
+  /**
+   * Creates a writable record that allows you to set a property of a building
+   * or unit.
+   *
+   * ```js
+   * const router = fetch.build(Teams.sharded, 0, Blocks.router);
+   * setProp(router).team = Teams.derelict;
+   * ```
+   */
+  export function setProp(target: BasicBuilding): SettableBuilding;
+  export function setProp(target: BasicUnit): SettableUnit;
+
+  /**
+   * Allows code running on the server to asynchronously send its version of a
+   * single register to the client.
+   *
+   * Can be used up to 20 times per second.
+   */
+  export class SyncLock<T extends number | string | symbol | undefined> {
+    /**
+     * The value held by this sync lock, synchronized whenever `sendToClients`
+     * is called.
+     */
+    value: T;
+
+    constructor(value?: T);
+
+    /**
+     * When running on the server, sends the value of this sync lock to every
+     * client in the game.
+     */
+    sendToClients(): void;
+  }
+
+  export namespace effect {
+    function warn(x: number, y: number): void;
+    function cross(x: number, y: number): void;
+    function blockFall(x: number, y: number, data: BlockSymbol): void;
+    function placeBlock(x: number, y: number, size: number): void;
+    function placeBlockSpark(x: number, y: number, size: number): void;
+    function breakBlock(x: number, y: number, size: number): void;
+    function spawn(x: number, y: number): void;
+    function trail(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function breakPop(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function smokeCloud(x: number, y: number, color: number): void;
+    function vapor(x: number, y: number, color: number): void;
+    function hit(x: number, y: number, color: number): void;
+    function hitSquare(x: number, y: number, color: number): void;
+    function shootSmall(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function shootBig(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function smokeSmall(x: number, y: number, rotation: number): void;
+    function smokeBig(x: number, y: number, rotation: number): void;
+    function smokeColor(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function smokeSquare(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function smokeSquareBig(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function spark(x: number, y: number, color: number): void;
+    function sparkBig(x: number, y: number, color: number): void;
+    function sparkShoot(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function sparkShootBig(options: {
+      x: number;
+      y: number;
+      color: number;
+      rotation: number;
+    }): void;
+    function drill(x: number, y: number, color: number): void;
+    function drillBig(x: number, y: number, color: number): void;
+    function lightBlock(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function explosion(x: number, y: number, size: number): void;
+    function smokePuff(x: number, y: number, color: number): void;
+    function sparkExplosion(x: number, y: number, color: number): void;
+    function crossExplosion(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function wave(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function bubble(x: number, y: number): void;
+  }
+
+  export namespace playSound {
+    function positional(options: {
+      sound: number;
+      volume: number;
+      pitch: number;
+      x: number;
+      y: number;
+      limit: boolean;
+    }): void;
+
+    function global(options: {
+      sound: number;
+      volume: number;
+      pitch: number;
+      pan: number;
+      limit: boolean;
+    }): void;
+  }
+
+  /** Represents a maker, invoking the methods or */
+  export interface Marker {
+    /** Deletes the marker, making its id available for reuse. */
+    remove(): void;
+    set world(value: boolean);
+    /** Wether the marker should be on the minimap or in the world */
+    set minimap(value: boolean);
+    set autoscale(value: boolean);
+    set pos(value: { x: number; y: number });
+    set endPos(value: { x: number; y: number });
+    set drawLayer(value: number);
+    set color(value: number);
+    set radius(value: number);
+    set stroke(value: number);
+    set rotation(value: number);
+    set shape(value: { sides: number; fill: boolean; outline: boolean });
+    /**
+     * Writes the contents of the global text buffer to the marker's text.
+     * Empties the global text buffer.
+     */
+    flushText(options: { fetch: boolean }): void;
+    set fontSize(value: number);
+    set textAlign(value: Align);
+    set lineAlign(value: Align);
+    set textHeight(value: number);
+    set outline(value: boolean);
+    set labelFlags(value: { background: boolean; outline: boolean });
+    set texture(value: string);
+    /** Writes the contents of the global text buffer to the marker's texture. */
+    flushTexture(): void;
+    set textureSize(value: { width: number; height: number });
+    /**
+     * Indexed position, used for line and quad markers with index zero being
+     * the first position.
+     */
+    set posi(value: { index: number; x: number; y: number });
+    /** Texture's position ranging from zero to one, used for quad markers. */
+    set uvi(value: { index: number; x: number; y: number });
+    /**
+     * Indexed position, used for line and quad markers with index zero being
+     * the first color.
+     */
+    set colori(value: { index: number; color: number });
+  }
+
+  interface MarkerConstructor {
+    /**
+     * Creates a marker object with the given id.
+     *
+     * This function provides access to existing markers and does not generate a
+     * `makemaker` instruction.
+     */
+    of(id: number): Marker;
+
+    /** Creates a new logic marker in the world. */
+    shapeText(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    minimap(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    shape(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    line(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    text(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    texture(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+    quad(options: {
+      id: number;
+      x: number;
+      y: number;
+      replace: boolean;
+    }): Marker;
+  }
+
+  /** Contains methods to create marker objects. */
+  export var Marker: MarkerConstructor;
+
+  /**
+   * Add map locale property value to the global text buffer.
+   *
+   * To set map locale bundles in map editor, check Map Info > Locale Bundles.
+   *
+   * If client is a mobile device, tries to print a property ending in ".mobile"
+   * first.
+   *
+   * ```js
+   * localePrint("map.locale.key");
+   * ```
+   */
+  export function localePrint(key: string): void;
 }
-
-/**
- * Creates an explosion.
- *
- * ```js
- * explosion({
- *   team: Teams.crux,
- *   x: 5,
- *   y: 15,
- *   radius: 20,
- *   damage: 100,
- *   air: true,
- *   ground: true,
- *   pierce: true,
- * });
- * ```
- */
-export function explosion(options: {
-  team: TeamSymbol;
-  x: number;
-  y: number;
-  radius: number;
-  damage: number;
-  air: boolean;
-  ground: boolean;
-  pierce: boolean;
-}): void;
-
-/**
- * Sets the speed of this world processor in instructions per tick.
- *
- * ```js
- * setRate(20);
- * ```
- */
-export function setRate(ipt: number): void;
-
-/** Contains the variants of the `fetch` instruction. */
-export namespace fetch {
-  /**
-   * Gets an unit from the given team
-   *
-   * The index starts at 0.
-   *
-   * ```js
-   * const count = fetch.unitCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const unit = fetch.unit(Teams.sharded, i);
-   *   print`x: ${unit.x}, y: ${unit.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function unit<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
-    index: number,
-  ): T;
-  /**
-   * Gets the amount of units existing on a given team.
-   *
-   * ```js
-   * const count = fetch.unitCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const unit = fetch.unit(Teams.sharded, i);
-   *   print`x: ${unit.x}, y: ${unit.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function unitCount(team: TeamSymbol): number;
-  /**
-   * Gets a player from a team.
-   *
-   * The index starts at 0.
-   *
-   * ```js
-   * const count = fetch.playerCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const player = fetch.player(Teams.sharded, i);
-   *   print`x: ${player.x}, y: ${player.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function player<T extends BasicUnit = AnyUnit>(
-    team: TeamSymbol,
-    index: number,
-  ): T;
-  /**
-   * Gets the amount of players existing on a given team.
-   *
-   * ```js
-   * const count = fetch.playerCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const player = fetch.player(Teams.sharded, i);
-   *   print`x: ${player.x}, y: ${player.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function playerCount(team: TeamSymbol): number;
-  /**
-   * Gets a core from a team.
-   *
-   * The index of the starts at 0.
-   *
-   * ```js
-   * const count = fetch.coreCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const core = fetch.core(Teams.sharded, i);
-   *   print`x: ${core.x}, y: ${core.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function core(team: TeamSymbol, index: number): AnyBuilding;
-  /**
-   * Gets the amount of cores existing on a given team.
-   *
-   * ```js
-   * const count = fetch.coreCount(Teams.sharded);
-   * for (let i = 0; i < count; i++) {
-   *   const core = fetch.core(Teams.sharded, i);
-   *   print`x: ${core.x}, y: ${core.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function coreCount(team: TeamSymbol): number;
-  /**
-   * Gets a building from a team.
-   *
-   * The index starts at 0.
-   *
-   * ```js
-   * const count = fetch.buildCount(Teams.sharded, Blocks.router);
-   * for (let i = 0; i < count; i++) {
-   *   const router = fetch.build(Teams.sharded, i, Blocks.router);
-   *   print`x: ${router.x}, y: ${router.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function build<T extends BasicBuilding = AnyBuilding>(
-    team: TeamSymbol,
-    index: number,
-    block: BuildingSymbol,
-  ): T;
-  /**
-   * Gets the amount of buildings existing on a given team.
-   *
-   * ```js
-   * const count = fetch.buildCount(Teams.sharded, Blocks.router);
-   * for (let i = 0; i < count; i++) {
-   *   const router = fetch.build(Teams.sharded, i, Blocks.router);
-   *   print`x: ${router.x}, y: ${router.y}\n`;
-   * }
-   * printFlush();
-   * ```
-   */
-  function buildCount(team: TeamSymbol, block: BuildingSymbol): number;
-}
-
-/**
- * Checks if a global flag is set.
- *
- * ```js
- * const flagEnabled = getFlag("foo");
- * ```
- */
-export function getFlag(flag: string): boolean;
-
-/**
- * Sets a global flag.
- *
- * ```js
- * setFlag("foo", true);
- * ```
- */
-export function setFlag(flag: string, value: boolean): void;
-
-/**
- * Creates a writable record that allows you to set a property of a building or
- * unit.
- *
- * ```js
- * const router = fetch.build(Teams.sharded, 0, Blocks.router);
- * setProp(router).team = Teams.derelict;
- * ```
- */
-export function setProp(target: BasicBuilding): SettableBuilding;
-export function setProp(target: BasicUnit): SettableUnit;

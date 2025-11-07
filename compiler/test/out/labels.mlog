@@ -1,26 +1,24 @@
 set i:1:16 0
-jump 17 greaterThanEq i:1:16 3
+jump 15 greaterThanEq i:1:16 3
 set j:2:11 0
-jump 15 greaterThanEq j:2:11 3
+jump 13 greaterThanEq j:2:11 3
 op equal &t0 i:1:16 1
 jump 7 equal &t0 0
 op equal &t0 j:2:11 1
-jump 15 notEqual &t0 0
-print "i = "
-print i:1:16
-print ", j = "
-print j:2:11
-print "\n"
+jump 13 notEqual &t0 0
+print "i = {0}, j = {0}\n"
+format i:1:16
+format j:2:11
 op add j:2:11 j:2:11 1
 jump 3 always
 op add i:1:16 i:1:16 1
 jump 1 always
 set i:9:4 0
-jump 25 greaterThanEq i:9:4 100
+jump 23 greaterThanEq i:9:4 100
 set j:12:6 0
-jump 25 equal i:9:4 j:12:6
-jump 24 lessThan i:9:4 j:12:6
+jump 23 equal i:9:4 j:12:6
+jump 22 lessThan i:9:4 j:12:6
 op add j:12:6 j:12:6 1
-jump 20 lessThan j:12:6 100
-jump 18 always
+jump 18 lessThan j:12:6 100
+jump 16 always
 end

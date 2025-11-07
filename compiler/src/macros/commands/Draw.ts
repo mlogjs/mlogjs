@@ -43,6 +43,20 @@ export class Draw extends ObjectValue {
           named: "options",
           args: ["x", "y", "image", "size", "rotation"],
         },
+        print: {
+          named: "options",
+          args: ["x", "y", "align"],
+        },
+        translate: {
+          args: ["x", "y"],
+        },
+        scale: {
+          args: ["x", "y"],
+        },
+        rotate: {
+          args: ["degrees"],
+        },
+        reset: { args: [] },
       },
 
       handler(scope, overload, out, ...args) {

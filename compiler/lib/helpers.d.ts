@@ -1,6 +1,6 @@
 /// <reference path="./kinds.d.ts" />
 
-import { TLogicLinkNames } from "./util";
+import { TLogicLinkNames } from "mlogjs:types";
 
 declare global {
   /**

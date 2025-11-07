@@ -1,11 +1,8 @@
 sensor &t0 cyclone1 @ammo
-print "current ammo: "
-print &t0
-print "\n"
+print "current ammo: {0}\n"
+format &t0
 sensor &t1 cyclone1 @cryofluid
-print "amount of "
-print @cryofluid
-print " : "
-print &t1
-print "\n"
+print "amount of {0} : {0}\n"
+format @cryofluid
+format &t1
 printflush message1

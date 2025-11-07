@@ -9,13 +9,13 @@ jump 15 strictEqual y:2:6 2
 jump 20 always
 op add &t1 x:1:6 y:2:6
 op sub &t2 x:1:6 y:2:6
-print &t1
-print " > "
-print &t2
+print "{0} > {0}"
+format &t1
+format &t2
 jump 20 always
 op sub &t1 x:1:6 y:2:6
 op add &t2 x:1:6 y:2:6
-print &t1
-print " < "
-print &t2
+print "{0} < {0}"
+format &t1
+format &t2
 printflush message1

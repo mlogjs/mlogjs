@@ -8,12 +8,8 @@ set c:3:6 b:2:6
 set d:4:6 a:1:6
 jump 10 notEqual a:1:6 0
 set d:4:6 b:2:6
-print "\na: "
-print a:1:6
-print "\nb: "
-print b:2:6
-print "\na && b: "
-print c:3:6
-print "\na || b: "
-print d:4:6
-print "\n"
+print "\na: {0}\nb: {0}\na && b: {0}\na || b: {0}\n"
+format a:1:6
+format b:2:6
+format c:3:6
+format d:4:6

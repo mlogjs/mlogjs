@@ -60,3 +60,42 @@ export class VarsNamespace extends NamespaceMacro {
     super();
   }
 }
+
+export class ColorsNamespace extends NamespaceMacro {
+  constructor() {
+    super();
+  }
+
+  get(
+    scope: IScope,
+    key: IValue,
+    out?: TEOutput | undefined,
+  ): TValueInstructions<IValue> {
+    if (!(key instanceof LiteralValue) || !key.isString())
+      return super.get(scope, key, out);
+    const plainName = key.data;
+
+    const name = `@color${plainName[0].toUpperCase()}${plainName.slice(1)}`;
+    const result = new StoreValue(name, EMutability.constant);
+    return [result, []];
+  }
+}
+
+export class SoundsNamespace extends NamespaceMacro {
+  constructor() {
+    super();
+  }
+
+  get(
+    scope: IScope,
+    key: IValue,
+    out?: TEOutput | undefined,
+  ): TValueInstructions<IValue> {
+    if (!(key instanceof LiteralValue) || !key.isString())
+      return super.get(scope, key, out);
+
+    const result = new StoreValue(`@sfx-${key.data}`, EMutability.constant);
+
+    return [result, []];
+  }
+}

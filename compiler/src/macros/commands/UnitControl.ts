@@ -13,6 +13,7 @@ export class UnitControl extends ObjectValue {
         move: { args: ["x", "y"] },
         approach: { named: "options", args: ["x", "y", "radius"] },
         pathfind: { args: ["x", "y"] },
+        autoPathfind: { args: [] },
         boost: { args: ["enable"] },
         target: { named: "options", args: ["x", "y", "shoot"] },
         targetp: { named: "options", args: ["unit", "shoot"] },

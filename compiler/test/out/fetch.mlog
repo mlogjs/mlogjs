@@ -1,14 +1,12 @@
 fetch buildCount routers:3:6 @sharded 0 @router
 set i:5:9 0
-jump 13 greaterThanEq i:5:9 routers:3:6
+jump 11 greaterThanEq i:5:9 routers:3:6
 fetch build router:6:8 @sharded i:5:9 @router
 sensor &t0 router:6:8 @x
 sensor &t1 router:6:8 @y
-print "x: "
-print &t0
-print " y: "
-print &t1
-print "\n"
+print "x: {0} y: {0}\n"
+format &t0
+format &t1
 op add i:5:9 i:5:9 1
 jump 2 always
 printflush message1

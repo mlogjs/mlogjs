@@ -1,8 +1,8 @@
 import type MarkdownIt from "markdown-it";
 import Container from "markdown-it-container";
 import * as es from "@babel/types";
-import { resolve } from "path";
-import { readFileSync, watchFile, type StatWatcher } from "fs";
+import { join, resolve } from "path";
+import { readFileSync, watch, type FSWatcher } from "fs";
 import { parse } from "@babel/parser";
 import { fileURLToPath } from "url";
 import type Token from "markdown-it/lib/token";
@@ -12,12 +12,14 @@ interface EnvData {
 }
 
 const envKey = "mlogjsCommandExamples";
-const filePath = resolve(
-  fileURLToPath(import.meta.url),
-  "../../../../../compiler/lib/commands.d.ts",
-);
 
-let watcher: StatWatcher | undefined;
+const libDir = resolve(
+  fileURLToPath(import.meta.url),
+  "../../../../../compiler/lib",
+);
+const files = ["commands.d.ts", "world.d.ts"];
+
+let watcher: FSWatcher | undefined;
 
 /**
  * Creates a custom markdown container that shows the code the example of a
@@ -47,7 +49,9 @@ function getEnvData(env: any): EnvData {
   env[envKey] ??= loadEnvData();
 
   if (process.env.NODE_ENV === "development") {
-    watcher ??= watchFile(filePath, () => {
+    watcher ??= watch(libDir, (event, filename) => {
+      if (event !== "change") return;
+      if (!files.includes(filename!)) return;
       env[envKey] = undefined;
     });
   }
@@ -56,22 +60,27 @@ function getEnvData(env: any): EnvData {
 }
 
 function loadEnvData() {
-  const content = readFileSync(filePath, "utf8");
+  const data: Record<string, string> = {};
 
-  const ast = parse(content, {
-    plugins: ["typescript"],
-    sourceType: "module",
-  });
+  for (const file of files) {
+    const content = readFileSync(join(libDir, file), "utf8");
+    const ast = parse(content, {
+      plugins: ["typescript"],
+      sourceType: "module",
+    });
 
-  if (ast.errors.length > 0) {
-    throw new Error(
-      // eslint-disable-next-line @typescript-eslint/no-base-to-string
-      `Error parsing commands declaration file: ${ast.errors[0]}`,
-      { cause: ast.errors[0] },
-    );
+    if (ast.errors.length > 0) {
+      throw new Error(
+        // eslint-disable-next-line @typescript-eslint/no-base-to-string
+        `Error parsing commands declaration file: ${ast.errors[0]}`,
+        { cause: ast.errors[0] },
+      );
+    }
+
+    Object.assign(data, traverseAst(ast));
   }
 
-  return traverseAst(ast);
+  return data;
 }
 
 function findExampleId(tokens: Token[], index: number) {
@@ -128,6 +137,13 @@ function traverseAst(node: es.Node): Record<string, string> {
     return {
       [name]: code,
     };
+  }
+
+  if (es.isExportNamedDeclaration(node) && node.declaration) {
+    // babel puts the comments in the export node
+    // instead of the actual declaration node
+    node.declaration.leadingComments = node.leadingComments;
+    return traverseAst(node.declaration);
   }
   return {};
 }

@@ -1,8 +1,7 @@
-print 10
+print "10"
 print "String literal"
 print "number index"
-print "Number is "
-print 20
+print "Number is 20"
 op rand &t0:&t1 10
 print &t0:&t1
 printflush message1

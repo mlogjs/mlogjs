@@ -1,19 +1,16 @@
 jump 2 notEqual @unit null
 ubind @flare
 sensor &t0 @unit @ammo
-print "ammo: "
-print &t0
-print "\n"
+print "ammo: {0}\n"
+format &t0
 sensor &t1 @unit @health
-print "health: "
-print &t1
-print "\n"
+print "health: {0}\n"
+format &t1
 set item:7:4 @copper
 sensor &t2 @unit item:7:4
-print "amount of "
-print item:7:4
-print " : "
-print &t2
+print "amount of {0} : {0}"
+format item:7:4
+format &t2
 printflush message1
 radar enemy any any distance cyclone1 1 unitA:11:6
 uradar enemy flying any distance 0 1 unitB:17:6

@@ -1,13 +1,19 @@
-import "./kind";
-import { TRadarFilter, TRadarSort, TUnitLocateBuildingGroup } from "./util";
+import "./kinds";
+import {
+  TRadarFilter,
+  TRadarSort,
+  TUnitLocateBuildingGroup,
+} from "mlogjs:types";
+
 declare global {
   /**
-   * Appends the items to the print buffer, calling this function on its own
-   * will not print any contents to a message block.
+   * Appends the items to the global text buffer, calling this function on its
+   * own will not print any contents to a message block.
    *
-   * To print the contents of the print buffer and empty it call, `printFlush`.
+   * To print the contents of the global text buffer and empty it, call
+   * `printFlush`.
    *
-   * @param items The items to be added to the print buffer.
+   * @param items The items to be added to the global text buffer.
    *
    *   ```js
    *   const a = Math.floor(Math.rand(10));
@@ -23,6 +29,30 @@ declare global {
    *   ```
    */
   function print(...items: unknown[]): void;
+
+  /**
+   * Replaces the first placeholder with lowest value in the global text buffer.
+   *
+   * ```js
+   * print("{1} {0}");
+   * format("world!");
+   * format("Hello");
+   * printFlush(); // prints "Hello world!"
+   * ```
+   */
+  function format(value: unknown): void;
+
+  /**
+   * Adds a character to the global text buffer using the provided using the
+   * provided UTF-16 code unit or the icon of the provided game content type.
+   *
+   * ```js
+   * printChar(128073); // "👉" emoji
+   * printChar(Blocks.router);
+   * printFlush();
+   * ```
+   */
+  function printChar(character: number | symbol): void;
 
   /** Contains the multiple variants of the `draw` instruction */
   namespace draw {
@@ -256,17 +286,55 @@ declare global {
       /** The rotation of the image in degrees. */
       rotation: number;
     }): void;
+
+    /**
+     * Draws text from the global text buffer, clearing it afterwards.
+     *
+     * Only ASCII characters are supported.
+     *
+     * ```js
+     * draw.print({
+     *   x: 10,
+     *   y: 10,
+     *   align: Align.topLeft,
+     * });
+     * ```
+     *
+     * Warning: nothing is drawn until `drawFlush` is called.
+     */
+    function print(options: { x: number; y: number; align: Align }): void;
+
+    /**
+     * Applies a translation to the next drawing operations.
+     *
+     * ```js
+     * draw.translate(10, 20);
+     * ```
+     */
+    function translate(x: number, y: number): void;
+
+    /** Applies a scaling to the next drawing operations. */
+    function scale(x: number, y: number): void;
+
+    /** Applies a rotation to the next drawing operations. */
+    function rotate(degrees: number): void;
+
+    /** Removes all applied transformations. */
+    function reset(): void;
   }
 
   /**
-   * Writes the contents of the print buffer into the target message and clears
-   * the buffer afterwards.
+   * Writes the contents of the global text buffer into the target message and
+   * clears the buffer afterwards.
    *
    * @param target The message building to write to. Writes to `message1` by
    *   default.
    *
    *   Note that the default value only applies if you don't pass any parameter to
    *   this function.
+   *
+   *   If `target` is `undefined`, the contents of the global text buffer will be
+   *   discarded.
    *
    *   ```js
    *   const { message2 } = getBuildings();
@@ -275,7 +343,7 @@ declare global {
    *   printFlush(); // defaults to message1
    *   ```
    */
-  function printFlush(target: BasicBuilding): void;
+  function printFlush(target: BasicBuilding | undefined): void;
   function printFlush(): void;
 
   /**
@@ -576,6 +644,21 @@ declare global {
      * ```
      */
     function liquid(index: number): LiquidSymbol | undefined;
+
+    /**
+     * Looks up a team symbol by its index on the content registry.
+     *
+     * Example:
+     *
+     * ```js
+     * const first = lookup.team(0);
+     *
+     * print`first team type: ${first}`;
+     *
+     * printFlush();
+     * ```
+     */
+    function team(index: number): TeamSymbol | undefined;
   }
 
   /**
@@ -596,6 +679,25 @@ declare global {
    * ```
    */
   function packColor(r: number, g: number, b: number, a: number): number;
+
+  /**
+   * Unpacks RGBA color information from a color.
+   *
+   * ```js
+   * const colorData = packColor(0.1, 0.6, 0.8, 0.1);
+   *
+   * const { r, g, b, a } = unpackColor(colorData);
+   *
+   * print`r: ${r}, g: ${g}, b: ${b}, a: ${a}`;
+   * printFlush();
+   * ```
+   */
+  function unpackColor(color: number): {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  };
 
   /**
    * Binds an unit to the this processor. The unit is accessible at `Vars.unit`.
@@ -697,6 +799,18 @@ declare global {
     function pathfind(x: number, y: number): void;
 
     /**
+     * Makes the unit bound to this processor automatically pathfind to the
+     * nearest enemy core or drop point.
+     *
+     * Is the same as standard wave enemy pathfinding.
+     *
+     * ```js
+     * unitControl.autoPathfind();
+     * ```
+     */
+    function autoPathfind(): void;
+
+    /**
      * Whether the unit bound to this processor should be boosted (floating)
      *
      * ```js
@@ -758,6 +872,11 @@ declare global {
      * Makes the unit bound to this processor drop it's held items onto the
      * given target
      *
+     * Using this command sets the unit's action timeout.
+     *
+     * This command will be on cooldown for 1.5 seconds after the timeout has
+     * been set.
+     *
      * @param target Where to drop the items, if `Blocks.air`, the unit will
      *   throw it's items away
      * @param amount How many items should be dropped
@@ -784,6 +903,11 @@ declare global {
     /**
      * Makes the unit bound to this processor take items from a building
      *
+     * Using this command sets the unit's action timeout.
+     *
+     * This command will be on cooldown for 1.5 seconds after the timeout has
+     * been set.
+     *
      * @param target The building that will have it's items taken
      * @param item The kind of item to take
      * @param amount How many items should be taken
@@ -807,6 +931,11 @@ declare global {
     /**
      * Makes the unit bound to this processor drop one entity from it's payload
      *
+     * Using this command sets the unit's action timeout.
+     *
+     * This command will be on cooldown for 1.5 seconds after the timeout has
+     * been set.
+     *
      * ```js
      * unitControl.payDrop();
      * ```
@@ -815,6 +944,11 @@ declare global {
 
     /**
      * Makes the unit bound to this processor take an entity into it's payload
+     *
+     * Using this command sets the unit's action timeout.
+     *
+     * This command will be on cooldown for 1.5 seconds after the timeout has
+     * been set.
      *
      * @param options.takeUnits Whether to take units or buildings
      *
@@ -866,7 +1000,8 @@ declare global {
      *
      * @param options.block The kind of building to build
      * @param options.rotation The rotation of the building, ranges from 0 to 3
-     * @param options.config The config of the building
+     * @param options.config The configuration value to use, or a building from
+     *   which the configuration value will be copied.
      *
      *   ```js
      *   unitControl.build({
@@ -885,8 +1020,11 @@ declare global {
       block: BuildingSymbol;
       /** The rotation of the building, ranges from 0 to 3 */
       rotation: number;
-      /** The config of the building */
-      config?: unknown;
+      /**
+       * The configuration value to use, or a building from which the
+       * configuration value will be copied.
+       */
+      config?: symbol | BasicBuilding;
     }): void;
 
     /**

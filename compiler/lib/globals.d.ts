@@ -30,7 +30,7 @@ interface Vars {
   readonly unit: AnyUnit;
   /** The amount of ticks that happened since the map started */
   readonly tick: number;
-  /** The current UNIX timestamp in milliseconds */
+  /** The amount of milliseconds that passed since the map started */
   readonly time: number;
   /**
    * The amount of seconds that passed since the map started.
@@ -67,6 +67,18 @@ interface Vars {
 
 declare const Vars: Vars;
 
+declare enum Align {
+  left,
+  center,
+  right,
+  topLeft,
+  top,
+  topRight,
+  bottomLeft,
+  bottom,
+  bottomRight,
+}
+
 /** Contains the base game teams. */
 declare namespace Teams {
   /** The gray team. */
@@ -92,6 +104,7 @@ declare namespace Teams {
 }
 
 type TeamSymbol = (typeof Teams)[keyof typeof Teams];
+type TeamIdentifier = TeamSymbol | number;
 
 declare namespace Items {
   const copper: unique symbol;
@@ -216,19 +229,33 @@ declare namespace LAccess {
   const powerNetOut: unique symbol;
   const ammo: unique symbol;
   const ammoCapacity: unique symbol;
+  const currentAmmoType: unique symbol;
+  const memoryCapacity: unique symbol;
   const health: unique symbol;
   const maxHealth: unique symbol;
   const heat: unique symbol;
   const shield: unique symbol;
+  const armor: unique symbol;
   const efficiency: unique symbol;
   const progress: unique symbol;
   const timescale: unique symbol;
   const rotation: unique symbol;
   const x: unique symbol;
   const y: unique symbol;
+  const velocityX: unique symbol;
+  const velocityY: unique symbol;
   const shootX: unique symbol;
   const shootY: unique symbol;
+  const cameraX: unique symbol;
+  const cameraY: unique symbol;
+  const cameraWidth: unique symbol;
+  const cameraHeight: unique symbol;
+  const displayWidth: unique symbol;
+  const displayHeight: unique symbol;
+  const bufferSize: unique symbol;
+  const operations: unique symbol;
   const size: unique symbol;
+  const solid: unique symbol;
   const dead: unique symbol;
   const range: unique symbol;
   const shooting: unique symbol;
@@ -245,6 +272,8 @@ declare namespace LAccess {
   const name: unique symbol;
   const payloadCount: unique symbol;
   const payloadType: unique symbol;
+  const totalPayload: unique symbol;
+  const payloadCapacity: unique symbol;
   const id: unique symbol;
   const enabled: unique symbol;
   const config: unique symbol;
@@ -260,6 +289,167 @@ declare namespace LAccess {
    */
   const color: unique symbol;
 }
+
+/** Contains the built-in game colors. */
+declare namespace Colors {
+  const tan: number;
+  const sky: number;
+  const pink: number;
+  const lightgrey: number;
+  const white: number;
+  const lightgray: number;
+  const magenta: number;
+  const salmon: number;
+  const coral: number;
+  const grey: number;
+  const darkgrey: number;
+  const lime: number;
+  const brown: number;
+  const blue: number;
+  const green: number;
+  const teal: number;
+  const forest: number;
+  const black: number;
+  const gold: number;
+  const brick: number;
+  const gray: number;
+  const cyan: number;
+  const royal: number;
+  const violet: number;
+  const yellow: number;
+  const clear: number;
+  const orange: number;
+  const maroon: number;
+  const red: number;
+  const darkgray: number;
+  const navy: number;
+  const scarlet: number;
+  const slate: number;
+  const olive: number;
+  const purple: number;
+  const acid: number;
+  const goldenrod: number;
+  const crimson: number;
+  const accent: number;
+  const unlaunched: number;
+  const highlight: number;
+  const stat: number;
+  const negstat: number;
+}
+
+declare namespace Weathers {
+  const snowing: unique symbol;
+  const rain: unique symbol;
+  const sandstorm: unique symbol;
+  const sporestorm: unique symbol;
+  const fog: unique symbol;
+  const suspendParticles: unique symbol;
+}
+
+interface Sounds {
+  readonly artillery: number;
+  readonly back: number;
+  readonly bang: number;
+  readonly beam: number;
+  readonly bigshot: number;
+  readonly bioLoop: number;
+  readonly blaster: number;
+  readonly bolt: number;
+  readonly boom: number;
+  readonly break: number;
+  readonly build: number;
+  readonly buttonClick: number;
+  readonly cannon: number;
+  readonly chatMessage: number;
+  readonly click: number;
+  readonly combustion: number;
+  readonly conveyor: number;
+  readonly corexplode: number;
+  readonly cutter: number;
+  readonly door: number;
+  readonly drill: number;
+  readonly drillCharge: number;
+  readonly drillImpact: number;
+  readonly dullExplosion: number;
+  readonly electricHum: number;
+  readonly explosion: number;
+  readonly explosionbig: number;
+  readonly extractLoop: number;
+  readonly fire: number;
+  readonly flame: number;
+  readonly flame2: number;
+  readonly flux: number;
+  readonly glow: number;
+  readonly grinding: number;
+  readonly hum: number;
+  readonly largeCannon: number;
+  readonly largeExplosion: number;
+  readonly laser: number;
+  readonly laserbeam: number;
+  readonly laserbig: number;
+  readonly laserblast: number;
+  readonly lasercharge: number;
+  readonly lasercharge2: number;
+  readonly lasershoot: number;
+  readonly machine: number;
+  readonly malignShoot: number;
+  readonly mediumCannon: number;
+  readonly message: number;
+  readonly mineDeploy: number;
+  readonly minebeam: number;
+  readonly missile: number;
+  readonly missileLarge: number;
+  readonly missileLaunch: number;
+  readonly missileSmall: number;
+  readonly missileTrail: number;
+  readonly mud: number;
+  readonly noammo: number;
+  readonly pew: number;
+  readonly place: number;
+  readonly plantBreak: number;
+  readonly plasmaboom: number;
+  readonly plasmadrop: number;
+  readonly press: number;
+  readonly pulse: number;
+  readonly pulseBlast: number;
+  readonly railgun: number;
+  readonly rain: number;
+  readonly release: number;
+  readonly respawn: number;
+  readonly respawning: number;
+  readonly rockBreak: number;
+  readonly sap: number;
+  readonly shield: number;
+  readonly shockBlast: number;
+  readonly shoot: number;
+  readonly shootAlt: number;
+  readonly shootAltLong: number;
+  readonly shootBig: number;
+  readonly shootSmite: number;
+  readonly shootSnap: number;
+  readonly shotgun: number;
+  readonly smelter: number;
+  readonly spark: number;
+  readonly spellLoop: number;
+  readonly splash: number;
+  readonly spray: number;
+  readonly steam: number;
+  readonly techloop: number;
+  readonly thruster: number;
+  readonly titanExplosion: number;
+  readonly torch: number;
+  readonly tractorbeam: number;
+  readonly unlock: number;
+  readonly wave: number;
+  readonly wind: number;
+  readonly wind2: number;
+  readonly wind3: number;
+  readonly windhowl: number;
+}
+
+declare const Sounds: Sounds;
+
+type WeatherSymbol = (typeof Weathers)[keyof typeof Weathers];
 
 interface BuildingSymbolTable {
   readonly graphitePress: unique symbol;
@@ -466,6 +656,18 @@ interface BuildingSymbolTable {
   readonly tetrativeReconstructor: unique symbol;
   readonly repairPoint: unique symbol;
   readonly repairTurret: unique symbol;
+  readonly tankFabricator: unique symbol;
+  readonly shipFabricator: unique symbol;
+  readonly mechFabricator: unique symbol;
+  readonly tankRefabricator: unique symbol;
+  readonly mechRefabricator: unique symbol;
+  readonly shipRefabricator: unique symbol;
+  readonly primeRefabricator: unique symbol;
+  readonly tankAssembler: unique symbol;
+  readonly shipAssembler: unique symbol;
+  readonly mechAssembler: unique symbol;
+  readonly basicAssemblerModule: unique symbol;
+  readonly unitRepairTower: unique symbol;
   readonly payloadConveyor: unique symbol;
   readonly payloadRouter: unique symbol;
   readonly reinforcedPayloadConveyor: unique symbol;
@@ -504,13 +706,12 @@ interface BuildingSymbolTable {
   readonly worldProcessor: unique symbol;
   readonly worldCell: unique symbol;
   readonly worldMessage: unique symbol;
+  readonly worldSwitch: unique symbol;
 }
 
 type BuildingSymbol = Blocks[keyof BuildingSymbolTable];
 
 interface EnvBlockSymbolTable {
-  // used by some instructions to represent any env block
-  readonly solid: EnvBlockSymbolTable["stoneWall"];
   readonly air: unique symbol;
   readonly spawn: unique symbol;
   readonly cliff: unique symbol;

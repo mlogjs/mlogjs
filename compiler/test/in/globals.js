@@ -133,7 +133,6 @@ print(
 
 print(
   Blocks.air,
-  Blocks.solid,
   Blocks.siliconSmelter,
   Blocks.siliconCrucible,
   Blocks.kiln,

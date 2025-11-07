@@ -1,60 +1,46 @@
-set &t2->0 5
-set &t2->1 4
-set &t2->2 3
-set &t2->3 2
-set &t2->4 1
-set n:7:19 1
-set &rcalculate:7:0 8
-jump 45 always
-set &t0 &fcalculate:7:0
+set &t0->0 5
+set &t0->1 4
+set &t0->2 3
+set &t0->3 2
+set &t0->4 1
+print "calculating 1\n"
+set &t0:calculate:7:0 1
 set a:1:22 null
-jump 16 lessThan &t0 0
-jump 16 greaterThan &t0 4
-set &t2.&rt 15
-op mul &t3 &t0 2
-op add @counter 50 &t3
-set a:1:22 &t2.&read
-op strictEqual &t4 a:1:22 null
-jump 22 equal &t4 0
-set n:7:19 2
-set &rcalculate:7:0 21
-jump 45 always
-set a:1:22 &fcalculate:7:0
-set n:7:19 3
-set &rcalculate:7:0 25
-jump 45 always
-set &t1 &fcalculate:7:0
+jump 14 lessThan &t0:calculate:7:0 0
+jump 14 greaterThan &t0:calculate:7:0 4
+set &t0.&rt 13
+op mul &t1 &t0:calculate:7:0 2
+op add @counter 36 &t1
+set a:1:22 &t0.&read
+op strictEqual &t2 a:1:22 null
+jump 18 equal &t2 0
+print "calculating 2\n"
+set a:1:22 2
+print "calculating 3\n"
+set &t1:calculate:7:0 3
 set b:1:56 null
-jump 33 lessThan &t1 0
-jump 33 greaterThan &t1 4
-set &t2.&rt 32
-op mul &t5 &t1 2
-op add @counter 50 &t5
-set b:1:56 &t2.&read
-op strictEqual &t6 b:1:56 null
-jump 39 equal &t6 0
-set n:7:19 4
-set &rcalculate:7:0 38
-jump 45 always
-set b:1:56 &fcalculate:7:0
-print "a: "
-print a:1:22
-print ", b: "
-print b:1:56
+jump 27 lessThan &t1:calculate:7:0 0
+jump 27 greaterThan &t1:calculate:7:0 4
+set &t0.&rt 26
+op mul &t3 &t1:calculate:7:0 2
+op add @counter 36 &t3
+set b:1:56 &t0.&read
+op strictEqual &t4 b:1:56 null
+jump 31 equal &t4 0
+print "calculating 4\n"
+set b:1:56 4
+print "a: {0}, b: {0}"
+format a:1:22
+format b:1:56
 printflush message1
 end
-print "calculating "
-print n:7:19
-print "\n"
-set &fcalculate:7:0 n:7:19
-set @counter &rcalculate:7:0
-set &t2.&read &t2->0
-set @counter &t2.&rt
-set &t2.&read &t2->1
-set @counter &t2.&rt
-set &t2.&read &t2->2
-set @counter &t2.&rt
-set &t2.&read &t2->3
-set @counter &t2.&rt
-set &t2.&read &t2->4
-set @counter &t2.&rt
+set &t0.&read &t0->0
+set @counter &t0.&rt
+set &t0.&read &t0->1
+set @counter &t0.&rt
+set &t0.&read &t0->2
+set @counter &t0.&rt
+set &t0.&read &t0->3
+set @counter &t0.&rt
+set &t0.&read &t0->4
+set @counter &t0.&rt

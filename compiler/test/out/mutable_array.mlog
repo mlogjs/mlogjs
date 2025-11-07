@@ -5,22 +5,18 @@ set units:1:6->3 @flare
 set units:1:6->1 @mono
 set units:1:6->0 @dagger
 set units:1:6.&rt 8
-jump 26 always
+jump 22 always
 op rand &t0 4
 op floor &t1 &t0
 set units:1:6.&write @navanax
 set units:1:6.&rt 14
 op mul &t2 &t1 2
-op add @counter 30 &t2
-print "\n"
-print units:1:6->0
-print "\n"
-print units:1:6->1
-print "\n"
-print units:1:6->2
-print "\n"
-print units:1:6->3
-print "\n"
+op add @counter 26 &t2
+print "\n{0}\n{0}\n{0}\n{0}\n"
+format units:1:6->0
+format units:1:6->1
+format units:1:6->2
+format units:1:6->3
 printflush message1
 wait 0.5
 end

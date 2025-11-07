@@ -35,9 +35,6 @@ export function getInnerTSConfig(): string {
       noEmit: true,
       noLib: true,
       target: "ESNext",
-      paths: {
-        "mlogjs:world": ["./lib/world.d.ts"],
-      },
     },
   };
   return JSON.stringify(config, null, "\t");

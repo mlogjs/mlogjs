@@ -5,9 +5,11 @@ import {
   GetBuildings,
   GetColor,
   GetGlobal,
+  MarkerConstructor,
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
+  StringViewBuilder,
   Unchecked,
   VarsNamespace,
 } from "./macros";
@@ -16,6 +18,7 @@ import { Asm } from "./macros/Asm";
 import { LiteralValue, ObjectValue } from "./values";
 import { Scope } from "./Scope";
 import { worldModuleName } from "./utils";
+import { ColorsNamespace, SoundsNamespace } from "./macros/Namespace";
 
 /**
  * Creates the global scope of the user's script, contains all built-ins that
@@ -37,6 +40,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("Units", new NamespaceMacro({ changeCasing: true }));
   scope.hardSet("LAccess", new NamespaceMacro());
   scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("Colors", new ColorsNamespace());
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
@@ -48,13 +52,19 @@ export function createGlobalScope(): IScope {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
+  scope.hardSet("StringView", new StringViewBuilder());
   scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
   scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
   scope.hardSet("unchecked", new Unchecked());
+  scope.hardSet("Align", new NamespaceMacro());
+  scope.hardSet("Weathers", new NamespaceMacro({ changeCasing: true }));
+  scope.hardSet("Sounds", new SoundsNamespace());
 
   // commands
   scope.hardSet("draw", new commands.Draw());
   scope.hardSet("print", new commands.Print());
+  scope.hardSet("format", new commands.Format());
+  scope.hardSet("printChar", new commands.PrintChar());
   scope.hardSet("printFlush", new commands.PrintFlush());
   scope.hardSet("drawFlush", new commands.DrawFlush());
   scope.hardSet("getLink", new commands.GetLink());
@@ -64,6 +74,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("wait", new commands.Wait());
   scope.hardSet("lookup", new commands.Lookup());
   scope.hardSet("packColor", new commands.PackColor());
+  scope.hardSet("unpackColor", new commands.UnpackColor());
   scope.hardSet("endScript", new commands.End());
   scope.hardSet("stopScript", new commands.Stop());
   scope.hardSet("unitBind", new commands.UnitBind());
@@ -76,6 +87,7 @@ export function createGlobalScope(): IScope {
 
 export function createWordModule() {
   const module = new ObjectValue({
+    PVars: new NamespaceMacro(),
     getBlock: new commands.GetBlock(),
     setBlock: new commands.SetBlock(),
     spawnUnit: new commands.SpawnUnit(),
@@ -90,6 +102,13 @@ export function createWordModule() {
     getFlag: new commands.GetFlag(),
     setFlag: new commands.SetFlag(),
     setProp: new commands.SetProp(),
+    SyncLock: new commands.SyncLockConstructor(),
+    effect: new commands.Effect(),
+    localePrint: new commands.LocalePrint(),
+    Marker: new MarkerConstructor(),
+    senseWeather: new commands.WeatherSense(),
+    setWeather: new commands.WeatherSet(),
+    playSound: new commands.PlaySound(),
   });
   return module;
 }

@@ -19,10 +19,16 @@ export class SetRule extends ObjectValue {
         unitCap: { args: ["cap"] },
         mapArea: { named: "options", args: ["x", "y", "width", "height"] },
         lighting: { args: ["enabled"] },
+        canGameOver: { args: ["enabled"] },
         ambientLight: { args: ["rgbaData"] },
         solarMultiplier: { args: ["multiplier"] },
+        dragMultiplier: { args: ["multiplier"] },
+        ban: { args: ["content"] },
+        unban: { args: ["content"] },
         buildSpeed: { args: ["team", "multiplier"] },
+        unitHealth: { args: ["team", "multiplier"] },
         unitBuildSpeed: { args: ["team", "multiplier"] },
+        unitMineSpeed: { args: ["team", "multiplier"] },
         unitCost: { args: ["team", "multiplier"] },
         unitDamage: { args: ["team", "multiplier"] },
         blockHealth: { args: ["team", "multiplier"] },
@@ -42,6 +48,7 @@ export class SetRule extends ObjectValue {
             break;
           }
           case "buildSpeed":
+          case "unitHealth":
           case "unitBuildSpeed":
           case "unitCost":
           case "unitDamage":

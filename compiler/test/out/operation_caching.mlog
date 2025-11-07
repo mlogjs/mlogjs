@@ -4,36 +4,29 @@ op add &_ a:1:4 2
 op add &t0 a:1:4 1
 op log &t1 a:1:4
 op div &t2 &t1 0.6931471805599453
-print "\na + 2: "
-print &_
-print "\na + 1: "
-print &t0
-print "\n2 + a: "
-print &_
-print "\n1 + a: "
-print &t0
-print "\nlog2 a: "
-print &t2
-print "\n"
+print "\na + 2: {0}\na + 1: {0}\n2 + a: {0}\n1 + a: {0}\nlog2 a: {0}\n"
+format &_
+format &t0
+format &_
+format &t0
+format &t2
 op rand &t3 2
-jump 29 lessThan &t3 1
+jump 24 lessThan &t3 1
 op rand &t4 2
 op greaterThanEq &t5 &t4 1
 print &t5
-print &t2
-print "\n"
+print "{0}\n"
+format &t2
 op add a:1:4 a:1:4 1
 op log &t6 a:1:4
 op div &t7 &t6 0.6931471805599453
-print &t7
-print "\n"
+print "{0}\n"
+format &t7
 op add &t4 a:1:4 1
-print "a + 1: "
-print &t4
+print "a + 1: {0}"
+format &t4
 op pow &t5 a:1:4 2
-print "\nMath.pow(a, 2): "
-print &t5
-print "\na ** 2: "
-print &t5
-print "\n"
+print "\nMath.pow(a, 2): {0}\na ** 2: {0}\n"
+format &t5
+format &t5
 printflush message1
