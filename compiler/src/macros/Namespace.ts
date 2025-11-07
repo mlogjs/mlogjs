@@ -66,11 +66,7 @@ export class ColorsNamespace extends NamespaceMacro {
     super();
   }
 
-  get(
-    scope: IScope,
-    key: IValue,
-    out?: TEOutput | undefined,
-  ): TValueInstructions<IValue> {
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
     if (!(key instanceof LiteralValue) || !key.isString())
       return super.get(scope, key, out);
     const plainName = key.data;
@@ -86,11 +82,7 @@ export class SoundsNamespace extends NamespaceMacro {
     super();
   }
 
-  get(
-    scope: IScope,
-    key: IValue,
-    out?: TEOutput | undefined,
-  ): TValueInstructions<IValue> {
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
     if (!(key instanceof LiteralValue) || !key.isString())
       return super.get(scope, key, out);
 

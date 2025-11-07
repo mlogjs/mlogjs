@@ -33,10 +33,7 @@ export class MacroFunction<
     return [this, []];
   }
 
-  preCall(
-    _scope: IScope,
-    _out?: TEOutput | undefined,
-  ): readonly TEOutput[] | undefined {
+  preCall(_scope: IScope, _out?: TEOutput): readonly TEOutput[] | undefined {
     return this.paramOuts;
   }
 

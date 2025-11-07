@@ -6,7 +6,6 @@ export function appendSourceLocations<T extends IValue | null>(
   node: es.Node,
 ): TValueInstructions<T> {
   for (const inst of valueInst[1]) {
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     inst.source ??= node.loc!;
   }
   return valueInst;

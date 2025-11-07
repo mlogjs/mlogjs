@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/prefer-promise-reject-errors */
 import { shallowRef, watch, type Ref, type ShallowRef } from "vue";
 import { debounce, toEditorPath } from "../util";
 import type * as monaco from "monaco-editor";

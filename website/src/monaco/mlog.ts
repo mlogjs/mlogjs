@@ -80,7 +80,6 @@ export function configureMlogLang(
     targettedLineCollection.clear();
     const jumpLine = getJumpLine(event, ignoredIndexes);
     if (jumpLine == undefined) return;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const line = event.target.position!.lineNumber;
 
     jumpUnderlineCollection.set([
@@ -103,7 +102,6 @@ export function configureMlogLang(
     if (!event.ctrlKey) return;
     const { position } = target;
     if (!position) return;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const lineContent = editor.getModel()!.getLineContent(position.lineNumber);
     const match = /^jump\s+(\d+)/.exec(lineContent);
     if (!match) return;

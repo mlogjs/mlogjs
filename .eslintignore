@@ -1,6 +1,0 @@
-*.js
-*.cjs
-*.mjs
-*.d.ts
-compiler/test
-jest.config.ts

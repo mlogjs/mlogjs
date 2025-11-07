@@ -68,7 +68,6 @@ export class JumpOutValue extends VoidValue {
       kind = invertedOperatorMap[operator];
     }
     const jump = new JumpInstruction(this.address, kind, left, right);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     jump.source = this.node.loc!;
     return jump;
   }

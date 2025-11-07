@@ -28,7 +28,7 @@ class SettableEntry extends VoidValue {
     super();
   }
 
-  eval(scope: IScope, out?: TEOutput | undefined): TValueInstructions {
+  eval(scope: IScope, out?: TEOutput): TValueInstructions {
     return this.target.get(scope, this.prop, out);
   }
 
@@ -53,11 +53,7 @@ class Settable extends ObjectValue {
     super({});
   }
 
-  get(
-    scope: IScope,
-    key: IValue,
-    out?: TEOutput | undefined,
-  ): TValueInstructions {
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
     const entry = new SettableEntry(this.target, key);
     if (out) return entry.eval(scope, out);
     return [entry, []];

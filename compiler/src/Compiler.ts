@@ -80,6 +80,8 @@ export class Compiler {
 
   protected serialize(resLines: TValueInstructions<IValue | null>) {
     const [, inst] = resLines;
+
+    // eslint-disable-next-line @typescript-eslint/no-base-to-string
     return inst.filter(l => !l.hidden).join("\n");
   }
 
