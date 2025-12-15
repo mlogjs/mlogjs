@@ -21,6 +21,7 @@ interface IOverloadNamespaceOptions<K extends string> {
   >;
 
   handler(
+    this: void,
     scope: IScope,
     overload: K,
     out: TEOutput | undefined,

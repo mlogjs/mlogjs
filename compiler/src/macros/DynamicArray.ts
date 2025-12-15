@@ -432,8 +432,8 @@ class DynamicArrayEntry extends BaseValue {
       out instanceof StoreValue
         ? out
         : out
-        ? getterTemp
-        : StoreValue.from(scope);
+          ? getterTemp
+          : StoreValue.from(scope);
 
     // used in checked mode, jumps to this address
     // if the index is out of bounds

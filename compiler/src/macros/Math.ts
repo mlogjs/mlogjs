@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-non-null-assertion */
 import { CompilerError } from "../CompilerError";
 import { OperationInstruction } from "../instructions";
 import { IInstruction, IValue } from "../types";

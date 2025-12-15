@@ -39,6 +39,7 @@ export async function compile(
       if (e.error.id !== inputMessage.id) return;
       e.stopPropagation();
       worker.removeEventListener("error", onError);
+      // eslint-disable-next-line @typescript-eslint/prefer-promise-reject-errors
       reject(e.error);
     };
 
@@ -47,7 +48,9 @@ export async function compile(
       if (id !== inputMessage.id) return;
       e.stopPropagation();
       worker.removeEventListener("messageerror", onMessageError);
-      reject(new Error(`Invalid worker input message: ${data}`));
+      reject(
+        new Error(`Invalid worker input message: ${JSON.stringify(data)}`),
+      );
     };
 
     worker.addEventListener("message", onMessage);

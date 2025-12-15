@@ -9,6 +9,7 @@ export type TDestructuringMembers = Map<
     value: IValue;
     /** Handles the input value, is responsible for the assignment. */
     handler(
+      this: void,
       get: () => TValueInstructions,
       propExists: () => boolean,
       scope: IScope,

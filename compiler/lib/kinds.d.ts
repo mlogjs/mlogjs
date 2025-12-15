@@ -1,7 +1,8 @@
 /// <reference path="./traits.d.ts" />
 
 interface BasicUnit
-  extends ItemHolder,
+  extends
+    ItemHolder,
     Shooting,
     WithHealth,
     WithShield,
@@ -24,7 +25,8 @@ interface BasicUnit
 interface AnyUnit extends BasicUnit, Boosted, WithCamera {}
 
 interface BasicBuilding
-  extends LiquidHolder,
+  extends
+    LiquidHolder,
     ItemHolder,
     PowerHolder,
     WithHealth,
@@ -48,7 +50,8 @@ interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 interface AnyTurret extends BasicTurret {}
 
 interface AnyBuilding
-  extends AnyTurret,
+  extends
+    AnyTurret,
     Heatable,
     WithShield,
     WithCamera,

@@ -135,7 +135,7 @@ export class Scope implements IScope {
     op: string,
     result: IValue,
     left: IValue,
-    right?: IValue | undefined,
+    right?: IValue,
   ): void {
     if (!left.name || !result.name || (right && !right.name)) return;
     if (result.volatile || left.volatile || right?.volatile) return;
@@ -146,7 +146,6 @@ export class Scope implements IScope {
 
     this.clearDependentCache(result);
     addCacheDependency(this, left.name, id);
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     if (right) addCacheDependency(this, right.name!, id);
     addCacheDependency(this, result.name, id);
   }
@@ -154,7 +153,7 @@ export class Scope implements IScope {
   getCachedOperation(
     op: string,
     left: IValue,
-    right?: IValue | undefined,
+    right?: IValue,
   ): IValue | undefined {
     if (left.volatile || right?.volatile) return;
 

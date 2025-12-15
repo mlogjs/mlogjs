@@ -58,7 +58,7 @@ export class VoidValue implements IValue {
 }
 
 // tells typescript that VoidValue implements value
-// eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
+// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
 export interface VoidValue extends IValueOperators {}
 
 for (const key of operators) {

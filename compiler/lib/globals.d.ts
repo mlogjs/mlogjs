@@ -860,9 +860,7 @@ interface OreSymbolTable {
 type OreSymbol = Blocks[keyof OreSymbolTable];
 
 interface Blocks
-  extends BuildingSymbolTable,
-    EnvBlockSymbolTable,
-    OreSymbolTable {
+  extends BuildingSymbolTable, EnvBlockSymbolTable, OreSymbolTable {
   readonly build1: unique symbol;
   readonly build2: unique symbol;
   readonly build3: unique symbol;

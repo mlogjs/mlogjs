@@ -90,7 +90,6 @@ Nothing is drawn until `drawFlush` is called.
 - #### `draw.poly`
 
   Draws a filled, regular polygon.
-
   - `sides` - The number of sides the polygon should have
   - `radius` - The smallest distance between a line and the center of the polygon
   - `rotation` - The rotation of the polygon in degree
@@ -101,7 +100,6 @@ Nothing is drawn until `drawFlush` is called.
 - #### `draw.linePoly`
 
   Draws the outline of a regular polygon.
-
   - `sides` - The number of sides the polygon should have
   - `radius` - The smallest distance between a line and the center of the polygon
   - `rotation` - The rotation of the polygon in degree
@@ -119,7 +117,6 @@ Nothing is drawn until `drawFlush` is called.
 - #### `draw.image`
 
   Draws an image of the respective content. (like `Units.dagger` and `Blocks.router`)
-
   - `image` - The symbol for the image to be drawn.
   - `rotation` - The rotation of the image in degrees.
 
@@ -179,7 +176,6 @@ Contains the multiple variants of the `control` instruction
 - #### `control.shoot`
 
   Makes the building shoot or aim at the given position
-
   - `building` - The shooting building
   - `shoot` - `true` to shoot, `false` to just aim at the position
 
@@ -189,7 +185,6 @@ Contains the multiple variants of the `control` instruction
 - #### `control.shootp`
 
   Shoot at an unit with velocity prediction
-
   - `building` - The shooting building
   - `unit` - The target unit
   - `shoot` - `true` to shoot, `false` to just aim
@@ -377,7 +372,6 @@ Controls the unit bound to the processor
 - #### `unitControl.approach`
 
   Makes the unit bound to this processor approach the given position at the given radius
-
   - `radius` - How distant to the position the unit can be
 
   ::: command-example
@@ -413,7 +407,6 @@ Controls the unit bound to the processor
 - #### `unitControl.target`
 
   Makes the unit bound to this processor shoot/aim at the given position
-
   - `shoot` - `true` to shoot, `false` to just aim
 
   ::: command-example
@@ -422,7 +415,6 @@ Controls the unit bound to the processor
 - #### `unitControl.targetp`
 
   Makes the unit bound to this processor target an unit with velocity prediction
-
   - `unit` - The shoot target
   - `shoot` - `true` to shoot, `false` to just aim
 
@@ -436,7 +428,6 @@ Controls the unit bound to the processor
   Using this command sets the unit's action timeout.
 
   This command will be on cooldown for 1.5 seconds after the timeout has been set.
-
   - `target` - Where to drop the items, if `Blocks.air`, the unit will throw it's items away
   - `amount` - How many items should be dropped
 
@@ -450,7 +441,6 @@ Controls the unit bound to the processor
   Using this command sets the unit's action timeout.
 
   This command will be on cooldown for 1.5 seconds after the timeout has been set.
-
   - `target` - The building that will have it's items taken
   - `item` - The kind of item to take
   - `amount` - How many items should be taken
@@ -476,7 +466,6 @@ Controls the unit bound to the processor
   Using this command sets the unit's action timeout.
 
   This command will be on cooldown for 1.5 seconds after the timeout has been set.
-
   - `takeUnits` - Whether to take units or buildings
 
   ::: command-example
@@ -508,7 +497,6 @@ Controls the unit bound to the processor
 
   Makes the unit bound to this processor build a building with the
   given properties
-
   - `block` - The kind of building to build
   - `rotation` - The rotation of the building, ranges from 0 to 3
   - `config` - The configuration value to use, or a building from which the configuration value will be copied.
@@ -560,7 +548,6 @@ Uses the unit bound to this processor to find specific types of blocks
 - #### `unitLocate.ore`
 
   Uses the unit bound to this processor to find an ore vein anywhere on the map
-
   - `ore` - The kind of item the ore should contain
 
   ::: command-example
@@ -569,7 +556,6 @@ Uses the unit bound to this processor to find specific types of blocks
 - #### `unitLocate.building`
 
   Uses the unit bound to this processor to find a building anywhere on the map
-
   - `group` - The group that the building belongs to
   - `enemy` - Whether it should be an enemy building or an ally one
 
@@ -915,7 +901,6 @@ and clears the buffer afterwards.
   Puts the content on the middle of the screen.
 
   Returns whether the operation was executed successfully.
-
   - `duration` - The duration, in seconds
 
   ::: command-example
@@ -926,7 +911,6 @@ and clears the buffer afterwards.
   Puts the content on the middle top of the screen.
 
   Returns whether the operation was executed successfully.
-
   - `duration` - The duration, in seconds
 
   ::: command-example
@@ -984,7 +968,6 @@ Contains the variants of the `fetch` instruction.
 - #### `fetch.unitCount`
 
   Gets the amount of units existing on a given team.
-
   - `type` - The type of unit to count.
     If `type` is not specified, returns the total amount of units
 
@@ -1035,7 +1018,6 @@ Contains the variants of the `fetch` instruction.
 - #### `fetch.buildCount`
 
   Gets the amount of buildings existing on a given team.
-
   - `type` - The type of building to count
     If `type` is not specified, returns the total amount of buildings.
 

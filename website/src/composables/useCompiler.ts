@@ -27,9 +27,8 @@ export function useCompiler({
     onCleanup(() => (subscribed = false));
     const editor = editorRef.value;
     if (!editor) return;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+
     const monaco = monacoRef.value!;
-    // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
     const model = editor.getModel()!;
 
     const [output, error, sourcemaps] = await compile(

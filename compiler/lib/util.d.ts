@@ -75,29 +75,27 @@ declare module "mlogjs:types" {
     health: number;
   };
 
-  interface SettableUnit
-    extends MutableWithSymbols<
-      CommonSettableProps & {
-        x: number;
-        y: number;
-        flag: number;
-        rotation: number;
-        payloadType?: UnitSymbol | BuildingSymbol;
-        speed: number;
-        shield: number;
-        armor: number;
-        velocityX: number;
-        velocityY: number;
-      }
-    > {}
+  interface SettableUnit extends MutableWithSymbols<
+    CommonSettableProps & {
+      x: number;
+      y: number;
+      flag: number;
+      rotation: number;
+      payloadType?: UnitSymbol | BuildingSymbol;
+      speed: number;
+      shield: number;
+      armor: number;
+      velocityX: number;
+      velocityY: number;
+    }
+  > {}
 
-  interface SettableBuilding
-    extends MutableWithSymbols<
-      CommonSettableProps &
-        Record<keyof typeof Liquids, number> & {
-          totalPower: number;
-        }
-    > {}
+  interface SettableBuilding extends MutableWithSymbols<
+    CommonSettableProps &
+      Record<keyof typeof Liquids, number> & {
+        totalPower: number;
+      }
+  > {}
 
   export type TLogicLinkNames<T extends string> =
     `${TLogicLinkName<T>}${TLogicLinkDigit}`;
@@ -116,15 +114,16 @@ declare module "mlogjs:types" {
    * Based on [the mindustry source
    * code](https://github.com/Anuken/Mindustry/blob/93daa7a5dcc3fac9e5f40c3375e9f57ae4720ff4/core/src/mindustry/world/blocks/logic/LogicBlock.java#L103-L115).
    */
-  export type TLogicLinkName<T extends string> = T extends Lowercase<string>
-    ? T
-    : T extends `${Uppercase<string>}${Lowercase<string>}`
-    ? Lowercase<T>
-    : T extends `${infer Begin}Large`
-    ? TLogicLinkName<Begin>
-    : T extends `${string}${infer Rest}`
-    ? TLogicLinkName<Rest>
-    : never;
+  export type TLogicLinkName<T extends string> =
+    T extends Lowercase<string>
+      ? T
+      : T extends `${Uppercase<string>}${Lowercase<string>}`
+        ? Lowercase<T>
+        : T extends `${infer Begin}Large`
+          ? TLogicLinkName<Begin>
+          : T extends `${string}${infer Rest}`
+            ? TLogicLinkName<Rest>
+            : never;
 
   export type TLogicLinkDigit = 1 | 2 | 3 | 4 | 6 | 7 | 8 | 9;
 }
