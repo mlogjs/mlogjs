@@ -7,7 +7,7 @@ const worldModuleName = "mlogjs:world";
 
 export function setLibs(monaco: Monaco) {
   const files = parseExtraLibs(libs);
-  
+
   monaco.typescript.typescriptDefaults.setExtraLibs(files);
   monaco.typescript.javascriptDefaults.setExtraLibs(files);
 }

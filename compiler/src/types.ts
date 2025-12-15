@@ -339,8 +339,9 @@ export interface INamedValue extends IValue {
 }
 
 export type TLiteral = string | number;
-export interface IBindableValue<T extends TLiteral | null = TLiteral>
-  extends IValue {
+export interface IBindableValue<
+  T extends TLiteral | null = TLiteral,
+> extends IValue {
   data: T;
 }
 export type TLineRef = IBindableValue<number | null>;

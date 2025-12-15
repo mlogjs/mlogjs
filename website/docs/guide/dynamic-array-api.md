@@ -141,17 +141,14 @@ if the operations are performed with a _bad state_. Here is a list of things
 that are considered bad state for each method when combined with `unchecked`:
 
 - Index accesses and `.at`:
-
   - The array is empty
   - The index is not an integer
   - The index is out of bounds
 
 - `.push`
-
   - The array is full
 
 - `.pop`
-
   - The array is empty
 
 - `.removeAt`
