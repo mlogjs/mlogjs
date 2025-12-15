@@ -14,8 +14,10 @@ print(1 + 2 > 1.4 ? 10 : -5);
 print(1 + 1 != 2 ? "huh, true" : "it's false");
 
 print(
+  // @ts-expect-error
   undefined ?? "undefined is null",
   offset ?? "offset is null?",
+  // @ts-expect-error
   "preserved" ?? "should not appear",
 );
 

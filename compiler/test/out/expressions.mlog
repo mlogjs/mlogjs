@@ -25,16 +25,16 @@ print "undefined is null{0}preserved"
 format &t2
 op rand &t4 1
 jump 29 lessThanEq &t4 0.5
-set item:22:4 null
+set item:24:4 null
 jump 30 always
-set item:22:4 @beryllium
-op strictEqual &t5 item:22:4 null
+set item:24:4 @beryllium
+op strictEqual &t5 item:24:4 null
 jump 33 equal &t5 0
-set item:22:4 @copper
+set item:24:4 @copper
 op rand &t6 65536
 op not &t7 &t6
 print &t7
-op strictEqual &t8 item:22:4 @copper
+op strictEqual &t8 item:24:4 @copper
 op equal &t9 &t8 0
 print &t9
 sensor &t10 @unit @ammo
