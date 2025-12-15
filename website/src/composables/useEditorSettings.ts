@@ -5,7 +5,7 @@ export interface EditorSettings {
   mlogjs: Pick<mlogs.CompilerOptions, "compactNames">;
   typescript: Required<
     Pick<
-      monaco.languages.typescript.CompilerOptions,
+      monaco.typescript.CompilerOptions,
       | "noImplicitAny"
       | "noUnusedLocals"
       | "noUnusedParameters"

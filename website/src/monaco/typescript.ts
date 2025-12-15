@@ -7,9 +7,9 @@ const worldModuleName = "mlogjs:world";
 
 export function setLibs(monaco: Monaco) {
   const files = parseExtraLibs(libs);
-
-  monaco.languages.typescript.typescriptDefaults.setExtraLibs(files);
-  monaco.languages.typescript.javascriptDefaults.setExtraLibs(files);
+  
+  monaco.typescript.typescriptDefaults.setExtraLibs(files);
+  monaco.typescript.javascriptDefaults.setExtraLibs(files);
 }
 
 export function addWorldModuleSnippet(monaco: Monaco) {
@@ -42,19 +42,19 @@ export function setMonacoTypescriptSettings(
   monaco: Monaco,
   settings: EditorSettings["typescript"],
 ) {
-  const options: monaco.languages.typescript.CompilerOptions = {
+  const options: monaco.typescript.CompilerOptions = {
     allowNonTsExtensions: true,
     noLib: true,
     noEmit: true,
-    target: monaco.languages.typescript.ScriptTarget.ESNext,
+    target: monaco.typescript.ScriptTarget.ESNext,
     paths: {
       [worldModuleName]: [toEditorPath("lib/world.d.ts")],
     },
     ...settings,
   };
 
-  monaco.languages.typescript.typescriptDefaults.setCompilerOptions(options);
-  monaco.languages.typescript.javascriptDefaults.setCompilerOptions({
+  monaco.typescript.typescriptDefaults.setCompilerOptions(options);
+  monaco.typescript.javascriptDefaults.setCompilerOptions({
     ...options,
     allowJs: true,
     checkJs: true,
