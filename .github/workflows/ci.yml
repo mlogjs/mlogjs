@@ -15,5 +15,5 @@ jobs:
       - uses: pnpm/action-setup@v4
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C compiler clean
-      - run: pnpm -C compiler/test exec tsc #typecheck tests
+      - run: pnpm -C compiler exec tsc -p test/tsconfig.json #typecheck tests
       - run: pnpm -C compiler coverage
