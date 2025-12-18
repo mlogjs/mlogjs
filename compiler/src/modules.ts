@@ -96,57 +96,31 @@ export function createGlobalScope(c: ICompilerContext): IScope {
   return scope;
 }
 
-export function createWordModule() {
-  const module = new ObjectValue({
-    PVars: new NamespaceMacro(),
-    getBlock: new commands.GetBlock(),
-    setBlock: new commands.SetBlock(),
-    spawnUnit: new commands.SpawnUnit(),
-    applyStatus: new commands.ApplyStatus(),
-    spawnWave: new commands.SpawnWave(),
-    setRule: new commands.SetRule(),
-    flushMessage: new commands.FlushMessage(),
-    cutscene: new commands.Cutscene(),
-    explosion: new commands.Explosion(),
-    setRate: new commands.SetRate(),
-    fetch: new commands.Fetch(),
-    getFlag: new commands.GetFlag(),
-    setFlag: new commands.SetFlag(),
-    setProp: new commands.SetProp(),
-    SyncLock: new commands.SyncLockConstructor(),
-    effect: new commands.Effect(),
-    localePrint: new commands.LocalePrint(),
-    Marker: new MarkerConstructor(),
-    senseWeather: new commands.WeatherSense(),
-    setWeather: new commands.WeatherSet(),
-    playSound: new commands.PlaySound(),
-  });
-}
 export function createWordModule(c: ICompilerContext) {
   const module = new ObjectValue(
     ObjectValue.autoRegisterData(c, {
       PVars: new NamespaceMacro(),
-      getBlock: new commands.GetBlock(),
-      setBlock: new commands.SetBlock(),
+      getBlock: new commands.GetBlock(c),
+      setBlock: new commands.SetBlock(c),
       spawnUnit: new commands.SpawnUnit(),
-      applyStatus: new commands.ApplyStatus(),
+      applyStatus: new commands.ApplyStatus(c),
       spawnWave: new commands.SpawnWave(),
-      setRule: new commands.SetRule(),
-      flushMessage: new commands.FlushMessage(),
-      cutscene: new commands.Cutscene(),
+      setRule: new commands.SetRule(c),
+      flushMessage: new commands.FlushMessage(c),
+      cutscene: new commands.Cutscene(c),
       explosion: new commands.Explosion(),
       setRate: new commands.SetRate(),
-      fetch: new commands.Fetch(),
+      fetch: new commands.Fetch(c),
       getFlag: new commands.GetFlag(),
       setFlag: new commands.SetFlag(),
       setProp: new commands.SetProp(),
       SyncLock: new commands.SyncLockConstructor(),
-      effect: new commands.Effect(),
+      effect: new commands.Effect(c),
       localePrint: new commands.LocalePrint(),
-      Marker: new MarkerConstructor(),
+      Marker: new MarkerConstructor(c),
       senseWeather: new commands.WeatherSense(),
       setWeather: new commands.WeatherSet(),
-      playSound: new commands.PlaySound(),
+      playSound: new commands.PlaySound(c),
     }),
   );
   return module;

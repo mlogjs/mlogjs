@@ -1,11 +1,14 @@
+import { ICompilerContext } from "../../CompilerContext";
+import { ImmutableId, NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Effect extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         warn: { args: ["x", "y"] },
         cross: { args: ["x", "y"] },
@@ -50,8 +53,8 @@ export class Effect extends ObjectValue {
         wave: { args: ["x", "y", "color", "size"], named: "options" },
         bubble: { args: ["x", "y"] },
       },
-      handler(scope, overload, out, ...args) {
-        const params: (string | IValue)[] = ["0", "0", "2", "%ffaaff", ""];
+      handler(c, overload, cursor, loc, ...args) {
+        const params: (string | ImmutableId)[] = ["0", "0", "2", "%ffaaff", ""];
         params[0] = args[0];
         params[1] = args[1];
         switch (overload) {
@@ -92,7 +95,16 @@ export class Effect extends ObjectValue {
             params[3] = args[2];
             break;
         }
-        return [null, [new InstructionBase("effect", overload, ...params)]];
+
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["effect", overload, ...params],
+            params.filter(p => typeof p === "object"),
+            [],
+            loc,
+          ),
+        );
+        return c.nullId;
       },
     });
     super(data);

@@ -1,10 +1,14 @@
+import { NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "../Function";
 
-export class Format extends MacroFunction<null> {
+export class Format extends MacroFunction {
   constructor() {
-    super((scope, out, value) => {
-      return [null, [new InstructionBase("format", value)]];
+    super((c, cursor, loc, value) => {
+      cursor.addInstruction(
+        new NativeInstruction(["format", value], [value], [], loc),
+      );
+      return c.nullId;
     });
   }
 }
