@@ -1,5 +1,6 @@
 import { ICompilerContext } from "../CompilerContext";
 import { IInstruction } from "../types";
+import { GlobalId, ImmutableId } from "./id";
 import { TBlockEndInstruction, TBlockInstruction } from "./instructions";
 
 export interface IForwardEdge {
@@ -14,8 +15,16 @@ export interface IBackwardEdge {
 
 export type TEdge = IForwardEdge | IBackwardEdge;
 
+export interface BlockParameterDefintion {
+  source: GlobalId;
+  value: ImmutableId;
+}
+
+let _id = 0;
 export class Block {
+  debugId = _id++;
   parents: Block[] = [];
+  parameters: BlockParameterDefintion[] = [];
 
   instructions = new InstructionList();
   constructor(public endInstruction?: TBlockEndInstruction) {}
@@ -119,7 +128,23 @@ export class InstructionList {
     return this.length === 0;
   }
 
-  add(instruction: TBlockInstruction) {
+  pushFront(instruction: TBlockInstruction) {
+    const node = new InstructionNode(instruction);
+    this.length++;
+    if (!this.head) {
+      this.head = node;
+      this.tail = node;
+      return;
+    }
+
+    const head = this.head;
+    head.previous = node;
+
+    node.next = head;
+    this.head = node;
+  }
+
+  pushBack(instruction: TBlockInstruction) {
     const node = new InstructionNode(instruction);
     this.length++;
     if (!this.head) {

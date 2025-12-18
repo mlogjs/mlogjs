@@ -54,7 +54,7 @@ export class BlockCursor implements IBlockCursor {
     if (this.mode === "create" && this.currentBlock.endInstruction) return;
 
     if (this.position === undefined) {
-      this.currentBlock.instructions.add(instruction);
+      this.currentBlock.instructions.pushBack(instruction);
       return;
     }
 

@@ -88,6 +88,7 @@ function bitwiseOp(fn: (...args: bigint[]) => bigint) {
   };
 }
 
+/** Allows you to find which instructions read a given immutable/global value. */
 export class ReaderMap {
   reads: Map<number, Set<TBlockInstruction | TBlockEndInstruction>> = new Map();
 
@@ -114,6 +115,7 @@ export class ReaderMap {
   }
 }
 
+/** Allows you to find which instruction defined which immutable value. */
 export class WriterMap {
   writes: Map<number, TBlockInstruction> = new Map();
 

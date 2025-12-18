@@ -79,6 +79,7 @@ export class CompilerContext implements ICompilerContext {
   #names = new Map<number, string>();
   #ids = new Map<string, ValueId>();
   #values = new Map<number, IValue>();
+  #localIds: ImmutableId[] = [];
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
@@ -95,7 +96,9 @@ export class CompilerContext implements ICompilerContext {
   }
 
   createImmutableId() {
-    return new ImmutableId(this.#idCounter++);
+    const id = new ImmutableId(this.#idCounter++);
+    this.#localIds.push(id);
+    return id;
   }
 
   createGlobalId() {
@@ -131,11 +134,18 @@ export class CompilerContext implements ICompilerContext {
     if (this.#names.has(alias.number) && !this.#names.has(original.number)) {
       this.setValueName(original, this.getValueName(alias)!);
     }
-    alias.number = original.number;
+
+    for (const id of this.#localIds) {
+      if (id.number !== alias.number) continue;
+      id.number = original.number;
+    }
   }
 
   setGlobalAlias(alias: ImmutableId, original: GlobalId): void {
-    alias.number = original.number;
+    for (const id of this.#localIds) {
+      if (id.number !== alias.number) continue;
+      id.number = original.number;
+    }
   }
 
   getValueName(id: ValueId): string | undefined {

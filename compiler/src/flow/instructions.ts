@@ -5,14 +5,60 @@ import { InstructionBase, SetInstruction } from "../instructions";
 import { IInstruction, Location, TLiteral, es } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
+import { CloningContext } from "./clone_context";
 import { GlobalId, ImmutableId } from "./id";
 import { ReaderMap, WriterMap, constantOperationMap } from "./optimizer";
 
-export interface ILowerableInstruction {
+interface BasicInstruction {
+  registerReader(reads: ReaderMap): void;
+
+  unregisterReader(reads: ReaderMap): void;
+
+  registerWriter(writes: WriterMap): void;
+
+  unregisterWriter(writes: WriterMap): void;
+}
+
+interface IBodyInstruction extends BasicInstruction {
+  toMlog(c: ICompilerContext): IInstruction[];
+}
+
+export interface IntermediateInstruction {
+  clone(c: CloningContext): IntermediateInstruction;
+}
+export interface ILowerableInstruction extends BasicInstruction {
   lower(c: ICompilerContext, cursor: IBlockCursor): void;
 }
 
-export class LoadInstruction {
+export class AllocLocalInstruction implements IBodyInstruction {
+  type = "alloc-local" as const;
+  source?: es.SourceLocation;
+
+  constructor(
+    public address: GlobalId,
+    node?: Location,
+  ) {
+    this.source = node?.loc ?? undefined;
+  }
+
+  registerReader(reads: ReaderMap) {
+    reads.add(this.address, this);
+  }
+
+  unregisterReader(reads: ReaderMap) {
+    reads.remove(this.address, this);
+  }
+
+  registerWriter(writes: WriterMap) {}
+
+  unregisterWriter(writes: WriterMap) {}
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    return [];
+  }
+}
+
+export class LoadInstruction implements IBodyInstruction {
   type = "load" as const;
   source?: es.SourceLocation;
 
@@ -22,15 +68,6 @@ export class LoadInstruction {
     node?: Location,
   ) {
     this.source = node?.loc ?? undefined;
-  }
-
-  toMlog(c: ICompilerContext): IInstruction[] {
-    const value = c.getValueOrTemp(this.address);
-    const out = c.getValueOrTemp(this.out);
-
-    const instruction = new SetInstruction(out, value);
-    instruction.source = this.source;
-    return [instruction];
   }
 
   registerReader(reads: ReaderMap) {
@@ -48,9 +85,18 @@ export class LoadInstruction {
   unregisterWriter(writes: WriterMap) {
     writes.remove(this.out);
   }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    const value = c.getValueOrTemp(this.address);
+    const out = c.getValueOrTemp(this.out);
+
+    const instruction = new SetInstruction(out, value);
+    instruction.source = this.source;
+    return [instruction];
+  }
 }
 
-export class StoreInstruction {
+export class StoreInstruction implements IBodyInstruction {
   type = "store" as const;
   source?: es.SourceLocation;
 
@@ -159,7 +205,7 @@ export class ValueGetInstruction implements ILowerableInstruction {
   }
 }
 
-export class ValueSetInstruction {
+export class ValueSetInstruction implements ILowerableInstruction {
   type = "value-set" as const;
   source?: es.SourceLocation;
 
@@ -250,7 +296,7 @@ const invertedOperatorMap: Partial<
   greaterThanEq: "lessThan",
 };
 
-export class BinaryOperationInstruction {
+export class BinaryOperationInstruction implements IBodyInstruction {
   type = "binary-operation" as const;
   source?: es.SourceLocation;
 
@@ -411,7 +457,7 @@ export type TUnaryOperationType =
   | "acos"
   | "atan";
 
-export class UnaryOperatorInstruction {
+export class UnaryOperatorInstruction implements IBodyInstruction {
   type = "unary-operation" as const;
   source?: es.SourceLocation;
 
@@ -466,6 +512,9 @@ export class BreakInstruction {
   type = "break" as const;
   target: TEdge;
   source?: es.SourceLocation;
+  /** Used during the conversion to SSA form */
+  blockParameters: ImmutableId[] = [];
+
   // TODO: why do we even require node when we could just ask for .loc directly?
   constructor(target: Block | TEdge, node?: Location) {
     this.source = node?.loc ?? undefined;
@@ -600,7 +649,7 @@ export class StopInstruction {
   }
 }
 
-export class NativeInstruction {
+export class NativeInstruction implements IBodyInstruction {
   type = "native" as const;
   source?: es.SourceLocation;
 
@@ -641,7 +690,7 @@ export class NativeInstruction {
 }
 
 //  TODO: handle variable mutations
-export class AsmInstruction {
+export class AsmInstruction implements IBodyInstruction {
   type = "asm" as const;
   source?: es.SourceLocation;
 
@@ -690,6 +739,7 @@ export type TBlockEndInstruction =
   | StopInstruction;
 
 export type TBlockInstruction =
+  | AllocLocalInstruction
   | LoadInstruction
   | StoreInstruction
   | ValueGetInstruction

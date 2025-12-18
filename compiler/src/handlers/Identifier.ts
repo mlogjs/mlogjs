@@ -1,5 +1,9 @@
 import { CompilerError } from "../CompilerError";
-import { LoadInstruction, StoreInstruction } from "../flow";
+import {
+  AllocLocalInstruction,
+  LoadInstruction,
+  StoreInstruction,
+} from "../flow";
 import { es, THandler } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";
@@ -51,6 +55,7 @@ Identifier.handleDeclaration = (
   c.setValue(valueId, new StoreValue(name));
   c.setValueName(valueId, name);
 
+  cursor.addInstruction(new AllocLocalInstruction(valueId, node));
   if (!init) return;
 
   cursor.addInstruction(new StoreInstruction(valueId, init, node));

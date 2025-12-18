@@ -8,7 +8,7 @@ import {
   JumpInstruction,
 } from "../instructions";
 import { IBindableValue, IInstruction } from "../types";
-import { LiteralValue } from "../values";
+import { LiteralValue, StoreValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import {
@@ -16,10 +16,16 @@ import {
   BreakInstruction,
   EndIfInstruction,
   EndInstruction,
+  LoadInstruction,
+  StoreInstruction,
   TBlockEndInstruction,
   isLowerable,
 } from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
+import {
+  generateGraphVizDOTString,
+  visualizeImmediateDominators,
+} from "./visualize";
 
 //  TODO: handle multiple leaf blocks (necessary because end and stop exist)
 // control flow graph internals for the compiler
@@ -55,9 +61,9 @@ export class Graph {
     const visited = new Set<Block>();
 
     while (queue.length > 0) {
-      const block = queue[0];
+      const block = queue.shift()!;
+
       if (visited.has(block)) {
-        queue.shift();
         continue;
       }
       visited.add(block);
@@ -66,19 +72,10 @@ export class Graph {
       queue.push(...children);
 
       if (block.endInstruction?.type !== "break-if") {
-        queue.shift();
         continue;
       }
 
       const { consequent, alternate } = block.endInstruction;
-
-      if (
-        consequent.block.parents.length === 1 &&
-        alternate.block.parents.length === 1
-      ) {
-        queue.shift();
-        continue;
-      }
 
       if (consequent.block.parents.length > 1) {
         const newBlock = new Block(new BreakInstruction(consequent));
@@ -108,7 +105,7 @@ export class Graph {
         if (target.block.parents.length !== 1) break;
 
         for (const inst of target.block.instructions) {
-          block.instructions.add(inst);
+          block.instructions.pushBack(inst);
         }
 
         block.endInstruction = target.block.endInstruction;
@@ -358,7 +355,7 @@ export class Graph {
         return;
 
       const newCondition = c.createImmutableId();
-      block.instructions.add(
+      block.instructions.pushBack(
         new BinaryOperationInstruction(
           "equal",
           endInstruction.condition,
@@ -418,7 +415,20 @@ export class Graph {
       if (!consequent.block.instructions.isEmpty) return;
       if (consequent.block.endInstruction?.type !== "end") return;
 
-      block.endInstruction = new EndIfInstruction(condition, alternate);
+      let target = alternate;
+
+      // if there is an empty block here
+      // it was created to prevent a critical edge
+      // but now that the current block will only have one child
+      // we don't need the empty block anymore
+      if (
+        alternate.block.instructions.isEmpty &&
+        alternate.block.endInstruction?.type === "break"
+      ) {
+        target = alternate.block.endInstruction.target;
+      }
+
+      block.endInstruction = new EndIfInstruction(condition, target);
       block.endInstruction.source = endInstruction.source;
     });
   }
@@ -610,7 +620,7 @@ export class Graph {
 
   optimizeGlobals(c: ICompilerContext) {
     const contexts = new Map<Block, Map<GlobalId, ImmutableId>>();
-    traverseParentsFirst(this.start, block => {
+    traverseReversePostOrder(this.start, block => {
       // const context = new Map<GlobalId, ImmutableId>();
 
       const context =
@@ -702,6 +712,222 @@ export class Graph {
     });
   }
 
+  constructSSA(c: ICompilerContext) {
+    // const idoms = immediateDominators(this.start);
+    // const frontiers = dominanceFrontier(this.start, idoms);
+    const orderedBlocks = getReversePostOrder(this.start);
+    const currentValues = new Map<Block, Map<GlobalId, ImmutableId>>();
+    const sealedBlocks = new Set<Block>();
+    const neverId = c.registerValue(
+      new LiteralValue("You should never see this"),
+    );
+
+    for (const block of orderedBlocks) {
+      currentValues.set(block, new Map());
+    }
+
+    function writeVariable(
+      variable: GlobalId,
+      block: Block,
+      value: ImmutableId,
+    ) {
+      currentValues.get(block)!.set(variable, value);
+    }
+
+    function readVariable(variable: GlobalId, block: Block): ImmutableId {
+      if (currentValues.get(block)!.has(variable)) {
+        return currentValues.get(block)!.get(variable)!;
+      }
+
+      return readVariableRecursive(variable, block);
+    }
+
+    function readVariableRecursive(
+      variable: GlobalId,
+      block: Block,
+    ): ImmutableId {
+      let val: ImmutableId;
+      if (block.parents.length === 1) {
+        val = readVariable(variable, block.parents[0]);
+      } else if (!sealedBlocks.has(block)) {
+        val = c.createImmutableId();
+        block.parameters.push({ source: variable, value: val });
+
+        // mark as incomplete and patch later on
+        for (const parent of block.parents) {
+          const endInst = parent.endInstruction;
+          if (endInst?.type !== "break") {
+            throw new CompilerError("Unexpected control flow during mem2reg");
+          }
+
+          if (sealedBlocks.has(parent)) {
+            const parentValue = readVariable(variable, parent);
+            endInst.blockParameters.push(parentValue);
+          } else {
+            endInst.blockParameters.push(neverId);
+          }
+        }
+      } else {
+        const pairs: { end: BreakInstruction; value: ImmutableId }[] = [];
+        for (const parent of block.parents) {
+          const parentValue = readVariable(variable, parent);
+
+          const { endInstruction } = parent;
+          if (endInstruction?.type !== "break") {
+            throw new CompilerError("Unexpected control flow during mem2reg");
+          }
+          pairs.push({ end: endInstruction, value: parentValue });
+        }
+
+        const firstId = pairs[0].value;
+        if (pairs.every(({ value }) => value.equals(firstId))) {
+          val = firstId;
+        } else {
+          val = c.createImmutableId();
+          block.parameters.push({ source: variable, value: val });
+          for (const { end, value } of pairs) {
+            end.blockParameters.push(value);
+          }
+        }
+      }
+
+      writeVariable(variable, block, val);
+      return val;
+    }
+
+    // perform mem2reg conversion
+    for (const block of orderedBlocks) {
+      const currentMap = new Map();
+      currentValues.set(block, currentMap);
+
+      for (const node of block.instructions.nodes()) {
+        const inst = node.instruction;
+        if (inst.type === "store") {
+          writeVariable(inst.address, block, inst.value);
+          block.instructions.remove(node);
+        } else if (inst.type === "load") {
+          const value = readVariable(inst.address, block);
+          c.setAlias(inst.out, value);
+          block.instructions.remove(node);
+          // const { address, out } = inst;
+          // const currentValue = currentMap.get(address);
+          // if (currentValue) {
+          //   c.setAlias(out, currentValue);
+          // } else {
+          //   const newValue = c.createImmutableId();
+          //   block.parameters.push({ source: address, value: newValue });
+          //   c.setAlias(out, newValue);
+          //   currentMap.set(address, newValue);
+          // }
+
+          // // block.instructions.remove(node);
+        }
+      }
+
+      sealedBlocks.add(block);
+
+      const endInstruction = block.endInstruction;
+      if (endInstruction?.type !== "break") continue;
+
+      // patch incomplete block parameters
+      for (let i = 0; i < endInstruction.blockParameters.length; i++) {
+        const param = endInstruction.blockParameters[i];
+        if (!param.equals(neverId)) continue;
+        const variable = endInstruction.target.block.parameters[i].source;
+        const value = readVariable(variable, block);
+        endInstruction.blockParameters[i] = value;
+      }
+    }
+
+    // remove trivial block parameters
+    for (const block of orderedBlocks) {
+      for (let i = block.parameters.length - 1; i >= 0; i--) {
+        const param = block.parameters[i];
+        const allSame = block.parents.every(parent => {
+          const endInst = parent.endInstruction;
+          if (endInst?.type !== "break") {
+            throw new CompilerError(
+              "Unexpected control flow during SSA deconstruction",
+            );
+          }
+          const value = endInst.blockParameters[i];
+          return value.equals(param.value);
+        });
+
+        if (allSame) {
+          block.parameters.splice(i, 1);
+          for (const parent of block.parents) {
+            const endInst = parent.endInstruction as BreakInstruction;
+            endInst.blockParameters.splice(i, 1);
+          }
+        }
+      }
+    }
+  }
+
+  deconstructSSA(c: ICompilerContext) {
+    const orderedBlocks = getReversePostOrder(this.start);
+    const writers = getWriterMap(c, this.start);
+
+    for (let i = orderedBlocks.length - 1; i >= 0; i--) {
+      const block = orderedBlocks[i];
+
+      for (const param of block.parameters) {
+        c.setGlobalAlias(param.value, param.source);
+        block.instructions.pushFront(
+          new LoadInstruction(param.source, param.value),
+        );
+      }
+
+      for (let i = 0; i < block.parameters.length; i++) {
+        const param = block.parameters[i];
+
+        console.log(c.getValue(param.value), c.getValue(param.source));
+        // c.setGlobalAlias(param.value, param.source);
+
+        for (const parent of block.parents) {
+          const endInst = parent.endInstruction;
+          if (endInst?.type !== "break") {
+            console.log(endInst, block.parameters);
+            throw new CompilerError(
+              "Unexpected control flow during SSA deconstruction",
+            );
+          }
+
+          const value = endInst.blockParameters[i];
+          const inner = c.getValue(value);
+
+          if (
+            !c.getValueName(value) &&
+            (!inner || inner instanceof StoreValue)
+          ) {
+            c.setAlias(value, param.value);
+          }
+          parent.instructions.pushBack(
+            new StoreInstruction(param.source, value),
+          );
+        }
+      }
+
+      block.parameters.length = 0;
+      for (const parent of block.parents) {
+        const endInstruction = parent.endInstruction;
+        if (endInstruction?.type !== "break") continue;
+        endInstruction.blockParameters.length = 0;
+      }
+
+      // if (endInstruction?.type !== "break") continue;
+
+      // for (let i = 0; i < endInstruction.blockParameters.length; i++) {
+      //   const value = endInstruction.blockParameters[i];
+      //   const variable = endInstruction.target.block.parameters[i].source;
+
+      //   const storeInst = new StoreInstruction(variable, value);
+      //   block.instructions.pushBack(storeInst);
+      // }
+    }
+  }
+
   optimize(c: ICompilerContext) {
     this.setParents();
     this.mergeBlocks();
@@ -709,28 +935,58 @@ export class Graph {
     this.setParents();
     this.removeCriticalEdges();
     this.splitLeaves();
+    this.constructSSA(c);
+
     this.canonicalizeBinaryOperations(c);
     // this.optimizeGlobals(c);
     this.canonicalizeBreakIfs(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
     this.flipBreakIfs(c);
+    this.setParents();
+    // const idoms = immediateDominators(this.start);
+    // const frontiers = dominanceFrontier(this.start, idoms);
+    // console.log(visualizeImmediateDominators(c, this.start, idoms, frontiers));
     this.createEndIfs(c);
 
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
-    this.optimizeImmediateLoads(c);
-    this.optimizeImmediateStores(c);
     this.setParents();
+    this.deconstructSSA(c);
+    console.log(generateGraphVizDOTString(c, this.start));
     this.skipBlocks();
 
     // TODO: fix updating of block parents during
     // the previous optimizations
     this.setParents();
+    // console.log(generateGraphVizDOTString(c, this.start));
     // console.log(dominators(this.start));
     // console.log(dominanceFrontier(this.start, dominators(this.start)));
+  }
+
+  clone(c: ICompilerContext) {
+    const clone = new Graph();
+    const blockMap = new Map<Block, Block>();
+
+    traverse(this.start, block => {
+      const newBlock = new Block();
+      blockMap.set(block, newBlock);
+    });
+
+    traverse(this.start, block => {
+      const newBlock = blockMap.get(block)!;
+      for (const edge of block.childEdges) {
+        const newTarget = blockMap.get(edge.block)!;
+        newBlock.childEdges.push({ ...edge, block: newTarget });
+      }
+    });
+
+    clone.start = blockMap.get(this.start)!;
+    clone.end = blockMap.get(this.end)!;
+
+    return clone;
   }
 }
 
@@ -750,25 +1006,40 @@ export function traverse(block: Block, action: (block: Block) => void) {
   _traverse(block);
 }
 
-export function traverseParentsFirst(
-  entry: Block,
-  action: (block: Block) => void,
-) {
+export function getReversePostOrder(entry: Block): Block[] {
+  const order: Block[] = [];
   const visited = new Set<Block>();
 
   function _traverse(block: Block) {
-    if (!block.forwardParents.every(parent => visited.has(parent))) return;
+    if (visited.has(block)) return;
 
     visited.add(block);
-    action(block);
+    const edges = block.childEdges;
 
-    for (const edge of block.childEdges) {
+    // iterating backwards to preserve their relative order
+    for (let i = edges.length - 1; i >= 0; i--) {
+      const edge = edges[i];
       if (edge.type === "backward") continue;
       _traverse(edge.block);
     }
+
+    order.push(block);
   }
 
   _traverse(entry);
+
+  return order.reverse();
+}
+
+export function traverseReversePostOrder(
+  entry: Block,
+  action: (block: Block) => void,
+) {
+  const order = getReversePostOrder(entry);
+
+  for (let i = 0; i < order.length; i++) {
+    action(order[i]);
+  }
 }
 
 export function traversePostOrder(
@@ -791,70 +1062,83 @@ export function traversePostOrder(
   _traverse(entry);
 }
 
-function dominators(entry: Block): Map<Block, Set<Block>> {
-  const doms = new Map<Block, Set<Block>>();
-
-  traverse(entry, block => {
-    doms.set(block, new Set([block]));
+function immediateDominators(entry: Block): Map<Block, Block> {
+  const idoms = new Map<Block, Block>();
+  const blockIndexes = new Map<Block, number>();
+  const allBlocks: Block[] = [];
+  traverseReversePostOrder(entry, block => {
+    blockIndexes.set(block, allBlocks.length);
+    allBlocks.push(block);
   });
 
-  traverseParentsFirst(entry, block => {
-    const { forwardParents } = block;
-    if (forwardParents.length === 0) return;
-    const d = doms.get(block)!;
+  idoms.set(entry, entry);
 
-    const common = intersectSets(...forwardParents.map(p => doms.get(p)!));
-    for (const c of common) {
-      d.add(c);
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const block of allBlocks) {
+      if (block === entry) continue;
+
+      const parents = block.parents;
+      let newIdom = parents[0];
+
+      for (let i = 1; i < parents.length; i++) {
+        const parent = parents[i];
+        if (idoms.has(parent)) {
+          newIdom = intersect(newIdom, parent);
+        }
+      }
+
+      if (idoms.get(block) !== newIdom) {
+        idoms.set(block, newIdom);
+        changed = true;
+      }
     }
-  });
+  }
+  return idoms;
 
-  return doms;
+  function intersect(a: Block, b: Block): Block {
+    let aIndex = blockIndexes.get(a)!;
+    let bIndex = blockIndexes.get(b)!;
+
+    while (aIndex !== bIndex) {
+      while (aIndex > bIndex) {
+        aIndex = blockIndexes.get(idoms.get(allBlocks[aIndex])!)!;
+      }
+      while (bIndex > aIndex) {
+        bIndex = blockIndexes.get(idoms.get(allBlocks[bIndex])!)!;
+      }
+    }
+
+    // if they are the same, return undefined
+    return allBlocks[aIndex];
+  }
 }
 
 function dominanceFrontier(
   entry: Block,
-  doms: Map<Block, Set<Block>>,
+  idoms: Map<Block, Block>,
 ): Map<Block, Set<Block>> {
   const frontiers = new Map<Block, Set<Block>>();
+  traverse(entry, block => frontiers.set(block, new Set<Block>()));
 
-  function df(x: Block) {
-    // console.log("df", x);
-    if (frontiers.has(x)) return frontiers.get(x)!;
+  traverseReversePostOrder(entry, block => {
+    frontiers.set(block, new Set<Block>());
 
-    const s = new Set<Block>();
-    const dx = doms.get(x)!;
-    for (const y of x.children) {
-      if (!dx.has(y) && x !== y) {
-        s.add(y);
+    const { parents } = block;
+    if (parents.length < 2) return;
+    const idom = idoms.get(block)!;
+
+    for (const parent of parents) {
+      let runner = parent;
+
+      while (runner !== idom) {
+        frontiers.get(runner)!.add(block);
+        runner = idoms.get(runner)!;
       }
     }
-    for (const k of x.children) {
-      if (!dx.has(k)) continue;
-      for (const y of df(k)) {
-        if (!dx.has(y)) {
-          s.add(y);
-        }
-      }
-    }
-    frontiers.set(x, s);
-    return s;
-  }
-
-  df(entry);
-
+  });
   return frontiers;
-}
-
-function intersectSets<T>(...sets: Set<T>[]) {
-  const result = new Set<T>();
-  const [first, ...rest] = sets;
-  for (const item of first) {
-    if (rest.every(set => set.has(item))) {
-      result.add(item);
-    }
-  }
-  return result;
 }
 
 function getWriterMap(c: ICompilerContext, entry: Block): WriterMap {
@@ -876,6 +1160,11 @@ function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
       inst.registerReader(reads);
     }
     switch (block.endInstruction?.type) {
+      case "break":
+        for (const param of block.endInstruction.blockParameters) {
+          reads.add(param, block.endInstruction);
+        }
+        break;
       case "break-if":
       case "end-if":
         reads.add(block.endInstruction.condition, block.endInstruction);
