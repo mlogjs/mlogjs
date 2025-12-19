@@ -1,11 +1,16 @@
+import { NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "../Function";
 
 export class GetFlag extends MacroFunction {
   constructor() {
-    super((c, out, flag) => {
-      const result = c.getValueOrTemp(out);
-      return [new InstructionBase("getflag", result, flag)];
+    super((c, cursor, loc, flag) => {
+      const out = c.createImmutableId();
+      cursor.addInstruction(
+        new NativeInstruction(["getflag", out, flag], [flag], [out], loc),
+      );
+
+      return out;
     });
   }
 }

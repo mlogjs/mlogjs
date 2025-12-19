@@ -3,7 +3,8 @@ import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { ImmutableId, NativeSensorInstruction } from "../flow";
-import { EMutability, IValue, Location } from "../types";
+import { SourceRange } from "../SourceRange";
+import { EMutability, IValue } from "../types";
 import { camelToDashCase, itemNames } from "../utils";
 
 /**
@@ -32,7 +33,7 @@ export class StoreValue extends BaseValue implements IValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): ImmutableId {
     const prop = c.getValue(propId);
     const out = c.createImmutableId();
@@ -68,6 +69,7 @@ export class StoreValue extends BaseValue implements IValue {
     }
     throw new CompilerError(
       `The property [${prop.debugString()}] cannot be sensed`,
+      loc,
     );
   }
 

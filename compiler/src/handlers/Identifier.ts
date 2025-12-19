@@ -4,6 +4,7 @@ import {
   LoadInstruction,
   StoreInstruction,
 } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { es, THandler } from "../types";
 import { nodeName } from "../utils";
 import { StoreValue } from "../values";
@@ -15,7 +16,9 @@ export const Identifier: THandler = (c, scope, cursor, node: es.Identifier) => {
       return id;
     case "global": {
       const out = c.createImmutableId();
-      cursor.addInstruction(new LoadInstruction(id, out, node));
+      cursor.addInstruction(
+        new LoadInstruction(id, out, SourceRange.fromNode(node)),
+      );
       return out;
     }
   }
@@ -29,7 +32,9 @@ Identifier.handleWriteable = (c, scope, cursor, node: es.Identifier) => {
     write(value, callerNode) {
       const id = scope.get(c, node.name);
       if (id.type !== "global") throw new Error("Cannot assign to constants");
-      cursor.addInstruction(new StoreInstruction(id, value, callerNode));
+      cursor.addInstruction(
+        new StoreInstruction(id, value, SourceRange.fromNode(callerNode)),
+      );
     },
   };
 };
@@ -44,7 +49,11 @@ Identifier.handleDeclaration = (
 ) => {
   const name = nodeName(node, !c.compactNames && node.name);
   if (kind === "const") {
-    if (!init) throw new CompilerError("const must be initialized", node);
+    if (!init)
+      throw new CompilerError(
+        "const must be initialized",
+        SourceRange.fromNode(node),
+      );
     scope.set(node.name, init);
     if (!c.getValueName(init)) c.setValueName(init, name);
     return;
@@ -55,8 +64,12 @@ Identifier.handleDeclaration = (
   c.setValue(valueId, new StoreValue(name));
   c.setValueName(valueId, name);
 
-  cursor.addInstruction(new AllocLocalInstruction(valueId, node));
+  cursor.addInstruction(
+    new AllocLocalInstruction(valueId, SourceRange.fromNode(node)),
+  );
   if (!init) return;
 
-  cursor.addInstruction(new StoreInstruction(valueId, init, node));
+  cursor.addInstruction(
+    new StoreInstruction(valueId, init, SourceRange.fromNode(node)),
+  );
 };

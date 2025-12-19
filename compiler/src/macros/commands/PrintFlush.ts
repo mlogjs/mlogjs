@@ -2,7 +2,8 @@ import { MacroFunction } from "..";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
 import { ImmutableId, NativeInstruction } from "../../flow";
-import { EMutability, Location } from "../../types";
+import { EMutability } from "../../types";
+import { SourceRange } from "../../SourceRange";
 
 const defaultTargetName = "message1";
 export class PrintFlush extends MacroFunction {
@@ -29,7 +30,7 @@ export class PrintFlush extends MacroFunction {
 }
 
 class NativePrintFlushInstruction extends NativeInstruction {
-  constructor(target: ImmutableId, node: Location) {
-    super(["printflush", target], [target], [], node);
+  constructor(target: ImmutableId, loc: SourceRange) {
+    super(["printflush", target], [target], [], loc);
   }
 }

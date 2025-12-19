@@ -6,7 +6,7 @@ import {
   TBlockEndInstruction,
   TBlockInstruction,
 } from "./flow";
-import { Location, es } from "./types";
+import { SourceRange } from "./SourceRange";
 
 export interface IBlockCursor {
   currentBlock: Block;
@@ -21,7 +21,7 @@ export interface IBlockCursor {
   removeInstruction(): void;
 
   /** Attempts to connect a block to the current block pointed at by this cursor. */
-  connectBlock(block: Block, node: es.Node): void;
+  connectBlock(block: Block, loc: SourceRange): void;
 
   setEndInstruction(instruction: TBlockEndInstruction): void;
 
@@ -73,7 +73,7 @@ export class BlockCursor implements IBlockCursor {
     this.position = previous;
   }
 
-  connectBlock(block: Block, loc: Location) {
+  connectBlock(block: Block, loc: SourceRange) {
     if (block === this.currentBlock) return;
     this.setEndInstruction(new BreakInstruction(block, loc));
     this.currentBlock = block;

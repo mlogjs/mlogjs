@@ -2,7 +2,8 @@ import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { ImmutableId } from "../flow";
-import { EMutability, IValue, Location } from "../types";
+import { SourceRange } from "../SourceRange";
+import { EMutability, IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
 
@@ -25,7 +26,7 @@ class BuildingsMacro extends ObjectValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValueOrTemp(propId);
     if (super.hasProperty(c, key))

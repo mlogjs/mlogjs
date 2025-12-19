@@ -7,6 +7,7 @@ import {
   InstructionBase,
   JumpInstruction,
 } from "../instructions";
+import { SourceRange } from "../SourceRange";
 import { IBindableValue, IInstruction } from "../types";
 import { LiteralValue, StoreValue } from "../values";
 import { Block, TEdge } from "./block";
@@ -33,13 +34,13 @@ export class Graph {
   start = new Block();
   end = new Block();
 
-  static from(entry: Block, exit: Block) {
+  static from(entry: Block, exit: Block, loc: SourceRange) {
     const graph = new Graph();
     graph.start = entry;
     graph.end = exit;
 
     traverse(graph.start, block => {
-      block.endInstruction ??= new BreakInstruction(graph.end);
+      block.endInstruction ??= new BreakInstruction(graph.end, loc);
     });
 
     graph.setParents();
@@ -75,10 +76,10 @@ export class Graph {
         continue;
       }
 
-      const { consequent, alternate } = block.endInstruction;
+      const { consequent, alternate, source } = block.endInstruction;
 
       if (consequent.block.parents.length > 1) {
-        const newBlock = new Block(new BreakInstruction(consequent));
+        const newBlock = new Block(new BreakInstruction(consequent, source));
         newBlock.endInstruction!.source = block.endInstruction.source;
         newBlock.addParent(block);
         consequent.block.removeParent(block);
@@ -87,7 +88,7 @@ export class Graph {
       }
 
       if (alternate.block.parents.length > 1) {
-        const newBlock = new Block(new BreakInstruction(alternate));
+        const newBlock = new Block(new BreakInstruction(alternate, source));
         newBlock.endInstruction!.source = block.endInstruction.source;
 
         newBlock.addParent(block);
@@ -361,6 +362,7 @@ export class Graph {
           endInstruction.condition,
           c.registerValue(new LiteralValue(0)),
           newCondition,
+          endInstruction.source,
         ),
       );
       endInstruction.condition = newCondition;
@@ -428,8 +430,11 @@ export class Graph {
         target = alternate.block.endInstruction.target;
       }
 
-      block.endInstruction = new EndIfInstruction(condition, target);
-      block.endInstruction.source = endInstruction.source;
+      block.endInstruction = new EndIfInstruction(
+        condition,
+        target,
+        endInstruction.source,
+      );
     });
   }
 
@@ -489,8 +494,8 @@ export class Graph {
         condition.num === 0
           ? endInstruction.alternate
           : endInstruction.consequent,
+        endInstruction.source,
       );
-      newBreak.source = endInstruction.source;
       block.endInstruction = newBreak;
     });
   }
@@ -502,13 +507,14 @@ export class Graph {
       const condition = c.getValue(endInstruction.condition);
       if (!(condition instanceof LiteralValue)) return;
 
-      const loc = block.endInstruction?.source;
+      const { source } = endInstruction;
       if (condition.num) {
-        block.endInstruction = new EndInstruction({ loc });
+        block.endInstruction = new EndInstruction(source);
       } else {
-        block.endInstruction = new BreakInstruction(endInstruction.alternate, {
-          loc,
-        });
+        block.endInstruction = new BreakInstruction(
+          endInstruction.alternate,
+          source,
+        );
       }
     });
   }
@@ -717,6 +723,7 @@ export class Graph {
     // const frontiers = dominanceFrontier(this.start, idoms);
     const orderedBlocks = getReversePostOrder(this.start);
     const currentValues = new Map<Block, Map<GlobalId, ImmutableId>>();
+    const valueLocations = new Map<ImmutableId, SourceRange>();
     const sealedBlocks = new Set<Block>();
     const neverId = c.registerValue(
       new LiteralValue("You should never see this"),
@@ -730,47 +737,52 @@ export class Graph {
       variable: GlobalId,
       block: Block,
       value: ImmutableId,
+      loc: SourceRange,
     ) {
       currentValues.get(block)!.set(variable, value);
+      if (!valueLocations.has(value)) {
+        valueLocations.set(value, loc);
+      }
     }
 
-    function readVariable(variable: GlobalId, block: Block): ImmutableId {
+    function readVariable(
+      variable: GlobalId,
+      block: Block,
+      loc: SourceRange,
+    ): ImmutableId {
       if (currentValues.get(block)!.has(variable)) {
         return currentValues.get(block)!.get(variable)!;
       }
 
-      return readVariableRecursive(variable, block);
+      return readVariableRecursive(variable, block, loc);
     }
 
     function readVariableRecursive(
       variable: GlobalId,
       block: Block,
+      loc: SourceRange,
     ): ImmutableId {
       let val: ImmutableId;
-      if (block.parents.length === 1) {
-        val = readVariable(variable, block.parents[0]);
-      } else if (!sealedBlocks.has(block)) {
+      if (!sealedBlocks.has(block)) {
         val = c.createImmutableId();
-        block.parameters.push({ source: variable, value: val });
+        valueLocations.set(val, loc);
+        block.parameters.push({ variable, value: val, loc });
 
         // mark as incomplete and patch later on
         for (const parent of block.parents) {
           const endInst = parent.endInstruction;
-          if (endInst?.type !== "break") {
+          if (endInst?.type !== "break" && endInst?.type !== "break-if") {
             throw new CompilerError("Unexpected control flow during mem2reg");
           }
 
-          if (sealedBlocks.has(parent)) {
-            const parentValue = readVariable(variable, parent);
-            endInst.blockParameters.push(parentValue);
-          } else {
-            endInst.blockParameters.push(neverId);
-          }
+          endInst.addBlockParameter(block, { value: neverId, loc });
         }
+      } else if (block.parents.length === 1) {
+        val = readVariable(variable, block.parents[0], loc);
       } else {
         const pairs: { end: BreakInstruction; value: ImmutableId }[] = [];
         for (const parent of block.parents) {
-          const parentValue = readVariable(variable, parent);
+          const parentValue = readVariable(variable, parent, loc);
 
           const { endInstruction } = parent;
           if (endInstruction?.type !== "break") {
@@ -784,14 +796,15 @@ export class Graph {
           val = firstId;
         } else {
           val = c.createImmutableId();
-          block.parameters.push({ source: variable, value: val });
+          valueLocations.set(val, loc);
+          block.parameters.push({ variable: variable, value: val, loc });
           for (const { end, value } of pairs) {
-            end.blockParameters.push(value);
+            end.blockParameters.push({ value, loc });
           }
         }
       }
 
-      writeVariable(variable, block, val);
+      writeVariable(variable, block, val, loc);
       return val;
     }
 
@@ -803,10 +816,10 @@ export class Graph {
       for (const node of block.instructions.nodes()) {
         const inst = node.instruction;
         if (inst.type === "store") {
-          writeVariable(inst.address, block, inst.value);
+          writeVariable(inst.address, block, inst.value, inst.source);
           block.instructions.remove(node);
         } else if (inst.type === "load") {
-          const value = readVariable(inst.address, block);
+          const value = readVariable(inst.address, block, inst.source);
           c.setAlias(inst.out, value);
           block.instructions.remove(node);
           // const { address, out } = inst;
@@ -832,10 +845,10 @@ export class Graph {
       // patch incomplete block parameters
       for (let i = 0; i < endInstruction.blockParameters.length; i++) {
         const param = endInstruction.blockParameters[i];
-        if (!param.equals(neverId)) continue;
-        const variable = endInstruction.target.block.parameters[i].source;
-        const value = readVariable(variable, block);
-        endInstruction.blockParameters[i] = value;
+        if (!param.value.equals(neverId)) continue;
+        const variable = endInstruction.target.block.parameters[i].variable;
+        const value = readVariable(variable, block, param.loc);
+        endInstruction.blockParameters[i] = { value, loc: param.loc };
       }
     }
 
@@ -851,7 +864,7 @@ export class Graph {
             );
           }
           const value = endInst.blockParameters[i];
-          return value.equals(param.value);
+          return value.value.equals(param.value);
         });
 
         if (allSame) {
@@ -873,16 +886,19 @@ export class Graph {
       const block = orderedBlocks[i];
 
       for (const param of block.parameters) {
-        c.setGlobalAlias(param.value, param.source);
+        c.setGlobalAlias(param.value, param.variable);
         block.instructions.pushFront(
-          new LoadInstruction(param.source, param.value),
+          new LoadInstruction(param.variable, param.value, param.loc),
         );
       }
 
       for (let i = 0; i < block.parameters.length; i++) {
-        const param = block.parameters[i];
+        const blockParam = block.parameters[i];
 
-        console.log(c.getValue(param.value), c.getValue(param.source));
+        console.log(
+          c.getValue(blockParam.value),
+          c.getValue(blockParam.variable),
+        );
         // c.setGlobalAlias(param.value, param.source);
 
         for (const parent of block.parents) {
@@ -894,17 +910,21 @@ export class Graph {
             );
           }
 
-          const value = endInst.blockParameters[i];
-          const inner = c.getValue(value);
+          const instParam = endInst.blockParameters[i];
+          const value = c.getValue(instParam.value);
 
           if (
-            !c.getValueName(value) &&
-            (!inner || inner instanceof StoreValue)
+            !c.getValueName(instParam.value) &&
+            (!value || value instanceof StoreValue)
           ) {
-            c.setAlias(value, param.value);
+            c.setAlias(instParam.value, blockParam.value);
           }
           parent.instructions.pushBack(
-            new StoreInstruction(param.source, value),
+            new StoreInstruction(
+              blockParam.variable,
+              instParam.value,
+              instParam.loc,
+            ),
           );
         }
       }
@@ -944,13 +964,9 @@ export class Graph {
     this.transformComparisons(c);
     this.flipBreakIfs(c);
     this.setParents();
-    // const idoms = immediateDominators(this.start);
-    // const frontiers = dominanceFrontier(this.start, idoms);
-    // console.log(visualizeImmediateDominators(c, this.start, idoms, frontiers));
-    this.createEndIfs(c);
-
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
+    this.createEndIfs(c);
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
     this.setParents();
@@ -1162,7 +1178,7 @@ function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
     switch (block.endInstruction?.type) {
       case "break":
         for (const param of block.endInstruction.blockParameters) {
-          reads.add(param, block.endInstruction);
+          reads.add(param.value, block.endInstruction);
         }
         break;
       case "break-if":

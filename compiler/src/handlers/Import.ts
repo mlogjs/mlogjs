@@ -1,5 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { ValueGetInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
 
@@ -77,7 +78,7 @@ export const ImportSpecifier: THandler = (
       key: keyId,
       object: moduleId,
       out,
-      node,
+      source: SourceRange.fromNode(node),
     }),
   );
 

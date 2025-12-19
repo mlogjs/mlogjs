@@ -1,13 +1,14 @@
 import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId } from "../flow";
-import { EMutability, Location } from "../types";
+import { SourceRange } from "../SourceRange";
+import { EMutability } from "../types";
 import { VoidValue } from "../values";
 
 type TFunction = (
   c: ICompilerContext,
   cursor: IBlockCursor,
-  loc: Location,
+  loc: SourceRange,
   ...args: ImmutableId[]
 ) => ImmutableId;
 
@@ -23,7 +24,7 @@ export class MacroFunction extends VoidValue {
   call(
     c: ICompilerContext,
     cursor: IBlockCursor,
-    loc: Location,
+    loc: SourceRange,
     args: ImmutableId[],
   ): ImmutableId {
     return this.fn.apply(this, [c, cursor, loc, ...args]);

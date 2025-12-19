@@ -7,7 +7,7 @@ import {
   assertLiteralOneOf,
 } from "../../utils";
 import { ImmutableId, NativeInstruction } from "../../flow";
-import { Location } from "../../types";
+import { SourceRange } from "../../SourceRange";
 
 export const validRadarFilters = [
   "any",
@@ -100,7 +100,7 @@ class NativeRadarInstruction extends NativeInstruction {
     building: ImmutableId;
     order: ImmutableId;
     out: ImmutableId;
-    loc: Location;
+    loc: SourceRange;
   }) {
     super(
       ["radar", ...filters, sort, building, order, out],

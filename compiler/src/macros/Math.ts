@@ -9,7 +9,8 @@ import {
   TUnaryOperationType,
   UnaryOperatorInstruction,
 } from "../flow";
-import { IValue, Location } from "../types";
+import { SourceRange } from "../SourceRange";
+import { IValue } from "../types";
 import { mathConstants } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
@@ -38,12 +39,13 @@ const forwardedBinaryOperations: TBinaryOperationType[] = [
   "min",
   "noise",
   "pow",
+  "emod",
 ];
 
 function createMacroMathOperations(c: ICompilerContext) {
   function binary(
     cursor: IBlockCursor,
-    loc: Location,
+    loc: SourceRange,
     operator: TBinaryOperationType,
     a: ImmutableId,
     b: ImmutableId,

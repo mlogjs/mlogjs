@@ -1,8 +1,8 @@
 import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { ImmutableId } from "../flow";
-import { Location } from "../types";
+import { ImmutableId, isImmutableId } from "../flow";
+import { SourceRange } from "../SourceRange";
 import {
   assertIsObjectMacro,
   assertObjectFields,
@@ -30,7 +30,7 @@ interface IOverloadNamespaceOptions<K extends string> {
     c: ICompilerContext,
     overload: K,
     cursor: IBlockCursor,
-    loc: Location,
+    loc: SourceRange,
     ...args: (ImmutableId | string)[]
   ): ImmutableId;
 }
@@ -92,5 +92,5 @@ export function createOverloadNamespace<K extends string>({
 }
 
 export function filterIds(args: (ImmutableId | string)[]): ImmutableId[] {
-  return args.filter((arg): arg is ImmutableId => typeof arg === "object");
+  return args.filter(isImmutableId);
 }

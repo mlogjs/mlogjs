@@ -1,4 +1,5 @@
 import { ICompilerContext } from "../CompilerContext";
+import { SourceRange } from "../SourceRange";
 import { IInstruction } from "../types";
 import { GlobalId, ImmutableId } from "./id";
 import { TBlockEndInstruction, TBlockInstruction } from "./instructions";
@@ -16,8 +17,9 @@ export interface IBackwardEdge {
 export type TEdge = IForwardEdge | IBackwardEdge;
 
 export interface BlockParameterDefintion {
-  source: GlobalId;
+  variable: GlobalId;
   value: ImmutableId;
+  loc: SourceRange;
 }
 
 let _id = 0;

@@ -4,8 +4,7 @@ import { Block } from "./flow";
 import { ICompilerContext } from "./CompilerContext";
 import { ImmutableId, ValueId } from "./flow/id";
 import { IBlockCursor } from "./BlockCursor";
-
-export type Location = Pick<es.Node, "loc">;
+import { SourceRange } from "./SourceRange";
 
 export enum EInstIntent {
   none,
@@ -33,7 +32,7 @@ export interface IInstruction {
    */
   ignoredByParser: boolean;
   resolve(i: number): void;
-  source?: es.SourceLocation;
+  source?: SourceRange;
   /**
    * Helps analyzing control flow, handlers should indicate which instructions
    * returned are guaranteed to run
@@ -212,7 +211,7 @@ export interface IValue {
   call(
     c: ICompilerContext,
     cursor: IBlockCursor,
-    loc: Location,
+    loc: SourceRange,
     args: ImmutableId[],
   ): ImmutableId;
   get(
@@ -220,7 +219,7 @@ export interface IValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): ImmutableId;
   set?(
     c: ICompilerContext,
@@ -228,7 +227,7 @@ export interface IValue {
     targetId: ImmutableId,
     propId: ImmutableId,
     valueId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): void;
 
   /**

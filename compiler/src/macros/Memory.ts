@@ -9,6 +9,7 @@ import {
   NativeWriteInstruction,
 } from "../flow";
 import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 class MemoryMacro extends ObjectValue {
   constructor(
@@ -26,11 +27,11 @@ class MemoryMacro extends ObjectValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    node: es.Node,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValue(propId);
     if (key && super.hasProperty(c, key))
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (key instanceof LiteralValue && !key.isNumber())
       throw new CompilerError(
@@ -40,7 +41,7 @@ class MemoryMacro extends ObjectValue {
     const out = c.createImmutableId();
 
     cursor.addInstruction(
-      new NativeReadInstruction(this.cell, propId, out, node),
+      new NativeReadInstruction(this.cell, propId, out, loc),
     );
 
     return out;
@@ -52,7 +53,7 @@ class MemoryMacro extends ObjectValue {
     targetId: ImmutableId,
     propId: ImmutableId,
     valueId: ImmutableId,
-    node: es.Node,
+    loc: SourceRange,
   ): void {
     const key = c.getValue(propId);
 
@@ -67,7 +68,7 @@ class MemoryMacro extends ObjectValue {
       );
 
     cursor.addInstruction(
-      new NativeWriteInstruction(this.cell, propId, valueId, node),
+      new NativeWriteInstruction(this.cell, propId, valueId, loc),
     );
   }
 

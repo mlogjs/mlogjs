@@ -2,7 +2,6 @@ import {
   EMutability,
   IScope,
   IValue,
-  Location,
   TEOutput,
   TValueInstructions,
 } from "../types";
@@ -10,6 +9,7 @@ import { CompilerError } from "../CompilerError";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId } from "../flow";
 import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
@@ -26,7 +26,7 @@ export class VoidValue implements IValue {
   call(
     _c: ICompilerContext,
     _cursor: IBlockCursor,
-    loc: Location,
+    loc: SourceRange,
     _args: ImmutableId[],
   ): ImmutableId {
     throw new CompilerError(`[${this.debugString()}] is not callable.`, loc);
@@ -36,7 +36,7 @@ export class VoidValue implements IValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     prop: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): ImmutableId {
     throw new CompilerError(
       `The member [${c

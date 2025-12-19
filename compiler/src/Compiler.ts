@@ -7,6 +7,7 @@ import { hideRedundantJumps } from "./utils";
 import { CompilerContext } from "./CompilerContext";
 import { BlockCursor } from "./BlockCursor";
 import { Block, EndInstruction, Graph } from "./flow";
+import { SourceRange } from "./SourceRange";
 
 type THandlerMap = { [k in es.Node["type"]]?: THandler };
 
@@ -45,13 +46,14 @@ export class Compiler {
       // the script, since it is treated as a module
       const scope = globalScope.createScope();
 
+      const programRange = SourceRange.fromNode(program);
       const entryBlock = new Block();
-      const exitBlock = new Block(new EndInstruction());
+      const exitBlock = new Block(new EndInstruction(programRange));
       const cursor = new BlockCursor("create", entryBlock);
 
       c.handle(scope, cursor, program);
 
-      const rootGraph = Graph.from(entryBlock, exitBlock);
+      const rootGraph = Graph.from(entryBlock, exitBlock, programRange);
 
       const inst = rootGraph.toMlog(c);
 

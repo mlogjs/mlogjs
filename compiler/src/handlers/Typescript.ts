@@ -1,4 +1,5 @@
 import { CompilerError } from "../CompilerError";
+import { SourceRange } from "../SourceRange";
 import { es, THandler } from "../types";
 import { nodeName } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
@@ -48,7 +49,7 @@ export const TSEnumDeclaration: THandler = (
     if (!(value instanceof LiteralValue))
       throw new CompilerError(
         "Enum members must contain literal values",
-        member,
+        SourceRange.fromNode(member),
       );
 
     if (value.isNumber()) {

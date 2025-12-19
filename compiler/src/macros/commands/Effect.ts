@@ -3,7 +3,7 @@ import { ImmutableId, NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class Effect extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -99,7 +99,7 @@ export class Effect extends ObjectValue {
         cursor.addInstruction(
           new NativeInstruction(
             ["effect", overload, ...params],
-            params.filter(p => typeof p === "object"),
+            filterIds(params),
             [],
             loc,
           ),

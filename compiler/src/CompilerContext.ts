@@ -75,11 +75,11 @@ export interface ICompilerContext {
 export class CompilerContext implements ICompilerContext {
   protected handlers: Partial<Record<es.Node["type"], THandler>> = handlers;
   #tempCounter = 0;
-  #idCounter = 0;
   #names = new Map<number, string>();
   #ids = new Map<string, ValueId>();
   #values = new Map<number, IValue>();
-  #localIds: ImmutableId[] = [];
+  /** Maps id numbers to all associated ValueIds */
+  #registeredIds: ValueId[][] = [];
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
@@ -96,13 +96,15 @@ export class CompilerContext implements ICompilerContext {
   }
 
   createImmutableId() {
-    const id = new ImmutableId(this.#idCounter++);
-    this.#localIds.push(id);
+    const id = new ImmutableId(this.#registeredIds.length);
+    this.#registeredIds.push([id]);
     return id;
   }
 
   createGlobalId() {
-    return new GlobalId(this.#idCounter++);
+    const id = new GlobalId(this.#registeredIds.length);
+    this.#registeredIds.push([id]);
+    return id;
   }
 
   getValue(id: ValueId | undefined): IValue | undefined {
@@ -135,17 +137,27 @@ export class CompilerContext implements ICompilerContext {
       this.setValueName(original, this.getValueName(alias)!);
     }
 
-    for (const id of this.#localIds) {
-      if (id.number !== alias.number) continue;
+    const aliasArray = this.#registeredIds[alias.number];
+    const targetArray = this.#registeredIds[original.number];
+
+    for (const id of aliasArray) {
       id.number = original.number;
+      targetArray.push(id);
     }
+
+    aliasArray.length = 0;
   }
 
   setGlobalAlias(alias: ImmutableId, original: GlobalId): void {
-    for (const id of this.#localIds) {
-      if (id.number !== alias.number) continue;
+    const aliasArray = this.#registeredIds[alias.number];
+    const originalArray = this.#registeredIds[original.number];
+
+    for (const id of aliasArray) {
       id.number = original.number;
+      originalArray.push(id);
     }
+
+    aliasArray.length = 0;
   }
 
   getValueName(id: ValueId): string | undefined {

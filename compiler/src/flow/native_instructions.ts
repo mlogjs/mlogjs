@@ -1,4 +1,4 @@
-import { Location } from "../types";
+import { SourceRange } from "../SourceRange";
 import { ImmutableId } from "./id";
 import { NativeInstruction } from "./instructions";
 
@@ -7,9 +7,9 @@ export class NativeSensorInstruction extends NativeInstruction {
     value: ImmutableId,
     prop: ImmutableId,
     result: ImmutableId,
-    node?: Location,
+    loc: SourceRange,
   ) {
-    super(["sensor", result, value, prop], [value, prop], [result], node);
+    super(["sensor", result, value, prop], [value, prop], [result], loc);
   }
 }
 
@@ -18,9 +18,9 @@ export class NativeReadInstruction extends NativeInstruction {
     cell: ImmutableId,
     index: ImmutableId,
     result: ImmutableId,
-    node?: Location,
+    loc: SourceRange,
   ) {
-    super(["read", result, cell, index], [cell, index], [result], node);
+    super(["read", result, cell, index], [cell, index], [result], loc);
   }
 }
 
@@ -29,14 +29,14 @@ export class NativeWriteInstruction extends NativeInstruction {
     cell: ImmutableId,
     index: ImmutableId,
     value: ImmutableId,
-    node?: Location,
+    loc: SourceRange,
   ) {
-    super(["write", value, cell, index], [value, cell, index], [], node);
+    super(["write", value, cell, index], [value, cell, index], [], loc);
   }
 }
 
 export class NativePrintInstruction extends NativeInstruction {
-  constructor(value: ImmutableId, node?: Location) {
-    super(["print", value], [value], [], node);
+  constructor(value: ImmutableId, loc: SourceRange) {
+    super(["print", value], [value], [], loc);
   }
 }

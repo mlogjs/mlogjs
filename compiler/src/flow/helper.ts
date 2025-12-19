@@ -1,6 +1,6 @@
 import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
-import { Location } from "../types";
+import { SourceRange } from "../SourceRange";
 import { LiteralValue } from "../values";
 import { ImmutableId } from "./id";
 import { BinaryOperationInstruction } from "./instructions";
@@ -16,7 +16,7 @@ export function negateValue(
   c: ICompilerContext,
   cursor: IBlockCursor,
   value: ImmutableId,
-  node?: Location,
+  node: SourceRange,
 ) {
   const out = c.createImmutableId();
   cursor.addInstruction(

@@ -1,4 +1,4 @@
-import { Location, es } from "./types";
+import { SourcePosition, SourceRange } from "./SourceRange";
 
 /**
  * Error thrown by the babel parser.
@@ -14,27 +14,7 @@ export interface ParsingError extends Error {
   };
 }
 
-type CompilerErrorSource =
-  | Location
-  | es.SourceLocation
-  | {
-      line: number;
-      column: number;
-    };
-
-export interface CompilerErrorLoc {
-  start: {
-    line: number;
-    column: number;
-  };
-  end: {
-    line: number;
-    column: number;
-  };
-}
-
 export class CompilerError extends Error {
-  protected _loc?: CompilerErrorLoc;
   /**
    * The error that preceded this `CompilerError`.
    *
@@ -43,37 +23,21 @@ export class CompilerError extends Error {
    */
   inner?: unknown;
 
-  constructor(message: string, source?: CompilerErrorSource) {
+  constructor(
+    message: string,
+    public loc?: SourceRange,
+  ) {
     super(message);
-
-    this.loc = source;
   }
 
-  get loc(): CompilerErrorLoc | undefined {
-    return this._loc;
-  }
-
-  set loc(value: CompilerErrorSource | undefined) {
-    if (!value) return;
-    if ("start" in value) {
-      this._loc = value;
-    } else if ("line" in value) {
-      this._loc = {
-        start: value,
-        end: value,
-      };
-    } else {
-      this._loc = value.loc!;
-    }
-  }
-
-  static from(error: unknown, source?: CompilerErrorSource) {
+  static from(error: unknown, loc?: SourceRange) {
     let message: string;
 
     if (error && typeof error === "object" && "loc" in error) {
       const err = error as ParsingError;
       message = err.toString();
-      source ??= err.loc;
+      const pos = new SourcePosition(err.loc.line, err.loc.column);
+      loc = new SourceRange(pos, pos);
     } else if (error instanceof Error) {
       message = error.message;
     } else if (typeof error === "string") {
@@ -81,7 +45,7 @@ export class CompilerError extends Error {
     } else {
       message = `Unknown error: ${error}`;
     }
-    const result = new CompilerError(message, source);
+    const result = new CompilerError(message, loc);
     result.inner = error;
     return result;
   }

@@ -2,7 +2,8 @@ import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { ImmutableId } from "../flow/id";
-import { EMutability, IValue, Location, TValueInstructions } from "../types";
+import { SourceRange } from "../SourceRange";
+import { EMutability, IValue, TValueInstructions } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
@@ -47,7 +48,7 @@ export class ObjectValue extends VoidValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    _loc: Location,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValueOrTemp(propId);
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
@@ -60,6 +61,7 @@ export class ObjectValue extends VoidValue {
 
     throw new CompilerError(
       `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
+      loc,
     );
   }
 

@@ -48,7 +48,7 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
           .map(arg => (typeof arg === "string" ? arg : n(arg)))
           .join(" ")}`;
       case "break":
-        return `break ${ids.get(inst.target.block)} (${inst.blockParameters.map(n).join(", ")})`;
+        return `break ${ids.get(inst.target.block)} (${inst.blockParameters.map(p => n(p.value)).join(", ")})`;
       case "break-if":
         return `break-if ${n(inst.condition)} ${ids.get(
           inst.consequent.block,
@@ -73,7 +73,7 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
 
   traverseReversePostOrder(entry, block => {
     const id = ids.get(block)!;
-    result += `${id} [label="${id}\\lparams: (${block.parameters.map(p => `${n(p.source)}=${n(p.value)}`).join(", ")})\\l\\l${[
+    result += `${id} [label="${id}\\lparams: (${block.parameters.map(p => `${n(p.variable)}=${n(p.value)}`).join(", ")})\\l\\l${[
       ...block.instructions,
       block.endInstruction,
     ]

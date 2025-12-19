@@ -34,3 +34,7 @@ export class ImmutableId {
 }
 
 export type ValueId = GlobalId | ImmutableId;
+
+export function isImmutableId(value: unknown): value is ImmutableId {
+  return value instanceof ImmutableId;
+}

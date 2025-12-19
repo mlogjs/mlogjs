@@ -10,6 +10,7 @@ import {
   ValueSetInstruction,
 } from "../flow";
 import { ImmutableId } from "../flow/id";
+import { SourceRange } from "../SourceRange";
 import { es, THandler } from "../types";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
@@ -22,9 +23,15 @@ export const ObjectExpression: THandler = (
   const data: IObjectValueData = {};
   for (const prop of node.properties) {
     if (prop.type === "SpreadElement")
-      throw new CompilerError("Cannot handle spread element", prop);
+      throw new CompilerError(
+        "Cannot handle spread element",
+        SourceRange.fromNode(prop),
+      );
     if (prop.computed)
-      throw new CompilerError("Cannot handle computed property.", prop);
+      throw new CompilerError(
+        "Cannot handle computed property.",
+        SourceRange.fromNode(prop),
+      );
     const { key } = prop;
     const value = prop.type === "ObjectProperty" ? prop.value : prop;
     let index: string;
@@ -33,7 +40,10 @@ export const ObjectExpression: THandler = (
     } else if (key.type === "StringLiteral" || key.type === "NumericLiteral") {
       index = String(key.value);
     } else {
-      throw new CompilerError(`Unsupported object key type: ${key.type}`, key);
+      throw new CompilerError(
+        `Unsupported object key type: ${key.type}`,
+        SourceRange.fromNode(key),
+      );
     }
 
     const member = c.handle(scope, cursor, value);
@@ -95,7 +105,7 @@ export const MemberExpression: THandler = (
       key,
       out,
       optionalObject: optional,
-      node,
+      source: SourceRange.fromNode(node),
     }),
   );
 
@@ -124,7 +134,7 @@ MemberExpression.handleWriteable = (
           key,
           out,
           optionalObject: optional,
-          node,
+          source: SourceRange.fromNode(node),
         }),
       );
 
@@ -133,7 +143,12 @@ MemberExpression.handleWriteable = (
 
     write(value, callerNode) {
       cursor.addInstruction(
-        new ValueSetInstruction(obj, key, value, callerNode),
+        new ValueSetInstruction(
+          obj,
+          key,
+          value,
+          SourceRange.fromNode(callerNode),
+        ),
       );
     },
   };
@@ -185,7 +200,7 @@ ArrayPattern.handleWriteable = (c, scope, cursor, node: es.ArrayPattern) => {
             key,
             out: temp,
             optionalKey: element.type === "AssignmentPattern",
-            node,
+            source: SourceRange.fromNode(node),
           }),
         );
         const handler = c.handleWriteable(scope, cursor, element);
@@ -245,7 +260,10 @@ ObjectPattern.handleWriteable = (c, scope, cursor, node: es.ObjectPattern) => {
     write(value, callerNode) {
       for (const prop of node.properties) {
         if (prop.type === "RestElement")
-          throw new CompilerError("The rest operator is not supported", prop);
+          throw new CompilerError(
+            "The rest operator is not supported",
+            SourceRange.fromNode(prop),
+          );
 
         const propKey = prop.key;
         const key =
@@ -261,7 +279,7 @@ ObjectPattern.handleWriteable = (c, scope, cursor, node: es.ObjectPattern) => {
             key,
             out: temp,
             optionalKey: prop.value.type === "AssignmentPattern",
-            node,
+            source: SourceRange.fromNode(node),
           }),
         );
 
@@ -287,7 +305,10 @@ ObjectPattern.handleDeclaration = (
 
   for (const prop of node.properties) {
     if (prop.type === "RestElement")
-      throw new CompilerError("The rest operator is not supported", prop);
+      throw new CompilerError(
+        "The rest operator is not supported",
+        SourceRange.fromNode(prop),
+      );
 
     const propKey = prop.key;
     const key =
@@ -303,7 +324,7 @@ ObjectPattern.handleDeclaration = (
         key,
         out: temp,
         optionalKey: prop.value.type === "AssignmentPattern",
-        node: prop,
+        source: SourceRange.fromNode(prop),
       }),
     );
     c.handleDeclaration(scope, cursor, prop.value, kind, temp);
@@ -330,7 +351,7 @@ export const AssignmentPattern: THandler = (
   // return [new AssignmentValue(left, right), inst];
   throw new CompilerError(
     "AssignmentPattern handler invoked incorrectly",
-    node,
+    SourceRange.fromNode(node),
   );
 };
 
@@ -360,24 +381,39 @@ AssignmentPattern.handleWriteable = (
           value,
           c.nullId,
           test,
-          node,
+          SourceRange.fromNode(node),
         ),
       );
       cursor.setEndInstruction(
-        new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+        new BreakIfInstruction(
+          test,
+          consequentBlock,
+          alternateBlock,
+          SourceRange.fromNode(node),
+        ),
       );
 
       cursor.currentBlock = consequentBlock;
       const defaultValue = c.handle(scope, cursor, node.right);
-      cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
-      cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+      cursor.addInstruction(
+        new StoreInstruction(temp, defaultValue, SourceRange.fromNode(node)),
+      );
+      cursor.setEndInstruction(
+        new BreakInstruction(exitBlock, SourceRange.fromNode(node)),
+      );
 
       cursor.currentBlock = alternateBlock;
-      cursor.addInstruction(new StoreInstruction(temp, value, node));
-      cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+      cursor.addInstruction(
+        new StoreInstruction(temp, value, SourceRange.fromNode(node)),
+      );
+      cursor.setEndInstruction(
+        new BreakInstruction(exitBlock, SourceRange.fromNode(node)),
+      );
 
       cursor.currentBlock = exitBlock;
-      cursor.addInstruction(new LoadInstruction(temp, result, node));
+      cursor.addInstruction(
+        new LoadInstruction(temp, result, SourceRange.fromNode(node)),
+      );
       leftHandler.write(result, callerNode);
     },
   };
@@ -394,7 +430,7 @@ AssignmentPattern.handleDeclaration = (
   if (!init)
     throw new CompilerError(
       "AssignmentPattern.handleDeclaration called without init",
-      node,
+      SourceRange.fromNode(node),
     );
   const consequentBlock = new Block();
   const alternateBlock = new Block();
@@ -403,25 +439,27 @@ AssignmentPattern.handleDeclaration = (
   const result = c.createImmutableId();
   const temp = c.createGlobalId();
   const test = c.createImmutableId();
+  const loc = SourceRange.fromNode(node);
+
   cursor.addInstruction(
-    new BinaryOperationInstruction("strictEqual", init, c.nullId, test, node),
+    new BinaryOperationInstruction("strictEqual", init, c.nullId, test, loc),
   );
   cursor.setEndInstruction(
-    new BreakIfInstruction(test, consequentBlock, alternateBlock, node),
+    new BreakIfInstruction(test, consequentBlock, alternateBlock, loc),
   );
 
   cursor.currentBlock = consequentBlock;
   const defaultValue = c.handle(scope, cursor, node.right);
-  cursor.addInstruction(new StoreInstruction(temp, defaultValue, node));
-  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.addInstruction(new StoreInstruction(temp, defaultValue, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
 
   cursor.currentBlock = alternateBlock;
   const value = c.handle(scope, cursor, node.right);
-  cursor.addInstruction(new StoreInstruction(temp, value, node));
-  cursor.setEndInstruction(new BreakInstruction(exitBlock, node));
+  cursor.addInstruction(new StoreInstruction(temp, value, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
 
   cursor.currentBlock = exitBlock;
-  cursor.addInstruction(new LoadInstruction(temp, result, node));
+  cursor.addInstruction(new LoadInstruction(temp, result, loc));
 
   c.handleDeclaration(scope, cursor, node.left, kind, result);
 };

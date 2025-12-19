@@ -1,5 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { Block, BreakInstruction, ReturnInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { es, IScope, THandler } from "../types";
 
 export const ExpressionStatement: THandler = (
@@ -20,7 +21,9 @@ export const BreakStatement: THandler = (
   const label = node.label?.name;
 
   const target = findScopeLabel(scope, label);
-  cursor.setEndInstruction(new BreakInstruction(target.break, node));
+  cursor.setEndInstruction(
+    new BreakInstruction(target.break, SourceRange.fromNode(node)),
+  );
 
   return c.nullId;
 };
@@ -34,7 +37,9 @@ export const ContinueStatement: THandler = (
   const label = node.label?.name;
 
   const target = findScopeLabel(scope, label);
-  cursor.setEndInstruction(new BreakInstruction(target.continue, node));
+  cursor.setEndInstruction(
+    new BreakInstruction(target.continue, SourceRange.fromNode(node)),
+  );
 
   return c.nullId;
 };
@@ -48,7 +53,9 @@ export const ReturnStatement: THandler = (
   const arg = node.argument ? c.handle(scope, cursor, node.argument) : c.nullId;
 
   // TODO: handle return value
-  cursor.setEndInstruction(new ReturnInstruction(arg));
+  cursor.setEndInstruction(
+    new ReturnInstruction(arg, SourceRange.fromNode(node)),
+  );
   return c.nullId;
 };
 
@@ -68,7 +75,7 @@ export const LabeledStatement: THandler = (
 
   c.handle(inner, cursor, node.body);
 
-  cursor.connectBlock(afterLabelBlock, node);
+  cursor.connectBlock(afterLabelBlock, SourceRange.fromNode(node));
 
   return c.nullId;
 };

@@ -1,21 +1,22 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IValue } from "../../types";
-import { LiteralValue, StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { NativeInstruction } from "../../flow";
 
 export class GetLink extends MacroFunction {
   constructor() {
-    super((c, out, index: IValue) => {
-      if (
-        !(index instanceof StoreValue) &&
-        (!(index instanceof LiteralValue) || !index.isNumber())
-      )
-        throw new CompilerError(
-          "The getlink index must be a number literal or a store",
-        );
-      const outBuild = c.getValueOrTemp(out);
-      return [new InstructionBase("getlink", outBuild, index)];
+    super((c, cursor, loc, index) => {
+      if (!index) throw new CompilerError("Missing parameter: index", loc);
+      const outBuild = c.createImmutableId();
+
+      cursor.addInstruction(
+        new NativeInstruction(
+          ["getlink", outBuild, index],
+          [index],
+          [outBuild],
+          loc,
+        ),
+      );
+      return outBuild;
     });
   }
 }

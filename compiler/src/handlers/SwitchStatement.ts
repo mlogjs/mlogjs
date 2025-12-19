@@ -4,6 +4,7 @@ import {
   BreakIfInstruction,
   BreakInstruction,
 } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { es, THandler } from "../types";
 
 export const SwitchStatement: THandler = (
@@ -15,15 +16,16 @@ export const SwitchStatement: THandler = (
   const innerScope = scope.createScope();
   const refBlock = new Block();
   const exitBlock = new Block();
-  cursor.connectBlock(refBlock, node);
+  const loc = SourceRange.fromNode(node);
+  cursor.connectBlock(refBlock, loc);
   innerScope.break = exitBlock;
 
   const ref = c.handle(scope, cursor, node.discriminant);
 
   let nextBodyBlock = new Block();
   let nextTestBlock = new Block();
-  let defaultCaseEntry = new Block(new BreakInstruction(exitBlock, node));
-  cursor.connectBlock(nextTestBlock, node);
+  let defaultCaseEntry = new Block(new BreakInstruction(exitBlock, loc));
+  cursor.connectBlock(nextTestBlock, loc);
 
   for (const scase of node.cases) {
     const bodyEntry = nextBodyBlock;
@@ -36,17 +38,18 @@ export const SwitchStatement: THandler = (
 
       const value = c.handle(scope, cursor, scase.test);
       const condition = c.createImmutableId();
+      const caseLoc = SourceRange.fromNode(scase);
       cursor.addInstruction(
         new BinaryOperationInstruction(
           "strictEqual",
           ref,
           value,
           condition,
-          scase,
+          caseLoc,
         ),
       );
       cursor.setEndInstruction(
-        new BreakIfInstruction(condition, bodyEntry, nextTestBlock, scase),
+        new BreakIfInstruction(condition, bodyEntry, nextTestBlock, caseLoc),
       );
     } else {
       // testEntry.endInstruction = new BreakInstruction(bodyEntry);
@@ -57,11 +60,11 @@ export const SwitchStatement: THandler = (
 
     c.handleMany(innerScope, cursor, scase.consequent);
 
-    cursor.setEndInstruction(new BreakInstruction(nextBodyBlock, node));
+    cursor.setEndInstruction(new BreakInstruction(nextBodyBlock, loc));
   }
 
-  nextTestBlock.endInstruction = new BreakInstruction(defaultCaseEntry, node);
-  nextBodyBlock.endInstruction = new BreakInstruction(exitBlock, node);
+  nextTestBlock.endInstruction = new BreakInstruction(defaultCaseEntry, loc);
+  nextBodyBlock.endInstruction = new BreakInstruction(exitBlock, loc);
 
   cursor.currentBlock = exitBlock;
   return c.nullId;

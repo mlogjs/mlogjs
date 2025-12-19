@@ -2,7 +2,7 @@ import { IBlockCursor } from "../../BlockCursor";
 import { ICompilerContext } from "../../CompilerContext";
 import { CompilerError } from "../../CompilerError";
 import { ImmutableId, NativeInstruction } from "../../flow";
-import { Location } from "../../types";
+import { SourceRange } from "../../SourceRange";
 import {
   LiteralValue,
   ObjectValue,
@@ -31,7 +31,7 @@ class Settable extends ObjectValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): ImmutableId {
     const value = c.getValueOrTemp(this.target);
 
@@ -44,7 +44,7 @@ class Settable extends ObjectValue {
     targetId: ImmutableId,
     propId: ImmutableId,
     valueId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): void {
     const prop = c.getValue(propId);
 
@@ -67,7 +67,7 @@ class NativeSetPropInstruction extends NativeInstruction {
     public target: ImmutableId,
     public prop: string | ImmutableId,
     public value: ImmutableId,
-    public loc: Location,
+    loc: SourceRange,
   ) {
     super(
       ["setprop", prop, target, value],

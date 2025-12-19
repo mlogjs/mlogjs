@@ -3,7 +3,7 @@ import { ImmutableId, NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class PlaySound extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -58,9 +58,7 @@ export class PlaySound extends ObjectValue {
               y,
               limit,
             ],
-            [sound, volume, pitch, pan, x, y, limit].filter(
-              a => typeof a === "object",
-            ),
+            filterIds([sound, volume, pitch, pan, x, y, limit]),
             [],
             loc,
           ),

@@ -1,17 +1,11 @@
 import { camelToDashCase } from "../utils";
-import {
-  EMutability,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-  es,
-} from "../types";
+import { EMutability, IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
 import { ICompilerContext } from "../CompilerContext";
 import { ImmutableId, LoadInstruction } from "../flow";
 import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 const dynamicVars = [
   "unit",
@@ -38,11 +32,11 @@ export class NamespaceMacro extends ObjectValue {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    node: es.Node,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValue(propId);
     if (key && super.hasProperty(c, key))
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (!(key instanceof LiteralValue) || !key.isString())
       throw new CompilerError(
@@ -68,7 +62,7 @@ export class NamespaceMacro extends ObjectValue {
         globalId,
         new StoreValue(`@${symbolName}`, EMutability.readonly),
       );
-      cursor.addInstruction(new LoadInstruction(globalId, out, node));
+      cursor.addInstruction(new LoadInstruction(globalId, out, loc));
     }
 
     return out;
@@ -95,13 +89,13 @@ export class ColorsNamespace extends NamespaceMacro {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    node: es.Node,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValue(propId);
     if (key && super.hasProperty(c, key))
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
     if (!(key instanceof LiteralValue) || !key.isString())
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
 
     const plainName = key.data;
 
@@ -120,14 +114,14 @@ export class SoundsNamespace extends NamespaceMacro {
     cursor: IBlockCursor,
     targetId: ImmutableId,
     propId: ImmutableId,
-    node: es.Node,
+    loc: SourceRange,
   ): ImmutableId {
     const key = c.getValue(propId);
     if (key && super.hasProperty(c, key))
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (!(key instanceof LiteralValue) || !key.isString())
-      return super.get(c, cursor, targetId, propId, node);
+      return super.get(c, cursor, targetId, propId, loc);
 
     const result = new StoreValue(`@sfx-${key.data}`, EMutability.constant);
 

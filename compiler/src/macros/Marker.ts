@@ -1,12 +1,12 @@
 import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { ImmutableId, NativeInstruction } from "../flow";
-import { Location } from "../types";
+import { ImmutableId, isImmutableId, NativeInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { assertIsObjectMacro, assertObjectFields } from "../utils";
 import { LiteralValue, ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
-import { createOverloadNamespace } from "./util";
+import { createOverloadNamespace, filterIds } from "./util";
 
 export class MarkerConstructor extends ObjectValue {
   constructor(c: ICompilerContext) {
@@ -55,7 +55,7 @@ export class MarkerConstructor extends ObjectValue {
           cursor.addInstruction(
             new NativeInstruction(
               ["makemarker", overload, id, ...rest],
-              [id, ...rest.filter(a => typeof a === "object")],
+              [id, ...filterIds(rest)],
               [],
               loc,
             ),
@@ -144,7 +144,7 @@ class MarkerMacro extends ObjectValue {
     targetId: ImmutableId,
     propId: ImmutableId,
     valueId: ImmutableId,
-    loc: Location,
+    loc: SourceRange,
   ): void {
     const key = c.getValue(propId);
 
@@ -194,14 +194,9 @@ class NativeSetMarkerInstruction extends NativeInstruction {
   constructor(
     public id: ImmutableId,
     public prop: string,
-    loc: Location,
+    loc: SourceRange,
     ...args: (ImmutableId | string)[]
   ) {
-    super(
-      ["setmarker", prop, id, ...args],
-      [id, ...args.filter(a => typeof a !== "string")],
-      [],
-      loc,
-    );
+    super(["setmarker", prop, id, ...args], [id, ...filterIds(args)], [], loc);
   }
 }

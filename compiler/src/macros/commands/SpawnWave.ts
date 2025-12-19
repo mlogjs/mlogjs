@@ -2,6 +2,7 @@ import { CompilerError } from "../../CompilerError";
 import { NativeInstruction } from "../../flow";
 import { LiteralValue } from "../../values";
 import { MacroFunction } from "../Function";
+import { filterIds } from "../util";
 
 export class SpawnWave extends MacroFunction {
   constructor() {
@@ -11,7 +12,7 @@ export class SpawnWave extends MacroFunction {
       cursor.addInstruction(
         new NativeInstruction(
           ["spawnwave", x ?? "0", y ?? "0", natural],
-          [x, y].filter(Boolean),
+          filterIds([x, y]),
           [],
           loc,
         ),

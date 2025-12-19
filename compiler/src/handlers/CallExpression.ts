@@ -1,5 +1,6 @@
 import { CallInstruction } from "../flow";
 import { ImmutableId } from "../flow/id";
+import { SourceRange } from "../SourceRange";
 import { es, THandler } from "../types";
 import { LiteralValue, ObjectValue } from "../values";
 
@@ -19,7 +20,9 @@ export const CallExpression: THandler = (
   calleeValue?.postCall(scope);
 
   const out = c.createImmutableId();
-  cursor.addInstruction(new CallInstruction(callee, args, out, node));
+  cursor.addInstruction(
+    new CallInstruction(callee, args, out, SourceRange.fromNode(node)),
+  );
 
   return out;
 };
@@ -66,7 +69,12 @@ export const TaggedTemplateExpression: THandler = (
 
   const out = c.createImmutableId();
   cursor.addInstruction(
-    new CallInstruction(tag, [stringsObjectId, ...expressions], out, node),
+    new CallInstruction(
+      tag,
+      [stringsObjectId, ...expressions],
+      out,
+      SourceRange.fromNode(node),
+    ),
   );
 
   return out;

@@ -2,7 +2,8 @@ import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { InstructionBase, SetInstruction } from "../instructions";
-import { IInstruction, Location, TLiteral, es } from "../types";
+import { SourceRange } from "../SourceRange";
+import { IInstruction, TLiteral, es } from "../types";
 import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { CloningContext } from "./clone_context";
@@ -32,14 +33,11 @@ export interface ILowerableInstruction extends BasicInstruction {
 
 export class AllocLocalInstruction implements IBodyInstruction {
   type = "alloc-local" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public address: GlobalId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     reads.add(this.address, this);
@@ -60,15 +58,12 @@ export class AllocLocalInstruction implements IBodyInstruction {
 
 export class LoadInstruction implements IBodyInstruction {
   type = "load" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public address: GlobalId,
     public out: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     reads.add(this.address, this);
@@ -98,15 +93,12 @@ export class LoadInstruction implements IBodyInstruction {
 
 export class StoreInstruction implements IBodyInstruction {
   type = "store" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public address: GlobalId,
     public value: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     reads.add(this.value, this);
@@ -132,7 +124,7 @@ export class StoreInstruction implements IBodyInstruction {
 
 export class ValueGetInstruction implements ILowerableInstruction {
   type = "value-get" as const;
-  source?: es.SourceLocation;
+  source: SourceRange;
   object: ImmutableId;
   key: ImmutableId;
   out: ImmutableId;
@@ -145,14 +137,14 @@ export class ValueGetInstruction implements ILowerableInstruction {
     out: ImmutableId;
     optionalKey?: boolean;
     optionalObject?: boolean;
-    node?: Location;
+    source: SourceRange;
   }) {
     this.key = options.key;
     this.object = options.object;
     this.out = options.out;
     this.optionalObject = options.optionalObject ?? false;
     this.optionalKey = options.optionalKey ?? false;
-    this.source = options.node?.loc ?? undefined;
+    this.source = options.source;
   }
 
   registerReader(reads: ReaderMap) {
@@ -191,9 +183,7 @@ export class ValueGetInstruction implements ILowerableInstruction {
       }
     }
 
-    const result = object.get(c, cursor, this.object, this.key, {
-      loc: this.source,
-    });
+    const result = object.get(c, cursor, this.object, this.key, this.source);
     c.setAlias(this.out, result);
   }
 
@@ -207,16 +197,13 @@ export class ValueGetInstruction implements ILowerableInstruction {
 
 export class ValueSetInstruction implements ILowerableInstruction {
   type = "value-set" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public target: ImmutableId,
     public key: ImmutableId,
     public value: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     reads.add(this.target, this);
@@ -244,9 +231,7 @@ export class ValueSetInstruction implements ILowerableInstruction {
         this.source,
       );
 
-    target.set(c, cursor, this.target, this.key, this.value, {
-      loc: this.source,
-    });
+    target.set(c, cursor, this.target, this.key, this.value, this.source);
   }
 
   toMlog(c: ICompilerContext): IInstruction[] {
@@ -264,6 +249,7 @@ export type TBinaryOperationType =
   | "div"
   | "idiv"
   | "mod"
+  | "emod"
   | "pow"
   | "equal"
   | "notEqual"
@@ -298,17 +284,14 @@ const invertedOperatorMap: Partial<
 
 export class BinaryOperationInstruction implements IBodyInstruction {
   type = "binary-operation" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public operator: TBinaryOperationType,
     public left: ImmutableId,
     public right: ImmutableId,
     public out: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   isJumpMergeable() {
     switch (this.operator) {
@@ -459,16 +442,13 @@ export type TUnaryOperationType =
 
 export class UnaryOperatorInstruction implements IBodyInstruction {
   type = "unary-operation" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public operator: TUnaryOperationType,
     public value: ImmutableId,
     public out: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     reads.add(this.value, this);
@@ -508,65 +488,93 @@ export class UnaryOperatorInstruction implements IBodyInstruction {
 }
 
 export type TSourceLoc = es.SourceLocation | undefined | null;
-export class BreakInstruction {
+
+export interface IBreakParameter {
+  loc: SourceRange;
+  value: ImmutableId;
+}
+
+export interface IBlockParamsInstruction {
+  addBlockParameter(childBlock: Block, param: IBreakParameter): void;
+}
+
+export class BreakInstruction implements IBlockParamsInstruction {
   type = "break" as const;
   target: TEdge;
-  source?: es.SourceLocation;
   /** Used during the conversion to SSA form */
-  blockParameters: ImmutableId[] = [];
+  blockParameters: IBreakParameter[] = [];
 
   // TODO: why do we even require node when we could just ask for .loc directly?
-  constructor(target: Block | TEdge, node?: Location) {
-    this.source = node?.loc ?? undefined;
+  constructor(
+    target: Block | TEdge,
+    public source: SourceRange,
+  ) {
     this.target = target instanceof Block ? target.toForward() : target;
+  }
+
+  addBlockParameter(childBlock: Block, param: IBreakParameter) {
+    this.blockParameters.push(param);
   }
 }
 
-export class BreakIfInstruction {
+export class BreakIfInstruction implements IBlockParamsInstruction {
   type = "break-if" as const;
-  source?: es.SourceLocation;
   consequent: TEdge;
   alternate: TEdge;
+  /**
+   * Only exists briefly during the conversion to SSA form. It's existence in
+   * any other compiler phase would imply a critical edge.
+   */
+  consequentParameters: IBreakParameter[] = [];
+  /**
+   * Only exists briefly during the conversion to SSA form. It's existence in
+   * any other compiler phase would imply a critical edge.
+   */
+  alternateParameters: IBreakParameter[] = [];
 
   constructor(
     public condition: ImmutableId,
     consequent: Block | TEdge,
     alternate: Block | TEdge,
-    node?: Location,
+    public source: SourceRange,
   ) {
-    this.source = node?.loc ?? undefined;
     this.consequent =
       consequent instanceof Block ? consequent.toForward() : consequent;
     this.alternate =
       alternate instanceof Block ? alternate.toForward() : alternate;
   }
+
+  addBlockParameter(childBlock: Block, param: IBreakParameter) {
+    if (this.consequent.block === childBlock) {
+      this.consequentParameters.push(param);
+    } else if (this.alternate.block === childBlock) {
+      this.alternateParameters.push(param);
+    } else {
+      throw new CompilerError(
+        "Attempted to add block parameter to break-if for non-child block",
+      );
+    }
+  }
 }
 
 export class ReturnInstruction {
   type = "return" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public value: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 }
 
 export class CallInstruction implements ILowerableInstruction {
   type = "call" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public callee: ImmutableId,
     public args: ImmutableId[],
     public out: ImmutableId,
-    node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
-
+    public source: SourceRange,
+  ) {}
   registerReader(reads: ReaderMap) {
     reads.add(this.callee, this);
     this.args.forEach(arg => reads.add(arg, this));
@@ -587,7 +595,7 @@ export class CallInstruction implements ILowerableInstruction {
 
   lower(c: ICompilerContext, cursor: IBlockCursor) {
     const callee = c.getValueOrTemp(this.callee);
-    const callResult = callee.call(c, cursor, { loc: this.source }, this.args);
+    const callResult = callee.call(c, cursor, this.source, this.args);
 
     c.setAlias(this.out, callResult);
   }
@@ -616,24 +624,19 @@ export class CallInstruction implements ILowerableInstruction {
 
 export class EndInstruction {
   type = "end" as const;
-  source?: es.SourceLocation;
 
-  constructor(node?: Location) {
-    this.source = node?.loc ?? undefined;
-  }
+  constructor(public source: SourceRange) {}
 }
 
 export class EndIfInstruction {
   type = "end-if" as const;
-  source?: es.SourceLocation;
   alternate: TEdge;
 
   constructor(
     public condition: ImmutableId,
     alternate: Block | TEdge,
-    node?: Location,
+    public source: SourceRange,
   ) {
-    this.source = node?.loc ?? undefined;
     this.alternate =
       alternate instanceof Block ? alternate.toForward() : alternate;
   }
@@ -642,25 +645,18 @@ export class EndIfInstruction {
 export class StopInstruction {
   type = "stop" as const;
 
-  source?: es.SourceLocation;
-
-  constructor(node?: Location) {
-    this.source = node?.loc ?? undefined;
-  }
+  constructor(public source: SourceRange) {}
 }
 
 export class NativeInstruction implements IBodyInstruction {
   type = "native" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public args: (ImmutableId | string)[],
     public inputs: ImmutableId[],
     public outputs: ImmutableId[],
-    public node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     this.inputs.forEach(input => reads.add(input, this));
@@ -692,17 +688,14 @@ export class NativeInstruction implements IBodyInstruction {
 //  TODO: handle variable mutations
 export class AsmInstruction implements IBodyInstruction {
   type = "asm" as const;
-  source?: es.SourceLocation;
 
   constructor(
     public lines: (string | ImmutableId)[][],
     public code: string,
     public inputs: ImmutableId[],
     public outputs: ImmutableId[],
-    public node?: Location,
-  ) {
-    this.source = node?.loc ?? undefined;
-  }
+    public source: SourceRange,
+  ) {}
 
   registerReader(reads: ReaderMap) {
     this.inputs.forEach(input => reads.add(input, this));
