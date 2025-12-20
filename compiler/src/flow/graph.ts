@@ -201,21 +201,14 @@ export class Graph {
     this.lower(c);
     this.optimize(c);
     const instructions: IInstruction[] = [];
-    const visited = new Set<Block>();
     const addresses = new Map<Block, IBindableValue<number | null>>();
+    const orderedBlocks = getReversePostOrder(this.start);
 
-    traverse(this.start, block => {
+    for (const block of orderedBlocks) {
       addresses.set(block, new LiteralValue(null));
-    });
+    }
 
-    const flatten = (block: Block) => {
-      if (visited.has(block)) return;
-      const { forwardParents } = block;
-
-      if (!forwardParents.every(parent => visited.has(parent))) {
-        return;
-      }
-      visited.add(block);
+    for (const block of orderedBlocks) {
       instructions.push(new AddressResolver(addresses.get(block)!));
       // instructions.push(new InstructionBase("blockstart"));
       instructions.push(...block.toMlog(c));
@@ -299,20 +292,7 @@ export class Graph {
         default:
           throw new CompilerError("Not implemented");
       }
-
-      // there are at most two children
-      // and because of how break-if is implemented
-      // having the alternate branch before the consequent branch
-      // reduces the amount of instructions needed
-      for (let i = block.childEdges.length - 1; i >= 0; i--) {
-        const edge = block.childEdges[i];
-        if (edge.type === "backward") continue;
-        // for (let i = 0; i < block.children.length; i++) {
-        flatten(edge.block);
-      }
-    };
-
-    flatten(this.start);
+    }
 
     return instructions;
   }
