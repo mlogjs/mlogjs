@@ -1,15 +1,19 @@
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import {
+  AllocLocalInstruction,
   BinaryOperationInstruction,
   Block,
   BreakIfInstruction,
   BreakInstruction,
+  ImmutableId,
   LoadInstruction,
   StoreInstruction,
   TBinaryOperationType,
   UnaryOperatorInstruction,
 } from "../flow";
-import { AssignementOperator } from "../operators";
+import { AssignmentOperator } from "../operators";
 import { SourceRange } from "../SourceRange";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
@@ -35,6 +39,7 @@ const binaryOperatorMap: Partial<
   "^": "xor",
   "<<": "shl",
   ">>": "shr",
+  ">>>": "ushr",
 };
 
 export const BinaryExpression: THandler = (
@@ -46,30 +51,15 @@ export const BinaryExpression: THandler = (
   const left = c.handle(scope, cursor, node.left);
   const right = c.handle(scope, cursor, node.right);
   const operator = node.operator;
-  const out = c.createImmutableId();
-  const loc = SourceRange.fromNode(node);
 
-  if (operator === "!==") {
-    const temp = c.createImmutableId();
-    const zero = c.registerValue(new LiteralValue(0));
-    cursor.addInstruction(
-      new BinaryOperationInstruction("strictEqual", left, right, temp, loc),
-    );
-    cursor.addInstruction(
-      new BinaryOperationInstruction("equal", temp, zero, out, loc),
-    );
-    return out;
-  }
-
-  const type = binaryOperatorMap[operator];
-  if (!type)
-    throw new CompilerError(`The operator ${operator} is not supported`);
-
-  cursor.addInstruction(
-    new BinaryOperationInstruction(type, left, right, out, loc),
+  return binaryExpression(
+    c,
+    cursor,
+    operator,
+    left,
+    right,
+    SourceRange.fromNode(node),
   );
-
-  return out;
 };
 
 export const LogicalExpression: THandler = (
@@ -78,67 +68,77 @@ export const LogicalExpression: THandler = (
   cursor,
   node: es.LogicalExpression,
 ) => {
-  const out = c.createGlobalId();
-  const alternateBlock = new Block();
-  const exitBlock = new Block();
-  const loc = SourceRange.fromNode(node);
-
   const left = c.handle(scope, cursor, node.left);
-  cursor.addInstruction(new StoreInstruction(out, left, loc));
-  switch (node.operator) {
-    case "&&":
-      cursor.setEndInstruction(
-        new BreakIfInstruction(left, alternateBlock, exitBlock, loc),
-      );
-      break;
-    case "||":
-      cursor.setEndInstruction(
-        new BreakIfInstruction(left, exitBlock, alternateBlock, loc),
-      );
-      break;
-    case "??": {
-      const test = c.createImmutableId();
-      const temp = c.createImmutableId();
-      cursor.addInstruction(
-        new BinaryOperationInstruction(
-          "strictEqual",
-          temp,
-          c.nullId,
-          test,
-          loc,
-        ),
-      );
-      cursor.addInstruction(new StoreInstruction(out, temp, loc));
-      cursor.setEndInstruction(
-        new BreakIfInstruction(test, alternateBlock, exitBlock, loc),
-      );
-    }
-  }
-
-  cursor.currentBlock = alternateBlock;
-  const right = c.handle(scope, cursor, node.right);
-  cursor.addInstruction(new StoreInstruction(out, right, loc));
-  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
-
-  cursor.currentBlock = exitBlock;
-  const immutableOut = c.createImmutableId();
-  cursor.addInstruction(new LoadInstruction(out, immutableOut, loc));
-
-  return immutableOut;
+  return logicalExpression(
+    c,
+    cursor,
+    node.operator,
+    left,
+    () => c.handle(scope, cursor, node.right),
+    SourceRange.fromNode(node),
+  );
 };
+
+type TrimmedOperator<T extends string> = T extends `${infer U}=` ? U : never;
 
 export const AssignmentExpression: THandler = (
   c,
   scope,
   cursor,
   node: es.AssignmentExpression & {
-    operator: AssignementOperator;
+    operator: AssignmentOperator;
   },
 ) => {
   // TODO: support the other assignment operators
   const handler = c.handleWriteable(scope, cursor, node.left);
 
-  const value = c.handle(scope, cursor, node.right);
+  const operator = node.operator;
+
+  let value: ImmutableId;
+  switch (node.operator) {
+    case "=": {
+      value = c.handle(scope, cursor, node.right);
+      break;
+    }
+    case "??=":
+    case "||=":
+    case "&&=": {
+      const left = handler.read();
+      value = logicalExpression(
+        c,
+        cursor,
+        operator.slice(0, 2) as es.LogicalExpression["operator"],
+        left,
+        () => c.handle(scope, cursor, node.right),
+        SourceRange.fromNode(node),
+      );
+      break;
+    }
+    case "%=":
+    case "*=":
+    case "+=":
+    case "-=":
+    case "/=":
+    case "<<=":
+    case ">>=":
+    case ">>>=":
+    case "&=":
+    case "^=":
+    case "**=":
+    case "|=": {
+      const left = handler.read();
+      const right = c.handle(scope, cursor, node.right);
+
+      value = binaryExpression(
+        c,
+        cursor,
+        operator.slice(0, -1) as es.BinaryExpression["operator"],
+        left,
+        right,
+        SourceRange.fromNode(node),
+      );
+    }
+  }
 
   handler.write(value, node);
   return value;
@@ -285,3 +285,91 @@ export const SequenceExpression: THandler = (
 
   return c.handle(scope, cursor, expressions[expressions.length - 1]);
 };
+
+function binaryExpression(
+  c: ICompilerContext,
+  cursor: IBlockCursor,
+  operator: es.BinaryExpression["operator"],
+  left: ImmutableId,
+  right: ImmutableId,
+  loc: SourceRange,
+) {
+  const out = c.createImmutableId();
+
+  if (operator === "!==") {
+    const temp = c.createImmutableId();
+    const zero = c.registerValue(new LiteralValue(0));
+    cursor.addInstruction(
+      new BinaryOperationInstruction("strictEqual", left, right, temp, loc),
+    );
+    cursor.addInstruction(
+      new BinaryOperationInstruction("equal", temp, zero, out, loc),
+    );
+    return out;
+  }
+
+  const type = binaryOperatorMap[operator];
+  if (!type)
+    throw new CompilerError(`The operator ${operator} is not supported`);
+
+  cursor.addInstruction(
+    new BinaryOperationInstruction(type, left, right, out, loc),
+  );
+
+  return out;
+}
+
+function logicalExpression(
+  c: ICompilerContext,
+  cursor: IBlockCursor,
+  operator: es.LogicalExpression["operator"],
+  left: ImmutableId,
+  handleRight: () => ImmutableId,
+  loc: SourceRange,
+) {
+  const out = c.createGlobalId();
+  cursor.addInstruction(new AllocLocalInstruction(out, loc));
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
+
+  cursor.addInstruction(new StoreInstruction(out, left, loc));
+  switch (operator) {
+    case "&&":
+      cursor.setEndInstruction(
+        new BreakIfInstruction(left, alternateBlock, exitBlock, loc),
+      );
+      break;
+    case "||":
+      cursor.setEndInstruction(
+        new BreakIfInstruction(left, exitBlock, alternateBlock, loc),
+      );
+      break;
+    case "??": {
+      const test = c.createImmutableId();
+      cursor.addInstruction(new StoreInstruction(out, left, loc));
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "strictEqual",
+          left,
+          c.nullId,
+          test,
+          loc,
+        ),
+      );
+      cursor.setEndInstruction(
+        new BreakIfInstruction(test, alternateBlock, exitBlock, loc),
+      );
+    }
+  }
+
+  cursor.currentBlock = alternateBlock;
+  const right = handleRight();
+  cursor.addInstruction(new StoreInstruction(out, right, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
+
+  cursor.currentBlock = exitBlock;
+  const immutableOut = c.createImmutableId();
+  cursor.addInstruction(new LoadInstruction(out, immutableOut, loc));
+
+  return immutableOut;
+}

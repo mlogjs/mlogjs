@@ -261,6 +261,7 @@ export type TBinaryOperationType =
   | "strictEqual"
   | "shl"
   | "shr"
+  | "ushr"
   | "or"
   | "and"
   | "xor"
