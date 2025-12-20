@@ -118,8 +118,17 @@ export class ReaderMap {
 /** Allows you to find which instruction defined which immutable value. */
 export class WriterMap {
   writes: Map<number, TBlockInstruction> = new Map();
+  blockParameters: Set<number> = new Set();
 
   constructor(public c: ICompilerContext) {}
+
+  addBlockParameter(id: ImmutableId) {
+    this.blockParameters.add(id.number);
+  }
+
+  isBlockParameter(id: ImmutableId) {
+    return this.blockParameters.has(id.number);
+  }
 
   set(id: ImmutableId, instruction: TBlockInstruction) {
     this.writes.set(id.number, instruction);

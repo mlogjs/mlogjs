@@ -79,7 +79,7 @@ export class CompilerContext implements ICompilerContext {
   #ids = new Map<string, ValueId>();
   #values = new Map<number, IValue>();
   /** Maps id numbers to all associated ValueIds */
-  #registeredIds: ValueId[][] = [];
+  #registeredIds: ImmutableId[][] = [];
 
   readonly compactNames: boolean;
   readonly sourcemap: boolean;
@@ -103,7 +103,7 @@ export class CompilerContext implements ICompilerContext {
 
   createGlobalId() {
     const id = new GlobalId(this.#registeredIds.length);
-    this.#registeredIds.push([id]);
+    this.#registeredIds.push([]);
     return id;
   }
 

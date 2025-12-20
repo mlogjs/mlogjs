@@ -9,7 +9,7 @@ import {
 } from "../instructions";
 import { SourceRange } from "../SourceRange";
 import { IBindableValue, IInstruction } from "../types";
-import { LiteralValue, StoreValue } from "../values";
+import { LiteralValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import {
@@ -23,10 +23,8 @@ import {
   isLowerable,
 } from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
-import {
-  generateGraphVizDOTString,
-  visualizeImmediateDominators,
-} from "./visualize";
+import { SSABuilder } from "./ssa";
+import { generateGraphVizDOTString } from "./visualize";
 
 //  TODO: handle multiple leaf blocks (necessary because end and stop exist)
 // control flow graph internals for the compiler
@@ -119,6 +117,10 @@ export class Graph {
     });
   }
 
+  /**
+   * Does not take block parameters into account. Only call before SSA
+   * construction or after SSA deconstruction.
+   */
   skipBlocks() {
     function tryToRedirect(block: Block, oldTarget: TEdge) {
       let current = oldTarget;
@@ -366,8 +368,7 @@ export class Graph {
         ),
       );
       endInstruction.condition = newCondition;
-      endInstruction.alternate = consequent;
-      endInstruction.consequent = alternate;
+      endInstruction.swapEdges();
     });
   }
 
@@ -396,8 +397,7 @@ export class Graph {
       const right = c.getValue(conditionInst.right);
       if (!(right instanceof LiteralValue) || right.data !== 0) return;
       endInstruction.condition = conditionInst.left;
-      endInstruction.alternate = consequent;
-      endInstruction.consequent = alternate;
+      endInstruction.swapEdges();
     });
   }
 
@@ -417,24 +417,13 @@ export class Graph {
       if (!consequent.block.instructions.isEmpty) return;
       if (consequent.block.endInstruction?.type !== "end") return;
 
-      let target = alternate;
-
-      // if there is an empty block here
-      // it was created to prevent a critical edge
-      // but now that the current block will only have one child
-      // we don't need the empty block anymore
-      if (
-        alternate.block.instructions.isEmpty &&
-        alternate.block.endInstruction?.type === "break"
-      ) {
-        target = alternate.block.endInstruction.target;
-      }
-
       block.endInstruction = new EndIfInstruction(
         condition,
-        target,
+        alternate,
         endInstruction.source,
       );
+      block.endInstruction.alternateParameters =
+        endInstruction.alternateParameters;
     });
   }
 
@@ -719,168 +708,17 @@ export class Graph {
   }
 
   constructSSA(c: ICompilerContext) {
-    // const idoms = immediateDominators(this.start);
-    // const frontiers = dominanceFrontier(this.start, idoms);
-    const orderedBlocks = getReversePostOrder(this.start);
-    const currentValues = new Map<Block, Map<GlobalId, ImmutableId>>();
-    const valueLocations = new Map<ImmutableId, SourceRange>();
-    const sealedBlocks = new Set<Block>();
-    const neverId = c.registerValue(
-      new LiteralValue("You should never see this"),
-    );
+    const builder = new SSABuilder(c, this);
 
-    for (const block of orderedBlocks) {
-      currentValues.set(block, new Map());
-    }
-
-    function writeVariable(
-      variable: GlobalId,
-      block: Block,
-      value: ImmutableId,
-      loc: SourceRange,
-    ) {
-      currentValues.get(block)!.set(variable, value);
-      if (!valueLocations.has(value)) {
-        valueLocations.set(value, loc);
-      }
-    }
-
-    function readVariable(
-      variable: GlobalId,
-      block: Block,
-      loc: SourceRange,
-    ): ImmutableId {
-      if (currentValues.get(block)!.has(variable)) {
-        return currentValues.get(block)!.get(variable)!;
-      }
-
-      return readVariableRecursive(variable, block, loc);
-    }
-
-    function readVariableRecursive(
-      variable: GlobalId,
-      block: Block,
-      loc: SourceRange,
-    ): ImmutableId {
-      let val: ImmutableId;
-      if (!sealedBlocks.has(block)) {
-        val = c.createImmutableId();
-        valueLocations.set(val, loc);
-        block.parameters.push({ variable, value: val, loc });
-
-        // mark as incomplete and patch later on
-        for (const parent of block.parents) {
-          const endInst = parent.endInstruction;
-          if (endInst?.type !== "break" && endInst?.type !== "break-if") {
-            throw new CompilerError("Unexpected control flow during mem2reg");
-          }
-
-          endInst.addBlockParameter(block, { value: neverId, loc });
-        }
-      } else if (block.parents.length === 1) {
-        val = readVariable(variable, block.parents[0], loc);
-      } else {
-        const pairs: { end: BreakInstruction; value: ImmutableId }[] = [];
-        for (const parent of block.parents) {
-          const parentValue = readVariable(variable, parent, loc);
-
-          const { endInstruction } = parent;
-          if (endInstruction?.type !== "break") {
-            throw new CompilerError("Unexpected control flow during mem2reg");
-          }
-          pairs.push({ end: endInstruction, value: parentValue });
-        }
-
-        const firstId = pairs[0].value;
-        if (pairs.every(({ value }) => value.equals(firstId))) {
-          val = firstId;
-        } else {
-          val = c.createImmutableId();
-          valueLocations.set(val, loc);
-          block.parameters.push({ variable: variable, value: val, loc });
-          for (const { end, value } of pairs) {
-            end.blockParameters.push({ value, loc });
-          }
-        }
-      }
-
-      writeVariable(variable, block, val, loc);
-      return val;
-    }
-
-    // perform mem2reg conversion
-    for (const block of orderedBlocks) {
-      const currentMap = new Map();
-      currentValues.set(block, currentMap);
-
-      for (const node of block.instructions.nodes()) {
-        const inst = node.instruction;
-        if (inst.type === "store") {
-          writeVariable(inst.address, block, inst.value, inst.source);
-          block.instructions.remove(node);
-        } else if (inst.type === "load") {
-          const value = readVariable(inst.address, block, inst.source);
-          c.setAlias(inst.out, value);
-          block.instructions.remove(node);
-          // const { address, out } = inst;
-          // const currentValue = currentMap.get(address);
-          // if (currentValue) {
-          //   c.setAlias(out, currentValue);
-          // } else {
-          //   const newValue = c.createImmutableId();
-          //   block.parameters.push({ source: address, value: newValue });
-          //   c.setAlias(out, newValue);
-          //   currentMap.set(address, newValue);
-          // }
-
-          // // block.instructions.remove(node);
-        }
-      }
-
-      sealedBlocks.add(block);
-
-      const endInstruction = block.endInstruction;
-      if (endInstruction?.type !== "break") continue;
-
-      // patch incomplete block parameters
-      for (let i = 0; i < endInstruction.blockParameters.length; i++) {
-        const param = endInstruction.blockParameters[i];
-        if (!param.value.equals(neverId)) continue;
-        const variable = endInstruction.target.block.parameters[i].variable;
-        const value = readVariable(variable, block, param.loc);
-        endInstruction.blockParameters[i] = { value, loc: param.loc };
-      }
-    }
-
-    // remove trivial block parameters
-    for (const block of orderedBlocks) {
-      for (let i = block.parameters.length - 1; i >= 0; i--) {
-        const param = block.parameters[i];
-        const allSame = block.parents.every(parent => {
-          const endInst = parent.endInstruction;
-          if (endInst?.type !== "break") {
-            throw new CompilerError(
-              "Unexpected control flow during SSA deconstruction",
-            );
-          }
-          const value = endInst.blockParameters[i];
-          return value.value.equals(param.value);
-        });
-
-        if (allSame) {
-          block.parameters.splice(i, 1);
-          for (const parent of block.parents) {
-            const endInst = parent.endInstruction as BreakInstruction;
-            endInst.blockParameters.splice(i, 1);
-          }
-        }
-      }
-    }
+    builder.run();
   }
 
   deconstructSSA(c: ICompilerContext) {
+    // remove any trivial block parameters left
+    const builder = new SSABuilder(c, this);
+    builder.run();
+
     const orderedBlocks = getReversePostOrder(this.start);
-    const writers = getWriterMap(c, this.start);
 
     for (let i = orderedBlocks.length - 1; i >= 0; i--) {
       const block = orderedBlocks[i];
@@ -899,7 +737,6 @@ export class Graph {
           c.getValue(blockParam.value),
           c.getValue(blockParam.variable),
         );
-        // c.setGlobalAlias(param.value, param.source);
 
         for (const parent of block.parents) {
           const endInst = parent.endInstruction;
@@ -911,14 +748,6 @@ export class Graph {
           }
 
           const instParam = endInst.blockParameters[i];
-          const value = c.getValue(instParam.value);
-
-          if (
-            !c.getValueName(instParam.value) &&
-            (!value || value instanceof StoreValue)
-          ) {
-            c.setAlias(instParam.value, blockParam.value);
-          }
           parent.instructions.pushBack(
             new StoreInstruction(
               blockParam.variable,
@@ -935,16 +764,6 @@ export class Graph {
         if (endInstruction?.type !== "break") continue;
         endInstruction.blockParameters.length = 0;
       }
-
-      // if (endInstruction?.type !== "break") continue;
-
-      // for (let i = 0; i < endInstruction.blockParameters.length; i++) {
-      //   const value = endInstruction.blockParameters[i];
-      //   const variable = endInstruction.target.block.parameters[i].source;
-
-      //   const storeInst = new StoreInstruction(variable, value);
-      //   block.instructions.pushBack(storeInst);
-      // }
     }
   }
 
@@ -970,8 +789,9 @@ export class Graph {
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
     this.setParents();
-    this.deconstructSSA(c);
     console.log(generateGraphVizDOTString(c, this.start));
+
+    this.deconstructSSA(c);
     this.skipBlocks();
 
     // TODO: fix updating of block parents during

@@ -495,7 +495,10 @@ export interface IBreakParameter {
 }
 
 export interface IBlockParamsInstruction {
+  getBlockParameterCount(childBlock: Block): number;
   addBlockParameter(childBlock: Block, param: IBreakParameter): void;
+  getBlockParameter(childBlock: Block, index: number): IBreakParameter;
+  removeBlockParameter(childBlock: Block, index: number): void;
 }
 
 export class BreakInstruction implements IBlockParamsInstruction {
@@ -512,8 +515,20 @@ export class BreakInstruction implements IBlockParamsInstruction {
     this.target = target instanceof Block ? target.toForward() : target;
   }
 
+  getBlockParameterCount(childBlock: Block): number {
+    return this.blockParameters.length;
+  }
+
   addBlockParameter(childBlock: Block, param: IBreakParameter) {
     this.blockParameters.push(param);
+  }
+
+  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
+    return this.blockParameters[index];
+  }
+
+  removeBlockParameter(childBlock: Block, index: number): void {
+    this.blockParameters.splice(index, 1);
   }
 }
 
@@ -544,6 +559,32 @@ export class BreakIfInstruction implements IBlockParamsInstruction {
       alternate instanceof Block ? alternate.toForward() : alternate;
   }
 
+  swapEdges() {
+    [
+      this.consequent,
+      this.alternate,
+      this.consequentParameters,
+      this.alternateParameters,
+    ] = [
+      this.alternate,
+      this.consequent,
+      this.alternateParameters,
+      this.consequentParameters,
+    ];
+  }
+
+  getBlockParameterCount(childBlock: Block): number {
+    if (this.consequent.block === childBlock) {
+      return this.consequentParameters.length;
+    }
+    if (this.alternate.block === childBlock) {
+      return this.alternateParameters.length;
+    }
+    throw new CompilerError(
+      "Attempted to get block parameter count from break-if for non-child block",
+    );
+  }
+
   addBlockParameter(childBlock: Block, param: IBreakParameter) {
     if (this.consequent.block === childBlock) {
       this.consequentParameters.push(param);
@@ -552,6 +593,31 @@ export class BreakIfInstruction implements IBlockParamsInstruction {
     } else {
       throw new CompilerError(
         "Attempted to add block parameter to break-if for non-child block",
+      );
+    }
+  }
+
+  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
+    if (this.consequent.block === childBlock) {
+      return this.consequentParameters[index];
+    }
+    if (this.alternate.block === childBlock) {
+      return this.alternateParameters[index];
+    }
+
+    throw new CompilerError(
+      "Attempted to get block parameter from break-if for non-child block",
+    );
+  }
+
+  removeBlockParameter(childBlock: Block, index: number): void {
+    if (this.consequent.block === childBlock) {
+      this.consequentParameters.splice(index, 1);
+    } else if (this.alternate.block === childBlock) {
+      this.alternateParameters.splice(index, 1);
+    } else {
+      throw new CompilerError(
+        "Attempted to remove block parameter from break-if for non-child block",
       );
     }
   }
@@ -628,9 +694,10 @@ export class EndInstruction {
   constructor(public source: SourceRange) {}
 }
 
-export class EndIfInstruction {
+export class EndIfInstruction implements IBlockParamsInstruction {
   type = "end-if" as const;
   alternate: TEdge;
+  alternateParameters: IBreakParameter[] = [];
 
   constructor(
     public condition: ImmutableId,
@@ -639,6 +706,22 @@ export class EndIfInstruction {
   ) {
     this.alternate =
       alternate instanceof Block ? alternate.toForward() : alternate;
+  }
+
+  getBlockParameterCount(childBlock: Block): number {
+    return this.alternateParameters.length;
+  }
+
+  addBlockParameter(childBlock: Block, param: IBreakParameter) {
+    this.alternateParameters.push(param);
+  }
+
+  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
+    return this.alternateParameters[index];
+  }
+
+  removeBlockParameter(childBlock: Block, index: number): void {
+    this.alternateParameters.splice(index, 1);
   }
 }
 
