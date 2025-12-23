@@ -832,8 +832,7 @@ export function getReversePostOrder(entry: Block): Block[] {
     visited.add(block);
     const edges = block.childEdges;
 
-    // iterating backwards to preserve their relative order
-    for (let i = edges.length - 1; i >= 0; i--) {
+    for (let i = 0; i < edges.length; i++) {
       const edge = edges[i];
       if (edge.type === "backward") continue;
       _traverse(edge.block);
