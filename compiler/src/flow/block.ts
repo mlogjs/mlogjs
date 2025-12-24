@@ -79,7 +79,7 @@ export class Block {
     for (const inst of this.instructions.inReverse()) {
       if (
         inst.type === "binary-operation" &&
-        inst.out === condition &&
+        inst.out.equals(condition) &&
         inst.isJumpMergeable()
       ) {
         return inst;
