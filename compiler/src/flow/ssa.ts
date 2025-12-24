@@ -77,6 +77,8 @@ export class SSABuilder {
         this.c.setGlobalAlias(undefId, inst.address);
         this.writeVariable(inst.address, block, undefId, inst.source);
       } else if (inst instanceof StoreInstruction) {
+        // can't optimize globals from outside
+        if (!this.locals.has(inst.address)) continue;
         this.writeVariable(inst.address, block, inst.value, inst.source);
         block.instructions.remove(node);
       } else if (inst instanceof LoadInstruction) {

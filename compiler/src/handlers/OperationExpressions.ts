@@ -246,6 +246,7 @@ export const ConditionalExpression: THandler = (
   const loc = SourceRange.fromNode(node);
 
   const out = c.createGlobalId();
+  cursor.addInstruction(new AllocLocalInstruction(out, loc));
 
   cursor.connectBlock(testBlock, loc);
   const test = c.handle(scope, cursor, node.test);
