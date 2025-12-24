@@ -17,6 +17,7 @@ import {
   BreakInstruction,
   EndIfInstruction,
   EndInstruction,
+  IBreakParameter,
   LoadInstruction,
   StoreInstruction,
   TBlockEndInstruction,
@@ -414,16 +415,31 @@ export class Graph {
       if (endInstruction?.type !== "break-if") return;
       const { condition, alternate, consequent } = endInstruction;
 
-      if (!consequent.block.instructions.isEmpty) return;
-      if (consequent.block.endInstruction?.type !== "end") return;
+      let preservedEdge: TEdge;
+      let params: IBreakParameter[];
+
+      if (
+        consequent.block.instructions.isEmpty &&
+        consequent.block.endInstruction?.type === "end"
+      ) {
+        preservedEdge = alternate;
+        params = endInstruction.alternateParameters;
+      } else if (
+        alternate.block.instructions.isEmpty &&
+        alternate.block.endInstruction?.type === "end"
+      ) {
+        preservedEdge = consequent;
+        params = endInstruction.consequentParameters;
+      } else {
+        return;
+      }
 
       block.endInstruction = new EndIfInstruction(
         condition,
-        alternate,
+        preservedEdge,
         endInstruction.source,
       );
-      block.endInstruction.alternateParameters =
-        endInstruction.alternateParameters;
+      block.endInstruction.alternateParameters = params;
     });
   }
 
