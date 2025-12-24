@@ -2,12 +2,7 @@ import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
 import { ImmutableId } from "../flow";
 import { IValue, TEOutput } from "../types";
-import {
-  DestructuringValue,
-  LiteralValue,
-  ObjectValue,
-  StoreValue,
-} from "../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { discardedName } from "./constants";
 
 export function isTemplateObjectArray(
@@ -26,15 +21,6 @@ export function isTemplateObjectArray(
 export function extractOutName(out: TEOutput | undefined) {
   if (!out || typeof out === "string") return out;
   return out.name;
-}
-
-export function extractDestrucuringOut(
-  out: TEOutput | undefined,
-  field: string | number,
-) {
-  if (isDiscardedOut(out)) return discardedName;
-  if (!(out instanceof DestructuringValue)) return;
-  return out.fields[field] ?? discardedName;
 }
 
 /** Asserts that `value` is a `LiteralValue` that contains a string */

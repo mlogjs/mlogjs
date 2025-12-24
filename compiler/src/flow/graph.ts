@@ -7,9 +7,11 @@ import {
   InstructionBase,
   JumpInstruction,
 } from "../instructions";
+import { SelectInstruction } from "../instructions/SelectInstruction";
 import { SourceRange } from "../SourceRange";
-import { IBindableValue, IInstruction } from "../types";
-import { LiteralValue } from "../values";
+import { EMutability, IBindableValue, IInstruction } from "../types";
+import { counterName } from "../utils";
+import { LiteralValue, StoreValue } from "../values";
 import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import {
@@ -204,12 +206,14 @@ export class Graph {
     const instructions: IInstruction[] = [];
     const addresses = new Map<Block, IBindableValue<number | null>>();
     const orderedBlocks = getReversePostOrder(this.start);
+    const counterVar = new StoreValue(counterName, EMutability.mutable);
 
     for (const block of orderedBlocks) {
       addresses.set(block, new LiteralValue(null));
     }
 
-    for (const block of orderedBlocks) {
+    for (let i = 0; i < orderedBlocks.length; i++) {
+      const block = orderedBlocks[i];
       instructions.push(new AddressResolver(addresses.get(block)!));
       // instructions.push(new InstructionBase("blockstart"));
       instructions.push(...block.toMlog(c));
@@ -228,6 +232,34 @@ export class Graph {
           const condition = c.getValue(endInstruction.condition);
           const conditionInst = block.conditionInstruction();
           const { consequent, alternate, source } = endInstruction;
+          const useSelect = alternate.block !== orderedBlocks[i + 1];
+          if (useSelect) {
+            if (conditionInst) {
+              instructions.push(
+                new SelectInstruction(
+                  counterVar,
+                  conditionInst.operator as EJumpKind,
+                  c.getValueOrTemp(conditionInst.left),
+                  c.getValueOrTemp(conditionInst.right),
+                  addresses.get(consequent.block)!,
+                  addresses.get(alternate.block)!,
+                ),
+              );
+            } else {
+              instructions.push(
+                new SelectInstruction(
+                  counterVar,
+                  EJumpKind.NotEqual,
+                  condition,
+                  new LiteralValue(0),
+                  addresses.get(consequent.block)!,
+                  addresses.get(alternate.block)!,
+                ),
+              );
+            }
+
+            instructions[instructions.length - 1].source = source;
+          } else {
           if (conditionInst) {
             instructions.push(
               new JumpInstruction(
@@ -256,6 +288,7 @@ export class Graph {
           );
           instructions[instructions.length - 1].source = source;
           instructions[instructions.length - 2].source = source;
+          }
           break;
         }
         case "end-if": {
@@ -470,7 +503,8 @@ export class Graph {
         const inst = current.instruction;
         if (
           inst.type !== "binary-operation" &&
-          inst.type !== "unary-operation"
+          inst.type !== "unary-operation" &&
+          inst.type !== "binary-select"
         ) {
           current = current.next;
           continue;

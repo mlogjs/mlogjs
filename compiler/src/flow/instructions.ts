@@ -401,27 +401,88 @@ export class BinaryOperationInstruction implements IBodyInstruction {
     if (!left || !right) return false;
     if (!(left instanceof LiteralValue) || !(right instanceof LiteralValue))
       return false;
-    switch (this.operator) {
-      case "equal": {
-        const a = left.data as TLiteral;
-        const b = right.data as TLiteral;
-        if (typeof a !== typeof b) break;
-        c.setValue(this.out, new LiteralValue(a === b ? 1 : 0));
-        return true;
-      }
-      case "notEqual": {
-        const a = left.data as TLiteral;
-        const b = right.data as TLiteral;
-        if (typeof a !== typeof b) break;
-        c.setValue(this.out, new LiteralValue(a !== b ? 1 : 0));
-        return true;
-      }
-    }
-    const value = constantOperationMap[this.operator]?.(left.num, right.num);
-    if (value === undefined) return false;
 
-    c.setValue(this.out, new LiteralValue(value));
+    const value = evaluateBinaryOperation(this.operator, left, right);
+    if (value === null) return false;
+
+    c.setValue(this.out, value);
     return true;
+  }
+}
+
+export type TBinarySelectType =
+  | "equal"
+  | "notEqual"
+  | "lessThan"
+  | "lessThanEq"
+  | "greaterThan"
+  | "greaterThanEq"
+  | "strictEqual";
+
+export class BinarySelectInstruction implements IBodyInstruction {
+  type = "binary-select" as const;
+
+  constructor(
+    public operator: TBinarySelectType,
+    public x: ImmutableId,
+    public y: ImmutableId,
+    public whenTrue: ImmutableId,
+    public whenFalse: ImmutableId,
+    public out: ImmutableId,
+    public source: SourceRange,
+  ) {}
+
+  constantFold(c: ICompilerContext): boolean {
+    const x = c.getValue(this.x);
+    const y = c.getValue(this.y);
+
+    if (!(x instanceof LiteralValue) || !(y instanceof LiteralValue))
+      return false;
+
+    const value = evaluateBinaryOperation(this.operator, x, y);
+    if (value === null) return false;
+
+    c.setAlias(this.out, value.num ? this.whenTrue : this.whenFalse);
+
+    return true;
+  }
+
+  registerReader(reads: ReaderMap): void {
+    reads.add(this.x, this);
+    reads.add(this.y, this);
+    reads.add(this.whenTrue, this);
+    reads.add(this.whenFalse, this);
+  }
+  unregisterReader(reads: ReaderMap): void {
+    reads.remove(this.x, this);
+    reads.remove(this.y, this);
+    reads.remove(this.whenTrue, this);
+    reads.remove(this.whenFalse, this);
+  }
+  registerWriter(writes: WriterMap): void {
+    writes.set(this.out, this);
+  }
+  unregisterWriter(writes: WriterMap): void {
+    writes.remove(this.out);
+  }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    const x = c.getValueOrTemp(this.x);
+    const y = c.getValueOrTemp(this.y);
+    const whenTrue = c.getValueOrTemp(this.whenTrue);
+    const whenFalse = c.getValueOrTemp(this.whenFalse);
+    const out = c.getValueOrTemp(this.out);
+
+    const select = new InstructionBase(
+      "select",
+      out,
+      this.operator,
+      x,
+      y,
+      whenTrue,
+      whenFalse,
+    );
+    return [select];
   }
 }
 
@@ -538,13 +599,13 @@ export class BreakIfInstruction implements IBlockParamsInstruction {
   consequent: TEdge;
   alternate: TEdge;
   /**
-   * Only exists briefly during the conversion to SSA form. It's existence in
-   * any other compiler phase would imply a critical edge.
+   * Only exists briefly during the conversion to SSA form. Its existence in any
+   * other compiler phase would imply a critical edge.
    */
   consequentParameters: IBreakParameter[] = [];
   /**
-   * Only exists briefly during the conversion to SSA form. It's existence in
-   * any other compiler phase would imply a critical edge.
+   * Only exists briefly during the conversion to SSA form. Its existence in any
+   * other compiler phase would imply a critical edge.
    */
   alternateParameters: IBreakParameter[] = [];
 
@@ -822,6 +883,7 @@ export type TBlockInstruction =
   | ValueGetInstruction
   | ValueSetInstruction
   | BinaryOperationInstruction
+  | BinarySelectInstruction
   | UnaryOperatorInstruction
   | CallInstruction
   | NativeInstruction
@@ -831,4 +893,29 @@ export function isLowerable<T extends TBlockInstruction>(
   instruction: T,
 ): instruction is T & ILowerableInstruction {
   return "lower" in instruction;
+}
+
+function evaluateBinaryOperation(
+  operator: TBinaryOperationType,
+  left: LiteralValue,
+  right: LiteralValue,
+): LiteralValue | null {
+  switch (operator) {
+    case "equal": {
+      const a = left.data;
+      const b = right.data;
+      if (typeof a !== typeof b) break;
+      return new LiteralValue(a === b ? 1 : 0);
+    }
+    case "notEqual": {
+      const a = left.data;
+      const b = right.data;
+      if (typeof a !== typeof b) break;
+      return new LiteralValue(a !== b ? 1 : 0);
+    }
+  }
+  const value = constantOperationMap[operator]?.(left.num, right.num);
+  if (value === undefined) return null;
+
+  return new LiteralValue(value);
 }
