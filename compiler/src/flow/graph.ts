@@ -302,11 +302,14 @@ export class Graph {
    * instructions in order to reduce the amount of jumps present in the
    * generated code. This is done because an empty block usually contains a jump
    * or an end instruction, and in the first case that jump being on the
-   * alternate side of the break-if neutralizes the benefit of eliminating a
-   * jump caused by placing alternate blocks first.
+   * alternate side of the break-if neutralizes the benefit of placing basic
+   * blocks in reverse post-order.
    */
   canonicalizeBreakIfs(c: ICompilerContext) {
-    traverse(this.start, block => {
+    const readers = getReaderMap(c, this.start);
+    const writers = getWriterMap(c, this.start);
+
+    traverseReversePostOrder(this.start, block => {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
       const { alternate, consequent } = endInstruction;
@@ -316,12 +319,13 @@ export class Graph {
       const isBackBreak = (end: TBlockEndInstruction | undefined) =>
         end?.type === "break" && end?.target.type === "backward";
 
-      if (!alternate.block.instructions.isEmpty) return;
+      if (!isBlockEffectivelyEmpty(alternate.block, readers)) return;
 
       // canonicalization doesn't really outside these cases
       // so it just makes the generated code harder to read
       switch (alternate.block.endInstruction?.type) {
         case "break":
+        case "break-if":
         case "end":
           break;
         default:
@@ -336,6 +340,22 @@ export class Graph {
         isBackBreak(consequent.block.endInstruction)
       )
         return;
+
+      const writer = writers.get(endInstruction.condition);
+
+      if (writer?.type === "binary-operation") {
+        const conditionReaders = readers.get(endInstruction.condition);
+
+        if (
+          conditionReaders.size === 1 &&
+          conditionReaders.has(endInstruction)
+        ) {
+          if (!writer.isInvertible()) return;
+          writer.invert();
+          endInstruction.swapEdges();
+          return;
+        }
+      }
 
       const newCondition = c.createImmutableId();
       block.instructions.pushBack(
@@ -758,10 +778,8 @@ export class Graph {
 
     this.canonicalizeBinaryOperations(c);
     // this.optimizeGlobals(c);
-    this.canonicalizeBreakIfs(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
-    this.flipBreakIfs(c);
     this.setParents();
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
@@ -772,6 +790,10 @@ export class Graph {
     console.log(generateGraphVizDOTString(c, this.start));
 
     this.deconstructSSA(c);
+    this.canonicalizeBreakIfs(c);
+    this.transformComparisons(c);
+    this.flipBreakIfs(c);
+    this.removeUnusedInstructions(c);
     this.skipBlocks();
 
     // TODO: fix updating of block parents during
@@ -991,4 +1013,50 @@ function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
   });
 
   return reads;
+}
+
+function isBlockEffectivelyEmpty(block: Block, readers: ReaderMap): boolean {
+  if (block.instructions.isEmpty) return true;
+
+  for (const inst of block.instructions) {
+    switch (inst.type) {
+      case "store":
+        // if (inst.address.number !== inst.value.number) return false;
+        return false;
+        break;
+      case "load":
+        // if (inst.address.number !== inst.out.number) return false;
+        return false;
+        break;
+      case "binary-operation":
+        if (!isBinaryOperationInlined(inst, readers)) return false;
+        break;
+      default:
+        return false;
+    }
+  }
+
+  return true;
+}
+
+function isBinaryOperationInlined(
+  inst: BinaryOperationInstruction,
+  readerMap: ReaderMap,
+): boolean {
+  if (!inst.isJumpMergeable()) return false;
+
+  const readers = readerMap.get(inst.out);
+
+  for (const reader of readers) {
+    switch (reader.type) {
+      case "break-if":
+      case "end-if":
+      case "binary-select":
+        break;
+      default:
+        return false;
+    }
+  }
+
+  return true;
 }
