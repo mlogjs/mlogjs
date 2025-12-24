@@ -1,8 +1,6 @@
 import { CompilerError } from "../../CompilerError";
 import { NativeInstruction } from "../../flow";
-import { InstructionBase } from "../../instructions";
-import { extractDestrucuringOut } from "../../utils";
-import { ObjectValue, StoreValue } from "../../values";
+import { ObjectValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 export class UnpackColor extends MacroFunction {
