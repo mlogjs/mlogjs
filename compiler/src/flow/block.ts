@@ -2,7 +2,12 @@ import { ICompilerContext } from "../CompilerContext";
 import { SourceRange } from "../SourceRange";
 import { IInstruction } from "../types";
 import { GlobalId, ImmutableId } from "./id";
-import { TBlockEndInstruction, TBlockInstruction } from "./instructions";
+import {
+  isBinaryOperationInlined,
+  TBlockEndInstruction,
+  TBlockInstruction,
+} from "./instructions";
+import { ReaderMap, WriterMap } from "./optimizer";
 
 export interface IForwardEdge {
   type: "forward";
@@ -68,7 +73,7 @@ export class Block {
     this.parents.splice(index, 1);
   }
 
-  conditionInstruction() {
+  conditionInstruction(writes: WriterMap) {
     if (
       this.endInstruction?.type !== "break-if" &&
       this.endInstruction?.type !== "end-if"
@@ -76,14 +81,14 @@ export class Block {
       return;
     const { condition } = this.endInstruction;
 
-    for (const inst of this.instructions.inReverse()) {
-      if (
-        inst.type === "binary-operation" &&
-        inst.out.equals(condition) &&
-        inst.isJumpMergeable()
-      ) {
-        return inst;
-      }
+    const inst = writes.get(condition);
+
+    if (
+      inst?.type === "binary-operation" &&
+      inst.out.equals(condition) &&
+      inst.isJumpMergeable()
+    ) {
+      return inst;
     }
   }
 
@@ -101,14 +106,21 @@ export class Block {
     };
   }
 
-  toMlog(c: ICompilerContext): IInstruction[] {
+  toMlog(
+    c: ICompilerContext,
+    reads: ReaderMap,
+    writes: WriterMap,
+  ): IInstruction[] {
     const inst: IInstruction[] = [];
 
-    const conditionInst = this.conditionInstruction();
-
     for (const instruction of this.instructions) {
-      if (instruction === conditionInst) continue;
-      inst.push(...instruction.toMlog(c));
+      if (
+        instruction.type === "binary-operation" &&
+        isBinaryOperationInlined(instruction, reads)
+      ) {
+        continue;
+      }
+      inst.push(...instruction.toMlog(c, writes));
     }
     return inst;
   }
@@ -206,6 +218,12 @@ export class InstructionList {
   removeLast() {
     if (!this.tail) return;
     this.remove(this.tail);
+  }
+
+  clear() {
+    this.length = 0;
+    this.head = undefined;
+    this.tail = undefined;
   }
 
   *[Symbol.iterator]() {

@@ -16,6 +16,7 @@ import { Block, TEdge } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import {
   BinaryOperationInstruction,
+  BinarySelectInstruction,
   BreakInstruction,
   EndIfInstruction,
   EndInstruction,
@@ -23,6 +24,9 @@ import {
   LoadInstruction,
   StoreInstruction,
   TBlockEndInstruction,
+  TBlockInstruction,
+  getEffectiveBlockSize,
+  isBinaryOperationInlined,
   isLowerable,
 } from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
@@ -207,6 +211,8 @@ export class Graph {
     const addresses = new Map<Block, IBindableValue<number | null>>();
     const orderedBlocks = getReversePostOrder(this.start);
     const counterVar = new StoreValue(counterName, EMutability.mutable);
+    const reads = getReaderMap(c, this.start);
+    const writes = getWriterMap(c, this.start);
 
     for (const block of orderedBlocks) {
       addresses.set(block, new LiteralValue(null));
@@ -216,7 +222,7 @@ export class Graph {
       const block = orderedBlocks[i];
       instructions.push(new AddressResolver(addresses.get(block)!));
       // instructions.push(new InstructionBase("blockstart"));
-      instructions.push(...block.toMlog(c));
+      instructions.push(...block.toMlog(c, reads, writes));
       const { endInstruction } = block;
       switch (endInstruction?.type) {
         case "break":
@@ -230,9 +236,10 @@ export class Graph {
           break;
         case "break-if": {
           const condition = c.getValue(endInstruction.condition);
-          const conditionInst = block.conditionInstruction();
+          const conditionInst = block.conditionInstruction(writes);
           const { consequent, alternate, source } = endInstruction;
           const useSelect = alternate.block !== orderedBlocks[i + 1];
+
           if (useSelect) {
             if (conditionInst) {
               instructions.push(
@@ -260,40 +267,40 @@ export class Graph {
 
             instructions[instructions.length - 1].source = source;
           } else {
-          if (conditionInst) {
-            instructions.push(
-              new JumpInstruction(
-                addresses.get(consequent.block)!,
-                conditionInst.operator as EJumpKind,
-                c.getValue(conditionInst.left),
-                c.getValue(conditionInst.right),
-              ),
-            );
-          } else {
-            instructions.push(
-              new JumpInstruction(
-                addresses.get(consequent.block)!,
-                EJumpKind.NotEqual,
-                condition,
-                new LiteralValue(0),
-              ),
-            );
-          }
+            if (conditionInst) {
+              instructions.push(
+                new JumpInstruction(
+                  addresses.get(consequent.block)!,
+                  conditionInst.operator as EJumpKind,
+                  c.getValue(conditionInst.left),
+                  c.getValue(conditionInst.right),
+                ),
+              );
+            } else {
+              instructions.push(
+                new JumpInstruction(
+                  addresses.get(consequent.block)!,
+                  EJumpKind.NotEqual,
+                  condition,
+                  new LiteralValue(0),
+                ),
+              );
+            }
 
-          instructions.push(
-            new JumpInstruction(
-              addresses.get(alternate.block)!,
-              EJumpKind.Always,
-            ),
-          );
-          instructions[instructions.length - 1].source = source;
-          instructions[instructions.length - 2].source = source;
+            instructions.push(
+              new JumpInstruction(
+                addresses.get(alternate.block)!,
+                EJumpKind.Always,
+              ),
+            );
+            instructions[instructions.length - 1].source = source;
+            instructions[instructions.length - 2].source = source;
           }
           break;
         }
         case "end-if": {
           const condition = c.getValue(endInstruction.condition);
-          const conditionInst = block.conditionInstruction();
+          const conditionInst = block.conditionInstruction(writes);
           const { source } = endInstruction;
           if (conditionInst) {
             instructions.push(
@@ -353,7 +360,7 @@ export class Graph {
       const isBackBreak = (end: TBlockEndInstruction | undefined) =>
         end?.type === "break" && end?.target.type === "backward";
 
-      if (!isBlockEffectivelyEmpty(alternate.block, readers)) return;
+      if (getEffectiveBlockSize(alternate.block, readers) > 0) return;
 
       // canonicalization doesn't really outside these cases
       // so it just makes the generated code harder to read
@@ -415,12 +422,14 @@ export class Graph {
    * operation instructions have been optimized and merged
    */
   flipBreakIfs(c: ICompilerContext) {
+    const writes = getWriterMap(c, this.start);
+
     traverse(this.start, block => {
       const { endInstruction } = block;
       if (endInstruction?.type !== "break-if") return;
       const { alternate, consequent } = endInstruction;
 
-      const conditionInst = block.conditionInstruction();
+      const conditionInst = block.conditionInstruction(writes);
 
       if (
         conditionInst?.operator !== "equal" ||
@@ -556,6 +565,268 @@ export class Graph {
         );
       }
     });
+  }
+
+  /**
+   * For an unoptimized ternary operation, the maximum amount of instructions
+   * executed is three.
+   *
+   * So we can only allow at most two instructions to be executed before the
+   * select, otherwise the performance degradation would be noticeable.
+   */
+  createSelects(c: ICompilerContext) {
+    const blocks = getReversePostOrder(this.start);
+    const writes = getWriterMap(c, this.start);
+    const reads = getReaderMap(c, this.start);
+    const maxDependencyCount = 2;
+
+    for (let i = blocks.length - 1; i >= 0; i--) {
+      const block = blocks[i];
+      const { endInstruction } = block;
+      if (endInstruction?.type !== "break-if") continue;
+
+      const { consequent, alternate, condition, source } = endInstruction;
+
+      const consequentEnd = consequent.block.endInstruction;
+      const alternateEnd = alternate.block.endInstruction;
+      if (consequentEnd?.type !== "break" || alternateEnd?.type !== "break")
+        continue;
+
+      if (consequentEnd.target.block !== alternateEnd.target.block) continue;
+
+      const mergeBlock = consequentEnd.target.block;
+
+      for (let i = 0; i < mergeBlock.parameters.length; i++) {
+        const consequentParam = consequentEnd.blockParameters[i];
+        const alternateParam = alternateEnd.blockParameters[i];
+        const consequentValue = consequentParam.value;
+        const alternateValue = alternateParam.value;
+
+        const total =
+          getInstructionCount(consequentValue, consequent.block) +
+          getInstructionCount(alternateValue, alternate.block);
+        if (total > maxDependencyCount) continue;
+        const hoistedInstructions = new Set<TBlockInstruction>();
+
+        selectHoistedInstructions(
+          hoistedInstructions,
+          consequentValue,
+          block,
+          consequent.block,
+        );
+        selectHoistedInstructions(
+          hoistedInstructions,
+          alternateValue,
+          block,
+          alternate.block,
+        );
+
+        for (const node of alternate.block.instructions.nodes()) {
+          const inst = node.instruction;
+          if (hoistedInstructions.has(inst) || inst.type === "alloc-local") {
+            alternate.block.instructions.remove(node);
+            block.instructions.pushBack(inst);
+            inst.unregisterWriter(writes);
+            inst.registerWriter(writes, block);
+          }
+        }
+
+        for (const node of consequent.block.instructions.nodes()) {
+          const inst = node.instruction;
+          if (hoistedInstructions.has(inst) || inst.type === "alloc-local") {
+            consequent.block.instructions.remove(node);
+            block.instructions.pushBack(inst);
+            inst.unregisterWriter(writes);
+            inst.registerWriter(writes, block);
+          }
+        }
+
+        const out = c.createImmutableId();
+
+        const select = new BinarySelectInstruction(
+          condition,
+          consequentValue,
+          alternateValue,
+          out,
+          source,
+        );
+        block.instructions.pushBack(select);
+        select.registerWriter(writes, block);
+        consequentParam.value = out;
+        alternateParam.value = out;
+      }
+
+      using _ = {
+        [Symbol.dispose]: () => {
+          console.log(
+            "select step: ",
+            generateGraphVizDOTString(c, this.start),
+          );
+        },
+      };
+
+      // jump directly to the merge block if both sides are identical
+      if (!consequent.block.instructions.isEmpty) continue;
+      if (!alternate.block.instructions.isEmpty) continue;
+
+      let identical = true;
+      for (let i = 0; i < mergeBlock.parameters.length; i++) {
+        const consequentParam = consequentEnd.blockParameters[i];
+        const alternateParam = alternateEnd.blockParameters[i];
+
+        if (!consequentParam.value.equals(alternateParam.value)) {
+          identical = false;
+          break;
+        }
+      }
+
+      if (!identical) continue;
+      block.endInstruction = new BreakInstruction(mergeBlock, source);
+      block.endInstruction.blockParameters = [...consequentEnd.blockParameters];
+      alternate.block.endInstruction = new EndInstruction(source);
+      consequent.block.endInstruction = new EndInstruction(source);
+      mergeBlock.addParent(block);
+      mergeBlock.removeParent(consequent.block);
+      mergeBlock.removeParent(alternate.block);
+
+      // move instruction from mergeBlock into current block
+      // to maintain the "diamond" structure of the control flow graph
+      // allowing the next iteration to identify more selects
+      if (mergeBlock.parents.length > 1) continue;
+
+      for (let i = 0; i < mergeBlock.parameters.length; i++) {
+        const param = mergeBlock.parameters[i];
+        const breakParam = block.endInstruction.blockParameters[i];
+        c.setAlias(param.value, breakParam.value);
+      }
+
+      mergeBlock.parameters = [];
+
+      for (const inst of mergeBlock.instructions) {
+        block.instructions.pushBack(inst);
+        inst.unregisterWriter(writes);
+        inst.registerWriter(writes, block);
+      }
+
+      block.endInstruction = mergeBlock.endInstruction;
+      mergeBlock.children.forEach(child => {
+        child.removeParent(mergeBlock);
+        child.addParent(block);
+      });
+
+      mergeBlock.parents = [];
+      mergeBlock.instructions.clear();
+      mergeBlock.endInstruction = new EndInstruction(source);
+    }
+
+    // remove unnecessary block parameters
+    const builder = new SSABuilder(c, this);
+    builder.run();
+
+    function getInstructionCount(id: ImmutableId, block: Block): number {
+      if (writes.getBlock(id) !== block) return 0;
+      const writer = writes.get(id);
+
+      switch (writer?.type) {
+        case undefined:
+        case "load":
+        case "alloc-local":
+          return 0;
+        case "binary-operation": {
+          let count = isBinaryOperationInlined(writer, reads) ? 0 : 1;
+          count += getInstructionCount(writer.left, block);
+          // don't calculate left side if we already exceed the max
+          if (count > maxDependencyCount) return count;
+
+          count += getInstructionCount(writer.right, block);
+          return count;
+        }
+        case "unary-operation": {
+          return 1 + getInstructionCount(writer.value, block);
+        }
+        case "binary-select": {
+          let count = 1;
+          count += getInstructionCount(writer.condition, block);
+          // don't calculate left side if we already exceed the max
+          if (count > maxDependencyCount) return count;
+
+          count += getInstructionCount(writer.whenTrue, block);
+          // don't calculate left side if we already exceed the max
+          if (count > maxDependencyCount) return count;
+
+          count += getInstructionCount(writer.whenFalse, block);
+          return count;
+        }
+        default:
+          return maxDependencyCount + 1;
+      }
+    }
+
+    function selectHoistedInstructions(
+      hoistedInstructions: Set<TBlockInstruction>,
+      id: ImmutableId,
+      parent: Block,
+      block: Block,
+    ) {
+      if (writes.getBlock(id) !== block) return;
+      const inst = writes.get(id);
+      if (!inst) return;
+
+      switch (inst.type) {
+        case "load":
+        case "alloc-local":
+          break;
+        case "binary-operation":
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.left,
+            parent,
+            block,
+          );
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.right,
+            parent,
+            block,
+          );
+          break;
+        case "unary-operation":
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.value,
+            parent,
+            block,
+          );
+          break;
+        case "binary-select":
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.condition,
+            parent,
+            block,
+          );
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.whenTrue,
+            parent,
+            block,
+          );
+          selectHoistedInstructions(
+            hoistedInstructions,
+            inst.whenFalse,
+            parent,
+            block,
+          );
+          break;
+        default:
+          throw new CompilerError(
+            "Attempted to hoist unsupported instruction",
+            inst?.source,
+          );
+      }
+
+      hoistedInstructions.add(inst);
+    }
   }
 
   transformComparisons(c: ICompilerContext) {
@@ -783,11 +1054,6 @@ export class Graph {
       for (let i = 0; i < block.parameters.length; i++) {
         const blockParam = block.parameters[i];
 
-        console.log(
-          c.getValue(blockParam.value),
-          c.getValue(blockParam.variable),
-        );
-
         for (const parent of block.parents) {
           const endInst = parent.endInstruction;
           if (endInst?.type !== "break") {
@@ -830,6 +1096,7 @@ export class Graph {
     // this.optimizeGlobals(c);
     this.foldConstantOperations(c);
     this.transformComparisons(c);
+    this.createSelects(c);
     this.setParents();
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
@@ -1033,7 +1300,7 @@ function getWriterMap(c: ICompilerContext, entry: Block): WriterMap {
 
   traverse(entry, block => {
     for (const inst of block.instructions) {
-      inst.registerWriter(sources);
+      inst.registerWriter(sources, block);
     }
   });
 
@@ -1063,50 +1330,4 @@ function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
   });
 
   return reads;
-}
-
-function isBlockEffectivelyEmpty(block: Block, readers: ReaderMap): boolean {
-  if (block.instructions.isEmpty) return true;
-
-  for (const inst of block.instructions) {
-    switch (inst.type) {
-      case "store":
-        // if (inst.address.number !== inst.value.number) return false;
-        return false;
-        break;
-      case "load":
-        // if (inst.address.number !== inst.out.number) return false;
-        return false;
-        break;
-      case "binary-operation":
-        if (!isBinaryOperationInlined(inst, readers)) return false;
-        break;
-      default:
-        return false;
-    }
-  }
-
-  return true;
-}
-
-function isBinaryOperationInlined(
-  inst: BinaryOperationInstruction,
-  readerMap: ReaderMap,
-): boolean {
-  if (!inst.isJumpMergeable()) return false;
-
-  const readers = readerMap.get(inst.out);
-
-  for (const reader of readers) {
-    switch (reader.type) {
-      case "break-if":
-      case "end-if":
-      case "binary-select":
-        break;
-      default:
-        return false;
-    }
-  }
-
-  return true;
 }

@@ -36,6 +36,8 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
         return `${n(inst.out)} = ${n(inst.left)} ${inst.operator} ${n(
           inst.right,
         )}`;
+      case "binary-select":
+        return `${n(inst.out)} = select ${n(inst.condition)} ? ${n(inst.whenTrue)} : ${n(inst.whenFalse)}`;
       case "unary-operation":
         return `${n(inst.out)} = ${inst.operator} ${n(inst.value)}`;
       case "call":

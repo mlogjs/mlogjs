@@ -1,7 +1,8 @@
 import { IBlockCursor } from "../BlockCursor";
 import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { InstructionBase, SetInstruction } from "../instructions";
+import { EJumpKind, InstructionBase, SetInstruction } from "../instructions";
+import { SelectInstruction } from "../instructions/SelectInstruction";
 import { SourceRange } from "../SourceRange";
 import { IInstruction, TLiteral, es } from "../types";
 import { LiteralValue } from "../values";
@@ -15,13 +16,13 @@ interface BasicInstruction {
 
   unregisterReader(reads: ReaderMap): void;
 
-  registerWriter(writes: WriterMap): void;
+  registerWriter(writes: WriterMap, block: Block): void;
 
   unregisterWriter(writes: WriterMap): void;
 }
 
 interface IBodyInstruction extends BasicInstruction {
-  toMlog(c: ICompilerContext): IInstruction[];
+  toMlog(c: ICompilerContext, writes: WriterMap): IInstruction[];
 }
 
 export interface IntermediateInstruction {
@@ -51,7 +52,7 @@ export class AllocLocalInstruction implements IBodyInstruction {
 
   unregisterWriter(writes: WriterMap) {}
 
-  toMlog(c: ICompilerContext): IInstruction[] {
+  toMlog(c: ICompilerContext, writes: WriterMap): IInstruction[] {
     return [];
   }
 }
@@ -73,8 +74,8 @@ export class LoadInstruction implements IBodyInstruction {
     reads.remove(this.address, this);
   }
 
-  registerWriter(writes: WriterMap) {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -157,8 +158,8 @@ export class ValueGetInstruction implements ILowerableInstruction {
     reads.remove(this.key, this);
   }
 
-  registerWriter(writes: WriterMap) {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -376,8 +377,8 @@ export class BinaryOperationInstruction implements IBodyInstruction {
     reads.remove(this.right, this);
   }
 
-  registerWriter(writes: WriterMap) {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -423,9 +424,7 @@ export class BinarySelectInstruction implements IBodyInstruction {
   type = "binary-select" as const;
 
   constructor(
-    public operator: TBinarySelectType,
-    public x: ImmutableId,
-    public y: ImmutableId,
+    public condition: ImmutableId,
     public whenTrue: ImmutableId,
     public whenFalse: ImmutableId,
     public out: ImmutableId,
@@ -433,55 +432,69 @@ export class BinarySelectInstruction implements IBodyInstruction {
   ) {}
 
   constantFold(c: ICompilerContext): boolean {
-    const x = c.getValue(this.x);
-    const y = c.getValue(this.y);
+    if (this.whenTrue.equals(this.whenFalse)) {
+      c.setAlias(this.out, this.whenTrue);
+      return true;
+    }
+    const condition = c.getValue(this.condition);
 
-    if (!(x instanceof LiteralValue) || !(y instanceof LiteralValue))
-      return false;
+    if (!(condition instanceof LiteralValue)) return false;
 
-    const value = evaluateBinaryOperation(this.operator, x, y);
-    if (value === null) return false;
-
-    c.setAlias(this.out, value.num ? this.whenTrue : this.whenFalse);
+    c.setAlias(this.out, condition.num ? this.whenTrue : this.whenFalse);
 
     return true;
   }
 
   registerReader(reads: ReaderMap): void {
-    reads.add(this.x, this);
-    reads.add(this.y, this);
+    reads.add(this.condition, this);
     reads.add(this.whenTrue, this);
     reads.add(this.whenFalse, this);
   }
   unregisterReader(reads: ReaderMap): void {
-    reads.remove(this.x, this);
-    reads.remove(this.y, this);
+    reads.remove(this.condition, this);
     reads.remove(this.whenTrue, this);
     reads.remove(this.whenFalse, this);
   }
-  registerWriter(writes: WriterMap): void {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block): void {
+    writes.set(this.out, this, block);
   }
   unregisterWriter(writes: WriterMap): void {
     writes.remove(this.out);
   }
 
-  toMlog(c: ICompilerContext): IInstruction[] {
-    const x = c.getValueOrTemp(this.x);
-    const y = c.getValueOrTemp(this.y);
+  toMlog(c: ICompilerContext, writes: WriterMap): IInstruction[] {
+    const writer = writes.get(this.condition);
     const whenTrue = c.getValueOrTemp(this.whenTrue);
     const whenFalse = c.getValueOrTemp(this.whenFalse);
     const out = c.getValueOrTemp(this.out);
 
-    const select = new InstructionBase(
-      "select",
-      out,
-      this.operator,
-      x,
-      y,
-      whenTrue,
-      whenFalse,
-    );
+    let select: SelectInstruction;
+    if (writer?.type === "binary-operation" && writer.isJumpMergeable()) {
+      const left = c.getValueOrTemp(writer.left);
+      const right = c.getValueOrTemp(writer.right);
+
+      select = new SelectInstruction(
+        out,
+        writer.operator as EJumpKind,
+        left,
+        right,
+        whenTrue,
+        whenFalse,
+      );
+    } else {
+      const condition = c.getValueOrTemp(this.condition);
+
+      select = new SelectInstruction(
+        out,
+        EJumpKind.NotEqual,
+        condition,
+        new LiteralValue(null),
+        whenTrue,
+        whenFalse,
+      );
+    }
+
+    select.source = this.source;
     return [select];
   }
 }
@@ -520,8 +533,8 @@ export class UnaryOperatorInstruction implements IBodyInstruction {
     reads.remove(this.value, this);
   }
 
-  registerWriter(writes: WriterMap) {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -713,8 +726,8 @@ export class CallInstruction implements ILowerableInstruction {
     this.args.forEach(arg => reads.remove(arg, this));
   }
 
-  registerWriter(writes: WriterMap) {
-    writes.set(this.out, this);
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -811,8 +824,8 @@ export class NativeInstruction implements IBodyInstruction {
     this.inputs.forEach(input => reads.remove(input, this));
   }
 
-  registerWriter(writes: WriterMap) {
-    this.outputs.forEach(output => writes.set(output, this));
+  registerWriter(writes: WriterMap, block: Block) {
+    this.outputs.forEach(output => writes.set(output, this, block));
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -850,8 +863,8 @@ export class AsmInstruction implements IBodyInstruction {
     this.inputs.forEach(input => reads.remove(input, this));
   }
 
-  registerWriter(writes: WriterMap) {
-    this.outputs.forEach(output => writes.set(output, this));
+  registerWriter(writes: WriterMap, block: Block) {
+    this.outputs.forEach(output => writes.set(output, this, block));
   }
 
   unregisterWriter(writes: WriterMap) {
@@ -893,6 +906,51 @@ export function isLowerable<T extends TBlockInstruction>(
   instruction: T,
 ): instruction is T & ILowerableInstruction {
   return "lower" in instruction;
+}
+
+export function getEffectiveBlockSize(
+  block: Block,
+  readers: ReaderMap,
+): number {
+  let size = 0;
+
+  for (const inst of block.instructions) {
+    switch (inst.type) {
+      case "store":
+        size++;
+        break;
+      case "load":
+        break;
+      case "binary-operation":
+        if (!isBinaryOperationInlined(inst, readers)) size++;
+        break;
+      default:
+        size++;
+    }
+  }
+  return size;
+}
+
+export function isBinaryOperationInlined(
+  inst: BinaryOperationInstruction,
+  readerMap: ReaderMap,
+): boolean {
+  if (!inst.isJumpMergeable()) return false;
+
+  const readers = readerMap.get(inst.out);
+
+  for (const reader of readers) {
+    switch (reader.type) {
+      case "break-if":
+      case "end-if":
+      case "binary-select":
+        break;
+      default:
+        return false;
+    }
+  }
+
+  return true;
 }
 
 function evaluateBinaryOperation(

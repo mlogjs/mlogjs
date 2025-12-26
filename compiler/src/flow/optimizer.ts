@@ -1,4 +1,5 @@
 import { ICompilerContext } from "../CompilerContext";
+import { Block } from "./block";
 import { ImmutableId, ValueId } from "./id";
 import {
   TBinaryOperationType,
@@ -121,27 +122,35 @@ export class ReaderMap {
 /** Allows you to find which instruction defined which immutable value. */
 export class WriterMap {
   writes: Map<number, TBlockInstruction> = new Map();
+  writingBlocks: Map<number, Block> = new Map();
   blockParameters: Set<number> = new Set();
 
   constructor(public c: ICompilerContext) {}
 
-  addBlockParameter(id: ImmutableId) {
+  addBlockParameter(id: ImmutableId, block: Block) {
     this.blockParameters.add(id.number);
+    this.writingBlocks.set(id.number, block);
   }
 
   isBlockParameter(id: ImmutableId) {
     return this.blockParameters.has(id.number);
   }
 
-  set(id: ImmutableId, instruction: TBlockInstruction) {
+  set(id: ImmutableId, instruction: TBlockInstruction, block: Block) {
     this.writes.set(id.number, instruction);
+    this.writingBlocks.set(id.number, block);
   }
 
   remove(id: ImmutableId) {
     this.writes.delete(id.number);
+    this.writingBlocks.delete(id.number);
   }
 
   get(id: ImmutableId) {
     return this.writes.get(id.number);
+  }
+
+  getBlock(id: ImmutableId) {
+    return this.writingBlocks.get(id.number);
   }
 }

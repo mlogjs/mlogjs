@@ -1,6 +1,3 @@
-import { InstructionNode } from "./block";
-import { TBlockInstruction } from "./instructions";
-
 /**
  * Identifier for global variables that can be modified at any point of
  * execution.
