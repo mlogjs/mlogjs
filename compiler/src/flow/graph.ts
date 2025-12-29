@@ -12,7 +12,7 @@ import { SourceRange } from "../SourceRange";
 import { EMutability, IBindableValue, IInstruction } from "../types";
 import { counterName } from "../utils";
 import { LiteralValue, StoreValue } from "../values";
-import { Block, TEdge } from "./block";
+import { Block, BlockEdge, EdgeArgument } from "./block";
 import { GlobalId, ImmutableId } from "./id";
 import {
   BinaryOperationInstruction,
@@ -20,7 +20,6 @@ import {
   BreakInstruction,
   EndIfInstruction,
   EndInstruction,
-  IBreakParameter,
   LoadInstruction,
   StoreInstruction,
   TBlockEndInstruction,
@@ -85,7 +84,7 @@ export class Graph {
 
       if (consequent.block.parents.length > 1) {
         const newBlock = new Block(new BreakInstruction(consequent, source));
-        newBlock.endInstruction!.source = block.endInstruction.source;
+
         newBlock.addParent(block);
         consequent.block.removeParent(block);
         consequent.block.addParent(newBlock);
@@ -94,7 +93,6 @@ export class Graph {
 
       if (alternate.block.parents.length > 1) {
         const newBlock = new Block(new BreakInstruction(alternate, source));
-        newBlock.endInstruction!.source = block.endInstruction.source;
 
         newBlock.addParent(block);
         alternate.block.removeParent(block);
@@ -129,21 +127,37 @@ export class Graph {
    * construction or after SSA deconstruction.
    */
   skipBlocks() {
-    function tryToRedirect(block: Block, oldTarget: TEdge) {
+    function tryToRedirect(block: Block, oldTarget: BlockEdge) {
       let current = oldTarget;
+      const mappedArgs = new Map<number, EdgeArgument>();
 
       while (
         current.block.endInstruction?.type === "break" &&
         current.block.instructions.isEmpty &&
         current.block.forwardParents.length === current.block.parents.length
       ) {
-        current = current.block.endInstruction.target;
+        const { endInstruction } = current.block;
+        current = endInstruction.target;
+
+        for (let i = 0; i < endInstruction.target.args.length; i++) {
+          const arg = endInstruction.target.args[i];
+          const param = endInstruction.target.block.parameters[i];
+          mappedArgs.set(
+            param.value.number,
+            mappedArgs.get(arg.value.number) ?? arg,
+          );
+        }
       }
 
       if (current === oldTarget) return;
-      const newTarget = current;
+      const newTarget = current.clone();
       newTarget.block.addParent(block);
       oldTarget.block.removeParent(block);
+
+      newTarget.args = newTarget.args.map(arg => {
+        return mappedArgs.get(arg.value.number) ?? arg;
+      });
+
       return newTarget;
     }
 
@@ -457,21 +471,18 @@ export class Graph {
       if (endInstruction?.type !== "break-if") return;
       const { condition, alternate, consequent } = endInstruction;
 
-      let preservedEdge: TEdge;
-      let params: IBreakParameter[];
+      let preservedEdge: BlockEdge;
 
       if (
         consequent.block.instructions.isEmpty &&
         consequent.block.endInstruction?.type === "end"
       ) {
         preservedEdge = alternate;
-        params = endInstruction.alternateParameters;
       } else if (
         alternate.block.instructions.isEmpty &&
         alternate.block.endInstruction?.type === "end"
       ) {
         preservedEdge = consequent;
-        params = endInstruction.consequentParameters;
       } else {
         return;
       }
@@ -481,7 +492,6 @@ export class Graph {
         preservedEdge,
         endInstruction.source,
       );
-      block.endInstruction.alternateParameters = params;
     });
   }
 
@@ -597,10 +607,10 @@ export class Graph {
       const mergeBlock = consequentEnd.target.block;
 
       for (let i = 0; i < mergeBlock.parameters.length; i++) {
-        const consequentParam = consequentEnd.blockParameters[i];
-        const alternateParam = alternateEnd.blockParameters[i];
-        const consequentValue = consequentParam.value;
-        const alternateValue = alternateParam.value;
+        const consequentArg = consequentEnd.target.args[i];
+        const alternateArg = alternateEnd.target.args[i];
+        const consequentValue = consequentArg.value;
+        const alternateValue = alternateArg.value;
 
         const total =
           getInstructionCount(consequentValue, consequent.block) +
@@ -652,18 +662,9 @@ export class Graph {
         );
         block.instructions.pushBack(select);
         select.registerWriter(writes, block);
-        consequentParam.value = out;
-        alternateParam.value = out;
+        consequentArg.value = out;
+        alternateArg.value = out;
       }
-
-      using _ = {
-        [Symbol.dispose]: () => {
-          console.log(
-            "select step: ",
-            generateGraphVizDOTString(c, this.start),
-          );
-        },
-      };
 
       // jump directly to the merge block if both sides are identical
       if (!consequent.block.instructions.isEmpty) continue;
@@ -671,18 +672,20 @@ export class Graph {
 
       let identical = true;
       for (let i = 0; i < mergeBlock.parameters.length; i++) {
-        const consequentParam = consequentEnd.blockParameters[i];
-        const alternateParam = alternateEnd.blockParameters[i];
+        const consequentArg = consequentEnd.target.args[i];
+        const alternateArg = alternateEnd.target.args[i];
 
-        if (!consequentParam.value.equals(alternateParam.value)) {
+        if (!consequentArg.value.equals(alternateArg.value)) {
           identical = false;
           break;
         }
       }
 
       if (!identical) continue;
-      block.endInstruction = new BreakInstruction(mergeBlock, source);
-      block.endInstruction.blockParameters = [...consequentEnd.blockParameters];
+      block.endInstruction = new BreakInstruction(
+        consequentEnd.target.clone(),
+        source,
+      );
       alternate.block.endInstruction = new EndInstruction(source);
       consequent.block.endInstruction = new EndInstruction(source);
       mergeBlock.addParent(block);
@@ -696,8 +699,8 @@ export class Graph {
 
       for (let i = 0; i < mergeBlock.parameters.length; i++) {
         const param = mergeBlock.parameters[i];
-        const breakParam = block.endInstruction.blockParameters[i];
-        c.setAlias(param.value, breakParam.value);
+        const arg = block.endInstruction.target.args[i];
+        c.setAlias(param.value, arg.value);
       }
 
       mergeBlock.parameters = [];
@@ -1063,13 +1066,9 @@ export class Graph {
             );
           }
 
-          const instParam = endInst.blockParameters[i];
+          const arg = endInst.target.args[i];
           parent.instructions.pushBack(
-            new StoreInstruction(
-              blockParam.variable,
-              instParam.value,
-              instParam.loc,
-            ),
+            new StoreInstruction(blockParam.variable, arg.value, arg.loc),
           );
         }
       }
@@ -1078,7 +1077,7 @@ export class Graph {
       for (const parent of block.parents) {
         const endInstruction = parent.endInstruction;
         if (endInstruction?.type !== "break") continue;
-        endInstruction.blockParameters.length = 0;
+        endInstruction.target.args.length = 0;
       }
     }
   }
@@ -1091,6 +1090,8 @@ export class Graph {
     this.removeCriticalEdges();
     this.splitLeaves();
     this.constructSSA(c);
+    this.skipBlocks();
+    this.removeCriticalEdges();
 
     this.canonicalizeBinaryOperations(c);
     // this.optimizeGlobals(c);
@@ -1104,7 +1105,6 @@ export class Graph {
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
     this.setParents();
-    console.log(generateGraphVizDOTString(c, this.start));
 
     this.deconstructSSA(c);
     this.canonicalizeBreakIfs(c);
@@ -1134,7 +1134,9 @@ export class Graph {
       const newBlock = blockMap.get(block)!;
       for (const edge of block.childEdges) {
         const newTarget = blockMap.get(edge.block)!;
-        newBlock.childEdges.push({ ...edge, block: newTarget });
+        newBlock.childEdges.push(
+          new BlockEdge(edge.type, newTarget, [...edge.args]),
+        );
       }
     });
 
@@ -1315,8 +1317,8 @@ function getReaderMap(c: ICompilerContext, entry: Block): ReaderMap {
     }
     switch (block.endInstruction?.type) {
       case "break":
-        for (const param of block.endInstruction.blockParameters) {
-          reads.add(param.value, block.endInstruction);
+        for (const arg of block.endInstruction.target.args) {
+          reads.add(arg.value, block.endInstruction);
         }
         break;
       case "break-if":

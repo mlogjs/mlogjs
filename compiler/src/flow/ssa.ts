@@ -180,12 +180,12 @@ export class SSABuilder {
       }
 
       // Ensure array is large enough (handling cases where we fill out of order)
-      while (end.getBlockParameterCount(block) < paramIndex) {
+      while (end.getBlockArgumentCount(block) < paramIndex) {
         // Fill gaps if necessary (shouldn't happen if logic is correct)
         // @ts-ignore
-        end.addBlockParameter(block, null);
+        end.addBlockArgument(block, null);
       }
-      end.addBlockParameter(block, {
+      end.addBlockArgument(block, {
         value: val,
         loc: this.valueLocations.get(val) ?? loc,
       });
@@ -226,8 +226,8 @@ export class SSABuilder {
 
     for (const pred of block.parents) {
       const end = pred.endInstruction as BreakInstruction;
-      if (end.blockParameters[paramIndex]) {
-        operands.push(end.blockParameters[paramIndex].value);
+      if (end.target.args[paramIndex]) {
+        operands.push(end.target.args[paramIndex].value);
       }
     }
 
@@ -264,7 +264,7 @@ export class SSABuilder {
           // Remove corresponding arguments from predecessors
           for (const pred of block.parents) {
             const end = pred.endInstruction as IBlockParamsInstruction;
-            end.removeBlockParameter(block, i);
+            end.removeBlockArgument(block, i);
           }
           continue;
         }
@@ -278,7 +278,7 @@ export class SSABuilder {
 
         for (const pred of block.parents) {
           const end = pred.endInstruction as IBlockParamsInstruction;
-          end.removeBlockParameter(block, i);
+          end.removeBlockArgument(block, i);
         }
       }
     }
@@ -291,7 +291,7 @@ export class SSABuilder {
     let first: ImmutableId | null = null;
     for (const parent of parents) {
       const end = parent.endInstruction as BreakInstruction;
-      const operand = end.blockParameters[paramIndex]?.value;
+      const operand = end.target.args[paramIndex]?.value;
       if (!operand) return null;
 
       if (first === null) {

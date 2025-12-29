@@ -6,7 +6,7 @@ import { SelectInstruction } from "../instructions/SelectInstruction";
 import { SourceRange } from "../SourceRange";
 import { IInstruction, TLiteral, es } from "../types";
 import { LiteralValue } from "../values";
-import { Block, TEdge } from "./block";
+import { Block, BlockEdge, EdgeArgument } from "./block";
 import { CloningContext } from "./clone_context";
 import { GlobalId, ImmutableId } from "./id";
 import { ReaderMap, WriterMap, constantOperationMap } from "./optimizer";
@@ -564,68 +564,50 @@ export class UnaryOperatorInstruction implements IBodyInstruction {
 
 export type TSourceLoc = es.SourceLocation | undefined | null;
 
-export interface IBreakParameter {
-  loc: SourceRange;
-  value: ImmutableId;
-}
-
 export interface IBlockParamsInstruction {
-  getBlockParameterCount(childBlock: Block): number;
-  addBlockParameter(childBlock: Block, param: IBreakParameter): void;
-  getBlockParameter(childBlock: Block, index: number): IBreakParameter;
-  removeBlockParameter(childBlock: Block, index: number): void;
+  getBlockArgumentCount(childBlock: Block): number;
+  addBlockArgument(childBlock: Block, arg: EdgeArgument): void;
+  getBlockArgument(childBlock: Block, index: number): EdgeArgument;
+  removeBlockArgument(childBlock: Block, index: number): void;
 }
 
 export class BreakInstruction implements IBlockParamsInstruction {
   type = "break" as const;
-  target: TEdge;
-  /** Used during the conversion to SSA form */
-  blockParameters: IBreakParameter[] = [];
+  target: BlockEdge;
 
   // TODO: why do we even require node when we could just ask for .loc directly?
   constructor(
-    target: Block | TEdge,
+    target: Block | BlockEdge,
     public source: SourceRange,
   ) {
     this.target = target instanceof Block ? target.toForward() : target;
   }
 
-  getBlockParameterCount(childBlock: Block): number {
-    return this.blockParameters.length;
+  getBlockArgumentCount(childBlock: Block): number {
+    return this.target.args.length;
   }
 
-  addBlockParameter(childBlock: Block, param: IBreakParameter) {
-    this.blockParameters.push(param);
+  addBlockArgument(childBlock: Block, arg: EdgeArgument) {
+    this.target.args.push(arg);
   }
 
-  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
-    return this.blockParameters[index];
+  getBlockArgument(childBlock: Block, index: number): EdgeArgument {
+    return this.target.args[index];
   }
 
-  removeBlockParameter(childBlock: Block, index: number): void {
-    this.blockParameters.splice(index, 1);
+  removeBlockArgument(childBlock: Block, index: number): void {
+    this.target.args.splice(index, 1);
   }
 }
 
 export class BreakIfInstruction implements IBlockParamsInstruction {
   type = "break-if" as const;
-  consequent: TEdge;
-  alternate: TEdge;
-  /**
-   * Only exists briefly during the conversion to SSA form. Its existence in any
-   * other compiler phase would imply a critical edge.
-   */
-  consequentParameters: IBreakParameter[] = [];
-  /**
-   * Only exists briefly during the conversion to SSA form. Its existence in any
-   * other compiler phase would imply a critical edge.
-   */
-  alternateParameters: IBreakParameter[] = [];
-
+  consequent: BlockEdge;
+  alternate: BlockEdge;
   constructor(
     public condition: ImmutableId,
-    consequent: Block | TEdge,
-    alternate: Block | TEdge,
+    consequent: Block | BlockEdge,
+    alternate: Block | BlockEdge,
     public source: SourceRange,
   ) {
     this.consequent =
@@ -635,64 +617,54 @@ export class BreakIfInstruction implements IBlockParamsInstruction {
   }
 
   swapEdges() {
-    [
-      this.consequent,
-      this.alternate,
-      this.consequentParameters,
-      this.alternateParameters,
-    ] = [
-      this.alternate,
-      this.consequent,
-      this.alternateParameters,
-      this.consequentParameters,
-    ];
+    [this.consequent, this.alternate] = [this.alternate, this.consequent];
   }
 
-  getBlockParameterCount(childBlock: Block): number {
+  getBlockArgumentCount(childBlock: Block): number {
     if (this.consequent.block === childBlock) {
-      return this.consequentParameters.length;
+      return this.consequent.args.length;
     }
     if (this.alternate.block === childBlock) {
-      return this.alternateParameters.length;
+      return this.alternate.args.length;
     }
     throw new CompilerError(
-      "Attempted to get block parameter count from break-if for non-child block",
+      "Attempted to get block argument count from break-if for non-child block",
     );
   }
 
-  addBlockParameter(childBlock: Block, param: IBreakParameter) {
+  addBlockArgument(childBlock: Block, arg: EdgeArgument) {
     if (this.consequent.block === childBlock) {
-      this.consequentParameters.push(param);
+      this.consequent.args.push(arg);
     } else if (this.alternate.block === childBlock) {
-      this.alternateParameters.push(param);
+      this.alternate.args.push(arg);
     } else {
       throw new CompilerError(
-        "Attempted to add block parameter to break-if for non-child block",
+        "Attempted to add block argument to break-if for non-child block",
       );
     }
   }
 
-  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
+  getBlockArgument(childBlock: Block, index: number): EdgeArgument {
     if (this.consequent.block === childBlock) {
-      return this.consequentParameters[index];
+      return this.consequent.args[index];
     }
     if (this.alternate.block === childBlock) {
-      return this.alternateParameters[index];
+      return this.alternate.args[index];
     }
 
     throw new CompilerError(
-      "Attempted to get block parameter from break-if for non-child block",
+      "Attempted to get block argument from break-if for non-child block",
     );
   }
 
-  removeBlockParameter(childBlock: Block, index: number): void {
+  removeBlockArgument(childBlock: Block, index: number): void {
     if (this.consequent.block === childBlock) {
-      this.consequentParameters.splice(index, 1);
+      this.consequent.args.splice(index, 1);
     } else if (this.alternate.block === childBlock) {
-      this.alternateParameters.splice(index, 1);
+      this.alternate.args.splice(index, 1);
     } else {
       throw new CompilerError(
-        "Attempted to remove block parameter from break-if for non-child block",
+        "Attempted to remove block argument from break-if for non-child block",
       );
     }
   }
@@ -771,32 +743,31 @@ export class EndInstruction {
 
 export class EndIfInstruction implements IBlockParamsInstruction {
   type = "end-if" as const;
-  alternate: TEdge;
-  alternateParameters: IBreakParameter[] = [];
+  alternate: BlockEdge;
 
   constructor(
     public condition: ImmutableId,
-    alternate: Block | TEdge,
+    alternate: Block | BlockEdge,
     public source: SourceRange,
   ) {
     this.alternate =
       alternate instanceof Block ? alternate.toForward() : alternate;
   }
 
-  getBlockParameterCount(childBlock: Block): number {
-    return this.alternateParameters.length;
+  getBlockArgumentCount(childBlock: Block): number {
+    return this.alternate.args.length;
   }
 
-  addBlockParameter(childBlock: Block, param: IBreakParameter) {
-    this.alternateParameters.push(param);
+  addBlockArgument(childBlock: Block, arg: EdgeArgument) {
+    this.alternate.args.push(arg);
   }
 
-  getBlockParameter(childBlock: Block, index: number): IBreakParameter {
-    return this.alternateParameters[index];
+  getBlockArgument(childBlock: Block, index: number): EdgeArgument {
+    return this.alternate.args[index];
   }
 
-  removeBlockParameter(childBlock: Block, index: number): void {
-    this.alternateParameters.splice(index, 1);
+  removeBlockArgument(childBlock: Block, index: number): void {
+    this.alternate.args.splice(index, 1);
   }
 }
 

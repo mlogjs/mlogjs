@@ -9,22 +9,15 @@ import {
 } from "./instructions";
 import { ReaderMap, WriterMap } from "./optimizer";
 
-export interface IForwardEdge {
-  type: "forward";
-  block: Block;
-}
-
-export interface IBackwardEdge {
-  type: "backward";
-  block: Block;
-}
-
-export type TEdge = IForwardEdge | IBackwardEdge;
-
 export interface BlockParameterDefintion {
   variable: GlobalId;
   value: ImmutableId;
   loc: SourceRange;
+}
+
+export interface EdgeArgument {
+  loc: SourceRange;
+  value: ImmutableId;
 }
 
 let _id = 0;
@@ -48,7 +41,7 @@ export class Block {
     return this.childEdges.map(edge => edge.block);
   }
 
-  get childEdges(): TEdge[] {
+  get childEdges(): BlockEdge[] {
     if (!this.endInstruction) return [];
     switch (this.endInstruction.type) {
       case "break":
@@ -92,18 +85,12 @@ export class Block {
     }
   }
 
-  toForward(): IForwardEdge {
-    return {
-      type: "forward",
-      block: this,
-    };
+  toForward(): BlockEdge {
+    return new BlockEdge("forward", this);
   }
 
-  toBackward(): IBackwardEdge {
-    return {
-      type: "backward",
-      block: this,
-    };
+  toBackward(): BlockEdge {
+    return new BlockEdge("backward", this);
   }
 
   toMlog(
@@ -123,6 +110,18 @@ export class Block {
       inst.push(...instruction.toMlog(c, writes));
     }
     return inst;
+  }
+}
+
+export class BlockEdge {
+  constructor(
+    public type: "forward" | "backward",
+    public block: Block,
+    public args: EdgeArgument[] = [],
+  ) {}
+
+  clone() {
+    return new BlockEdge(this.type, this.block, [...this.args]);
   }
 }
 

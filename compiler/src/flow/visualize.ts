@@ -1,6 +1,6 @@
 import { ICompilerContext } from "../CompilerContext";
-import { Block } from "./block";
-import { traverse, traverseReversePostOrder } from "./graph";
+import { Block, BlockEdge } from "./block";
+import { traverseReversePostOrder } from "./graph";
 import { ValueId } from "./id";
 import { TBlockInstruction, TBlockEndInstruction } from "./instructions";
 
@@ -18,6 +18,17 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
   });
 
   const n = (id: ValueId) => c.getValueOrTemp(id)?.toMlogString();
+
+  function edgeToString(edge: BlockEdge) {
+    let result = ids.get(edge.block)!;
+
+    if (edge.args.length > 0) {
+      result += ` (${edge.args.map(p => n(p.value)).join(", ")})`;
+    }
+
+    return result;
+  }
+
   function instToString(
     inst: TBlockInstruction | TBlockEndInstruction,
   ): string {
@@ -50,11 +61,11 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
           .map(arg => (typeof arg === "string" ? arg : n(arg)))
           .join(" ")}`;
       case "break":
-        return `break ${ids.get(inst.target.block)} (${inst.blockParameters.map(p => n(p.value)).join(", ")})`;
+        return `break ${edgeToString(inst.target)}`;
       case "break-if":
-        return `break-if ${n(inst.condition)} ${ids.get(
-          inst.consequent.block,
-        )} ${ids.get(inst.alternate.block)}`;
+        return `break-if ${n(inst.condition)} ${edgeToString(
+          inst.consequent,
+        )} ${edgeToString(inst.alternate)}`;
       case "return":
         return `return ${n(inst.value)}`;
       case "end":
@@ -62,7 +73,7 @@ export function generateGraphVizDOTString(c: ICompilerContext, entry: Block) {
       case "stop":
         return "stop";
       case "end-if":
-        return `end-if ${n(inst.condition)} ${ids.get(inst.alternate.block)}`;
+        return `end-if ${n(inst.condition)} ${edgeToString(inst.alternate)}`;
       default:
         throw new Error(
           `Missing representation for instruction of type ${
