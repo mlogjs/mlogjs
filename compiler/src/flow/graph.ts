@@ -1217,11 +1217,10 @@ export function traversePostOrder(
 function immediateDominators(entry: Block): Map<Block, Block> {
   const idoms = new Map<Block, Block>();
   const blockIndexes = new Map<Block, number>();
-  const allBlocks: Block[] = [];
-  traverseReversePostOrder(entry, block => {
-    blockIndexes.set(block, allBlocks.length);
-    allBlocks.push(block);
-  });
+  const allBlocks: Block[] = getReversePostOrder(entry);
+  for (let i = 0; i < allBlocks.length; i++) {
+    blockIndexes.set(allBlocks[i], i);
+  }
 
   idoms.set(entry, entry);
 
