@@ -36,15 +36,13 @@ import { generateGraphVizDOTString } from "./visualize";
 // control flow graph internals for the compiler
 export class Graph {
   start = new Block();
-  end = new Block();
 
-  static from(entry: Block, exit: Block, loc: SourceRange) {
+  static from(entry: Block, loc: SourceRange) {
     const graph = new Graph();
     graph.start = entry;
-    graph.end = exit;
 
     traverse(graph.start, block => {
-      block.endInstruction ??= new BreakInstruction(graph.end, loc);
+      block.endInstruction ??= new EndInstruction(loc);
     });
 
     graph.setParents();
@@ -117,7 +115,6 @@ export class Graph {
           child.removeParent(target.block);
           child.addParent(block);
         });
-        if (target.block === this.end) this.end = block;
       }
     });
   }
@@ -1141,7 +1138,6 @@ export class Graph {
     });
 
     clone.start = blockMap.get(this.start)!;
-    clone.end = blockMap.get(this.end)!;
 
     return clone;
   }
