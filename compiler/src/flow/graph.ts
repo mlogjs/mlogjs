@@ -548,9 +548,25 @@ export class Graph {
     });
   }
 
+  hoistLoadLiterals(c: ICompilerContext) {
+    const entry = this.start;
+
+    traverse(this.start, block => {
+      if (block === entry) return;
+      for (const node of block.instructions.nodes()) {
+        const inst = node.instruction;
+        if (inst.type !== "load-literal") continue;
+        block.instructions.remove(node);
+        entry.instructions.pushFront(inst);
+      }
+    });
+  }
+
   foldConstantOperations(c: ICompilerContext) {
+    const cursor = new BlockCursor("edit", this.start);
     traverse(this.start, block => {
       let current = block.instructions.head;
+      cursor.currentBlock = block;
 
       while (current) {
         const inst = current.instruction;
@@ -562,15 +578,9 @@ export class Graph {
           current = current.next;
           continue;
         }
-
-        if (!inst.constantFold(c)) {
-          current = current.next;
-          continue;
-        }
-
-        const { next } = current;
-        block.instructions.remove(current);
-        current = next;
+        cursor.position = current;
+        inst.constantFold(c, cursor);
+        current = cursor.position.next;
       }
     });
   }
@@ -777,6 +787,7 @@ export class Graph {
       switch (writer?.type) {
         case undefined:
         case "load":
+        case "load-literal":
         case "alloc-local":
           return 0;
         case "binary-operation": {
@@ -821,6 +832,7 @@ export class Graph {
 
       switch (inst.type) {
         case "load":
+        case "load-literal":
         case "alloc-local":
           break;
         case "binary-operation":
@@ -1128,7 +1140,47 @@ export class Graph {
     }
   }
 
+  eliminateCommonSubexpressions(c: ICompilerContext) {
+    this.setParents();
+    const idoms = immediateDominators(this.start);
+    const expressions = new Map<Block, Map<string, ImmutableId>>();
+
+    traverseReversePostOrder(this.start, block => {
+      const idom = idoms.get(block);
+      const blockExpressions = new Map<string, ImmutableId>(
+        idom ? expressions.get(idom) : null,
+      );
+      expressions.set(block, blockExpressions);
+
+      for (const node of block.instructions.nodes()) {
+        const inst = node.instruction;
+
+        if (
+          inst.type === "binary-operation" ||
+          inst.type === "unary-operation" ||
+          inst.type === "binary-select" ||
+          inst.type === "load-literal"
+        ) {
+          const key = inst.getExpressionKey(c);
+          const existing = blockExpressions.get(key);
+
+          if (existing) {
+            c.setAlias(inst.out, existing);
+            block.instructions.remove(node);
+            continue;
+          } else {
+            blockExpressions.set(key, inst.out);
+          }
+        }
+      }
+    });
+  }
+
   optimize(c: ICompilerContext) {
+    // hoisting load-literal instructions here
+    // allows skipBlocks and removeCriticalEdges
+    // to work better
+    this.hoistLoadLiterals(c);
     this.mergeBlocks();
     this.skipBlocks();
     this.removeCriticalEdges();
@@ -1140,8 +1192,10 @@ export class Graph {
     this.canonicalizeBinaryOperations(c);
     // this.optimizeGlobals(c);
     this.foldConstantOperations(c);
+    this.hoistLoadLiterals(c);
     this.transformComparisons(c);
     this.createSelects(c);
+    this.eliminateCommonSubexpressions(c);
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
     this.createEndIfs(c);

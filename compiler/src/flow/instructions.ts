@@ -32,6 +32,18 @@ export interface ILowerableInstruction extends BasicInstruction {
   lower(c: ICompilerContext, cursor: IBlockCursor): void;
 }
 
+export interface IConstantFoldableInstruction {
+  /**
+   * Attempts to perform constant folding on the instruction. If successful,
+   * returns true and modifies the instruction list accordingly.
+   *
+   * The cursor position will be at the instruction being folded. After this
+   * method is called, the caller should use `cursor.position.next` to advance
+   * to the next instruction node.
+   */
+  constantFold(c: ICompilerContext, cursor: IBlockCursor): boolean;
+}
+
 export class AllocLocalInstruction implements IBodyInstruction {
   type = "alloc-local" as const;
 
@@ -54,6 +66,36 @@ export class AllocLocalInstruction implements IBodyInstruction {
 
   toMlog(c: ICompilerContext, writes: WriterMap): IInstruction[] {
     return [];
+  }
+}
+
+export class LoadLiteralInstruction implements IBodyInstruction {
+  type = "load-literal" as const;
+
+  constructor(
+    public literal: TLiteral | null,
+    public out: ImmutableId,
+    public source: SourceRange,
+  ) {}
+
+  registerReader(reads: ReaderMap) {}
+
+  unregisterReader(reads: ReaderMap) {}
+
+  registerWriter(writes: WriterMap, block: Block) {
+    writes.set(this.out, this, block);
+  }
+
+  unregisterWriter(writes: WriterMap) {
+    writes.remove(this.out);
+  }
+
+  toMlog(c: ICompilerContext): IInstruction[] {
+    return [];
+  }
+
+  getExpressionKey(c: ICompilerContext): string {
+    return `ll:${String(this.literal)}`;
   }
 }
 
@@ -284,7 +326,9 @@ const invertedOperatorMap: Partial<
   greaterThanEq: "lessThan",
 };
 
-export class BinaryOperationInstruction implements IBodyInstruction {
+export class BinaryOperationInstruction
+  implements IBodyInstruction, IConstantFoldableInstruction
+{
   type = "binary-operation" as const;
 
   constructor(
@@ -396,7 +440,7 @@ export class BinaryOperationInstruction implements IBodyInstruction {
     return [op];
   }
 
-  constantFold(c: ICompilerContext): boolean {
+  constantFold(c: ICompilerContext, cursor: IBlockCursor): boolean {
     const left = c.getValue(this.left);
     const right = c.getValue(this.right);
     if (!left || !right) return false;
@@ -407,7 +451,16 @@ export class BinaryOperationInstruction implements IBodyInstruction {
     if (value === null) return false;
 
     c.setValue(this.out, value);
+    cursor.removeInstruction();
+    cursor.addInstruction(
+      new LoadLiteralInstruction(value.data, this.out, this.source),
+    );
+
     return true;
+  }
+
+  getExpressionKey(c: ICompilerContext): string {
+    return `b:${this.operator}:${this.left.toString()}:${this.right.toString()}`;
   }
 }
 
@@ -420,7 +473,9 @@ export type TBinarySelectType =
   | "greaterThanEq"
   | "strictEqual";
 
-export class BinarySelectInstruction implements IBodyInstruction {
+export class BinarySelectInstruction
+  implements IBodyInstruction, IConstantFoldableInstruction
+{
   type = "binary-select" as const;
 
   constructor(
@@ -431,8 +486,9 @@ export class BinarySelectInstruction implements IBodyInstruction {
     public source: SourceRange,
   ) {}
 
-  constantFold(c: ICompilerContext): boolean {
+  constantFold(c: ICompilerContext, cursor: IBlockCursor): boolean {
     if (this.whenTrue.equals(this.whenFalse)) {
+      cursor.removeInstruction();
       c.setAlias(this.out, this.whenTrue);
       return true;
     }
@@ -440,6 +496,7 @@ export class BinarySelectInstruction implements IBodyInstruction {
 
     if (!(condition instanceof LiteralValue)) return false;
 
+    cursor.removeInstruction();
     c.setAlias(this.out, condition.num ? this.whenTrue : this.whenFalse);
 
     return true;
@@ -497,6 +554,10 @@ export class BinarySelectInstruction implements IBodyInstruction {
     select.source = this.source;
     return [select];
   }
+
+  getExpressionKey(c: ICompilerContext) {
+    return `s:${this.condition.toString()}:${this.whenTrue.toString()}:${this.whenFalse.toString()}`;
+  }
 }
 
 export type TUnaryOperationType =
@@ -515,7 +576,9 @@ export type TUnaryOperationType =
   | "acos"
   | "atan";
 
-export class UnaryOperatorInstruction implements IBodyInstruction {
+export class UnaryOperatorInstruction
+  implements IBodyInstruction, IConstantFoldableInstruction
+{
   type = "unary-operation" as const;
 
   constructor(
@@ -551,14 +614,24 @@ export class UnaryOperatorInstruction implements IBodyInstruction {
     return [op];
   }
 
-  constantFold(c: ICompilerContext): boolean {
+  constantFold(c: ICompilerContext, cursor: IBlockCursor): boolean {
     const value = c.getValue(this.value);
     if (!value) return false;
     if (!(value instanceof LiteralValue)) return false;
     const result = constantOperationMap[this.operator]?.(value.num);
     if (result === undefined) return false;
     c.setValue(this.out, new LiteralValue(result));
+
+    cursor.removeInstruction();
+    cursor.addInstruction(
+      new LoadLiteralInstruction(result, this.out, this.source),
+    );
+
     return true;
+  }
+
+  getExpressionKey(c: ICompilerContext): string {
+    return `u:${this.operator}:${this.value.toString()}`;
   }
 }
 
@@ -862,6 +935,7 @@ export type TBlockEndInstruction =
 
 export type TBlockInstruction =
   | AllocLocalInstruction
+  | LoadLiteralInstruction
   | LoadInstruction
   | StoreInstruction
   | ValueGetInstruction

@@ -107,7 +107,11 @@ function evaluateEnumMember(
       block.endInstruction.source,
     );
 
-  for (const instruction of block.instructions) {
+  let current = block.instructions.head;
+
+  while (current) {
+    const { instruction } = current;
+
     if (
       instruction.type !== "binary-operation" &&
       instruction.type !== "unary-operation"
@@ -117,11 +121,14 @@ function evaluateEnumMember(
         instruction.source,
       );
     }
-    if (!instruction.constantFold(c))
+    cursor.position = current;
+
+    if (!instruction.constantFold(c, cursor))
       throw new CompilerError(
         "Enum member initializers can only contain constant expressions",
         instruction.source,
       );
+    current = cursor.position.next;
   }
 
   const value = c.getValue(id);
