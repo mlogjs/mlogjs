@@ -1,10 +1,18 @@
-import { InstructionBase } from "../../instructions";
+import { NativeInstruction } from "../../flow";
 import { MacroFunction } from "../Function";
 
-export class WeatherSet extends MacroFunction<null> {
+export class WeatherSet extends MacroFunction {
   constructor() {
-    super((scope, out, weather, state) => {
-      return [null, [new InstructionBase("weathersense", weather, state)]];
+    super((c, cursor, loc, weather, state) => {
+      cursor.addInstruction(
+        new NativeInstruction(
+          ["weatherset", weather, state],
+          [weather, state],
+          [],
+          loc,
+        ),
+      );
+      return c.nullId;
     });
   }
 }

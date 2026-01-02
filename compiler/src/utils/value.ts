@@ -1,46 +1,26 @@
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
+import { ImmutableId } from "../flow";
 import { IValue, TEOutput } from "../types";
-import {
-  DestructuringValue,
-  IObjectValueData,
-  LiteralValue,
-  ObjectValue,
-  StoreValue,
-} from "../values";
+import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { discardedName } from "./constants";
 
-export function isTemplateObjectArray(value: IValue): value is ObjectValue & {
-  data: IObjectValueData & {
-    raw: ObjectValue & {
-      data: IObjectValueData & {
-        length: LiteralValue<number>;
-      };
-    };
-    length: LiteralValue<number>;
-  };
-} {
-  return (
-    value instanceof ObjectValue &&
-    value.data.length instanceof LiteralValue &&
-    value.data.length.isNumber() &&
-    value.data.raw instanceof ObjectValue &&
-    value.data.raw.data.length instanceof LiteralValue &&
-    value.data.raw.data.length.isNumber()
-  );
+export function isTemplateObjectArray(
+  c: ICompilerContext,
+  value: IValue | undefined,
+): value is ObjectValue {
+  if (!(value instanceof ObjectValue)) return false;
+  const length = c.getValue(value.data.length);
+  if (!(length instanceof LiteralValue) || !length.isNumber()) return false;
+  const raw = c.getValue(value.data.raw);
+  if (!(raw instanceof ObjectValue)) return false;
+  const rawLength = c.getValue(raw.data.length);
+  return rawLength instanceof LiteralValue && rawLength.isNumber();
 }
 
 export function extractOutName(out: TEOutput | undefined) {
   if (!out || typeof out === "string") return out;
   return out.name;
-}
-
-export function extractDestrucuringOut(
-  out: TEOutput | undefined,
-  field: string | number,
-) {
-  if (isDiscardedOut(out)) return discardedName;
-  if (!(out instanceof DestructuringValue)) return;
-  return out.fields[field] ?? discardedName;
 }
 
 /** Asserts that `value` is a `LiteralValue` that contains a string */
@@ -91,15 +71,16 @@ export function assertIsObjectMacro(
 
 /** Asserts that `value` is an `ObjectValue` that has a length property */
 export function assertIsArrayMacro(
+  c: ICompilerContext,
   value: IValue | undefined,
   name: string,
 ): asserts value is ObjectValue & {
   data: {
-    length: LiteralValue<number>;
+    length: ImmutableId;
   };
 } {
   if (value instanceof ObjectValue) {
-    const { length } = value.data;
+    const length = c.getValue(value.data.length);
     if (length instanceof LiteralValue && length.isNumber()) return;
   }
 
@@ -129,20 +110,22 @@ export interface IParameterDescriptor {
 
 /** Asserts that all of the fields described are present on `value` */
 export function assertObjectFields(
+  c: ICompilerContext,
   value: ObjectValue,
   fields: (string | IParameterDescriptor)[],
-): (IValue | string)[] {
-  const result: (IValue | string)[] = [];
+): (ImmutableId | string)[] {
+  const result: (ImmutableId | string)[] = [];
 
   for (const field of fields) {
     const param: IParameterDescriptor =
       typeof field === "object" ? field : { key: field };
 
-    const item = value.data[param.key];
+    const itemId = value.data[param.key];
 
-    if (item) {
+    if (itemId) {
+      const item = c.getValueOrTemp(itemId);
       param.validate?.(item);
-      result.push(item);
+      result.push(itemId);
       continue;
     }
 

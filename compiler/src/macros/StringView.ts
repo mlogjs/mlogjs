@@ -1,53 +1,66 @@
-import { InstructionBase } from "../instructions";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../types";
+import { IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
 import { MacroFunction } from "./Function";
+import { ImmutableId, NativeReadInstruction } from "../flow";
+import { ICompilerContext } from "../CompilerContext";
+import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 class StringView extends ObjectValue {
-  constructor(public string: IValue) {
+  constructor(public stringId: ImmutableId) {
     super();
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
-    if (super.hasProperty(scope, key)) return super.get(scope, key, out);
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const key = c.getValue(propId);
+    if (key && super.hasProperty(c, key))
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (key instanceof LiteralValue) {
       if (key.data === "length") {
-        return this.string.get(scope, key, out);
+        const string = c.getValueOrTemp(this.stringId);
+        return string.get(c, cursor, this.stringId, propId, loc);
       }
 
       if (!key.isNumber())
         throw new CompilerError(
           `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
+          loc,
         );
 
-      if (this.string instanceof LiteralValue && this.string.isString()) {
-        const char = this.string.data.charCodeAt(key.data);
+      const string = c.getValue(this.stringId);
+      if (string instanceof LiteralValue && string.isString()) {
+        const char = string.data.charCodeAt(key.data);
 
-        return [new LiteralValue(char), []];
+        return c.registerValue(new LiteralValue(char));
       }
     }
 
-    const outValue = StoreValue.from(scope, out);
-
-    return [
-      outValue,
-      [new InstructionBase("read", outValue, this.string, key)],
-    ];
+    const out = c.createImmutableId();
+    cursor.addInstruction(
+      new NativeReadInstruction(this.stringId, propId, out, loc),
+    );
+    return out;
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     if (
       (prop instanceof LiteralValue && prop.isNumber()) ||
       prop instanceof StoreValue
     )
       return true;
-    return super.hasProperty(scope, prop);
+    return super.hasProperty(c, prop);
   }
 
   debugString(): string {
-    return `StringView(${this.string.debugString()})`;
+    return `StringView(${this.stringId.toString()})`;
   }
 
   toMlogString() {
@@ -57,8 +70,8 @@ class StringView extends ObjectValue {
 
 export class StringViewBuilder extends MacroFunction {
   constructor() {
-    super((scope, out, string) => {
-      return [new StringView(string), []];
+    super((c, cursor, loc, string) => {
+      return c.registerValue(new StringView(string));
     });
   }
 }

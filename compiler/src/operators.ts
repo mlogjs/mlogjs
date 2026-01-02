@@ -59,7 +59,7 @@ export const assignmentOperators = [
   ...bitwiseAssignmentOperators,
   "=",
 ] as const;
-export type AssignementOperator = (typeof assignmentOperators)[number];
+export type AssignmentOperator = (typeof assignmentOperators)[number];
 
 export const leftRightOperators = [
   ...binaryOperators,
@@ -118,16 +118,3 @@ export const operatorMap = {
   >,
   string
 >;
-
-export const orderIndependentOperators: readonly Operator[] = [
-  "!=",
-  "!==",
-  "&&",
-  "&",
-  "*",
-  "+",
-  "==",
-  "===",
-  "|",
-  "||",
-] as const;

@@ -1,10 +1,14 @@
 import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
+import { NativeInstruction } from "../../flow";
 
-export class PrintChar extends MacroFunction<null> {
+export class PrintChar extends MacroFunction {
   constructor() {
-    super((scope, out, character) => {
-      return [null, [new InstructionBase("printchar", character)]];
+    super((c, cursor, loc, character) => {
+      cursor.addInstruction(
+        new NativeInstruction(["printchar", character], [character], [], loc),
+      );
+      return c.nullId;
     });
   }
 }

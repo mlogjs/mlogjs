@@ -1,30 +1,35 @@
+import { BlockCursor, IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { es, IValue, THandler, TValueInstructions } from "../types";
+import { Block, ImmutableId } from "../flow";
+import { SourceRange } from "../SourceRange";
+import { es, IScope, THandler } from "../types";
 import { nodeName } from "../utils";
 import { IObjectValueData, LiteralValue, ObjectValue } from "../values";
 
 const TypeCastExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.TSAsExpression | es.TSTypeAssertion,
-  out,
 ) => {
-  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
+  return c.handle(scope, cursor, node.expression);
 };
 
 export const TSAsExpression = TypeCastExpression;
 
 export const TSTypeAssertion = TypeCastExpression;
 
-const IgnoredHandler: THandler<null> = () => [null, []];
+const IgnoredHandler: THandler = c => c.nullId;
 
 export const TSInterfaceDeclaration = IgnoredHandler;
 
 export const TSTypeAliasDeclaration = IgnoredHandler;
 
-export const TSEnumDeclaration: THandler<null> = (
+export const TSEnumDeclaration: THandler = (
   c,
   scope,
+  cursor,
   node: es.TSEnumDeclaration,
 ) => {
   if (!node.const)
@@ -38,17 +43,14 @@ export const TSEnumDeclaration: THandler<null> = (
 
   for (const member of node.members) {
     if (lastType === "string" && !member.initializer)
-      throw new CompilerError("This enum member must be initialized", member);
-
-    const [value] = member.initializer
-      ? c.handleEval(scope, member.initializer)
-      : [new LiteralValue(counter)];
-
-    if (!(value instanceof LiteralValue))
       throw new CompilerError(
-        "Enum members must contain literal values",
-        member,
+        "This enum member must be initialized",
+        SourceRange.fromNode(member),
       );
+
+    const value = member.initializer
+      ? evaluateEnumMember(c, scope, cursor, member.initializer)
+      : new LiteralValue(counter);
 
     if (value.isNumber()) {
       lastType = "number";
@@ -59,29 +61,80 @@ export const TSEnumDeclaration: THandler<null> = (
 
     const name =
       member.id.type === "Identifier" ? member.id.name : member.id.value;
-    data[name] = value;
+    data[name] = c.registerValue(value);
   }
 
   const value = new ObjectValue(data);
+  const id = c.registerValue(value);
   value.name = nodeName(node, !c.compactNames && node.id.name);
 
-  scope.set(node.id.name, value);
+  scope.set(node.id.name, id);
 
-  return [null, []];
+  return id;
 };
 
 export const TSNonNullExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.TSNonNullExpression,
-  out,
 ) => {
-  return c.handle(scope, node.expression, undefined, out) as TValueInstructions;
+  return c.handle(scope, cursor, node.expression);
 };
 
-export const TSSatisfiesExpression: THandler<IValue | null> = (
+export const TSSatisfiesExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.TSSatisfiesExpression,
-  out,
-) => c.handle(scope, node.expression, undefined, out);
+) => c.handle(scope, cursor, node.expression);
+
+function evaluateEnumMember(
+  c: ICompilerContext,
+  scope: IScope,
+  cursor: IBlockCursor,
+  initializer: es.Expression,
+): LiteralValue {
+  const { currentBlock } = cursor;
+  const block = new Block();
+  cursor.currentBlock = block;
+  const id = c.handle(scope, cursor, initializer);
+  cursor.currentBlock = currentBlock;
+
+  if (block.endInstruction)
+    throw new CompilerError(
+      "Enum member initializers cannot contain control flow",
+      block.endInstruction.source,
+    );
+
+  let current = block.instructions.head;
+
+  while (current) {
+    const { instruction } = current;
+
+    if (
+      instruction.type !== "binary-operation" &&
+      instruction.type !== "unary-operation"
+    ) {
+      throw new CompilerError(
+        "Enum member initializers can only contain constant expressions",
+        instruction.source,
+      );
+    }
+    cursor.position = current;
+
+    if (!instruction.constantFold(c, cursor))
+      throw new CompilerError(
+        "Enum member initializers can only contain constant expressions",
+        instruction.source,
+      );
+    current = cursor.position.next;
+  }
+
+  const value = c.getValue(id);
+  if (value instanceof LiteralValue) return new LiteralValue(value.data);
+  throw new CompilerError(
+    "Enum member initializers must evaluate to literal values",
+    SourceRange.fromNode(initializer),
+  );
+}

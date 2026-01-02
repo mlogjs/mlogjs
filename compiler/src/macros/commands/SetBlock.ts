@@ -1,10 +1,12 @@
-import { InstructionBase } from "../../instructions";
+import { ICompilerContext } from "../../CompilerContext";
+import { NativeInstruction } from "../../flow";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class SetBlock extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         floor: { args: ["x", "y", "to"] },
         ore: { args: ["x", "y", "to"] },
@@ -13,11 +15,10 @@ export class SetBlock extends ObjectValue {
           args: ["x", "y", "to", "team", { key: "rotation", default: "0" }],
         },
       },
-      handler(scope, overload, out, x, y, to, team, rotation) {
-        return [
-          null,
-          [
-            new InstructionBase(
+      handler(c, overload, cursor, loc, x, y, to, team, rotation) {
+        cursor.addInstruction(
+          new NativeInstruction(
+            [
               "setblock",
               overload,
               to,
@@ -25,9 +26,13 @@ export class SetBlock extends ObjectValue {
               y,
               team ?? "@derelict",
               rotation ?? "0",
-            ),
-          ],
-        ];
+            ],
+            filterIds([x, y, to, team, rotation]),
+            [],
+            loc,
+          ),
+        );
+        return c.nullId;
       },
     });
     super(data);

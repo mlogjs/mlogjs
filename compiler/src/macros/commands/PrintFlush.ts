@@ -1,19 +1,36 @@
-import { InstructionBase } from "../../instructions";
 import { MacroFunction } from "..";
-import { IValue } from "../../types";
 import { StoreValue } from "../../values";
 import { CompilerError } from "../../CompilerError";
+import { ImmutableId, NativeInstruction } from "../../flow";
+import { EMutability } from "../../types";
+import { SourceRange } from "../../SourceRange";
 
 const defaultTargetName = "message1";
-export class PrintFlush extends MacroFunction<null> {
+export class PrintFlush extends MacroFunction {
   constructor() {
-    super((scope, out, target?: IValue) => {
-      if (!target)
-        return [null, [new InstructionBase("printflush", defaultTargetName)]];
+    super((c, cursor, node, targetId) => {
+      if (!targetId) {
+        const defaultTarget = c.registerValue(
+          new StoreValue(defaultTargetName, EMutability.constant),
+        );
+        cursor.addInstruction(
+          new NativePrintFlushInstruction(defaultTarget, node),
+        );
+        return c.nullId;
+      }
+
+      const target = c.getValueOrTemp(targetId);
 
       if (!(target instanceof StoreValue))
         throw new CompilerError("The printflush target must be a store value");
-      return [null, [new InstructionBase("printflush", target)]];
+      cursor.addInstruction(new NativePrintFlushInstruction(targetId, node));
+      return c.nullId;
     });
+  }
+}
+
+class NativePrintFlushInstruction extends NativeInstruction {
+  constructor(target: ImmutableId, loc: SourceRange) {
+    super(["printflush", target], [target], [], loc);
   }
 }

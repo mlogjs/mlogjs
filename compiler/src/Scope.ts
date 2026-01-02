@@ -1,30 +1,22 @@
-import { LiteralValue, StoreValue } from "./values";
-import { AddressResolver } from "./instructions";
-import {
-  IFunctionValue,
-  IInstruction,
-  INamedValue,
-  IScope,
-  IValue,
-} from "./types";
+import { LiteralValue } from "./values";
+import { IFunctionValue, IInstruction, IScope } from "./types";
 import { CompilerError } from "./CompilerError";
-import { internalPrefix } from "./utils";
+import { Block, ImmutableId, ValueId } from "./flow";
+import { ICompilerContext } from "./CompilerContext";
 
 export class Scope implements IScope {
-  data: Record<string, IValue | null>;
+  data: Record<string, ValueId>;
   parent: IScope | null;
   ntemp: number;
   name: string;
   inst: IInstruction[];
-  operationCache: Record<string, IValue>;
-  cacheDependencies: Record<string, string[]>;
-  break!: AddressResolver;
-  continue!: AddressResolver;
+  break!: Block;
+  continue!: Block;
   function!: IFunctionValue;
   label?: string;
   // Only `unchecked` is supposed to change this
   checkIndexes = true;
-  builtInModules: Record<string, IValue>;
+  builtInModules: Record<string, ImmutableId>;
 
   constructor({
     data = {},
@@ -32,20 +24,11 @@ export class Scope implements IScope {
     ntemp = 0,
     name = "",
     inst = [],
-    operationCache = {},
-    cacheDependencies = {},
     builtInModules = {},
   }: Partial<
     Pick<
       IScope,
-      | "data"
-      | "parent"
-      | "ntemp"
-      | "name"
-      | "inst"
-      | "operationCache"
-      | "cacheDependencies"
-      | "builtInModules"
+      "data" | "parent" | "ntemp" | "name" | "inst" | "builtInModules"
     >
   > = {}) {
     this.data = data;
@@ -53,16 +36,12 @@ export class Scope implements IScope {
     this.ntemp = ntemp;
     this.name = name;
     this.inst = inst;
-    this.operationCache = operationCache;
-    this.cacheDependencies = cacheDependencies;
     this.builtInModules = builtInModules;
   }
   copy(): IScope {
     const scope = new Scope({
       ...this,
       data: { ...this.data },
-      operationCache: { ...this.operationCache },
-      cacheDependencies: { ...this.cacheDependencies },
     });
     scope.break = this.break;
     scope.continue = this.continue;
@@ -72,8 +51,6 @@ export class Scope implements IScope {
   createScope(): IScope {
     const scope = this.copy();
     scope.data = {};
-    scope.operationCache = {};
-    scope.cacheDependencies = {};
     scope.parent = this;
     return scope;
   }
@@ -91,96 +68,32 @@ export class Scope implements IScope {
     if (this.parent) return this.parent.has(identifier);
     return false;
   }
-  get(identifier: string): INamedValue {
+  get(c: ICompilerContext, identifier: string): ValueId {
     const value = this.data[identifier];
-    if (value) return value as INamedValue;
-    if (this.parent) return this.parent.get(identifier);
+    if (value !== undefined) return value;
+    if (this.parent) return this.parent.get(c, identifier);
     let message = `${identifier} is not declared.`;
 
     const name = new LiteralValue(identifier);
     for (const moduleName in this.builtInModules) {
-      const module = this.builtInModules[moduleName];
-      if (module.hasProperty(this, name)) {
+      const moduleId = this.builtInModules[moduleName];
+      const module = c.getValue(moduleId)!;
+      if (module.hasProperty(c, name)) {
         message += ` Did you mean to use "${identifier}" exported from "${moduleName}"?`;
       }
     }
     throw new CompilerError(message);
   }
 
-  set<T extends IValue>(name: string, value: T): T {
+  set(name: string, value: ValueId): void {
     if (name in this.data)
       throw new CompilerError(`${name} is already declared.`);
     return this.hardSet(name, value);
   }
 
-  hardSet<T extends IValue>(name: string, value: T): T {
+  hardSet(name: string, value: ValueId): void {
     if (!name)
       throw new CompilerError("Values in a scope must have an identifier");
     this.data[name] = value;
-    return value;
   }
-  make(identifier: string, name: string): StoreValue {
-    const value = new StoreValue(name);
-    return this.set(identifier, value);
-  }
-  makeTempName(): string {
-    let result = `${internalPrefix}t${this.ntemp}`;
-    if (this.name) result += `:${this.name}`;
-
-    this.ntemp++;
-    return result;
-  }
-
-  addCachedOperation(
-    op: string,
-    result: IValue,
-    left: IValue,
-    right?: IValue,
-  ): void {
-    if (!left.name || !result.name || (right && !right.name)) return;
-    if (result.volatile || left.volatile || right?.volatile) return;
-
-    const id = formatCacheId(op, left, right);
-
-    this.operationCache[id] = result;
-
-    this.clearDependentCache(result);
-    addCacheDependency(this, left.name, id);
-    if (right) addCacheDependency(this, right.name!, id);
-    addCacheDependency(this, result.name, id);
-  }
-
-  getCachedOperation(
-    op: string,
-    left: IValue,
-    right?: IValue,
-  ): IValue | undefined {
-    if (left.volatile || right?.volatile) return;
-
-    const id = formatCacheId(op, left, right);
-    const result = this.operationCache[id];
-    if (result) return result;
-    if (this.parent) return this.parent.getCachedOperation(op, left, right);
-  }
-
-  clearDependentCache(value: IValue): void {
-    if (!value.name) return;
-
-    const dependents = this.cacheDependencies[value.name];
-    if (dependents) {
-      for (const id of dependents) {
-        delete this.operationCache[id];
-      }
-    }
-    if (this.parent) this.parent.clearDependentCache(value);
-  }
-}
-
-function formatCacheId(op: string, left: IValue, right?: IValue) {
-  if (right) return `{${op}}{${left.name}}{${right.name}}`;
-  return `{${op}}{${left.name}}`;
-}
-
-function addCacheDependency(scope: IScope, name: string, id: string) {
-  (scope.cacheDependencies[name] ??= []).push(id);
 }

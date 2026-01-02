@@ -1,30 +1,38 @@
 import { CompilerError } from "../../CompilerError";
-import { InstructionBase } from "../../instructions";
-import { extractDestrucuringOut } from "../../utils";
-import { ObjectValue, StoreValue } from "../../values";
+import { NativeInstruction } from "../../flow";
+import { ObjectValue } from "../../values";
 import { MacroFunction } from "../Function";
 
 export class UnpackColor extends MacroFunction {
   constructor() {
-    super((scope, out, color) => {
+    super((c, cursor, loc, colorId) => {
+      const color = c.getValue(colorId);
       if (!color) {
         throw new CompilerError(`Missing argument: color`);
       }
 
-      const outR = StoreValue.from(scope, extractDestrucuringOut(out, "r"));
-      const outG = StoreValue.from(scope, extractDestrucuringOut(out, "g"));
-      const outB = StoreValue.from(scope, extractDestrucuringOut(out, "b"));
-      const outA = StoreValue.from(scope, extractDestrucuringOut(out, "a"));
+      const outR = c.createImmutableId();
+      const outG = c.createImmutableId();
+      const outB = c.createImmutableId();
+      const outA = c.createImmutableId();
 
-      return [
+      cursor.addInstruction(
+        new NativeInstruction(
+          ["unpackcolor", outR, outG, outB, outA, colorId],
+          [colorId],
+          [outR, outG, outB, outA],
+          loc,
+        ),
+      );
+
+      return c.registerValue(
         new ObjectValue({
           r: outR,
           g: outG,
           b: outB,
           a: outA,
         }),
-        [new InstructionBase("unpackcolor", outR, outG, outB, outA, color)],
-      ];
+      );
     });
   }
 }

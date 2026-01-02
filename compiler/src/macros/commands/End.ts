@@ -1,8 +1,12 @@
-import { EndInstruction } from "../../instructions";
+import { EndInstruction } from "../../flow";
 import { MacroFunction } from "../Function";
 
-export class End extends MacroFunction<null> {
+export class End extends MacroFunction {
   constructor() {
-    super(() => [null, [new EndInstruction()]]);
+    super((c, cursor, node) => {
+      cursor.discardFollowing();
+      cursor.setEndInstruction(new EndInstruction(node));
+      return c.nullId;
+    });
   }
 }

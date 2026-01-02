@@ -1,72 +1,90 @@
 import { CompilerError } from "../CompilerError";
+import { ValueGetInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
 
 const noExternalModuleErrorMessage =
   "Cannot import values from modules that are not built into the compiler";
 
-export const ImportDeclaration: THandler<null> = (
+export const ImportDeclaration: THandler = (
   c,
   scope,
+  cursor,
   node: es.ImportDeclaration,
 ) => {
-  if (node.importKind === "type") return [null, []];
+  if (node.importKind === "type") return c.nullId;
 
   if (!(node.source.value in scope.builtInModules))
     throw new CompilerError(noExternalModuleErrorMessage);
 
   for (const specifier of node.specifiers) {
-    c.handle(scope, specifier, undefined, undefined, node.source.value);
+    c.handle(scope, cursor, specifier, undefined, node.source.value);
   }
-  return [null, []];
+  return c.nullId;
 };
 
-export const ImportDefaultSpecifier: THandler<null> = (
+export const ImportDefaultSpecifier: THandler = (
   c,
   scope,
+  cursor,
   node: es.ImportDefaultSpecifier,
-  out,
   source: string,
 ) => {
-  if (!(source in scope.builtInModules)) return [null, []];
+  if (!(source in scope.builtInModules)) return c.nullId;
   throw new CompilerError(`"${source}" does not have a default export`);
 };
 
-export const ImportNamespaceSpecifier: THandler<null> = (
+export const ImportNamespaceSpecifier: THandler = (
   c,
   scope,
+  cursor,
   node: es.ImportDefaultSpecifier,
-  out,
   source: string,
 ) => {
   scope.set(node.local.name, scope.builtInModules[source]);
 
-  return [null, []];
+  return c.nullId;
 };
 
-export const ImportSpecifier: THandler<null> = (
+export const ImportSpecifier: THandler = (
   c,
   scope,
+  cursor,
   node: es.ImportSpecifier,
-  out,
   source: string,
 ) => {
-  if (node.importKind === "type") return [null, []];
+  if (node.importKind === "type") return c.nullId;
 
-  const module = scope.builtInModules[source];
+  const moduleId = scope.builtInModules[source];
+  const module = c.getValue(moduleId)!;
   const { imported, local } = node;
   const importedName =
     imported.type === "Identifier" ? imported.name : imported.value;
 
   const key = new LiteralValue(importedName);
+  const keyId = c.registerValue(key);
 
-  if (!module.hasProperty(scope, key)) {
+  if (!module?.hasProperty(c, key)) {
     throw new CompilerError(
       `The requested module '${source}' does not provide an export named '${importedName}'`,
     );
   }
 
-  const [value] = module.get(scope, key);
-  scope.set(local.name, value);
-  return [null, []];
+  const out = c.createImmutableId();
+
+  cursor.addInstruction(
+    new ValueGetInstruction({
+      key: keyId,
+      object: moduleId,
+      out,
+      source: SourceRange.fromNode(node),
+    }),
+  );
+
+  //  TODO: update after dealing with object members
+  // const [value] = module.get(c,  key, );
+  // scope.set(local.name, value as any as number);
+  scope.set(local.name, out);
+  return c.nullId;
 };

@@ -1,61 +1,79 @@
+import { IBlockCursor } from "../../BlockCursor";
+import { ICompilerContext } from "../../CompilerContext";
 import { CompilerError } from "../../CompilerError";
-import { InstructionBase } from "../../instructions";
-import { IScope, IValue, TEOutput, TValueInstructions } from "../../types";
+import { ImmutableId, NativeInstruction } from "../../flow";
+import { SourceRange } from "../../SourceRange";
 import {
   LiteralValue,
   ObjectValue,
-  VoidValue,
   formatSenseablePropName,
 } from "../../values";
 import { MacroFunction } from "../Function";
+import { filterIds } from "../util";
 
 export class SetProp extends MacroFunction {
   constructor() {
-    super((scope, out, target) => {
+    super((c, cursor, loc, target) => {
       if (!target) throw new CompilerError("Missing argument: target");
 
-      return [new Settable(target), []];
+      return c.registerValue(new Settable(target));
     });
   }
 }
 
-class SettableEntry extends VoidValue {
-  macro = true;
-  constructor(
-    public target: IValue,
-    public prop: IValue,
-  ) {
-    super();
-  }
-
-  eval(scope: IScope, out?: TEOutput): TValueInstructions {
-    return this.target.get(scope, this.prop, out);
-  }
-
-  "="(scope: IScope, value: IValue): TValueInstructions {
-    let prop: string | IValue = this.prop;
-    if (prop instanceof LiteralValue && prop.isString())
-      prop = formatSenseablePropName(prop.data);
-    return [value, [new InstructionBase("setprop", prop, this.target, value)]];
-  }
-
-  debugString(): string {
-    return "SettableEntry";
-  }
-
-  toMlogString(): string {
-    return "[macro SettableEntry]";
-  }
-}
-
 class Settable extends ObjectValue {
-  constructor(public target: IValue) {
+  constructor(public target: ImmutableId) {
     super({});
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
-    const entry = new SettableEntry(this.target, key);
-    if (out) return entry.eval(scope, out);
-    return [entry, []];
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const value = c.getValueOrTemp(this.target);
+
+    return value.get(c, cursor, this.target, propId, loc);
+  }
+
+  set(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    valueId: ImmutableId,
+    loc: SourceRange,
+  ): void {
+    const prop = c.getValue(propId);
+
+    if (prop instanceof LiteralValue && prop.isString()) {
+      const key = formatSenseablePropName(prop.data);
+      cursor.addInstruction(
+        new NativeSetPropInstruction(this.target, key, valueId, loc),
+      );
+      return;
+    }
+
+    cursor.addInstruction(
+      new NativeSetPropInstruction(this.target, propId, valueId, loc),
+    );
+  }
+}
+
+class NativeSetPropInstruction extends NativeInstruction {
+  constructor(
+    public target: ImmutableId,
+    public prop: string | ImmutableId,
+    public value: ImmutableId,
+    loc: SourceRange,
+  ) {
+    super(
+      ["setprop", prop, target, value],
+      filterIds([target, prop, value]),
+      [],
+      loc,
+    );
   }
 }

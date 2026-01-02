@@ -1,93 +1,49 @@
-import { Compiler } from "../Compiler";
-import { JumpInstruction, AddressResolver } from "../instructions";
-import { EJumpKind } from "../instructions";
-import {
-  THandler,
-  es,
-  IInstruction,
-  EInstIntent,
-  IScope,
-  TValueInstructions,
-  IValue,
-  TLineRef,
-} from "../types";
-import { pipeInsts, withAlwaysRuns } from "../utils";
-import { LiteralValue } from "../values";
-import { JumpOutValue } from "../values/JumpOutValue";
+import { Block, BreakIfInstruction, BreakInstruction } from "../flow";
+import { negateValue } from "../flow/helper";
+import { SourceRange } from "../SourceRange";
+import { THandler, es } from "../types";
 
-export const IfStatement: THandler<null> = (c, scope, node: es.IfStatement) => {
-  const inst: IInstruction[] = [];
-  const endIfAddr = new LiteralValue(null);
-  const testOut = createJumpOut(c, scope, node, endIfAddr);
-  const mergedJumps = testOut.whenTrue;
-
-  const test = pipeInsts(c.handleEval(scope, node.test, testOut), inst);
-
-  if (test instanceof LiteralValue) {
-    if (test.data) return [null, c.handle(scope, node.consequent)[1]];
-    else if (node.alternate) return [null, c.handle(scope, node.alternate)[1]];
-    return [null, []];
-  }
-
-  const consequent: TValueInstructions<IValue | null> = !mergedJumps
-    ? withAlwaysRuns(c.handle(scope, node.consequent), false)
-    : [null, []];
-
-  inst.push(...JumpInstruction.or(test, testOut), ...consequent[1]);
-
-  if (!node.alternate) {
-    inst.push(new AddressResolver(endIfAddr));
-  } else {
-    const endElseAddr = new LiteralValue(null);
-    const needsJump = !endsWithControlFlow(consequent[1]) && !mergedJumps;
-
-    if (needsJump)
-      inst.push(new JumpInstruction(endElseAddr, EJumpKind.Always));
-
-    inst.push(
-      new AddressResolver(endIfAddr),
-      ...withAlwaysRuns(c.handle(scope, node.alternate), false)[1],
-    );
-
-    if (needsJump) inst.push(new AddressResolver(endElseAddr));
-  }
-  return [null, inst];
-};
-
-/**
- * Returns `true` if the instruction array ends with an instruction that already
- * changes the control flow of the script (like `jump x always`, `end` , `stop`,
- * etc)
- */
-function endsWithControlFlow(inst: IInstruction[]) {
-  for (let i = inst.length - 1; i >= 0; i--) {
-    const instruction = inst[i];
-    if (instruction instanceof AddressResolver) return false;
-    if (instruction.hidden) continue;
-
-    return instruction.intent !== EInstIntent.none;
-  }
-  return false;
-}
-
-function createJumpOut(
-  c: Compiler,
-  scope: IScope,
+export const IfStatement: THandler = (
+  c,
+  scope,
+  cursor,
   node: es.IfStatement,
-  endIfAddr: TLineRef,
-) {
-  const jumpNode = asMergeableJumpNode(node.consequent);
-  if (!jumpNode) return new JumpOutValue(node, endIfAddr, false);
-  const jump = c.handle(scope, jumpNode)[1][0] as JumpInstruction;
-  return new JumpOutValue(node, jump.address, true);
-}
+) => {
+  const test = c.handle(scope, cursor, node.test);
 
-function asMergeableJumpNode(
-  body: es.Statement,
-): es.BreakStatement | es.ContinueStatement | undefined {
-  if (body.type === "ContinueStatement" || body.type === "BreakStatement")
-    return body;
-  if (body.type !== "BlockStatement") return;
-  if (body.body.length == 0) return;
-  return asMergeableJumpNode(body.body[0]);
-}
+  const consequentBlock = new Block();
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
+
+  // usually results in better ordering of the generated mlog instructions
+  const notTest = negateValue(c, cursor, test, SourceRange.fromNode(node));
+
+  cursor.setEndInstruction(
+    new BreakIfInstruction(
+      notTest,
+      alternateBlock,
+      consequentBlock,
+      SourceRange.fromNode(node),
+    ),
+  );
+
+  cursor.currentBlock = consequentBlock;
+  c.handle(scope, cursor, node.consequent);
+  cursor.setEndInstruction(
+    new BreakInstruction(exitBlock, SourceRange.fromNode(node)),
+  );
+
+  cursor.currentBlock = alternateBlock;
+  if (node.alternate) {
+    c.handle(scope, cursor, node.alternate);
+  }
+  // this has to be done regardless because
+  // the alternate block has to be connected to the exit block
+  cursor.setEndInstruction(
+    new BreakInstruction(exitBlock, SourceRange.fromNode(node)),
+  );
+
+  cursor.currentBlock = exitBlock;
+
+  return c.nullId;
+};

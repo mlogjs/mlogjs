@@ -26,6 +26,7 @@ import {
 import { extractOutName } from "../utils";
 import { BaseValue, LiteralValue, ObjectValue, StoreValue } from "../values";
 import { MacroFunction } from "./Function";
+import { ICompilerContext } from "../CompilerContext";
 
 /**
  * The size of a dynamic array iteration item. Includes the set counter
@@ -49,7 +50,7 @@ export class DynamicArray extends ObjectValue {
   bundledFill = false;
 
   constructor(
-    public scope: IScope,
+    c: ICompilerContext,
     public name: string,
     public values: IValue[],
     public dynamic: boolean,
@@ -60,6 +61,26 @@ export class DynamicArray extends ObjectValue {
     const lengthName = getLengthName(name);
     const lengthStore = new StoreValue(lengthName);
     const sizeValue = new LiteralValue(values.length);
+
+    const fill = c.registerValue(
+      new MacroFunction((c, out, cursor, valueId) => {
+        if (!valueId) throw new CompilerError("Missing argument: value");
+        this.initFill();
+        const inst: IInstruction[] = [];
+
+        const returnAddress = new LiteralValue(null);
+        pipeInsts(values[0]["="](scope, value), inst);
+        pipeInsts(this.returnTemp["="](scope, returnAddress), inst);
+        inst.push(new JumpInstruction(this.fillAddr, EJumpKind.Always));
+        inst.push(new AddressResolver(returnAddress));
+        if (this.lengthStore) {
+          pipeInsts(
+            this.lengthStore["="](scope, new LiteralValue(values.length)),
+            inst,
+          );
+        }
+      }),
+    );
     super({
       fill: new MacroFunction(
         (scope, out, value) => {

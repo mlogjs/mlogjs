@@ -1,6 +1,6 @@
-import { SourceLocation } from "@babel/types";
 import { EInstIntent, IInstruction, IValue } from "../types";
 import { formatInstructionArgs } from "../utils";
+import { SourceRange } from "../SourceRange";
 
 export class InstructionBase implements IInstruction {
   intent = EInstIntent.none;
@@ -20,7 +20,7 @@ export class InstructionBase implements IInstruction {
 
   args: (string | IValue | null)[];
 
-  source?: SourceLocation;
+  source?: SourceRange;
 
   constructor(...args: (string | IValue | null)[]) {
     this.args = args;

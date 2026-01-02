@@ -1,18 +1,30 @@
-import { InstructionBase } from "../../instructions";
+import { ICompilerContext } from "../../CompilerContext";
+import { NativeInstruction } from "../../flow";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class Cutscene extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         pan: { named: "options", args: ["x", "y", "speed"] },
         zoom: { args: ["level"] },
         stop: { args: [] },
       },
-      handler(scope, overload, out, ...args) {
+      handler(c, overload, cursor, loc, ...args) {
         const params = Object.assign(["100", "100", "0.06", "0"], args);
-        return [null, [new InstructionBase("cutscene", overload, ...params)]];
+
+        cursor.addInstruction(
+          new NativeInstruction(
+            ["cutscene", overload, ...params],
+            filterIds(args),
+            [],
+            loc,
+          ),
+        );
+
+        return c.nullId;
       },
     });
     super(data);

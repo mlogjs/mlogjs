@@ -1,13 +1,17 @@
-import { InstructionBase } from "../instructions";
-import { IInstruction, IScope, IValue, TValueInstructions } from "../types";
-import { assertIsObjectMacro, assertObjectFields, pipeInsts } from "../utils";
-import { LiteralValue, ObjectValue, StoreValue, VoidValue } from "../values";
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
+import { CompilerError } from "../CompilerError";
+import { ImmutableId, isImmutableId, NativeInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
+import { assertIsObjectMacro, assertObjectFields } from "../utils";
+import { LiteralValue, ObjectValue } from "../values";
 import { MacroFunction } from "./Function";
-import { createOverloadNamespace } from "./util";
+import { createOverloadNamespace, filterIds } from "./util";
 
 export class MarkerConstructor extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         of: { args: ["id"] },
         shapeText: {
@@ -40,110 +44,159 @@ export class MarkerConstructor extends ObjectValue {
         },
       },
 
-      handler(scope, overload, out, ...args) {
+      handler(c, overload, cursor, loc, ...args) {
         // makemarker id line x y replace
-
-        const inst: IInstruction[] = [];
-        let id = args[0] as IValue;
-
+        let id = args[0] as ImmutableId;
         const rest = args.slice(1);
 
-        if (!(id instanceof LiteralValue)) {
-          // prevent mutations to the source
-          // from affecting the object's internal value
-          const store = StoreValue.from(scope);
-          pipeInsts(store["="](scope, id), inst);
-          id = store;
-        }
-        const marker = new MarkerMacro(id);
+        const marker = new MarkerMacro(c, id);
 
         if (overload !== "of") {
-          inst.push(new InstructionBase("makemarker", overload, id, ...rest));
+          cursor.addInstruction(
+            new NativeInstruction(
+              ["makemarker", overload, id, ...rest],
+              [id, ...filterIds(rest)],
+              [],
+              loc,
+            ),
+          );
         }
-        return [marker, inst];
+
+        return c.registerValue(marker);
       },
     });
     super(data);
   }
 }
 
+const setterArgMap: Record<
+  string,
+  {
+    props: string[];
+    modify?: (args: (ImmutableId | string)[]) => (ImmutableId | string)[];
+  }
+> = {
+  world: { props: [] },
+  minimap: { props: [] },
+  autoscale: { props: [] },
+  pos: { props: ["x", "y"] },
+  endPos: { props: ["x", "y"] },
+  drawLayer: { props: [] },
+  color: { props: [] },
+  radius: { props: [] },
+  stroke: { props: [] },
+  rotation: { props: [] },
+  shape: { props: ["sides", "fill", "outline"] },
+  fontSize: { props: [] },
+  textAlign: { props: [] },
+  lineAlign: { props: [] },
+  textHeight: { props: [] },
+  outline: { props: [] },
+  labelFlags: { props: ["background", "outline"] },
+  texture: {
+    props: [],
+    modify(args) {
+      return ["0", ...args];
+    },
+  },
+  textureSize: { props: ["width", "height"] },
+  posi: { props: ["index", "x", "y"] },
+  uvi: { props: ["index", "x", "y"] },
+  colori: { props: ["index", "color"] },
+};
+
 class MarkerMacro extends ObjectValue {
-  constructor(id: IValue) {
-    super({
-      remove: new MacroFunction(() => [null, [setmarker(id, "remove")]]),
-      world: new MarkerMacroSetter(id, "world"),
-      minimap: new MarkerMacroSetter(id, "minimap"),
-      autoscale: new MarkerMacroSetter(id, "autoscale"),
-      pos: new MarkerMacroSetter(id, "pos", ["x", "y"]),
-      endPos: new MarkerMacroSetter(id, "endPos", ["x", "y"]),
-      drawLayer: new MarkerMacroSetter(id, "drawLayer"),
-      color: new MarkerMacroSetter(id, "color"),
-      radius: new MarkerMacroSetter(id, "radius"),
-      stroke: new MarkerMacroSetter(id, "stroke"),
-      rotation: new MarkerMacroSetter(id, "rotation"),
-      shape: new MarkerMacroSetter(id, "shape", ["sides", "fill", "outline"]),
-      flushText: new MacroFunction((scope, out, options) => {
-        assertIsObjectMacro(options, "options");
-        const [fetch] = assertObjectFields(options, ["fetch"]);
-        return [null, [setmarker(id, "flushText", fetch)]];
-      }),
-      fontSize: new MarkerMacroSetter(id, "fontSize"),
-      textAlign: new MarkerMacroSetter(id, "textAlign"),
-      lineAlign: new MarkerMacroSetter(id, "lineAlign"),
-      textHeight: new MarkerMacroSetter(id, "textHeight"),
-      outline: new MarkerMacroSetter(id, "outline"),
-      labelFlags: new MarkerMacroSetter(id, "labelFlags", [
-        "background",
-        "outline",
-      ]),
-      texture: new MarkerMacroSetter(id, "texture", [], args => ["0", ...args]),
-      flushTexture: new MacroFunction(() => [
-        null,
-        [setmarker(id, "texture", "1")],
-      ]),
-      textureSize: new MarkerMacroSetter(id, "textureSize", [
-        "width",
-        "height",
-      ]),
-      posi: new MarkerMacroSetter(id, "posi", ["index", "x", "y"]),
-      uvi: new MarkerMacroSetter(id, "uvi", ["index", "x", "y"]),
-      colori: new MarkerMacroSetter(id, "colori", ["index", "color"]),
-    });
-  }
-}
-
-class MarkerMacroSetter extends VoidValue {
   constructor(
-    public id: IValue,
-    public prop: string,
-    public keys: string[] = [],
-    public modifyArgs?: (args: IValue[]) => (IValue | string)[],
+    c: ICompilerContext,
+    public markerId: ImmutableId,
   ) {
-    super();
+    super(
+      ObjectValue.autoRegisterData(c, {
+        remove: new MacroFunction((c, cursor, loc) => {
+          cursor.addInstruction(
+            new NativeSetMarkerInstruction(markerId, "remove", loc),
+          );
+          return c.nullId;
+        }),
+        flushText: new MacroFunction((c, cursor, loc, optionsId) => {
+          const options = c.getValue(optionsId);
+          assertIsObjectMacro(options, "options");
+          const [fetch] = assertObjectFields(c, options, ["fetch"]);
+          cursor.addInstruction(
+            new NativeSetMarkerInstruction(markerId, "flushText", loc, fetch),
+          );
+
+          return c.nullId;
+        }),
+        flushTexture: new MacroFunction((c, cursor, loc) => {
+          cursor.addInstruction(
+            new NativeSetMarkerInstruction(markerId, "texture", loc, "1"),
+          );
+          return c.nullId;
+        }),
+      }),
+    );
   }
 
-  "="(scope: IScope, value: IValue): TValueInstructions {
-    const inst: IInstruction[] = [];
+  set(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    valueId: ImmutableId,
+    loc: SourceRange,
+  ): void {
+    const key = c.getValue(propId);
+
+    if (key && super.hasProperty(c, key))
+      throw new CompilerError(
+        `The member [${key.debugString()}] is readonly in [${this.debugString()}]`,
+      );
+
+    if (
+      !(key instanceof LiteralValue) ||
+      !key.isString() ||
+      !(key.data in setterArgMap)
+    )
+      throw new CompilerError(
+        `The member [${key?.debugString()}] is not present in [${this.debugString()}]`,
+      );
+
+    const data = setterArgMap[key.data as keyof typeof setterArgMap];
+
     let args = [];
-    if (this.keys.length === 0) {
-      args.push(value);
+    if (data.props.length === 0) {
+      args.push(valueId);
     } else {
-      for (const key of this.keys) {
-        const member = pipeInsts(value.get(scope, new LiteralValue(key)), inst);
-        args.push(member);
+      const options = c.getValue(valueId)!;
+
+      for (const prop of data.props) {
+        const memberId = options.get(
+          c,
+          cursor,
+          valueId,
+          c.registerValue(new LiteralValue(prop)),
+          loc,
+        );
+        args.push(memberId);
       }
     }
 
-    if (this.modifyArgs) {
-      args = this.modifyArgs(args);
-    }
+    args = data.modify ? data.modify(args) : args;
 
-    inst.push(setmarker(this.id, this.prop, ...args));
-
-    return [value, inst];
+    cursor.addInstruction(
+      new NativeSetMarkerInstruction(this.markerId, key.data, loc, ...args),
+    );
   }
 }
 
-function setmarker(id: IValue, prop: string, ...args: (IValue | string)[]) {
-  return new InstructionBase("setmarker", prop, id, ...args);
+class NativeSetMarkerInstruction extends NativeInstruction {
+  constructor(
+    public id: ImmutableId,
+    public prop: string,
+    loc: SourceRange,
+    ...args: (ImmutableId | string)[]
+  ) {
+    super(["setmarker", prop, id, ...args], [id, ...filterIds(args)], [], loc);
+  }
 }

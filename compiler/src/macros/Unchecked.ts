@@ -3,12 +3,14 @@ import { MacroFunction } from "./Function";
 
 export class Unchecked extends MacroFunction {
   constructor() {
-    super((scope, out, expression) => [expression, []]);
+    super((c, cursor, loc, expression) => {
+      return expression;
+    });
   }
 
-  preCall(scope: IScope, out?: TEOutput): readonly TEOutput[] | undefined {
+  preCall(scope: IScope): readonly TEOutput[] | undefined {
     scope.checkIndexes = false;
-    if (out) return [out];
+    return undefined;
   }
 
   postCall(scope: IScope): void {

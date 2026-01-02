@@ -1,13 +1,11 @@
 import { camelToDashCase } from "../utils";
-import {
-  EMutability,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-} from "../types";
+import { EMutability, IValue } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
+import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId, LoadInstruction } from "../flow";
+import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 const dynamicVars = [
   "unit",
@@ -29,8 +27,16 @@ export class NamespaceMacro extends ObjectValue {
     this.changeCasing = changeCasing;
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
-    if (super.hasProperty(scope, key)) return super.get(scope, key, out);
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const key = c.getValue(propId);
+    if (key && super.hasProperty(c, key))
+      return super.get(c, cursor, targetId, propId, loc);
 
     if (!(key instanceof LiteralValue) || !key.isString())
       throw new CompilerError(
@@ -38,19 +44,31 @@ export class NamespaceMacro extends ObjectValue {
       );
     const symbolName = this.changeCasing ? camelToDashCase(key.data) : key.data;
 
-    if (dynamicVars.includes(symbolName)) {
-      return [
-        new StoreValue(`@${symbolName}`, EMutability.readonly, {
-          volatile: true,
-        }),
-        [],
-      ];
+    // if (dynamicVars.includes(symbolName)) {
+    //   return [
+    //     new StoreValue(`@${symbolName}`, EMutability.readonly, {
+    //       volatile: true,
+    //     }),
+    //     [],
+    //   ];
+    // }
+
+    const out = c.createImmutableId();
+    if (!dynamicVars.includes(symbolName)) {
+      c.setValue(out, new StoreValue(`@${symbolName}`, EMutability.constant));
+    } else {
+      const globalId = c.createGlobalId();
+      c.setValue(
+        globalId,
+        new StoreValue(`@${symbolName}`, EMutability.readonly),
+      );
+      cursor.addInstruction(new LoadInstruction(globalId, out, loc));
     }
 
-    return [new StoreValue(`@${symbolName}`, EMutability.constant), []];
+    return out;
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     return prop instanceof LiteralValue && prop.isString();
   }
 }
@@ -66,14 +84,23 @@ export class ColorsNamespace extends NamespaceMacro {
     super();
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const key = c.getValue(propId);
+    if (key && super.hasProperty(c, key))
+      return super.get(c, cursor, targetId, propId, loc);
     if (!(key instanceof LiteralValue) || !key.isString())
-      return super.get(scope, key, out);
+      return super.get(c, cursor, targetId, propId, loc);
+
     const plainName = key.data;
 
     const name = `@color${plainName[0].toUpperCase()}${plainName.slice(1)}`;
-    const result = new StoreValue(name, EMutability.constant);
-    return [result, []];
+    return c.registerValue(new StoreValue(name, EMutability.constant));
   }
 }
 
@@ -82,12 +109,22 @@ export class SoundsNamespace extends NamespaceMacro {
     super();
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const key = c.getValue(propId);
+    if (key && super.hasProperty(c, key))
+      return super.get(c, cursor, targetId, propId, loc);
+
     if (!(key instanceof LiteralValue) || !key.isString())
-      return super.get(scope, key, out);
+      return super.get(c, cursor, targetId, propId, loc);
 
     const result = new StoreValue(`@sfx-${key.data}`, EMutability.constant);
 
-    return [result, []];
+    return c.registerValue(result);
   }
 }

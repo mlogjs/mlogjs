@@ -1,65 +1,81 @@
-import { es, IInstruction, IValue, THandler } from "../types";
-import { pipeInsts } from "../utils";
+import { CallInstruction } from "../flow";
+import { ImmutableId } from "../flow/id";
+import { SourceRange } from "../SourceRange";
+import { es, THandler } from "../types";
 import { LiteralValue, ObjectValue } from "../values";
 
-export const CallExpression: THandler<IValue | null> = (
+export const CallExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.CallExpression,
-  out,
 ) => {
-  const inst: IInstruction[] = [];
+  const callee = c.handle(scope, cursor, node.callee);
 
-  const callee = pipeInsts(c.handleEval(scope, node.callee), inst);
-
-  const paramOuts = callee.preCall(scope, out);
-
-  const args = node.arguments.map((node, index) => {
-    const out = paramOuts?.[index];
-    return pipeInsts(c.handleEval(scope, node, out), inst);
+  const calleeValue = c.getValue(callee);
+  calleeValue?.preCall(scope);
+  const args = node.arguments.map(node => {
+    return c.handle(scope, cursor, node);
   });
+  calleeValue?.postCall(scope);
 
-  const callValue = pipeInsts(callee.call(scope, args, out), inst);
+  const out = c.createImmutableId();
+  cursor.addInstruction(
+    new CallInstruction(callee, args, out, SourceRange.fromNode(node)),
+  );
 
-  callee.postCall(scope);
-
-  return [callValue, inst];
+  return out;
 };
 
 export const NewExpression = CallExpression;
 
-export const TaggedTemplateExpression: THandler<IValue | null> = (
+export const TaggedTemplateExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.TaggedTemplateExpression,
-  out,
 ) => {
-  const [tag, tagInst] = c.handleEval(scope, node.tag);
+  //  TODO: handle nested properties of object values
+  const tag = c.handle(scope, cursor, node.tag);
 
   const template = node.quasi;
 
   const stringsObject = ObjectValue.fromArray(
-    template.quasis.map(quasi => new LiteralValue(quasi.value.cooked ?? "")),
+    c,
+    template.quasis.map(quasi =>
+      c.registerValue(new LiteralValue(quasi.value.cooked ?? "")),
+    ),
     {
-      raw: ObjectValue.fromArray(
-        template.quasis.map(quasi => new LiteralValue(quasi.value.raw)),
+      raw: c.registerValue(
+        ObjectValue.fromArray(
+          c,
+          template.quasis.map(quasi =>
+            c.registerValue(new LiteralValue(quasi.value.raw)),
+          ),
+        ),
       ),
     },
   );
 
-  const expressions: IValue[] = [];
-  const expressionInsts: IInstruction[] = [];
+  const stringsObjectId = c.registerValue(stringsObject);
+
+  const expressions: ImmutableId[] = [];
 
   template.expressions.forEach(expression => {
-    const value = pipeInsts(c.handleEval(scope, expression), expressionInsts);
+    const value = c.handle(scope, cursor, expression);
+
     expressions.push(value);
   });
 
-  const [result, resultInst] = tag.call(
-    scope,
-    [stringsObject, ...expressions],
-    out,
+  const out = c.createImmutableId();
+  cursor.addInstruction(
+    new CallInstruction(
+      tag,
+      [stringsObjectId, ...expressions],
+      out,
+      SourceRange.fromNode(node),
+    ),
   );
 
-  return [result, [...expressionInsts, ...tagInst, ...resultInst]];
+  return out;
 };

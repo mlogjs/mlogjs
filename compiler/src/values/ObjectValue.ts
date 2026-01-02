@@ -1,16 +1,14 @@
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import {
-  EMutability,
-  IScope,
-  IValue,
-  TEOutput,
-  TValueInstructions,
-} from "../types";
+import { ImmutableId } from "../flow/id";
+import { SourceRange } from "../SourceRange";
+import { EMutability, IValue, TValueInstructions } from "../types";
 import { LiteralValue } from "./LiteralValue";
 import { VoidValue } from "./VoidValue";
 
 export interface IObjectValueData {
-  [k: string]: IValue;
+  [k: string]: ImmutableId;
 }
 export class ObjectValue extends VoidValue {
   mutability = EMutability.constant;
@@ -22,13 +20,22 @@ export class ObjectValue extends VoidValue {
     this.data = data;
   }
 
+  static autoRegisterData(c: ICompilerContext, data: Record<string, IValue>) {
+    const result: IObjectValueData = {};
+    for (const key in data) {
+      result[key] = c.registerValue(data[key]);
+    }
+    return result;
+  }
+
   static fromArray(
+    c: ICompilerContext,
     items: IObjectValueData[keyof IObjectValueData][],
     initialData?: IObjectValueData,
   ): ObjectValue {
     const data: IObjectValueData = {
       ...initialData,
-      length: new LiteralValue(items.length),
+      length: c.registerValue(new LiteralValue(items.length)),
     };
     items.forEach((item, i) => {
       if (item) data[i] = item;
@@ -36,23 +43,29 @@ export class ObjectValue extends VoidValue {
     return new ObjectValue(data);
   }
 
-  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
+    const key = c.getValueOrTemp(propId);
     if (key instanceof LiteralValue && (key.isNumber() || key.isString())) {
       // avoids naming collisions with keys like
       // constructor or toString
       if (Object.prototype.hasOwnProperty.call(this.data, key.data)) {
-        const member = this.data[key.data];
-        if (out) return member.eval(scope, out);
-        return [member, []];
+        return this.data[key.data];
       }
     }
 
     throw new CompilerError(
       `The member [${key.debugString()}] is not present in [${this.debugString()}]`,
+      loc,
     );
   }
 
-  hasProperty(scope: IScope, prop: IValue): boolean {
+  hasProperty(c: ICompilerContext, prop: IValue): boolean {
     if (prop instanceof LiteralValue && (prop.isNumber() || prop.isString())) {
       const hasMember = Object.prototype.hasOwnProperty.call(
         this.data,

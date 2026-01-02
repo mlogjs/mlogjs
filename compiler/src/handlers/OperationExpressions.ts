@@ -1,297 +1,376 @@
+import { IBlockCursor } from "../BlockCursor";
+import { ICompilerContext } from "../CompilerContext";
 import { CompilerError } from "../CompilerError";
-import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
 import {
-  AssignementOperator,
-  BinaryOperator,
-  LogicalOperator,
-  orderIndependentOperators,
-} from "../operators";
-import {
-  THandler,
-  es,
-  IInstruction,
-  EMutability,
-  IValue,
-  TEOutput,
-  TLineRef,
-} from "../types";
-import { discardedName, pipeInsts } from "../utils";
-import { LazyValue, LiteralValue, StoreValue } from "../values";
-import { JumpOutValue } from "../values/JumpOutValue";
+  AllocLocalInstruction,
+  BinaryOperationInstruction,
+  Block,
+  BreakIfInstruction,
+  BreakInstruction,
+  ImmutableId,
+  LoadInstruction,
+  StoreInstruction,
+  TBinaryOperationType,
+  UnaryOperatorInstruction,
+} from "../flow";
+import { AssignmentOperator } from "../operators";
+import { SourceRange } from "../SourceRange";
+import { THandler, es } from "../types";
+import { LiteralValue } from "../values";
 
-export const LRExpression: THandler = (
-  c,
-  scope,
-  node: {
-    left: es.Node;
-    right: es.Node;
-    operator: BinaryOperator | LogicalOperator;
-  },
-  out,
-) => {
-  const [left, leftInst] = c.handleEval(scope, node.left);
-  const [right, rightInst] = c.handleEval(scope, node.right);
-
-  if (!(left instanceof LiteralValue) || !(right instanceof LiteralValue)) {
-    const cachedResult = scope.getCachedOperation(node.operator, left, right);
-    if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
-
-    // because a * b is the same as b * a
-    if (orderIndependentOperators.includes(node.operator)) {
-      const cachedResult = scope.getCachedOperation(node.operator, right, left);
-      if (cachedResult) return [cachedResult, [...leftInst, ...rightInst]];
-    }
-  }
-
-  const [op, opInst] = left[node.operator](scope, right, out);
-
-  if (!(op instanceof LiteralValue)) {
-    scope.addCachedOperation(node.operator, op, left, right);
-  }
-
-  return [op, [...leftInst, ...rightInst, ...opInst]];
+const binaryOperatorMap: Partial<
+  Record<es.BinaryExpression["operator"], TBinaryOperationType>
+> = {
+  "!=": "notEqual",
+  "==": "equal",
+  "===": "strictEqual",
+  ">=": "greaterThanEq",
+  ">": "greaterThan",
+  "<=": "lessThanEq",
+  "<": "lessThan",
+  "+": "add",
+  "-": "sub",
+  "*": "mul",
+  "/": "div",
+  "%": "mod",
+  "**": "pow",
+  "&": "land",
+  "|": "or",
+  "^": "xor",
+  "<<": "shl",
+  ">>": "shr",
+  ">>>": "ushr",
 };
 
-export const BinaryExpression: THandler = LRExpression;
+export const BinaryExpression: THandler = (
+  c,
+  scope,
+  cursor,
+  node: es.BinaryExpression,
+) => {
+  const left = c.handle(scope, cursor, node.left);
+  const right = c.handle(scope, cursor, node.right);
+  const operator = node.operator;
+
+  return binaryExpression(
+    c,
+    cursor,
+    operator,
+    left,
+    right,
+    SourceRange.fromNode(node),
+  );
+};
+
 export const LogicalExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.LogicalExpression,
-  out,
-  arg?: {
-    onNonNullishAddress?: TLineRef;
-    onFalsyAddress?: TLineRef;
-    onTruthyAddress?: TLineRef;
-  },
 ) => {
-  // TODO: these expressions can be optimized
-  // to skip some jump checks inside if statements.
-  // Remove this comment if this optimization is
-  // really not necessary
-
-  type THandlerArg = typeof arg;
-
-  // patch to prevent the jump out value
-  // from being double-used later in the handler
-  if (out instanceof JumpOutValue) {
-    out = StoreValue.from(scope);
-  }
-
-  let leftNodeArg: THandlerArg;
-  let rightNodeArg: THandlerArg;
-  let operatorAddress: TLineRef;
-  let afterRightAddress: TLineRef | undefined;
-  let beforeRightAddress: TLineRef | undefined;
-
-  switch (node.operator) {
-    case "||": {
-      const {
-        onFalsyAddress = new LiteralValue(null),
-        onTruthyAddress = new LiteralValue(null),
-      } = arg ?? {};
-      leftNodeArg = {
-        onTruthyAddress,
-        onFalsyAddress,
-      };
-      rightNodeArg = { onTruthyAddress };
-      operatorAddress = onTruthyAddress;
-      if (!arg?.onFalsyAddress) beforeRightAddress = onFalsyAddress;
-      if (!arg?.onTruthyAddress) afterRightAddress = onTruthyAddress;
-      break;
-    }
-    case "&&": {
-      const {
-        onFalsyAddress = new LiteralValue(null),
-        onTruthyAddress = new LiteralValue(null),
-      } = arg ?? {};
-      leftNodeArg = { onTruthyAddress, onFalsyAddress };
-      rightNodeArg = { onFalsyAddress };
-      operatorAddress = onFalsyAddress;
-      if (!arg?.onTruthyAddress) beforeRightAddress = onTruthyAddress;
-      if (!arg?.onFalsyAddress) afterRightAddress = onFalsyAddress;
-      break;
-    }
-    case "??": {
-      const { onNonNullishAddress = new LiteralValue(null) } = arg ?? {};
-      leftNodeArg = {
-        onNonNullishAddress,
-        onTruthyAddress: onNonNullishAddress,
-      };
-      rightNodeArg = {
-        onNonNullishAddress,
-        onTruthyAddress: onNonNullishAddress,
-      };
-      operatorAddress = onNonNullishAddress;
-      if (!arg?.onNonNullishAddress) afterRightAddress = onNonNullishAddress;
-      break;
-    }
-  }
-
-  const other = new LazyValue((scope, out) => {
-    const [value, inst] = c.handleEval(
-      scope,
-      node.right,
-      out,
-      node.right.type === "LogicalExpression" ? rightNodeArg : undefined,
-    );
-    if (!beforeRightAddress) return [value, inst];
-    return [value, [new AddressResolver(beforeRightAddress), ...inst]];
-  });
-
-  const [left, leftInst] = c.handleEval(
-    scope,
-    node.left,
-    out,
-    node.left.type === "LogicalExpression" ? leftNodeArg : undefined,
+  const left = c.handle(scope, cursor, node.left);
+  return logicalExpression(
+    c,
+    cursor,
+    node.operator,
+    left,
+    () => c.handle(scope, cursor, node.right),
+    SourceRange.fromNode(node),
   );
-
-  // patch for situations where `left` is a temporary value and `out` is `undefined`
-  // since `out` is undefined there is potential for up to three temp values
-  // to be created. So to prevent that we will try to reuse `left` as an out value
-  // whenever possible
-  const resultOut = reuseTemporaryValue(left, out);
-
-  const [result, resultInst] = left[node.operator](
-    scope,
-    other,
-    resultOut,
-    operatorAddress,
-  );
-
-  return [
-    result,
-    [
-      ...leftInst,
-      ...resultInst,
-      ...(afterRightAddress ? [new AddressResolver(afterRightAddress)] : []),
-    ],
-  ];
 };
 
-const logicalAssignmentOperators: AssignementOperator[] = ["??=", "||=", "&&="];
+type TrimmedOperator<T extends string> = T extends `${infer U}=` ? U : never;
 
 export const AssignmentExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.AssignmentExpression & {
-    operator: AssignementOperator;
+    operator: AssignmentOperator;
   },
 ) => {
-  const [left, leftInst] = c.handleValue(scope, node.left);
+  // TODO: support the other assignment operators
+  const handler = c.handleWriteable(scope, cursor, node.left);
 
-  const leftOutput = left.toOut();
-  const [right, rightInst] = !logicalAssignmentOperators.includes(node.operator)
-    ? c.handleEval(
-        scope,
-        node.right,
-        node.operator === "=" ? leftOutput : undefined,
-      )
-    : [new LazyValue((scope, out) => c.handleEval(scope, node.right, out)), []];
+  const operator = node.operator;
 
-  const [op, opInst] = left[node.operator](scope, right);
-  scope.clearDependentCache(left);
-  scope.clearDependentCache(leftOutput);
-  return [op, [...leftInst, ...rightInst, ...opInst]];
+  let value: ImmutableId;
+  switch (node.operator) {
+    case "=": {
+      value = c.handle(scope, cursor, node.right);
+      break;
+    }
+    case "??=":
+    case "||=":
+    case "&&=": {
+      const left = handler.read();
+      value = logicalExpression(
+        c,
+        cursor,
+        operator.slice(0, 2) as es.LogicalExpression["operator"],
+        left,
+        () => c.handle(scope, cursor, node.right),
+        SourceRange.fromNode(node),
+      );
+      break;
+    }
+    case "%=":
+    case "*=":
+    case "+=":
+    case "-=":
+    case "/=":
+    case "<<=":
+    case ">>=":
+    case ">>>=":
+    case "&=":
+    case "^=":
+    case "**=":
+    case "|=": {
+      const left = handler.read();
+      const right = c.handle(scope, cursor, node.right);
+
+      value = binaryExpression(
+        c,
+        cursor,
+        operator.slice(0, -1) as es.BinaryExpression["operator"],
+        left,
+        right,
+        SourceRange.fromNode(node),
+      );
+    }
+  }
+
+  handler.write(value, node);
+  return value;
 };
 
 export const UnaryExpression: THandler = (
   c,
   scope,
-  { argument, operator }: es.UnaryExpression,
-  out,
+  cursor,
+  node: es.UnaryExpression,
 ) => {
-  const [arg, argInst] = c.handleEval(scope, argument);
+  const out = c.createImmutableId();
+  const value = c.handle(scope, cursor, node.argument);
+  const loc = SourceRange.fromNode(node);
 
-  const cachedResult = scope.getCachedOperation(operator, arg);
-  if (cachedResult) return [cachedResult, argInst];
-
-  const operatorId =
-    operator == "+" || operator == "-" ? (`u${operator}` as const) : operator;
-  if (operatorId === "throw")
-    throw new CompilerError("throw operator is not supported");
-
-  const [op, opInst] = arg[operatorId](scope, out);
-  scope.addCachedOperation(operator, op, arg);
-  return [op, [...argInst, ...opInst]];
+  switch (node.operator) {
+    case "void":
+      return c.nullId;
+    case "!":
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "equal",
+          value,
+          c.registerValue(new LiteralValue(0)),
+          out,
+          loc,
+        ),
+      );
+      break;
+    case "+":
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "add",
+          value,
+          c.registerValue(new LiteralValue(0)),
+          out,
+          loc,
+        ),
+      );
+      break;
+    case "-":
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "sub",
+          c.registerValue(new LiteralValue(0)),
+          value,
+          out,
+          loc,
+        ),
+      );
+      break;
+    case "~":
+      cursor.addInstruction(
+        new UnaryOperatorInstruction("not", value, out, loc),
+      );
+      break;
+    case "throw":
+    case "delete":
+    case "typeof":
+      throw new CompilerError(
+        `The operator "${node.operator}" is not supported`,
+      );
+  }
+  return out;
 };
 export const UpdateExpression: THandler = (
   c,
   scope,
-  { argument, operator, prefix }: es.UpdateExpression,
-  out,
+  cursor,
+  node: es.UpdateExpression,
 ) => {
-  const [arg, argInst] = c.handleValue(scope, argument);
+  const handler = c.handleWriteable(scope, cursor, node.argument);
 
-  scope.clearDependentCache(arg);
-  const [op, opInst] = arg[operator](scope, prefix, out);
-  return [op, [...argInst, ...opInst]];
+  const oldValue = handler.read();
+  const newValue = c.createImmutableId();
+  const one = c.registerValue(new LiteralValue(1));
+  const loc = SourceRange.fromNode(node);
+
+  cursor.addInstruction(
+    new BinaryOperationInstruction(
+      node.operator === "++" ? "add" : "sub",
+      oldValue,
+      one,
+      newValue,
+      loc,
+    ),
+  );
+  handler.write(newValue, node);
+
+  if (node.prefix) return newValue;
+  return oldValue;
 };
 
 // TODO: use the select instruction once we have an optimizer
 export const ConditionalExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.ConditionalExpression,
-  out,
 ) => {
-  const alternateStartAdress = new LiteralValue(null);
-  const endExpressionAdress = new LiteralValue(null);
+  const testBlock = new Block();
+  const consequentBlock = new Block();
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
+  const loc = SourceRange.fromNode(node);
 
-  const testOut = new JumpOutValue(node, alternateStartAdress, false);
-  const [test, testInst] = c.handleEval(scope, node.test, testOut);
+  const out = c.createGlobalId();
+  cursor.addInstruction(new AllocLocalInstruction(out, loc));
 
-  if (test instanceof LiteralValue) {
-    if (test.data) return c.handleEval(scope, node.consequent, out);
-    return c.handleEval(scope, node.alternate, out);
-  }
+  cursor.connectBlock(testBlock, loc);
+  const test = c.handle(scope, cursor, node.test);
+  cursor.setEndInstruction(
+    new BreakIfInstruction(test, consequentBlock, alternateBlock, loc),
+  );
 
-  const result = StoreValue.from(scope, out);
+  cursor.currentBlock = consequentBlock;
+  const consequent = c.handle(scope, cursor, node.consequent);
+  cursor.addInstruction(new StoreInstruction(out, consequent, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
 
-  const consequent = c.handleEval(scope, node.consequent, result);
-  const alternate = c.handleEval(scope, node.alternate, result);
+  cursor.currentBlock = alternateBlock;
+  const alternate = c.handle(scope, cursor, node.alternate);
+  cursor.addInstruction(new StoreInstruction(out, alternate, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
 
-  return [
-    result,
-    [
-      ...testInst,
-      ...JumpInstruction.or(test, testOut),
-      ...consequent[1],
-      ...result["="](scope, consequent[0])[1],
-      new JumpInstruction(endExpressionAdress, EJumpKind.Always),
-      new AddressResolver(alternateStartAdress),
-      ...alternate[1],
-      ...result["="](scope, alternate[0])[1],
-      new AddressResolver(endExpressionAdress),
-    ],
-  ];
+  cursor.currentBlock = exitBlock;
+  const immutableOut = c.createImmutableId();
+  cursor.addInstruction(new LoadInstruction(out, immutableOut, loc));
+
+  return immutableOut;
 };
 
 export const SequenceExpression: THandler = (
   c,
   scope,
+  cursor,
   node: es.SequenceExpression,
-  out,
 ) => {
   const { expressions } = node;
-  const inst: IInstruction[] = [];
 
   // compute every expression except the last one
   for (let i = 0; i < expressions.length - 1; i++) {
-    pipeInsts(c.handleEval(scope, expressions[i], discardedName), inst);
+    c.handle(scope, cursor, expressions[i]);
   }
 
-  const value = pipeInsts(
-    c.handleEval(scope, expressions[expressions.length - 1], out),
-    inst,
-  );
-
-  return [value, inst];
+  return c.handle(scope, cursor, expressions[expressions.length - 1]);
 };
 
-function reuseTemporaryValue(value: IValue, out?: TEOutput) {
-  if (value instanceof StoreValue && value.temporary)
-    return new StoreValue(value.name, EMutability.mutable, {
-      temporary: true,
-    });
+function binaryExpression(
+  c: ICompilerContext,
+  cursor: IBlockCursor,
+  operator: es.BinaryExpression["operator"],
+  left: ImmutableId,
+  right: ImmutableId,
+  loc: SourceRange,
+) {
+  const out = c.createImmutableId();
+
+  if (operator === "!==") {
+    const temp = c.createImmutableId();
+    const zero = c.registerValue(new LiteralValue(0));
+    cursor.addInstruction(
+      new BinaryOperationInstruction("strictEqual", left, right, temp, loc),
+    );
+    cursor.addInstruction(
+      new BinaryOperationInstruction("equal", temp, zero, out, loc),
+    );
+    return out;
+  }
+
+  const type = binaryOperatorMap[operator];
+  if (!type)
+    throw new CompilerError(`The operator ${operator} is not supported`);
+
+  cursor.addInstruction(
+    new BinaryOperationInstruction(type, left, right, out, loc),
+  );
+
   return out;
+}
+
+function logicalExpression(
+  c: ICompilerContext,
+  cursor: IBlockCursor,
+  operator: es.LogicalExpression["operator"],
+  left: ImmutableId,
+  handleRight: () => ImmutableId,
+  loc: SourceRange,
+) {
+  const out = c.createGlobalId();
+  cursor.addInstruction(new AllocLocalInstruction(out, loc));
+  const alternateBlock = new Block();
+  const exitBlock = new Block();
+
+  cursor.addInstruction(new StoreInstruction(out, left, loc));
+  switch (operator) {
+    case "&&":
+      cursor.setEndInstruction(
+        new BreakIfInstruction(left, alternateBlock, exitBlock, loc),
+      );
+      break;
+    case "||":
+      cursor.setEndInstruction(
+        new BreakIfInstruction(left, exitBlock, alternateBlock, loc),
+      );
+      break;
+    case "??": {
+      const test = c.createImmutableId();
+      cursor.addInstruction(new StoreInstruction(out, left, loc));
+      cursor.addInstruction(
+        new BinaryOperationInstruction(
+          "strictEqual",
+          left,
+          c.nullId,
+          test,
+          loc,
+        ),
+      );
+      cursor.setEndInstruction(
+        new BreakIfInstruction(test, alternateBlock, exitBlock, loc),
+      );
+    }
+  }
+
+  cursor.currentBlock = alternateBlock;
+  const right = handleRight();
+  cursor.addInstruction(new StoreInstruction(out, right, loc));
+  cursor.setEndInstruction(new BreakInstruction(exitBlock, loc));
+
+  cursor.currentBlock = exitBlock;
+  const immutableOut = c.createImmutableId();
+  cursor.addInstruction(new LoadInstruction(out, immutableOut, loc));
+
+  return immutableOut;
 }

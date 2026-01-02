@@ -1,86 +1,86 @@
 import { CompilerError } from "../CompilerError";
-import {
-  AddressResolver,
-  BreakInstruction,
-  ContinueInstruction,
-} from "../instructions";
-import { es, IScope, IValue, THandler } from "../types";
-import { discardedName, usesAddressResolver } from "../utils";
-import { LazyValue, LiteralValue } from "../values";
+import { Block, BreakInstruction, ReturnInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
+import { es, IScope, THandler } from "../types";
 
-export const ExpressionStatement: THandler<IValue | null> = (
+export const ExpressionStatement: THandler = (
   c,
   scope,
+  cursor,
   node: es.ExpressionStatement,
 ) => {
-  return c.handle(scope, node.expression, undefined, discardedName);
+  return c.handle(scope, cursor, node.expression);
 };
 
-export const BreakStatement: THandler<null> = (
-  _,
+export const BreakStatement: THandler = (
+  c,
   scope,
+  cursor,
   node: es.BreakStatement,
 ) => {
   const label = node.label?.name;
 
-  const target = label ? findScopeLabel(scope, label) : scope;
-  const addr = new LiteralValue(null);
-  target.break.bind(addr);
+  const target = findScopeLabel(scope, label);
+  cursor.setEndInstruction(
+    new BreakInstruction(target.break, SourceRange.fromNode(node)),
+  );
 
-  return [null, [new BreakInstruction(addr)]];
+  return c.nullId;
 };
 
-export const ContinueStatement: THandler<null> = (
-  _,
+export const ContinueStatement: THandler = (
+  c,
   scope,
+  cursor,
   node: es.ContinueStatement,
 ) => {
-  const addr = new LiteralValue(null);
-
   const label = node.label?.name;
 
-  const target = label ? findScopeLabel(scope, label) : scope;
-  target.continue.bind(addr);
+  const target = findScopeLabel(scope, label);
+  cursor.setEndInstruction(
+    new BreakInstruction(target.continue, SourceRange.fromNode(node)),
+  );
 
-  return [null, [new ContinueInstruction(addr)]];
+  return c.nullId;
 };
 
-export const ReturnStatement: THandler<IValue | null> = (
+export const ReturnStatement: THandler = (
   c,
   scope,
+  cursor,
   node: es.ReturnStatement,
-  out,
 ) => {
-  const { argument } = node;
+  const arg = node.argument ? c.handle(scope, cursor, node.argument) : c.nullId;
 
-  const [arg, argInst] = argument
-    ? [new LazyValue((scope, out) => c.handleEval(scope, argument, out)), []]
-    : [new LiteralValue(null), []];
-  const [ret, retInst] = scope.function.return(scope, arg, out);
-  return [ret, [...argInst, ...retInst]];
+  // TODO: handle return value
+  cursor.setEndInstruction(
+    new ReturnInstruction(arg, SourceRange.fromNode(node)),
+  );
+  return c.nullId;
 };
 
-export const EmptyStatement: THandler<null> = () => [null, []];
+export const EmptyStatement: THandler = c => c.nullId;
 
-export const LabeledStatement: THandler<null> = (
+export const LabeledStatement: THandler = (
   c,
   scope,
+  cursor,
   node: es.LabeledStatement,
 ) => {
+  const afterLabelBlock = new Block();
+
   const inner = scope.createScope();
   inner.label = node.label.name;
+  inner.break = afterLabelBlock;
 
-  const end = new LiteralValue(null);
-  const endAdress = new AddressResolver(end).bindBreak(inner);
+  c.handle(inner, cursor, node.body);
 
-  const [, bodyInst] = c.handle(inner, node.body);
+  cursor.connectBlock(afterLabelBlock, SourceRange.fromNode(node));
 
-  if (usesAddressResolver(endAdress, bodyInst)) bodyInst.push(endAdress);
-
-  return [null, bodyInst];
+  return c.nullId;
 };
 
-function findScopeLabel(scope: IScope, label: string) {
+function findScopeLabel(scope: IScope, label: string | undefined) {
   let current: IScope | null = scope;
   while (current !== null) {
     if (current.label === label) return current;

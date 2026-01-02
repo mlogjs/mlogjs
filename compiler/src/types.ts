@@ -1,7 +1,10 @@
 export * as es from "@babel/types";
 import * as es from "@babel/types";
-import { Compiler } from "./Compiler";
-import { AddressResolver } from "./instructions";
+import { Block } from "./flow";
+import { ICompilerContext } from "./CompilerContext";
+import { ImmutableId, ValueId } from "./flow/id";
+import { IBlockCursor } from "./BlockCursor";
+import { SourceRange } from "./SourceRange";
 
 export enum EInstIntent {
   none,
@@ -29,7 +32,7 @@ export interface IInstruction {
    */
   ignoredByParser: boolean;
   resolve(i: number): void;
-  source?: es.SourceLocation;
+  source?: SourceRange;
   /**
    * Helps analyzing control flow, handlers should indicate which instructions
    * returned are guaranteed to run
@@ -49,16 +52,49 @@ export interface IInstruction {
  */
 export type TEOutput = IValue | string;
 
-export type THandler<T extends IValue | null = IValue> = (
-  compiler: Compiler,
-  scope: IScope,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  node: any,
-  out: TEOutput | undefined,
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  arg: any,
-) => TValueInstructions<T>;
+export interface IWriteableHandler {
+  read(): ImmutableId;
+  write(value: ImmutableId, callerNode: es.Node): void;
+}
 
+export type TDeclareCallback = (
+  init: ImmutableId | undefined,
+  callerNode: es.Node,
+) => void;
+
+export type TDeclarationKind = "var" | "let" | "const";
+
+export type THandler = {
+  (
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    cursor: IBlockCursor,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    arg: any,
+  ): ImmutableId;
+
+  handleWriteable?(
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    cursor: IBlockCursor,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    arg: any,
+  ): IWriteableHandler;
+
+  handleDeclaration?(
+    compilerContext: ICompilerContext,
+    scope: IScope,
+    cursor: IBlockCursor,
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    node: any,
+    kind: TDeclarationKind,
+    init?: ImmutableId,
+  ): void;
+};
 /**
  * The scope manages the source code generated variables and their owners, as
  * well as break and continue statements and they also work as function bodies.
@@ -67,7 +103,7 @@ export interface IScope {
   /** Every scope except the top level one has a parent */
   parent: IScope | null;
   /** The registry of variables contained by this scope */
-  data: Record<string, IValue | null>;
+  data: Record<string, ValueId>;
   name: string;
   /**
    * Additional instructions required by this scope, such as the instructions
@@ -77,9 +113,9 @@ export interface IScope {
   /** The label applied to this scope */
   label?: string;
   /** Where to jump to on a break statement */
-  break: AddressResolver;
+  break: Block;
   /** Where to jump to on a continue statement */
-  continue: AddressResolver;
+  continue: Block;
   /**
    * The function linked to `this`, is `null` when the scope is not inside a
    * function.
@@ -88,14 +124,6 @@ export interface IScope {
   /** Counts the number of temp variables generated during compilaton */
   ntemp: number;
 
-  /**
-   * A record of the cached value operations, maps the id of an operation to a
-   * previously computed value.
-   */
-  operationCache: Record<string, IValue>;
-
-  /** Tracks the dependency relation beteween values and cached operations */
-  cacheDependencies: Record<string, string[]>;
   /**
    * Tells array macros whether to check index access performed. This field is
    * mutable.
@@ -109,7 +137,7 @@ export interface IScope {
    * to the ast node handlers, and it is more appropriate to put this in the
    * scope rather than the compiler object.
    */
-  builtInModules: Record<string, IValue>;
+  builtInModules: Record<string, ImmutableId>;
 
   /** Creates a new scope that has `this` as it's parent. */
   createScope(): IScope;
@@ -129,7 +157,7 @@ export interface IScope {
   /** Checks if there is an owner registered with the specified identifier */
   has(identifier: string): boolean;
   /** Gets a value by their owner's identifier */
-  get(identifier: string): INamedValue;
+  get(c: ICompilerContext, identifier: string): ValueId;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, throws an error if there already is an owner with the same
@@ -138,7 +166,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  set<T extends IValue>(name: string, value: T): T;
+  set(name: string, id: ValueId): void;
   /**
    * Registers `value` with an owner that uses `name` as both it's name and
    * identifier, overriding any preexisting variables with the same identifier.
@@ -146,14 +174,7 @@ export interface IScope {
    * @param name
    * @param value
    */
-  hardSet<T extends IValue>(name: string, value: T): T;
-  /**
-   * Creates an owned store and registers it to this scope.
-   *
-   * @param identifier The name of the variable that will hold the store
-   * @param name The mlog name that the owner will have
-   */
-  make(identifier: string, name: string): IValue;
+  hardSet(name: string, value: ValueId): void;
   /**
    * Creates a shallow copy of this scope.
    *
@@ -162,105 +183,6 @@ export interface IScope {
    * data also follow this rule.
    */
   copy(): IScope;
-  /** Creates a temporary mlog variable name */
-  makeTempName(): string;
-
-  /** Adds the result of an operation to the local cache */
-  addCachedOperation(
-    op: string,
-    result: IValue,
-    left: IValue,
-    right?: IValue,
-  ): void;
-
-  /** Attempts to get an operation cached in this or in a parent scope. */
-  getCachedOperation(
-    op: string,
-    left: IValue,
-    right?: IValue,
-  ): IValue | undefined;
-
-  /**
-   * Removes all cached operations dependent on the given value.
-   *
-   * Affects this scope and all of its parents.
-   */
-  clearDependentCache(value: IValue): void;
-}
-
-// we can't use type maps to define actual methods
-// and if we don't do this we'll get an error [ts(2425)]
-export interface IValueOperators {
-  // unary operators
-  "!"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "u+"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "u-"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "delete"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "typeof"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "void"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "~"(scope: IScope, out?: TEOutput): TValueInstructions;
-
-  // update operators
-  "++"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
-  "--"(scope: IScope, prefix: boolean, out?: TEOutput): TValueInstructions;
-
-  // left right operators
-  "*"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "**"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "+"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "-"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "/"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "%"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "!="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "!=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "=="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "==="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<<"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>>"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "^"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "|"(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  instanceof(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  in(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "??"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "||"(
-    scope: IScope,
-    value: IValue,
-    out?: TEOutput,
-    endAddress?: TLineRef,
-  ): TValueInstructions;
-  "%="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "*="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "**="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "+="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "-="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "/="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "&&="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "||="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "??="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "<<="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  ">>>="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "^="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "|="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
-  "="(scope: IScope, value: IValue, out?: TEOutput): TValueInstructions;
 }
 
 /** Defines the possible types of mutability of a value */
@@ -280,34 +202,39 @@ export enum EMutability {
   immutable,
 }
 
-export interface IValue extends IValueOperators {
-  // main properties
-
-  /** The name is used by values that exist on some form in the runtime */
+export interface IValue {
   name?: string;
+  // main properties
   mutability: EMutability;
   macro: boolean;
 
-  /** Used by the operation cache to know if an operation can be safely cached. */
-  volatile: boolean;
-
-  /**
-   * Evaluates `this`, returning it's representation in a more basic value like
-   * `StoreValue` with the instructions required to compute that value
-   */
-  eval(scope: IScope, out?: TEOutput): TValueInstructions;
   call(
-    scope: IScope,
-    args: IValue[],
-    out?: TEOutput,
-  ): TValueInstructions<IValue | null>;
-  get(scope: IScope, name: IValue, out?: TEOutput): TValueInstructions;
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    loc: SourceRange,
+    args: ImmutableId[],
+  ): ImmutableId;
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId;
+  set?(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    propId: ImmutableId,
+    valueId: ImmutableId,
+    loc: SourceRange,
+  ): void;
 
   /**
    * Wether `this` has a given property. This method is used to know if it's
    * safe to get a field of an object without errors.
    */
-  hasProperty(scope: IScope, prop: IValue): boolean;
+  hasProperty(compilerContext: ICompilerContext, prop: IValue): boolean;
 
   /**
    * A hook that the CallExpression and related handlers call before evaluating
@@ -326,12 +253,6 @@ export interface IValue extends IValueOperators {
 
   /** The string representation of `this` in the generated mlog code. */
   toMlogString(): string;
-
-  /**
-   * Allows some values to choose alternative representations when they are used
-   * as operation outputs.
-   */
-  toOut(): IValue;
 }
 /** Helper type that is used in some typescript assertions */
 export interface INamedValue extends IValue {
@@ -365,3 +286,5 @@ export type TValueInstructions<Content extends IValue | null = IValue> = [
   Content,
   IInstruction[],
 ];
+
+export type TBlockInstructions = [number, Block[]];

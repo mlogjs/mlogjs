@@ -2,12 +2,14 @@ import {
   EMutability,
   IScope,
   IValue,
-  IValueOperators,
   TEOutput,
   TValueInstructions,
 } from "../types";
-import { operators } from "../operators";
 import { CompilerError } from "../CompilerError";
+import { ICompilerContext } from "../CompilerContext";
+import { ImmutableId } from "../flow";
+import { IBlockCursor } from "../BlockCursor";
+import { SourceRange } from "../SourceRange";
 
 // eslint-disable-next-line @typescript-eslint/no-unsafe-declaration-merging
 export class VoidValue implements IValue {
@@ -22,19 +24,29 @@ export class VoidValue implements IValue {
     );
   }
   call(
-    _scope: IScope,
-    _args: IValue[],
-    _out?: TEOutput,
-  ): TValueInstructions<IValue | null> {
-    throw new CompilerError(`[${this.debugString()}] is not callable.`);
+    _c: ICompilerContext,
+    _cursor: IBlockCursor,
+    loc: SourceRange,
+    _args: ImmutableId[],
+  ): ImmutableId {
+    throw new CompilerError(`[${this.debugString()}] is not callable.`, loc);
   }
-  get(_scope: IScope, name: IValue): TValueInstructions {
+  get(
+    c: ICompilerContext,
+    cursor: IBlockCursor,
+    targetId: ImmutableId,
+    prop: ImmutableId,
+    loc: SourceRange,
+  ): ImmutableId {
     throw new CompilerError(
-      `The member [${name.debugString()}] does not exist in [${this.debugString()}]`,
+      `The member [${c
+        .getValueOrTemp(prop)
+        .debugString()}] does not exist in [${this.debugString()}]`,
+      loc,
     );
   }
 
-  hasProperty(_scope: IScope, _prop: IValue): boolean {
+  hasProperty(_compilerContext: ICompilerContext, _prop: IValue): boolean {
     return false;
   }
 
@@ -55,17 +67,4 @@ export class VoidValue implements IValue {
   toMlogString(): string {
     return '"[macro VoidValue]"';
   }
-}
-
-// tells typescript that VoidValue implements value
-// eslint-disable-next-line @typescript-eslint/no-empty-object-type, @typescript-eslint/no-unsafe-declaration-merging
-export interface VoidValue extends IValueOperators {}
-
-for (const key of operators) {
-  VoidValue.prototype[key] = function () {
-    console.log(this);
-    throw new CompilerError(
-      `The operator '${key}' is not defined for [${this.debugString()}].`,
-    );
-  };
 }

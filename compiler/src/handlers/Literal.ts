@@ -1,12 +1,21 @@
 import { CompilerError } from "../CompilerError";
+import { LoadLiteralInstruction } from "../flow";
+import { SourceRange } from "../SourceRange";
 import { THandler, es } from "../types";
 import { LiteralValue } from "../values";
 
 const Literal: THandler = (
-  _c,
+  c,
   scope,
+  cursor,
   node: es.StringLiteral | es.NumericLiteral,
-) => [new LiteralValue(node.value), []];
+) => {
+  const out = c.registerValue(new LiteralValue(node.value));
+  cursor.addInstruction(
+    new LoadLiteralInstruction(node.value, out, SourceRange.fromNode(node)),
+  );
+  return out;
+};
 
 export const NumericLiteral = Literal;
 export const StringLiteral = Literal;
@@ -18,7 +27,14 @@ export const NullLiteral: THandler = () => {
 };
 
 export const BooleanLiteral: THandler = (
-  _c,
+  c,
   scope,
+  cursor,
   node: es.BooleanLiteral,
-) => [new LiteralValue(+node.value), []];
+) => {
+  const out = c.registerValue(new LiteralValue(+node.value));
+  cursor.addInstruction(
+    new LoadLiteralInstruction(+node.value, out, SourceRange.fromNode(node)),
+  );
+  return out;
+};

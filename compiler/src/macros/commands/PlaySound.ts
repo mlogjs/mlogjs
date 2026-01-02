@@ -1,11 +1,14 @@
+import { ICompilerContext } from "../../CompilerContext";
+import { ImmutableId, NativeInstruction } from "../../flow";
 import { InstructionBase } from "../../instructions";
 import { IValue } from "../../types";
 import { ObjectValue } from "../../values";
-import { createOverloadNamespace } from "../util";
+import { createOverloadNamespace, filterIds } from "../util";
 
 export class PlaySound extends ObjectValue {
-  constructor() {
+  constructor(c: ICompilerContext) {
     const data = createOverloadNamespace({
+      c,
       overloads: {
         positional: {
           named: "options",
@@ -19,14 +22,14 @@ export class PlaySound extends ObjectValue {
       //playsound false @sfx-pew 12 0.1 globalyespan @thisx @thisy true
       // wait 1
 
-      handler(scope, overload, out, ...args) {
-        let sound: string | IValue = "0";
-        let volume: string | IValue = "0";
-        let pitch: string | IValue = "0";
-        let pan: string | IValue = "0";
-        let x: string | IValue = "0";
-        let y: string | IValue = "0";
-        let limit: string | IValue = "0";
+      handler(c, overload, cursor, loc, ...args) {
+        let sound: string | ImmutableId = "0";
+        let volume: string | ImmutableId = "0";
+        let pitch: string | ImmutableId = "0";
+        let pan: string | ImmutableId = "0";
+        let x: string | ImmutableId = "0";
+        let y: string | ImmutableId = "0";
+        let limit: string | ImmutableId = "0";
 
         // let volume =
         switch (overload) {
@@ -41,10 +44,10 @@ export class PlaySound extends ObjectValue {
             break;
           }
         }
-        return [
-          null,
-          [
-            new InstructionBase(
+
+        cursor.addInstruction(
+          new NativeInstruction(
+            [
               "playsound",
               String(overload === "positional"),
               sound,
@@ -54,9 +57,13 @@ export class PlaySound extends ObjectValue {
               x,
               y,
               limit,
-            ),
-          ],
-        ];
+            ],
+            filterIds([sound, volume, pitch, pan, x, y, limit]),
+            [],
+            loc,
+          ),
+        );
+        return c.nullId;
       },
     });
     super(data);
