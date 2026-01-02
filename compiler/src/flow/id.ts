@@ -12,7 +12,7 @@ export class GlobalId {
   }
 
   toString() {
-    return `GlobalId(${this.number})`;
+    return `@${this.number}`;
   }
 }
 
@@ -26,7 +26,7 @@ export class ImmutableId {
   }
 
   toString() {
-    return `ImmutableId(${this.number})`;
+    return `%${this.number}`;
   }
 }
 
