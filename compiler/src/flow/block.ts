@@ -55,6 +55,37 @@ export class Block {
     }
   }
 
+  removeFromParents() {
+    const end = this.endInstruction;
+    switch (end?.type) {
+      case "break":
+        end.target.block.removeParent(this);
+        break;
+      case "break-if":
+        end.consequent.block.removeParent(this);
+        end.alternate.block.removeParent(this);
+        break;
+      case "end-if":
+        end.alternate.block.removeParent(this);
+        break;
+    }
+  }
+
+  addToParents() {
+    switch (this.endInstruction?.type) {
+      case "break":
+        this.endInstruction.target.block.addParent(this);
+        break;
+      case "break-if":
+        this.endInstruction.consequent.block.addParent(this);
+        this.endInstruction.alternate.block.addParent(this);
+        break;
+      case "end-if":
+        this.endInstruction.alternate.block.addParent(this);
+        break;
+    }
+  }
+
   addParent(block: Block) {
     if (this.parents.includes(block)) return;
     this.parents.push(block);

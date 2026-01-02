@@ -36,6 +36,18 @@ import { generateGraphVizDOTString } from "./visualize";
 // control flow graph internals for the compiler
 export class Graph {
   start = new Block();
+  /**
+   * Marks wether or not the parents of blocks are invalid and need to be
+   * recomputed.
+   *
+   * Each optimization function that modifies the structure of the graph needs
+   * to either update the parents by itself or set this to true to let the next
+   * optimizations recompute the parents if necessary.
+   *
+   * Optimizations that make use of the parents must call setParents() before
+   * using them.
+   */
+  invalidParents = true;
 
   static from(entry: Block, loc: SourceRange) {
     const graph = new Graph();
@@ -51,15 +63,23 @@ export class Graph {
   }
 
   setParents() {
-    traverse(this.start, block => {
+    if (!this.invalidParents) return;
+    this.invalidParents = false;
+
+    const blocks = getReversePostOrder(this.start);
+    for (const block of blocks) {
       block.parents = [];
-    });
-    traverse(this.start, block => {
-      block.children.forEach(child => child.addParent(block));
-    });
+    }
+
+    for (const block of blocks) {
+      for (const child of block.children) {
+        child.addParent(block);
+      }
+    }
   }
 
   removeCriticalEdges() {
+    this.setParents();
     const queue: Block[] = [this.start];
     const visited = new Set<Block>();
 
@@ -78,29 +98,32 @@ export class Graph {
         continue;
       }
 
-      const { consequent, alternate, source } = block.endInstruction;
+      let { consequent, alternate, source } = block.endInstruction;
 
       if (consequent.block.parents.length > 1) {
         const newBlock = new Block(new BreakInstruction(consequent, source));
+        newBlock.addToParents();
 
-        newBlock.addParent(block);
-        consequent.block.removeParent(block);
-        consequent.block.addParent(newBlock);
-        block.endInstruction.consequent = newBlock.toForward();
+        consequent = newBlock.toForward();
       }
 
       if (alternate.block.parents.length > 1) {
         const newBlock = new Block(new BreakInstruction(alternate, source));
+        newBlock.addToParents();
 
-        newBlock.addParent(block);
-        alternate.block.removeParent(block);
-        alternate.block.addParent(newBlock);
-        block.endInstruction.alternate = newBlock.toForward();
+        alternate = newBlock.toForward();
       }
+
+      block.removeFromParents();
+      block.endInstruction.consequent = consequent;
+      block.endInstruction.alternate = alternate;
+      block.addToParents();
     }
   }
 
   mergeBlocks() {
+    this.setParents();
+
     traverse(this.start, block => {
       while (block.endInstruction?.type === "break") {
         const { target } = block.endInstruction;
@@ -110,11 +133,10 @@ export class Graph {
           block.instructions.pushBack(inst);
         }
 
+        target.block.removeFromParents();
+        block.removeFromParents();
         block.endInstruction = target.block.endInstruction;
-        target.block.children.forEach(child => {
-          child.removeParent(target.block);
-          child.addParent(block);
-        });
+        block.addToParents();
       }
     });
   }
@@ -124,14 +146,19 @@ export class Graph {
    * construction or after SSA deconstruction.
    */
   skipBlocks() {
-    function tryToRedirect(block: Block, oldTarget: BlockEdge) {
+    // jump threading can leave
+    // some "hanging" parents (blocks that have no parents themselves,
+    // but are still marked as parents of reachable blocks),
+    // which are not easy to remove, so instead we invalidate the parents
+    this.invalidParents = true;
+
+    function tryToRedirect(oldTarget: BlockEdge) {
       let current = oldTarget;
       const mappedArgs = new Map<number, EdgeArgument>();
 
       while (
         current.block.endInstruction?.type === "break" &&
-        current.block.instructions.isEmpty &&
-        current.block.forwardParents.length === current.block.parents.length
+        current.block.instructions.isEmpty
       ) {
         const { endInstruction } = current.block;
         current = endInstruction.target;
@@ -147,13 +174,11 @@ export class Graph {
       }
 
       if (current === oldTarget) return;
-      const newTarget = current.clone();
-      newTarget.block.addParent(block);
-      oldTarget.block.removeParent(block);
-
-      newTarget.args = newTarget.args.map(arg => {
-        return mappedArgs.get(arg.value.number) ?? arg;
-      });
+      const newTarget = new BlockEdge(
+        current.type,
+        current.block,
+        current.args.map(arg => mappedArgs.get(arg.value.number) ?? arg),
+      );
 
       return newTarget;
     }
@@ -161,15 +186,23 @@ export class Graph {
     traverse(this.start, block => {
       switch (block.endInstruction?.type) {
         case "break": {
-          const newTarget = tryToRedirect(block, block.endInstruction.target);
+          const newTarget = tryToRedirect(block.endInstruction.target);
           if (!newTarget) break;
           block.endInstruction.target = newTarget;
           break;
         }
+        case "end-if": {
+          const { alternate } = block.endInstruction;
+          const newAlternate = tryToRedirect(alternate);
+          if (!newAlternate) break;
+          block.endInstruction.alternate = newAlternate;
+          break;
+        }
         case "break-if": {
           const { consequent, alternate } = block.endInstruction;
-          const newConsequent = tryToRedirect(block, consequent);
-          const newAlternate = tryToRedirect(block, alternate);
+          const newConsequent = tryToRedirect(consequent);
+          const newAlternate = tryToRedirect(alternate);
+
           if (newConsequent) block.endInstruction.consequent = newConsequent;
           if (newAlternate) block.endInstruction.alternate = newAlternate;
           break;
@@ -191,6 +224,7 @@ export class Graph {
       switch (target.endInstruction?.type) {
         case "end":
         case "stop":
+          block.removeFromParents();
           block.endInstruction = target.endInstruction;
           break;
       }
@@ -484,6 +518,9 @@ export class Graph {
         return;
       }
 
+      // creates "hanging" parents
+      this.invalidParents = true;
+
       block.endInstruction = new EndIfInstruction(
         condition,
         preservedEdge,
@@ -552,6 +589,12 @@ export class Graph {
         endInstruction.source,
       );
       block.endInstruction = newBreak;
+
+      // removing constant break-ifs can leave
+      // some "hanging" parents (blocks that have no parents themselves,
+      // but are still marked as parents of reachable blocks),
+      // which are not easy to remove, so instead we invalidate the parents
+      this.invalidParents = true;
     });
   }
 
@@ -565,6 +608,9 @@ export class Graph {
       const { source } = endInstruction;
       if (condition.num) {
         block.endInstruction = new EndInstruction(source);
+
+        // leaves the alternate block as a "hanging" parent
+        this.invalidParents = true;
       } else {
         block.endInstruction = new BreakInstruction(
           endInstruction.alternate,
@@ -582,6 +628,7 @@ export class Graph {
    * select, otherwise the performance degradation would be noticeable.
    */
   createSelects(c: ICompilerContext) {
+    this.setParents();
     const blocks = getReversePostOrder(this.start);
     const writes = getWriterMap(c, this.start);
     const reads = getReaderMap(c, this.start);
@@ -679,21 +726,23 @@ export class Graph {
       }
 
       if (!identical) continue;
+      block.removeFromParents();
       block.endInstruction = new BreakInstruction(
         consequentEnd.target.clone(),
         source,
       );
+      block.addToParents();
+
+      alternate.block.removeFromParents();
+      consequent.block.removeFromParents();
       alternate.block.endInstruction = new EndInstruction(source);
       consequent.block.endInstruction = new EndInstruction(source);
-      mergeBlock.addParent(block);
-      mergeBlock.removeParent(consequent.block);
-      mergeBlock.removeParent(alternate.block);
 
-      // move instruction from mergeBlock into current block
-      // to maintain the "diamond" structure of the control flow graph
-      // allowing the next iteration to identify more selects
       if (mergeBlock.parents.length > 1) continue;
 
+      // move instructions from mergeBlock into the current block
+      // to maintain the "diamond" structure of the control flow graph
+      // allowing the next iteration to identify more selects
       for (let i = 0; i < mergeBlock.parameters.length; i++) {
         const param = mergeBlock.parameters[i];
         const arg = block.endInstruction.target.args[i];
@@ -708,14 +757,12 @@ export class Graph {
         inst.registerWriter(writes, block);
       }
 
+      block.removeFromParents();
       block.endInstruction = mergeBlock.endInstruction;
-      mergeBlock.children.forEach(child => {
-        child.removeParent(mergeBlock);
-        child.addParent(block);
-      });
+      block.addToParents();
 
-      mergeBlock.parents = [];
       mergeBlock.instructions.clear();
+      mergeBlock.removeFromParents();
       mergeBlock.endInstruction = new EndInstruction(source);
     }
 
@@ -1029,12 +1076,14 @@ export class Graph {
   }
 
   constructSSA(c: ICompilerContext) {
+    this.setParents();
     const builder = new SSABuilder(c, this);
 
     builder.run();
   }
 
   deconstructSSA(c: ICompilerContext) {
+    this.setParents();
     // remove any trivial block parameters left
     const builder = new SSABuilder(c, this);
     builder.run();
@@ -1080,10 +1129,8 @@ export class Graph {
   }
 
   optimize(c: ICompilerContext) {
-    this.setParents();
     this.mergeBlocks();
     this.skipBlocks();
-    this.setParents();
     this.removeCriticalEdges();
     this.splitLeaves();
     this.constructSSA(c);
@@ -1095,13 +1142,11 @@ export class Graph {
     this.foldConstantOperations(c);
     this.transformComparisons(c);
     this.createSelects(c);
-    this.setParents();
     this.removeUnusedInstructions(c);
     // this.optimizeStoreInstructions(c);
     this.createEndIfs(c);
     this.removeConstantBreakIfs(c);
     this.removeConstantEndIfs(c);
-    this.setParents();
 
     this.deconstructSSA(c);
     this.canonicalizeBreakIfs(c);
@@ -1112,7 +1157,6 @@ export class Graph {
 
     // TODO: fix updating of block parents during
     // the previous optimizations
-    this.setParents();
     // console.log(generateGraphVizDOTString(c, this.start));
     // console.log(dominators(this.start));
     // console.log(dominanceFrontier(this.start, dominators(this.start)));
@@ -1214,6 +1258,7 @@ export function traversePostOrder(
   _traverse(entry);
 }
 
+/** Requires parent information. */
 function immediateDominators(entry: Block): Map<Block, Block> {
   const idoms = new Map<Block, Block>();
   const blockIndexes = new Map<Block, number>();

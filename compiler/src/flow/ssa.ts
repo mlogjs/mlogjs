@@ -225,7 +225,9 @@ export class SSABuilder {
     const operands: ImmutableId[] = [];
 
     for (const pred of block.parents) {
-      const end = pred.endInstruction as BreakInstruction;
+      const end = pred.endInstruction;
+      if (end?.type !== "break")
+        throw new CompilerError("Expected break instruction, got " + end?.type);
       if (end.target.args[paramIndex]) {
         operands.push(end.target.args[paramIndex].value);
       }
@@ -290,7 +292,9 @@ export class SSABuilder {
   ): ImmutableId | null {
     let first: ImmutableId | null = null;
     for (const parent of parents) {
-      const end = parent.endInstruction as BreakInstruction;
+      const end = parent.endInstruction;
+      if (end?.type !== "break")
+        throw new CompilerError("Expected break instruction, got " + end?.type);
       const operand = end.target.args[paramIndex]?.value;
       if (!operand) return null;
 

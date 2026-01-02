@@ -53,7 +53,7 @@ export class Compiler {
 
       c.handle(scope, cursor, program);
 
-      const rootGraph = Graph.from(entryBlock, exitBlock, programRange);
+      const rootGraph = Graph.from(entryBlock, programRange);
 
       const inst = rootGraph.toMlog(c);
 
