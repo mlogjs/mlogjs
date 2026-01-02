@@ -156,22 +156,20 @@ export class Graph {
       let current = oldTarget;
       const mappedArgs = new Map<number, EdgeArgument>();
 
-      while (
-        current.block.endInstruction?.type === "break" &&
-        current.block.instructions.isEmpty
-      ) {
-        const { endInstruction } = current.block;
-        current = endInstruction.target;
-
-        for (let i = 0; i < endInstruction.target.args.length; i++) {
-          const arg = endInstruction.target.args[i];
-          const param = endInstruction.target.block.parameters[i];
+      do {
+        for (let i = 0; i < current.args.length; i++) {
+          const arg = current.args[i];
+          const param = current.block.parameters[i];
           mappedArgs.set(
             param.value.number,
             mappedArgs.get(arg.value.number) ?? arg,
           );
         }
-      }
+
+        if (current.block.endInstruction?.type !== "break") break;
+        if (!current.block.instructions.isEmpty) break;
+        current = current.block.endInstruction.target;
+      } while (true);
 
       if (current === oldTarget) return;
       const newTarget = new BlockEdge(
