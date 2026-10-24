@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## Fixed
 
 - Imports to `mlogjs:types` are now fully ignored
+- `query.rect` and `query.circle` generating invalid instructions
 
 ## [0.6.0] - 2026-10-24
 

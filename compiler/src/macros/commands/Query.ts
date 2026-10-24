@@ -1,5 +1,6 @@
+import { CompilerError } from "../..";
 import { InstructionBase } from "../../instructions";
-import { ObjectValue } from "../../values";
+import { LiteralValue, ObjectValue } from "../../values";
 import { createOverloadNamespace } from "../util";
 
 export class Query extends ObjectValue {
@@ -23,15 +24,22 @@ export class Query extends ObjectValue {
         },
       },
       handler(scope, overload, out, ...args) {
+        const [type] = args;
+        if (!(type instanceof LiteralValue) || !type.isString()) {
+          throw new CompilerError(
+            `The first argument to query.${overload} must be a string literal`,
+          );
+        }
+
         if (overload === "circle") {
-          const [type, team, x, y, radius] = args;
+          const [, team, x, y, radius] = args;
           return [
             null,
             [
               new InstructionBase(
                 "query",
                 "circle",
-                type,
+                type.data,
                 team,
                 x,
                 y,
@@ -41,14 +49,15 @@ export class Query extends ObjectValue {
             ],
           ];
         }
-        const [type, team, x, y, width, height] = args;
+
+        const [, team, x, y, width, height] = args;
         return [
           null,
           [
             new InstructionBase(
               "query",
               "rect",
-              type,
+              type.data,
               team,
               x,
               y,

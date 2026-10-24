@@ -1,6 +1,6 @@
-query circle "unit" null 10 20 15 0
+query circle unit null 10 20 15 0
 sensor len:10:6 @queries @size
 read first:11:6 @queries 0
 read second:12:6 @queries 1
 set raw:13:6 @queries
-query rect "building" @sharded 0 0 50 100
+query rect building @sharded 0 0 50 100
