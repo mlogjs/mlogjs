@@ -25,6 +25,10 @@ export default defineConfig({
       entryFileNames: "[name].mjs",
       format: "esm",
       sourcemap: dev,
+      manualChunks: {
+        index: ["src/index.ts"],
+        bin: ["src/bin/index.ts"],
+      },
       banner(chunk) {
         if (chunk.name !== "bin") return "";
         return "#!/usr/bin/env node";
