@@ -1,11 +1,11 @@
-import type MarkdownIt from "markdown-it";
 import Container from "markdown-it-container";
 import * as es from "@babel/types";
 import { join, resolve } from "path";
 import { readFileSync, watch, type FSWatcher } from "fs";
 import { parse } from "@babel/parser";
 import { fileURLToPath } from "url";
-import type Token from "markdown-it/lib/token";
+import type MarkdownIt from "markdown-it";
+import type { Token } from "markdown-it";
 
 interface EnvData {
   [name: string]: string;

@@ -24,12 +24,6 @@ export default defineConfig({
       entryFileNames: "[name].mjs",
       format: "esm",
       sourcemap: dev,
-    },
-    {
-      dir: "dist",
-      entryFileNames: "[name].cjs",
-      format: "cjs",
-      sourcemap: dev,
       banner(chunk) {
         if (chunk.name !== "bin") return "";
         return "#!/usr/bin/env node";

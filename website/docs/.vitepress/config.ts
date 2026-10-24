@@ -1,8 +1,8 @@
 import type { UserConfig } from "vitepress";
-import { rawResolver } from "./raw_resolver";
-import { mlogjsOutput } from "./md_plugins/mlogjs_output";
-import { commandExample } from "./md_plugins/command_example";
-import mlogTm from "./langs/mlog.tmLanguage.json";
+import { rawResolver } from "./raw_resolver.js";
+import { mlogjsOutput } from "./md_plugins/mlogjs_output.js";
+import { commandExample } from "./md_plugins/command_example.js";
+import mlogTm from "./langs/mlog.tmLanguage.json" with { type: "json" };
 
 const base = process.env.BASE ?? "/mlogjs/";
 

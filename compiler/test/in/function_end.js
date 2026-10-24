@@ -1,4 +1,4 @@
-// tests wether the implicit function return
+// tests whether the implicit function return
 // is removed because of the `end`
 // instruction present at the end of the function body
 cubeRoots(-8);

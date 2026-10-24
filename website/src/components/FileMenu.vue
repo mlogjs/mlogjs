@@ -74,6 +74,7 @@ ul {
   max-height: 100%;
   overflow-y: auto;
   overflow-x: hidden;
+  font-size: 0.9rem;
 }
 
 button.file {

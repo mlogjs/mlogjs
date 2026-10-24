@@ -48,7 +48,7 @@ export function getInnerTSConfig(): string {
  * function will not return the correct path to the lib folder.
  */
 export function getLibFolderPath(): string {
-  const currentPath = __dirname.replace(/\\/g, "/");
+  const currentPath = import.meta.dirname.replace(/\\/g, "/");
   const parent = currentPath.split("/").slice(0, -1).join("/");
   return join(parent, "lib");
 }

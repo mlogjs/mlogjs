@@ -770,14 +770,14 @@ Contains the multiple variants of the `setrule` instruction.
 
 - #### `setRule.waveSending`
 
-  Sets wether waves can be manually summoned by pressing the play button.
+  Sets whether waves can be manually summoned by pressing the play button.
 
   ::: command-example
   :::
 
 - #### `setRule.attackMode`
 
-  Sets wether the gamemode is the attack mode
+  Sets whether the gamemode is the attack mode
 
   ::: command-example
   :::
@@ -812,7 +812,7 @@ Contains the multiple variants of the `setrule` instruction.
 
 - #### `setRule.lighting`
 
-  Sets wether ambient lighting is enabled
+  Sets whether ambient lighting is enabled
 
   ::: command-example
   :::

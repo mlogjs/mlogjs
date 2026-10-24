@@ -1,6 +1,5 @@
+import type { SplitpanesResizedPayload } from "splitpanes";
 import { ref, type Ref, watchEffect } from "vue";
-
-export type PaneResizeEvent = { min: number; max: number; size: number }[];
 
 export interface PaneSizes {
   sideBar: number;
@@ -16,9 +15,9 @@ export function usePaneSizes(isMobile: Ref<boolean>) {
   watchEffect(() => {
     sizes.value = getSavedSizes(isMobile.value);
   });
-  function handlePaneResize(event: PaneResizeEvent) {
+  function handlePaneResize(event: SplitpanesResizedPayload) {
     sizes.value = arrayToPaneSizes(
-      event.map(item => item.size),
+      event.panes.map(item => item.size),
       isMobile.value,
     );
     savePaneSizes(sizes.value, isMobile.value);

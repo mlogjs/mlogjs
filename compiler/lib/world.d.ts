@@ -288,7 +288,7 @@ declare module "mlogjs:world" {
     function waveSpacing(seconds: number): void;
 
     /**
-     * Sets wether waves can be manually summoned by pressing the play button.
+     * Sets whether waves can be manually summoned by pressing the play button.
      *
      * ```js
      * setRule.waveSending(true);
@@ -297,7 +297,7 @@ declare module "mlogjs:world" {
     function waveSending(enabled: boolean): void;
 
     /**
-     * Sets wether the gamemode is the attack mode
+     * Sets whether the gamemode is the attack mode
      *
      * ```js
      * setRule.attackMode(true);
@@ -352,10 +352,10 @@ declare module "mlogjs:world" {
       height: number;
     }): void;
 
-    /** Sets wether ambient lighting is enabled */
+    /** Sets whether ambient lighting is enabled */
     function lighting(enabled: boolean): void;
 
-    /** Sets wether the game can end when all cores of a team are destroyed. */
+    /** Sets whether the game can end when all cores of a team are destroyed. */
     function canGameOver(enabled: boolean): void;
 
     /**

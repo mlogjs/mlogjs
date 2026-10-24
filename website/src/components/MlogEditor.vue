@@ -2,7 +2,7 @@
 import { computed, provide, ref, shallowRef, watchEffect } from "vue";
 import { Splitpanes, Pane } from "splitpanes";
 import type { CompilerOptions } from "mlogjs";
-import type * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import type * as monaco from "monaco-editor/editor";
 import "splitpanes/dist/splitpanes.css";
 import { useCompiler } from "../composables/useCompiler";
 import { useSourceMapping } from "../composables/useSourceMapping";

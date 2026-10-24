@@ -36,7 +36,7 @@ export const TSEnumDeclaration: THandler<null> = (
 
   const data: IObjectValueData = {};
 
-  for (const member of node.members) {
+  for (const member of node.body.members) {
     if (lastType === "string" && !member.initializer)
       throw new CompilerError("This enum member must be initialized", member);
 

@@ -79,8 +79,8 @@ div {
 }
 
 div :deep(svg) {
-  width: 1.5em;
-  height: 1.5em;
+  width: 1.2em;
+  height: 1.2em;
 }
 div.bar-actions {
   display: flex;

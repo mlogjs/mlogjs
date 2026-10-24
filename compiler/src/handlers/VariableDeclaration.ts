@@ -65,12 +65,7 @@ type TDeclareHandler<T extends es.Node> = (
   kind: "let" | "const" | "var",
 ) => TValueInstructions<DeclarationValue>;
 
-const Declare: TDeclareHandler<es.LVal | es.VoidPattern> = (
-  c,
-  scope,
-  node,
-  kind,
-) => {
+const Declare: TDeclareHandler<es.PatternLike> = (c, scope, node, kind) => {
   return c.handle(scope, node, () => {
     switch (node.type) {
       case "Identifier":

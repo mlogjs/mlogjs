@@ -1,6 +1,6 @@
-import MarkdownIt from "markdown-it";
+import type { Token } from "markdown-it";
+import type MarkdownIt from "markdown-it";
 import Container from "markdown-it-container";
-import type Token from "markdown-it/lib/token";
 import { Compiler } from "mlogjs";
 
 const extensions = ["js", "ts"];

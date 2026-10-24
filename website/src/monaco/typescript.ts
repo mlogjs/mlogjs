@@ -21,7 +21,7 @@ export function addWorldModuleSnippet(monaco: Monaco) {
         return {
           suggestions: [
             {
-              label: `Add import from "${worldModuleName}"`,
+              label: `import mlogjs:world`,
               kind: monaco.languages.CompletionItemKind.Snippet,
               insertText: `import {  } from "${worldModuleName}";`,
               range: new monaco.Range(
