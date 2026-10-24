@@ -110,3 +110,4 @@ dist
 
 
 /website/docs/.vitepress/cache
+.vitest

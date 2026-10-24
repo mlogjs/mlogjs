@@ -9,8 +9,7 @@
     "resolveJsonModule": true,
     "rootDir": "src",
     "strict": true,
-    "target": "ES2021",
-    "types": ["@types/node"]
+    "target": "ES2021"
   },
-  "include": ["src", "lib/*"]
+  "include": ["src"]
 }

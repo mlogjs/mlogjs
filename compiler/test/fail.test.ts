@@ -1,7 +1,8 @@
-import { readdirSync } from "fs";
-import { readFile } from "fs/promises";
-import { parse } from "path";
+import { readdirSync } from "node:fs";
+import { readFile } from "node:fs/promises";
+import { parse } from "node:path";
 import { Compiler } from "../src";
+import { expect, test } from "vitest";
 
 const paths = readdirSync("test/fail");
 

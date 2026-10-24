@@ -16,6 +16,6 @@ jobs:
       - run: pnpm install --frozen-lockfile
       - run: pnpm -C compiler clean
       - run: pnpm -C compiler exec tsc -p test/tsconfig.json #typecheck tests
-      - run: pnpm -C compiler coverage
+      - run: pnpm -C compiler test
       - run: pnpm -C compiler build
       - run: pnpm -C website build
