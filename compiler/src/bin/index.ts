@@ -14,6 +14,8 @@ import { join, parse, resolve } from "node:path";
 import { Compiler, CompilerOptions } from "../index";
 import { getInnerTSConfig, getLibFolderPath, getRootTSConfig } from "./files";
 
+declare const __VERSION__: string;
+
 // eslint-disable-next-line @typescript-eslint/no-floating-promises
 yargs(hideBin(process.argv))
   .command(
@@ -88,6 +90,7 @@ yargs(hideBin(process.argv))
     },
   )
   .help()
+  .version(__VERSION__)
   .scriptName("mlogjs")
   .demandCommand()
   .parse();

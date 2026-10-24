@@ -1,5 +1,6 @@
 import { defineConfig } from "rollup";
 import typescript from "@rollup/plugin-typescript";
+import replace from "@rollup/plugin-replace";
 
 import pkg from "./package.json" with { type: "json" };
 
@@ -31,6 +32,11 @@ export default defineConfig({
     },
   ],
   plugins: [
+    replace({
+      values: {
+        __VERSION__: JSON.stringify(pkg.version),
+      },
+    }),
     typescript({
       tsconfig: "./tsconfig.json",
       compilerOptions: {
