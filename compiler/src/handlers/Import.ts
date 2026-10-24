@@ -1,5 +1,6 @@
 import { CompilerError } from "../CompilerError";
 import { THandler, es } from "../types";
+import { typesModuleName } from "../utils";
 import { LiteralValue } from "../values";
 
 const noExternalModuleErrorMessage =
@@ -11,6 +12,7 @@ export const ImportDeclaration: THandler<null> = (
   node: es.ImportDeclaration,
 ) => {
   if (node.importKind === "type") return [null, []];
+  if (node.source.value === typesModuleName) return [null, []];
 
   if (!(node.source.value in scope.builtInModules))
     throw new CompilerError(noExternalModuleErrorMessage);
