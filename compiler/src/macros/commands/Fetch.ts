@@ -7,8 +7,10 @@ export class Fetch extends ObjectValue {
   constructor() {
     const data = createOverloadNamespace({
       overloads: {
-        unit: { args: ["team", "index"] },
-        unitCount: { args: ["team"] },
+        unit: {
+          args: ["team", "index", { key: "type", default: "null" }],
+        },
+        unitCount: { args: ["team", { key: "type", default: "null" }] },
         player: { args: ["team", "index"] },
         playerCount: { args: ["team"] },
         core: { args: ["team", "index"] },
@@ -21,7 +23,7 @@ export class Fetch extends ObjectValue {
 
         const params: (IValue | string)[] = ["0", "@conveyor"];
 
-        if (overload === "buildCount") {
+        if (overload === "buildCount" || overload === "unitCount") {
           params[1] = rest[0];
         } else {
           Object.assign(params, rest);

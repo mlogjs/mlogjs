@@ -1,0 +1,24 @@
+control config driver1 driver2
+control config bridge1 bridge2
+control config node1 factory1
+sensor isDriverLinked:11:6 driver1 driver2
+sensor isBridgeLinked:12:6 bridge1 bridge2
+sensor isNodeLinked:13:6 node1 factory1
+fetch unit unit:16:6 @sharded 0 null
+sensor camX:17:6 unit:16:6 @cameraX
+sensor camY:18:6 unit:16:6 @cameraY
+sensor camW:19:6 unit:16:6 @cameraWidth
+sensor camH:20:6 unit:16:6 @cameraHeight
+sensor pCamX:23:6 @clientUnit @cameraX
+sensor pCamY:24:6 @clientUnit @cameraY
+sensor pCamW:25:6 @clientUnit @cameraWidth
+sensor pCamH:26:6 @clientUnit @cameraHeight
+print "cam: {0},{0} {0}x{0} | links: {0},{0},{0}"
+format camX:17:6
+format camY:18:6
+format camW:19:6
+format camH:20:6
+format isDriverLinked:11:6
+format isBridgeLinked:12:6
+format isNodeLinked:13:6
+printflush message1

@@ -23,7 +23,7 @@ const b = "some string"; // string literal
 
 Store values are the registers in the game inside a processor.
 
-You can also "sense" their properties as if they were fields.
+Game entities such as buildings, units, and bullets are also store values. You can "sense" their properties as if they were fields:
 
 ::: mlogjs-output
 
@@ -41,6 +41,14 @@ printFlush();
 
 output:
 :::
+
+### Senseable entities
+
+- **Buildings**: Senses properties like `health`, `maxHealth`, `totalPower`, `efficiency`, `timescale`, `itemCapacity`, `liquidCapacity`, stored items (`building[Items.copper]`), and liquids (`building[Liquids.water]`).
+- **Units**: Senses properties like `health`, `shield`, `armor`, `x`, `y`, `speed`, `rotation`, `elevation`, `mining`, `mineX`, `mineY`, `buildX`, `buildY`, `building`, `breaking`, `flying`, `controlled`, `controller`, and held items. Camera viewport properties (`cameraX`, `cameraY`, `cameraWidth`, `cameraHeight`) can also be sensed on player units, but evaluate to `null` unless executing in a privileged (world) processor.
+- **Bullets**: Bullets returned by `spawnBullet` or queries expose properties like `health`, `x`, `y`, `velocityX`, `velocityY`, `rotation`, `team`, `speed`, `bulletLifetime`, and `bulletTime`.
+
+To modify properties of store entities in world processors, use [`setProp`](/guide/commands#setprop).
 
 ## Function
 

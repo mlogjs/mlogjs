@@ -26,6 +26,20 @@ To print the contents of the global text buffer and empty it, call `printFlush`.
 ::: command-example
 :::
 
+### `printChar`
+
+Appends a character to the global text buffer using the provided UTF-16 code unit or the icon of the provided game content symbol.
+
+::: command-example
+:::
+
+### `format`
+
+Replaces the lowest-numbered `{placeholder}` in the global text buffer with the given value.
+
+::: command-example
+:::
+
 ### `draw`
 
 Contains the multiple variants of the `draw` instruction
@@ -194,7 +208,12 @@ Contains the multiple variants of the `control` instruction
 
 - #### `control.config`
 
-  Sets the config of a block (like the item of a sorter)
+  Sets the config of a block (like the item of a sorter).
+
+  In privileged (world) processors, `control.config` can also be used to:
+  - Configure which block is linked to a mass driver (`control.config(driver1, driver2)`).
+  - Configure which block is linked to a bridge conveyor/conduit (`control.config(bridge1, bridge2)`).
+  - Toggle whether a block is connected to a power node (`control.config(node1, building)`).
 
   ::: command-example
   :::
@@ -225,10 +244,28 @@ Example:
 Alternate way to access special properties on objects.
 
 This method allows you to use customly created symbols
-and sensor them on buildings.
+and sensor them on buildings, units, and bullets.
 
-- `property` - The property to be sensed on the building
+- `property` - The property or building to be sensed on the target
 - `target` - The object that will be "sensed"
+
+In privileged (world) processors, `sensor` can also query if a block is linked to a mass driver, bridge, or power node:
+
+```js
+const { driver1, driver2, node1, factory1 } = getBuildings();
+
+// Senses if driver2 is linked to driver1
+const isDriverLinked = sensor(driver2, driver1);
+
+// Senses if factory1 is connected to power node node1
+const isPowerLinked = sensor(factory1, node1);
+```
+
+::: tip Privileged Camera Properties
+Camera viewport properties (`cameraX`, `cameraY`, `cameraWidth`, and `cameraHeight`) can be accessed directly on units (e.g. `unit.cameraX`) or sensed via `sensor(LAccess.cameraX, unit)`.
+
+In Mindustry, these properties are privileged: they only return coordinate values when executing in privileged (world) processors; in standard processors, they evaluate to `null`.
+:::
 
 ::: code-group
 
@@ -302,6 +339,13 @@ For the inverse of this operation, you can sense the `id` of a symbol:
 Packs RGBA color information into a single number.
 
 Each paremeter must range from `0` to `1`.
+
+::: command-example
+:::
+
+### `unpackColor`
+
+Unpacks RGBA color information from a packed color number into an object with `r`, `g`, `b`, and `a` components (each ranging from `0` to `1`).
 
 ::: command-example
 :::
@@ -500,6 +544,13 @@ Controls the unit bound to the processor
   - `block` - The kind of building to build
   - `rotation` - The rotation of the building, ranges from 0 to 3
   - `config` - The configuration value to use, or a building from which the configuration value will be copied.
+
+  ::: command-example
+  :::
+
+- #### `unitControl.deconstruct`
+
+  Makes the unit bound to this processor deconstruct a building at the given position
 
   ::: command-example
   :::
@@ -961,6 +1012,7 @@ Contains the variants of the `fetch` instruction.
 
   Gets an unit from the given team
   The index starts at 0.
+  - `type` - The type of unit to get. If not specified, returns units of any type.
 
   ::: command-example
   :::
@@ -1040,7 +1092,13 @@ Sets a global flag.
 
 ### `setProp`
 
-Creates a writable record that allows you to set a property of a building or unit.
+Creates a writable record that allows you to set a property of a building, unit, or bullet.
+
+Supports setting:
+
+- **Units**: `x`, `y`, `health`, `shield`, `armor`, `speed`, `rotation`, `velocityX`, `velocityY`, `team`, `flag`, `payloadType`, `totalPower`, `bulletTime`, `bulletLifetime`.
+- **Buildings**: `health`, `totalPower`, items, liquids.
+- **Bullets**: `health`, `x`, `y`, `velocityX`, `velocityY`, `rotation`, `team`, `speed`, `bulletLifetime`, `bulletTime`.
 
 ::: command-example
 :::
@@ -1056,3 +1114,133 @@ first.
 
 ::: command-example
 :::
+
+### `playMusic`
+
+Plays background music.
+
+::: command-example
+:::
+
+### `spawnBullet`
+
+Spawns a bullet with specified properties.
+
+::: command-example
+:::
+
+### `query`
+
+Queries entities in a circle or rectangle, populating the `@queries` variable.
+
+- #### `query.circle`
+
+  Queries entities within a circular radius.
+
+  ::: command-example
+  :::
+
+- #### `query.rect`
+
+  Queries entities within a rectangular area.
+
+  ::: command-example
+  :::
+
+### `effect`
+
+Emits visual and audio effects at given coordinates. Available in `mlogjs:world`.
+
+```js
+import { effect } from "mlogjs:world";
+
+effect.warn(10, 20);
+effect.explosion(50, 50, 5);
+effect.trail({ x: 30, y: 30, color: packColor(1, 0, 0, 1), size: 2 });
+```
+
+### `playSound`
+
+Plays a sound effect either globally or at specific coordinates. Available in `mlogjs:world`.
+
+- #### `playSound.positional`
+
+  Plays a positional sound.
+
+  ```js
+  import { playSound } from "mlogjs:world";
+
+  playSound.positional({
+    sound: Sounds.pew,
+    x: 10,
+    y: 20,
+    volume: 1,
+    pitch: 1,
+  });
+  ```
+
+- #### `playSound.global`
+
+  Plays a sound globally.
+
+  ```js
+  import { playSound } from "mlogjs:world";
+
+  playSound.global({
+    sound: Sounds.artillery,
+    volume: 1,
+    pitch: 1,
+  });
+  ```
+
+### `senseWeather`
+
+Checks whether a weather effect is currently active on the map. Available in `mlogjs:world`.
+
+```js
+import { senseWeather } from "mlogjs:world";
+
+const isRaining = senseWeather(Weathers.rain);
+print`Raining: ${isRaining}`;
+printFlush();
+```
+
+### `setWeather`
+
+Enables or disables a weather effect on the map. Available in `mlogjs:world`.
+
+```js
+import { setWeather } from "mlogjs:world";
+
+setWeather(Weathers.rain, true);
+```
+
+### `SyncLock`
+
+Helper class for server-to-client variable synchronization (emits the `sync` instruction). Available in `mlogjs:world`.
+
+```js
+import { SyncLock } from "mlogjs:world";
+
+const lock = new SyncLock(100);
+lock.value = 200;
+lock.sendToClients();
+```
+
+### `Marker`
+
+Allows creating and manipulating world and minimap markers. Available in `mlogjs:world`.
+
+```js
+import { Marker } from "mlogjs:world";
+
+// create a shape marker
+const m = Marker.shape({ id: 1, x: 50, y: 50, replace: true });
+m.color = packColor(1, 0, 0, 1);
+m.radius = 10;
+m.world = true;
+
+// access an existing marker
+const existing = Marker.of(1);
+existing.radius = 15;
+```

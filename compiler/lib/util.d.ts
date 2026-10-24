@@ -48,10 +48,12 @@ declare module "mlogjs:types" {
     | "shield";
 
   export type TStatusEffect =
+    | "none"
     | "burning"
     | "freezing"
     | "unmoving"
     | "slow"
+    | "fast"
     | "wet"
     | "muddy"
     | "melting"
@@ -66,6 +68,7 @@ declare module "mlogjs:types" {
     | "disarmed"
     | "electrified"
     | "invincible"
+    | "dynamic"
     | TPermanentStatusEffect;
 
   export type TPermanentStatusEffect = "boss" | "overdrive";
@@ -87,6 +90,9 @@ declare module "mlogjs:types" {
       armor: number;
       velocityX: number;
       velocityY: number;
+      totalPower?: number;
+      bulletTime?: number;
+      bulletLifetime?: number;
     }
   > {}
 
@@ -96,6 +102,19 @@ declare module "mlogjs:types" {
         totalPower: number;
       }
   > {}
+
+  interface SettableBullet extends MutableWithSymbols<{
+    health: number;
+    x: number;
+    y: number;
+    velocityX: number;
+    velocityY: number;
+    rotation: number;
+    team: TeamIdentifier;
+    speed: number;
+    bulletLifetime: number;
+    bulletTime: number;
+  }> {}
 
   export type TLogicLinkNames<T extends string> =
     `${TLogicLinkName<T>}${TLogicLinkDigit}`;

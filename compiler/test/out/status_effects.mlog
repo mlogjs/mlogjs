@@ -1,0 +1,4 @@
+status false @status-burning @unit 10
+status false @status-boss @unit 10
+status false @status-fast @unit 5
+status true @status-burning @unit

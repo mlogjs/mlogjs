@@ -1,0 +1,11 @@
+printchar 128073
+printchar @router
+format "Hello"
+packcolor packed:4:6 0.2 0.4 0.6 0.8
+unpackcolor r:5:8 g:5:11 b:5:14 a:5:17 packed:4:6
+print "r: {0} g: {0} b: {0} a: {0}"
+format r:5:8
+format g:5:11
+format b:5:14
+format a:5:17
+printflush message1

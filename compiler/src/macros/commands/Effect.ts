@@ -16,6 +16,7 @@ export class Effect extends ObjectValue {
         spawn: { args: ["x", "y"] },
         trail: { args: ["x", "y", "color", "size"], named: "options" },
         breakPop: { args: ["x", "y", "color", "size"], named: "options" },
+        breakProp: { args: ["x", "y", "color", "size"], named: "options" },
         smokeCloud: { args: ["x", "y", "color"] },
         vapor: { args: ["x", "y", "color"] },
         hit: { args: ["x", "y", "color"] },
@@ -66,6 +67,7 @@ export class Effect extends ObjectValue {
             break;
           case "trail":
           case "breakPop":
+          case "breakProp":
           case "shootSmall":
           case "shootBig":
           case "smokeColor":
@@ -92,7 +94,16 @@ export class Effect extends ObjectValue {
             params[3] = args[2];
             break;
         }
-        return [null, [new InstructionBase("effect", overload, ...params)]];
+        return [
+          null,
+          [
+            new InstructionBase(
+              "effect",
+              overload === "breakPop" ? "breakProp" : overload,
+              ...params,
+            ),
+          ],
+        ];
       },
     });
     super(data);

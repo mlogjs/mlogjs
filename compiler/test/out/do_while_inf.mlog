@@ -1,10 +1,7 @@
 set i:1:4 0
 print "{0}\n"
 format i:1:4
-op rand &t0 1
-jump 7 lessThanEq &t0 0.5
-set &t1 2
-jump 8 always
-set &t1 1
-op add i:1:4 i:1:4 &t1
+op rand &t1 1
+select &t0 greaterThan &t1 0.5 2 1
+op add i:1:4 i:1:4 &t0
 jump 1 always

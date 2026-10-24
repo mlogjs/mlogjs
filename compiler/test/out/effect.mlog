@@ -1,0 +1,6 @@
+effect warn 10 20 2 %ffaaff
+effect explosion 30 40 5 %ffaaff
+effect breakProp 10 10 2 1
+effect breakProp 15 15 2 1
+effect trail 0 0 1 1
+effect smokeColor 5 5 90 1

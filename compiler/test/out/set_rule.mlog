@@ -21,3 +21,7 @@ setrule waveSending 1 0 0 100 100
 setrule waveSpacing 256 0 0 100 100
 setrule waveTimer 1 0 0 100 100
 setrule waves 1 0 0 100 100
+setrule unitLight 1 0 0 100 100
+setrule pauseDisabled 1 0 0 100 100
+setrule musicVolume 0.5 0 0 100 100
+setrule unitMineSpeed 2.5 @sharded 0 100 100

@@ -1,5 +1,10 @@
 import { CompilerError } from "../CompilerError";
-import { AddressResolver, EJumpKind, JumpInstruction } from "../instructions";
+import {
+  AddressResolver,
+  EJumpKind,
+  InstructionBase,
+  JumpInstruction,
+} from "../instructions";
 import {
   AssignementOperator,
   BinaryOperator,
@@ -227,13 +232,91 @@ export const UpdateExpression: THandler = (
   return [op, [...argInst, ...opInst]];
 };
 
-// TODO: use the select instruction once we have an optimizer
+const selectOperatorMap: Record<string, string> = {
+  "==": "equal",
+  "!=": "notEqual",
+  "<": "lessThan",
+  "<=": "lessThanEq",
+  ">": "greaterThan",
+  ">=": "greaterThanEq",
+  "===": "strictEqual",
+};
+
 export const ConditionalExpression: THandler = (
   c,
   scope,
   node: es.ConditionalExpression,
   out,
 ) => {
+  if (
+    node.test.type === "BooleanLiteral" ||
+    node.test.type === "NumericLiteral" ||
+    node.test.type === "StringLiteral"
+  ) {
+    if (node.test.value) return c.handleEval(scope, node.consequent, out);
+    return c.handleEval(scope, node.alternate, out);
+  }
+
+  const result = StoreValue.from(scope, out);
+
+  const consequent = c.handleEval(scope, node.consequent, result);
+  const alternate = c.handleEval(scope, node.alternate, result);
+
+  if (consequent[1].length === 0 && alternate[1].length === 0) {
+    if (
+      node.test.type === "BinaryExpression" &&
+      (node.test.operator in selectOperatorMap || node.test.operator === "!==")
+    ) {
+      const [left, leftInst] = c.handleEval(scope, node.test.left);
+      const [right, rightInst] = c.handleEval(scope, node.test.right);
+      const isStrictNotEqual = node.test.operator === "!==";
+      const op = isStrictNotEqual
+        ? "strictEqual"
+        : selectOperatorMap[node.test.operator];
+      const trueVal = isStrictNotEqual ? alternate[0] : consequent[0];
+      const falseVal = isStrictNotEqual ? consequent[0] : alternate[0];
+
+      return [
+        result,
+        [
+          ...leftInst,
+          ...rightInst,
+          new InstructionBase(
+            "select",
+            result,
+            op,
+            left,
+            right,
+            trueVal,
+            falseVal,
+          ),
+        ],
+      ];
+    }
+
+    const [test, testInst] = c.handleEval(scope, node.test);
+    if (test instanceof LiteralValue) {
+      if (test.data) return [result, [...result["="](scope, consequent[0])[1]]];
+      return [result, [...result["="](scope, alternate[0])[1]]];
+    }
+
+    return [
+      result,
+      [
+        ...testInst,
+        new InstructionBase(
+          "select",
+          result,
+          "notEqual",
+          test,
+          "0",
+          consequent[0],
+          alternate[0],
+        ),
+      ],
+    ];
+  }
+
   const alternateStartAdress = new LiteralValue(null);
   const endExpressionAdress = new LiteralValue(null);
 
@@ -244,11 +327,6 @@ export const ConditionalExpression: THandler = (
     if (test.data) return c.handleEval(scope, node.consequent, out);
     return c.handleEval(scope, node.alternate, out);
   }
-
-  const result = StoreValue.from(scope, out);
-
-  const consequent = c.handleEval(scope, node.consequent, result);
-  const alternate = c.handleEval(scope, node.alternate, result);
 
   return [
     result,

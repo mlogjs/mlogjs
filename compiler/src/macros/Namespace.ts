@@ -8,6 +8,7 @@ import {
 } from "../types";
 import { LiteralValue, ObjectValue, StoreValue } from "../values";
 import { CompilerError } from "../CompilerError";
+import { QueriesMacro } from "./Queries";
 
 const dynamicVars = [
   "unit",
@@ -17,6 +18,15 @@ const dynamicVars = [
   "minute",
   "waveNumber",
   "waveTime",
+  "server",
+  "client",
+  "clientLocale",
+  "clientUnit",
+  "clientName",
+  "clientTeam",
+  "clientMobile",
+  "clientMusicPlaying",
+  "clientCurrentMusic",
 ];
 
 interface NamespaceMacroOptions {
@@ -89,5 +99,33 @@ export class SoundsNamespace extends NamespaceMacro {
     const result = new StoreValue(`@sfx-${key.data}`, EMutability.constant);
 
     return [result, []];
+  }
+}
+
+export class StatusEffectsNamespace extends NamespaceMacro {
+  constructor() {
+    super({ changeCasing: true });
+  }
+
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    if (!(key instanceof LiteralValue) || !key.isString())
+      return super.get(scope, key, out);
+
+    const name = `@status-${camelToDashCase(key.data)}`;
+    const result = new StoreValue(name, EMutability.constant);
+    return [result, []];
+  }
+}
+
+export class PVarsNamespace extends NamespaceMacro {
+  constructor() {
+    super();
+  }
+
+  get(scope: IScope, key: IValue, out?: TEOutput): TValueInstructions<IValue> {
+    if (key instanceof LiteralValue && key.data === "queries") {
+      return [new QueriesMacro(), []];
+    }
+    return super.get(scope, key, out);
   }
 }

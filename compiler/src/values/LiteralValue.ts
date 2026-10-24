@@ -60,13 +60,7 @@ export class LiteralValue<T extends TLiteral | null = TLiteral>
     }
     if (typeof data !== "string") return JSON.stringify(data);
 
-    // this special handling is required because of
-    // how mindustry parses string literals in logic statements
-
-    // replace double quotes by two single quotes before
-    // forming the json string
-    // (there is no way to escape a " character)
-    return JSON.stringify(data.replace(/"/g, "''")).replace(/\\\\/g, "\\"); // "unescape" backslashes
+    return formatMlogString(data);
   }
   get(scope: IScope, name: IValue): TValueInstructions {
     if (!(name instanceof LiteralValue && name.isString()))
@@ -214,4 +208,24 @@ function bitwiseOp(fn: (...args: bigint[]) => bigint) {
     // and convert it back into a number
     return Number(BigInt.asIntN(64, bigResult));
   };
+}
+
+function formatMlogString(str: string): string {
+  let result = '"';
+  for (let i = 0; i < str.length; i++) {
+    const char = str[i];
+    const code = str.charCodeAt(i);
+    if (char === '"') {
+      result += '\\"';
+    } else if (char === "\\") {
+      result += "\\\\";
+    } else if (char === "\n") {
+      result += "\\n";
+    } else if (code < 0x20 || code >= 0x7f) {
+      result += `\\u${code.toString(16).padStart(4, "0")}`;
+    } else {
+      result += char;
+    }
+  }
+  return result + '"';
 }

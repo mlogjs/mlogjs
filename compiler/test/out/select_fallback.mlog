@@ -1,0 +1,8 @@
+set a:1:4 1
+op rand &t0 1
+jump 6 lessThanEq &t0 0.5
+op add a:1:4 a:1:4 1
+op mul result:2:6 a:1:4 2
+jump 7 always
+op sub result:2:6 a:1:4 1
+print result:2:6

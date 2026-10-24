@@ -273,15 +273,15 @@ printFlush();
 
 ### Math and related operators
 
-All the mathematical operators for numbers are supported and will be transpiled into mlog code.
+All the mathematical and bitwise operators for numbers are supported and will be transpiled into mlog code:
+`+`, `-`, `*`, `/`, `%`, `**`, `&`, `|`, `^`, `~`, `<<`, `>>`, and `>>>` (zero-fill right shift, mapped to `ushr`).
 
-But the `Math` object has been modified to match the other math functions
-available on the mlog runtime. They are listed bellow:
+The `Math` object provides mathematical functions and constants available on the mlog runtime:
 
 - `PI` - Pi. This is the ratio of the circumference of a circle to its diameter.
 - `E` - The mathematical constant e. This is Euler's number, the base of natural logarithms.
-- `degToRad` - The convertion ratio for degress to radians.
-- `radToDeg` - The convertion ratio for radians to degrees.
+- `degToRad` - The conversion ratio for degrees to radians.
+- `radToDeg` - The conversion ratio for radians to degrees.
 - `abs` - Absolute value of a number
 - `angle` - Angle of a vector in degrees
 - `angleDiff` - Absolute distance between two angles in degrees.
@@ -303,6 +303,17 @@ available on the mlog runtime. They are listed bellow:
 - `sin` - Sine of an angle in degrees
 - `sqrt` - Square root of a number
 - `tan` - Tangent of an angle in degrees
+- `sign` - Returns 1 for positive numbers, -1 for negative numbers, and 0 for zero.
+- `round` - Rounds a number to the nearest integer.
+- `trunc` - Returns the integer part of a number by removing any fractional digits.
+- `exp` - Returns Euler's number raised to the power of a number.
+- `expm1` - Returns `exp(x) - 1`.
+- `cosh` - Returns the hyperbolic cosine of a value.
+- `acosh` - Returns the inverse hyperbolic cosine of a value.
+- `sinh` - Returns the hyperbolic sine of a value.
+- `asinh` - Returns the inverse hyperbolic sine of a value.
+- `tanh` - Returns the hyperbolic tangent of a value.
+- `atanh` - Returns the inverse hyperbolic tangent of a value.
 
 Check out the [online editor](/editor) to see how each one works!
 
@@ -356,6 +367,7 @@ printFlush();
 Behavior:
 
 - It evaluates each return value lazily according to the test condition.
+- When both branches are pure expressions that do not require additional statements, mlogjs compiles the ternary into Mindustry's `select` instruction (`select result condition trueVal falseVal`) instead of jump branches.
 
 ### Object/array literals
 

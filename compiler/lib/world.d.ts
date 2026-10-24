@@ -4,10 +4,18 @@
 declare module "mlogjs:world" {
   import {
     SettableBuilding,
+    SettableBullet,
     SettableUnit,
     TPermanentStatusEffect,
     TStatusEffect,
   } from "mlogjs:types";
+
+  interface QueriesView {
+    readonly length: number;
+    readonly value: unknown;
+    readonly [index: number]: AnyUnit | BasicBuilding | undefined;
+    at(index: number): AnyUnit | BasicBuilding | undefined;
+  }
 
   // privileged global variables
   interface PVars {
@@ -18,6 +26,9 @@ declare module "mlogjs:world" {
     readonly clientName: string;
     readonly clientTeam: number;
     readonly clientMobile: boolean;
+    readonly clientMusicPlaying: boolean;
+    readonly clientCurrentMusic?: string;
+    readonly queries: QueriesView;
   }
 
   export var PVars: PVars;
@@ -153,7 +164,24 @@ declare module "mlogjs:world" {
     team: TeamIdentifier;
     /** The initial rotation of the unit in degrees. */
     rotation?: number;
+    /** Whether the spawn effect should be displayed. Defaults to `true`. */
+    effect?: boolean;
   }): T;
+
+  export function spawnBullet(options: {
+    from: BasicBuilding | AnyUnit | BlockSymbol | UnitSymbol;
+    x: number;
+    y: number;
+    rotation: number;
+    team: TeamIdentifier;
+    index?: number;
+    owner?: AnyUnit | BasicBuilding;
+    damage?: number;
+    velocityScl?: number;
+    lifeScl?: number;
+    aimX?: number;
+    aimY?: number;
+  }): Bullet;
 
   export function senseWeather(weather: WeatherSymbol): boolean;
 
@@ -173,9 +201,12 @@ declare module "mlogjs:world" {
      * ```
      */
     function apply(
-      status: Exclude<TStatusEffect, TPermanentStatusEffect>,
+      status:
+        | Exclude<TStatusEffect, TPermanentStatusEffect>
+        | StatusEffectSymbol
+        | symbol,
       unit: BasicUnit,
-      duration: number,
+      duration?: number,
     ): void;
 
     function apply(status: TPermanentStatusEffect, unit: BasicUnit): void;
@@ -188,7 +219,10 @@ declare module "mlogjs:world" {
      * applyStatus.clear("boss", Vars.unit);
      * ```
      */
-    function clear(status: TStatusEffect, unit: BasicUnit): void;
+    function clear(
+      status: TStatusEffect | StatusEffectSymbol | symbol,
+      unit: BasicUnit,
+    ): void;
   }
 
   /**
@@ -456,6 +490,33 @@ declare module "mlogjs:world" {
      * ```
      */
     function rtsMinSquad(team: TeamIdentifier, value: number): void;
+
+    /**
+     * Sets whether units have ambient light.
+     *
+     * ```js
+     * setRule.unitLight(true);
+     * ```
+     */
+    function unitLight(enabled: boolean): void;
+
+    /**
+     * Sets whether pausing the game is disabled.
+     *
+     * ```js
+     * setRule.pauseDisabled(true);
+     * ```
+     */
+    function pauseDisabled(enabled: boolean): void;
+
+    /**
+     * Sets the background music volume.
+     *
+     * ```js
+     * setRule.musicVolume(0.5);
+     * ```
+     */
+    function musicVolume(volume: number): void;
   }
 
   /**
@@ -602,6 +663,38 @@ declare module "mlogjs:world" {
      * ```
      */
     function stop(): void;
+    /**
+     * Checks if a cutscene is currently active.
+     *
+     * ```js
+     * const isActive = cutscene.active();
+     * ```
+     */
+    function active(): boolean;
+    /**
+     * Shakes the player screen.
+     *
+     * ```js
+     * cutscene.shake(10, 2);
+     * ```
+     */
+    function shake(amount: number, duration: number): void;
+    /**
+     * Checks if the HUD is currently visible.
+     *
+     * ```js
+     * const hudShown = cutscene.getHud();
+     * ```
+     */
+    function getHud(): boolean;
+    /**
+     * Shows or hides the player HUD.
+     *
+     * ```js
+     * cutscene.setHud(false);
+     * ```
+     */
+    function setHud(shown: boolean): void;
   }
 
   /**
@@ -661,6 +754,7 @@ declare module "mlogjs:world" {
     function unit<T extends BasicUnit = AnyUnit>(
       team: TeamIdentifier,
       index: number,
+      type?: UnitSymbol,
     ): T;
     /**
      * Gets the amount of units existing on a given team.
@@ -801,6 +895,7 @@ declare module "mlogjs:world" {
    */
   export function setProp(target: BasicBuilding): SettableBuilding;
   export function setProp(target: BasicUnit): SettableUnit;
+  export function setProp(target: Bullet): SettableBullet;
 
   /**
    * Allows code running on the server to asynchronously send its version of a
@@ -839,6 +934,12 @@ declare module "mlogjs:world" {
       size: number;
     }): void;
     function breakPop(options: {
+      x: number;
+      y: number;
+      color: number;
+      size: number;
+    }): void;
+    function breakProp(options: {
       x: number;
       y: number;
       color: number;
@@ -946,6 +1047,7 @@ declare module "mlogjs:world" {
     set world(value: boolean);
     /** Wether the marker should be on the minimap or in the world */
     set minimap(value: boolean);
+    set light(value: boolean);
     set autoscale(value: boolean);
     set pos(value: { x: number; y: number });
     set endPos(value: { x: number; y: number });
@@ -955,6 +1057,7 @@ declare module "mlogjs:world" {
     set stroke(value: number);
     set rotation(value: number);
     set shape(value: { sides: number; fill: boolean; outline: boolean });
+    set arc(value: { start: number; end: number });
     /**
      * Writes the contents of the global text buffer to the marker's text.
      * Empties the global text buffer.
@@ -1054,4 +1157,41 @@ declare module "mlogjs:world" {
    * ```
    */
   export function localePrint(key: string): void;
+
+  /**
+   * Plays a background music track.
+   *
+   * @param name The name of the music track (e.g. "game1").
+   * @param interrupt Whether to interrupt currently playing track. Defaults to
+   *   `true`.
+   */
+  export function playMusic(name: string, interrupt?: boolean): void;
+
+  /**
+   * Queries entities within a shape into the privileged `@queries` variable.
+   * Access results using `PVars.queries`.
+   */
+  export namespace query {
+    /** Queries units or buildings within a circular area into `PVars.queries`. */
+    function circle(options: {
+      type: "unit" | "building";
+      team?: TeamIdentifier;
+      x: number;
+      y: number;
+      radius: number;
+    }): void;
+
+    /**
+     * Queries units or buildings within a rectangular area into
+     * `PVars.queries`.
+     */
+    function rect(options: {
+      type: "unit" | "building";
+      team?: TeamIdentifier;
+      x: number;
+      y: number;
+      width: number;
+      height: number;
+    }): void;
+  }
 }

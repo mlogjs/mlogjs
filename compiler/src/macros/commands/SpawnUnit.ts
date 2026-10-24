@@ -8,7 +8,7 @@ export class SpawnUnit extends MacroFunction {
     super((scope, out, options) => {
       assertIsObjectMacro(options, "The options");
 
-      const { type, x, y, team, rotation } = options.data;
+      const { type, x, y, team, rotation, effect } = options.data;
 
       assertIsRuntimeValue(type, "type");
       assertIsRuntimeValue(x, "x");
@@ -28,6 +28,7 @@ export class SpawnUnit extends MacroFunction {
             rotation ?? "0",
             team,
             output,
+            effect ?? "true",
           ),
         ],
       ];

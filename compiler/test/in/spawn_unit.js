@@ -13,5 +13,13 @@ const unit = spawnUnit({
   team: Teams.malis,
 });
 
-print`available health: ${unit.health}`;
+const silentUnit = spawnUnit({
+  type: Units.flare,
+  x: shootX,
+  y: shootY,
+  team: Teams.sharded,
+  effect: false,
+});
+
+print`available health: ${unit.health} ${silentUnit.health}`;
 printFlush();

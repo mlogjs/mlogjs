@@ -1,4 +1,4 @@
-import { CompilerError } from "../../CompilerError";
+import { IValue } from "../../types";
 import { InstructionBase } from "../../instructions";
 import { assertLiteralOneOf } from "../../utils";
 import { LiteralValue, ObjectValue } from "../../values";
@@ -10,6 +10,7 @@ const validEffects = [
   "freezing",
   "unmoving",
   "slow",
+  "fast",
   "wet",
   "muddy",
   "melting",
@@ -26,6 +27,7 @@ const validEffects = [
   "disarmed",
   "electrified",
   "invincible",
+  "dynamic",
 ] as const;
 
 export class ApplyStatus extends ObjectValue {
@@ -38,22 +40,25 @@ export class ApplyStatus extends ObjectValue {
         clear: { args: ["status", "unit"] },
       },
       handler(scope, overload, out, effect, unit, duration) {
-        if (!(effect instanceof LiteralValue))
-          throw new CompilerError("The status effect must be a string literal");
-        assertLiteralOneOf(effect, validEffects, "The status effect");
+        let effectValue: IValue | string = effect;
+        if (effect instanceof LiteralValue && effect.isString()) {
+          if (effect.data.startsWith("@status-")) {
+            effectValue = effect.data;
+          } else {
+            assertLiteralOneOf(effect, validEffects, "The status effect");
+            effectValue = `@status-${effect.data}`;
+          }
+        }
 
-        return [
-          null,
-          [
-            new InstructionBase(
-              "status",
-              String(overload !== "apply"),
-              effect.data,
-              unit,
-              duration,
-            ),
-          ],
+        const instArgs: (IValue | string)[] = [
+          "status",
+          String(overload !== "apply"),
+          effectValue,
+          unit,
         ];
+        if (duration) instArgs.push(duration);
+
+        return [null, [new InstructionBase(...instArgs)]];
       },
     });
     super(data);

@@ -4,11 +4,12 @@ The following namespaces allow you to safely access processor symbols or variabl
 
 ## ControlKind
 
-This is actually an enum that serves the same purpose as the other namespaces. Gives you direct access to symbols such as `@ctrlPlayer`, `@ctrlProcessor` and `@ctrlFormation`.
+This is actually an enum that serves the same purpose as the other namespaces. Gives you direct access to symbols such as `@ctrlPlayer`, `@ctrlProcessor` and `@ctrlCommand`.
 
 - `ctrlPlayer`
 - `ctrlProcessor`
-- `ctrlFormation`
+- `ctrlCommand`
+- `ctrlFormation` (deprecated: replaced by `ctrlCommand` in Mindustry v7)
 
 ## Vars
 
@@ -32,6 +33,49 @@ Allows you to access processor variables.
 - `minute` - The amount of minutes that passed since the map started
 - `waveNumber` - The number of the current wave, starts at 1;
 - `waveTime` - The amount of seconds left before the next wave
+
+## PVars
+
+Imported from `mlogjs:world`, contains privileged world processor variables.
+
+- `server` - Whether the script is running on a server.
+- `client` - Whether the script is running on a client.
+- `clientLocale` - Client locale string.
+- `clientUnit` - Client unit.
+- `clientName` - Client player name.
+- `clientTeam` - Client player team.
+- `clientMobile` - Whether client is on a mobile device.
+- `clientMusicPlaying` - Whether client music is currently playing.
+- `clientCurrentMusic` - Name of currently playing client music track.
+- `queries` - View into the results of the `@queries` variable populated by `query`. Supports `.length`, array indexing `[index]`, `.at(index)`, and `.value` to access `@queries` directly.
+
+## StatusEffects
+
+Contains the status effect symbols available in Mindustry. These are variables pointing to `@status-<name>`.
+
+- `none`
+- `burning`
+- `freezing`
+- `unmoving`
+- `slow`
+- `fast`
+- `wet`
+- `muddy`
+- `melting`
+- `sapped`
+- `tarred`
+- `overdrive`
+- `overclock`
+- `shielded`
+- `shocked`
+- `blasted`
+- `corroded`
+- `boss`
+- `sporeSlowed`
+- `disarmed`
+- `electrified`
+- `invincible`
+- `dynamic`
 
 ## Teams
 
@@ -152,10 +196,12 @@ Contains all units available
 - `block`
 - `manifold`
 - `assemblyDrone`
+- `dummy`
+- `missile`
 
 ## LAccess
 
-This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/guide/data-types#senseable)
+This namespace contains all symbols that can be used to access properties of entities via the `sense` command. Although it exists you will more likely use the [object property notation](/guide/data-types#store)
 
 - `totalItems`
 - `firstItem`
@@ -170,18 +216,33 @@ This namespace contains all symbols that can be used to access properties of ent
 - `powerNetOut`
 - `ammo`
 - `ammoCapacity`
+- `currentAmmoType`
+- `memoryCapacity`
 - `health`
 - `maxHealth`
 - `heat`
+- `shield`
+- `armor`
 - `efficiency`
 - `progress`
 - `timescale`
 - `rotation`
 - `x`
 - `y`
+- `velocityX`
+- `velocityY`
 - `shootX`
 - `shootY`
+- `cameraX` (Privileged: only evaluates in world processors; returns null in standard processors)
+- `cameraY` (Privileged: only evaluates in world processors; returns null in standard processors)
+- `cameraWidth` (Privileged: only evaluates in world processors; returns null in standard processors)
+- `cameraHeight` (Privileged: only evaluates in world processors; returns null in standard processors)
+- `displayWidth`
+- `displayHeight`
+- `bufferSize`
+- `operations`
 - `size`
+- `solid`
 - `dead`
 - `range`
 - `shooting`
@@ -189,16 +250,31 @@ This namespace contains all symbols that can be used to access properties of ent
 - `mineX`
 - `mineY`
 - `mining`
+- `buildX`
+- `buildY`
+- `building`
+- `breaking`
 - `speed`
 - `team`
 - `type`
 - `flag`
+- `flying`
 - `controlled`
 - `controller`
 - `name`
 - `payloadCount`
 - `payloadType`
+- `totalPayload`
+- `payloadCapacity`
+- `maxUnits`
 - `id`
+- `pingX`
+- `pingY`
+- `pingText`
+- `selectedBlock`
+- `selectedRotation`
+- `bulletLifetime`
+- `bulletTime`
 - `enabled`
 - `config`
 - `color`
@@ -665,3 +741,43 @@ Contains the available symbols for blocks.
 - `build14`
 - `build15`
 - `build16`
+
+## Weathers
+
+Contains weather effect symbols for use with `weatherSense` and `weatherSet`:
+
+- `snowing`
+- `rain`
+- `sandstorm`
+- `sporestorm`
+- `fog`
+- `suspendParticles`
+
+## Align
+
+Contains alignment constants used for text drawing and marker alignments:
+
+- `left`
+- `center`
+- `right`
+- `topLeft`
+- `top`
+- `topRight`
+- `bottomLeft`
+- `bottom`
+- `bottomRight`
+
+## Sounds
+
+Contains sound effect ID constants used with `playSound`:
+
+- `artillery`
+- `pew`
+- `bang`
+- `boom`
+- `laser`
+- `flame`
+- `shotgun`
+- `missile`
+- `spark`
+- and other game sounds accessible via `Sounds.<name>`

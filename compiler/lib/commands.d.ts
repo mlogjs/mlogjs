@@ -459,15 +459,28 @@ declare global {
     }): void;
 
     /**
-     * Sets the config of a block (like the item of a sorter)
+     * Sets the config of a block (like the item of a sorter).
+     *
+     * In privileged (world) processors, this can also be used to:
+     *
+     * - Configure the target block of a mass driver.
+     * - Configure the target block of a bridge.
+     * - Toggle whether a block is connected to a power node.
      *
      * ```js
-     * const { sorter1 } = getBuildings();
+     * const { sorter1, driver1, driver2, node1, factory1 } =
+     *   getBuildings();
      *
      * control.config(sorter1, Items.copper);
+     * // World processor only:
+     * control.config(driver1, driver2);
+     * control.config(node1, factory1);
      * ```
      */
-    function config(building: BasicBuilding, value: symbol): void;
+    function config(
+      building: BasicBuilding,
+      value: symbol | BasicBuilding,
+    ): void;
 
     /**
      * Sets the color of an illuminator.
@@ -536,7 +549,11 @@ declare global {
    *   const result = sensor(myCustomSymbol, myBuilding);
    *   ```
    */
-  function sensor<T>(property: symbol, target: BasicBuilding | BasicUnit): T;
+  function sensor(property: BasicBuilding, target: BasicBuilding): boolean;
+  function sensor<T>(
+    property: symbol,
+    target: BasicBuilding | BasicUnit | Bullet,
+  ): T;
 
   /**
    * Stops the execution for the given amount of seconds
@@ -1028,6 +1045,16 @@ declare global {
     }): void;
 
     /**
+     * Makes the unit bound to this processor deconstruct the building at the
+     * given position.
+     *
+     * ```js
+     * unitControl.deconstruct(10, 20);
+     * ```
+     */
+    function deconstruct(x: number, y: number): void;
+
+    /**
      * Makes the unit bound to this processor get data about a block at the
      * given position.
      *
@@ -1267,4 +1294,13 @@ declare global {
    * ```
    */
   function stopScript(): never;
+
+  /**
+   * Sets the execution rate of the current processor in instructions per tick.
+   *
+   * ```js
+   * setRate(1000);
+   * ```
+   */
+  function setRate(ipt: number): void;
 }

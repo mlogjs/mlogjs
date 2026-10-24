@@ -28,6 +28,9 @@ export class UnitControl extends ObjectValue {
           named: "options",
           args: ["x", "y", "block", "rotation", { key: "config", default: "" }],
         },
+        deconstruct: {
+          args: ["x", "y"],
+        },
         getBlock: {
           args: ["x", "y"],
         },

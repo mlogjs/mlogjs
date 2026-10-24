@@ -1,0 +1,15 @@
+bullet b1:3:6 @duo 0 10 20 90 @sharded null -1 1 1 -1 -1
+bullet b2:11:6 @flare 0 30 40 180 @crux null 50 2 1.5 100 100
+sensor lifetime:24:6 b1:3:6 @bulletLifetime
+sensor time:25:6 b1:3:6 @bulletTime
+sensor damage:26:6 b1:3:6 @health
+sensor maxDamage:27:6 b1:3:6 @maxHealth
+sensor aimX:28:6 b1:3:6 @shootX
+sensor aimY:29:6 b1:3:6 @shootY
+sensor angle:30:6 b1:3:6 @rotation
+sensor speed:31:6 b1:3:6 @speed
+setprop @speed b1:3:6 12
+setprop @bulletLifetime b1:3:6 50
+setprop @bulletTime b1:3:6 10
+setprop @x b1:3:6 15
+setprop @y b1:3:6 25

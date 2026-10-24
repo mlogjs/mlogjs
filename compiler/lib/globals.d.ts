@@ -3,6 +3,8 @@
 declare enum ControlKind {
   ctrlPlayer,
   ctrlProcessor,
+  ctrlCommand,
+  /** @deprecated Replaced by ctrlCommand in Mindustry v7 */
   ctrlFormation,
 }
 
@@ -211,6 +213,8 @@ declare namespace Units {
   const block: unique symbol;
   const manifold: unique symbol;
   const assemblyDrone: unique symbol;
+  const dummy: unique symbol;
+  const missile: unique symbol;
 }
 
 type UnitSymbol = (typeof Units)[keyof typeof Units];
@@ -246,9 +250,25 @@ declare namespace LAccess {
   const velocityY: unique symbol;
   const shootX: unique symbol;
   const shootY: unique symbol;
+  /**
+   * Senses the X coordinate of the player camera. Privileged (world) processors
+   * only; evaluates to null on standard processors.
+   */
   const cameraX: unique symbol;
+  /**
+   * Senses the Y coordinate of the player camera. Privileged (world) processors
+   * only; evaluates to null on standard processors.
+   */
   const cameraY: unique symbol;
+  /**
+   * Senses the viewport width of the player camera. Privileged (world)
+   * processors only; evaluates to null on standard processors.
+   */
   const cameraWidth: unique symbol;
+  /**
+   * Senses the viewport height of the player camera. Privileged (world)
+   * processors only; evaluates to null on standard processors.
+   */
   const cameraHeight: unique symbol;
   const displayWidth: unique symbol;
   const displayHeight: unique symbol;
@@ -263,10 +283,15 @@ declare namespace LAccess {
   const mineX: unique symbol;
   const mineY: unique symbol;
   const mining: unique symbol;
+  const buildX: unique symbol;
+  const buildY: unique symbol;
+  const building: unique symbol;
+  const breaking: unique symbol;
   const speed: unique symbol;
   const team: unique symbol;
   const type: unique symbol;
   const flag: unique symbol;
+  const flying: unique symbol;
   const controlled: unique symbol;
   const controller: unique symbol;
   const name: unique symbol;
@@ -274,7 +299,15 @@ declare namespace LAccess {
   const payloadType: unique symbol;
   const totalPayload: unique symbol;
   const payloadCapacity: unique symbol;
+  const maxUnits: unique symbol;
   const id: unique symbol;
+  const pingX: unique symbol;
+  const pingY: unique symbol;
+  const pingText: unique symbol;
+  const selectedBlock: unique symbol;
+  const selectedRotation: unique symbol;
+  const bulletLifetime: unique symbol;
+  const bulletTime: unique symbol;
   const enabled: unique symbol;
   const config: unique symbol;
   /**
@@ -881,3 +914,31 @@ interface Blocks
 
 type BlockSymbol = Blocks[keyof Blocks];
 declare const Blocks: Blocks;
+
+declare namespace StatusEffects {
+  const none: StatusEffectSymbol;
+  const burning: StatusEffectSymbol;
+  const freezing: StatusEffectSymbol;
+  const unmoving: StatusEffectSymbol;
+  const slow: StatusEffectSymbol;
+  const fast: StatusEffectSymbol;
+  const wet: StatusEffectSymbol;
+  const muddy: StatusEffectSymbol;
+  const melting: StatusEffectSymbol;
+  const sapped: StatusEffectSymbol;
+  const tarred: StatusEffectSymbol;
+  const overdrive: StatusEffectSymbol;
+  const overclock: StatusEffectSymbol;
+  const shielded: StatusEffectSymbol;
+  const shocked: StatusEffectSymbol;
+  const blasted: StatusEffectSymbol;
+  const corroded: StatusEffectSymbol;
+  const boss: StatusEffectSymbol;
+  const sporeSlowed: StatusEffectSymbol;
+  const disarmed: StatusEffectSymbol;
+  const electrified: StatusEffectSymbol;
+  const invincible: StatusEffectSymbol;
+  const dynamic: StatusEffectSymbol;
+}
+
+type StatusEffectSymbol = symbol & { readonly __statusEffect: unique symbol };

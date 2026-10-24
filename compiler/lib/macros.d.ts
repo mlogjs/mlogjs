@@ -1,7 +1,12 @@
 /// <reference path="./kinds.d.ts" />
 
 type MemoryCapacity = 64 | 128 | 512;
-/** Allows you to view and modify the data of memory cells and memory banks. */
+/**
+ * Allows you to view and modify the data of memory cells and memory banks.
+ *
+ * @deprecated Use `MemoryView` instead. This class is only kept for backwards
+ *   compatibility and will be removed in a future version.
+ */
 declare class Memory<S extends MemoryCapacity = 64> {
   constructor(cell: BasicBuilding, size?: S);
 
@@ -10,6 +15,17 @@ declare class Memory<S extends MemoryCapacity = 64> {
 
   /** The practical length of the memory view. */
   readonly length: S;
+}
+
+/** Allows you to view and modify the data of memory cells and memory banks. */
+declare class MemoryView<T = number> {
+  constructor(cell: BasicBuilding, size?: number);
+
+  [Symbol.iterator](): IterableIterator<T>;
+  [index: number]: T;
+
+  /** The practical length of the memory view. */
+  readonly length: number;
 }
 
 /**

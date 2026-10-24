@@ -35,6 +35,9 @@ export class SetRule extends ObjectValue {
         blockDamage: { args: ["team", "multiplier"] },
         rtsMinWeight: { args: ["team", "value"] },
         rtsMinSquad: { args: ["team", "value"] },
+        unitLight: { args: ["enabled"] },
+        pauseDisabled: { args: ["enabled"] },
+        musicVolume: { args: ["volume"] },
       },
       handler(scope, overload, out, ...args) {
         const params: (IValue | string)[] = ["10", "0", "0", "100", "100"];
@@ -50,6 +53,7 @@ export class SetRule extends ObjectValue {
           case "buildSpeed":
           case "unitHealth":
           case "unitBuildSpeed":
+          case "unitMineSpeed":
           case "unitCost":
           case "unitDamage":
           case "blockHealth":

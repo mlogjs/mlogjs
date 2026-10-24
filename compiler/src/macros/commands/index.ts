@@ -38,3 +38,6 @@ export * from "./PlaySound";
 export * from "./PrintChar";
 export * from "./UnpackColor";
 export * from "./Format";
+export * from "./Query";
+export * from "./SpawnBullet";
+export * from "./PlayMusic";

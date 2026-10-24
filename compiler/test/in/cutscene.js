@@ -14,3 +14,8 @@ print("Camera controls!");
 flushMessage.announce(4);
 wait(5);
 cutscene.stop();
+
+const isCutsceneActive = cutscene.active();
+cutscene.shake(2, 5);
+const hudVisible = cutscene.getHud();
+cutscene.setHud(false);

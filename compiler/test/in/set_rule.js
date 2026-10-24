@@ -22,3 +22,7 @@ setRule.waveSending(true);
 setRule.waveSpacing(256);
 setRule.waveTimer(true);
 setRule.waves(true);
+setRule.unitLight(true);
+setRule.pauseDisabled(true);
+setRule.musicVolume(0.5);
+setRule.unitMineSpeed(Teams.sharded, 2.5);

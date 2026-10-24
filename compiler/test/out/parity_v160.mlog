@@ -1,0 +1,20 @@
+ubind @flare
+ucontrol deconstruct 10 20
+fetch unit flare0:6:6 @sharded 0 @flare
+fetch unit anyUnit0:7:6 @sharded 0 null
+fetch unitCount flareCount:8:6 @sharded 0 @flare
+fetch unitCount totalUnits:9:6 @sharded 0 null
+sensor buildX:11:8 @unit @buildX
+sensor buildY:11:16 @unit @buildY
+sensor building:11:24 @unit @building
+sensor breaking:11:34 @unit @breaking
+sensor flying:11:44 @unit @flying
+sensor maxUnits:13:6 core1 @maxUnits
+sensor &t0 @unit @controlled
+op strictEqual isCommand:15:6 &t0 @ctrlCommand
+print "flareCount: {0} total: {0} max: {0} cmd: {0}"
+format flareCount:8:6
+format totalUnits:9:6
+format maxUnits:13:6
+format isCommand:15:6
+printflush message1

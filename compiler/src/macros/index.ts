@@ -3,7 +3,13 @@ export * from "./Math";
 export * from "./Other";
 export * as commands from "./commands";
 export * from "./Memory";
-export { NamespaceMacro, VarsNamespace } from "./Namespace";
+export {
+  NamespaceMacro,
+  VarsNamespace,
+  StatusEffectsNamespace,
+  PVarsNamespace,
+} from "./Namespace";
+export * from "./Queries";
 export * from "./DynamicArray";
 export * from "./Unchecked";
 export * from "./GetBuildings";

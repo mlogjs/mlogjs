@@ -73,6 +73,7 @@ class MarkerMacro extends ObjectValue {
       remove: new MacroFunction(() => [null, [setmarker(id, "remove")]]),
       world: new MarkerMacroSetter(id, "world"),
       minimap: new MarkerMacroSetter(id, "minimap"),
+      light: new MarkerMacroSetter(id, "light"),
       autoscale: new MarkerMacroSetter(id, "autoscale"),
       pos: new MarkerMacroSetter(id, "pos", ["x", "y"]),
       endPos: new MarkerMacroSetter(id, "endPos", ["x", "y"]),
@@ -82,6 +83,7 @@ class MarkerMacro extends ObjectValue {
       stroke: new MarkerMacroSetter(id, "stroke"),
       rotation: new MarkerMacroSetter(id, "rotation"),
       shape: new MarkerMacroSetter(id, "shape", ["sides", "fill", "outline"]),
+      arc: new MarkerMacroSetter(id, "arc", ["start", "end"]),
       flushText: new MacroFunction((scope, out, options) => {
         assertIsObjectMacro(options, "options");
         const [fetch] = assertObjectFields(options, ["fetch"]);

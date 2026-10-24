@@ -2,18 +2,15 @@ set number:6:19 -8
 set &rcubeRoots:6:0 3
 jump 4 always
 end
-jump 7 lessThanEq number:6:19 0
-set sign:10:8 1
-jump 8 always
-set sign:10:8 -1
+select sign:10:8 greaterThan number:6:19 0 1 -1
 op abs &t0:cubeRoots:6:0 number:6:19
 op pow &t1:cubeRoots:6:0 &t0:cubeRoots:6:0 0.3333333333333333
 op mul p:11:8 &t1:cubeRoots:6:0 sign:10:8
-print "{0} * [cos(0°) + i sen(0°)]\n"
+print "{0} * [cos(0\u00b0) + i sen(0\u00b0)]\n"
 format p:11:8
-print "{0} * [cos(120°) + i sen(120°)]\n"
+print "{0} * [cos(120\u00b0) + i sen(120\u00b0)]\n"
 format p:11:8
-print "{0} * [cos(240°) + i sen(240°)]\n"
+print "{0} * [cos(240\u00b0) + i sen(240\u00b0)]\n"
 format p:11:8
 printflush message1
 end

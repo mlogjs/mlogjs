@@ -10,6 +10,8 @@ interface BasicUnit
     Spaced,
     Ranged,
     Mining,
+    WithBuild,
+    Flying,
     Typed<UnitSymbol>,
     Flagged,
     Controlled,
@@ -42,7 +44,8 @@ interface BasicBuilding
     WithConfig,
     WithColor,
     WithTeam,
-    WithSolid {}
+    WithSolid,
+    WithMaxUnits {}
 
 interface BasicTurret extends BasicBuilding, Shooting, WithProgress {}
 
@@ -54,8 +57,20 @@ interface AnyBuilding
     AnyTurret,
     Heatable,
     WithShield,
-    WithCamera,
     WithMemory,
     WithBufferSize,
     WithDisplay,
     WithOperations {}
+
+interface Bullet
+  extends
+    Rotatable,
+    WithHealth,
+    Spaced,
+    WithVelocity,
+    WithTeam,
+    Ranged,
+    WithAim,
+    WithSpeed,
+    WithColor,
+    WithBulletTime {}

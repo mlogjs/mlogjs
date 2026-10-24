@@ -9,6 +9,31 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
+- Added `unitControl.deconstruct` command (`ucontrol deconstruct x y`).
+- Added optional unit type filtering parameter to `fetch.unit` and `fetch.unitCount`.
+- Added support for sensing if a block is linked to a mass driver, bridge, or power node via `sensor(propertyBuilding, targetBuilding)` (privileged/world processor capability).
+- Added camera viewport properties to global `LAccess` and `AnyUnit` (`cameraX`, `cameraY`, `cameraWidth`, `cameraHeight`) with documentation noting they evaluate to `null` unless executing in a privileged (world) processor.
+- Added missing `LAccess` senses and unit/building traits: `buildX`, `buildY`, `building`, `breaking`, `flying`, and `maxUnits`.
+- Added missing unit symbols to `Units`: `dummy` and `missile`.
+- Added `ControlKind.ctrlCommand` (= 3) reflecting Mindustry's RTS command controller.
+- Added support for `>>>` (zero-fill right shift) mapped to the `ushr` instruction.
+- Added automatic compilation of ternary expressions (`a ? b : c`) into the `select` instruction when branches do not require statements.
+- Added modern string literal escape sequences (`\"`, `\\`, `\n`) and unicode escape sequences (`\uXXXX`) for non-ASCII and unparsed characters.
+- Added `StatusEffects` namespace to access status effect logic variables (`@status-<name>`).
+- Added support for passing `StatusEffects` symbols, strings, and dynamic variables to `applyStatus`.
+- Added `query` command (`query.circle` and `query.rect`) in `mlogjs:world`.
+- Added `PVars.queries` built-in macro view for `@queries` supporting `.length`, array indexing `[i]`, `.at(i)`, and `.value`.
+- Added `spawnBullet` command in `mlogjs:world` emitting the `bullet` instruction.
+- Added `playMusic` command in `mlogjs:world` emitting the `playmusic` instruction.
+- Added `setRate` in the global scope in addition to `mlogjs:world`.
+- Added new cutscene actions: `cutscene.active`, `cutscene.shake`, `cutscene.getHud`, and `cutscene.setHud`.
+- Added new logic rules to `setRule`: `unitLight`, `pauseDisabled`, and `musicVolume`.
+- Added new marker controls to `Marker`: `light` and `arc`.
+- Added `effect.breakProp` to `effect` (aliasing `breakPop`).
+- Added privileged dynamic client variables to `PVars`: `clientMusicPlaying` and `clientCurrentMusic`.
+- Added new `LAccess` symbols: `pingX`, `pingY`, `pingText`, `selectedBlock`, `selectedRotation`, `bulletLifetime`, `bulletTime`.
+- Added settables for `bulletTime`, `bulletLifetime`, `totalPower`, and `payloadType`.
+- Added the `Bullet` store value interface in `kinds.d.ts` and `SettableBullet` in `util.d.ts` for sensing and setting bullet properties.
 - Added the `getColor` function to access color literals.
 - Added a directive to control a function's inlining behavior
 - Added a watch mode to the CLI via the `--watch` flag.
@@ -34,6 +59,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Changed
 
+- Documented world processor usage of `control.config` for configuring mass drivers, bridges, and toggling power node links.
+- `spawnUnit` now emits 7 arguments including the `effect` parameter (defaults to `true`).
+- `applyStatus` now emits canonical `@status-<name>` variables.
 - (Breaking) world processor functionality was moved to the `mlogjs:world` module.
 - Reading `Vars.this.x` now returns `Vars.thisx` (the same applies for `Vars.this.y`).
 - `Vars.unit` is now treated as a mutable readonly value.
@@ -42,12 +70,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Synchronized the block symbol table with the game's.
 - Store values are now senseable.
 
+### Deprecated
+
+- Deprecated `ControlKind.ctrlFormation` in favor of `ControlKind.ctrlCommand`.
+
 ### Removed
 
 - Removed support for object operator overriding.
 - Removed support for the `typeof` operator.
 
 ### Fixed
+
+- Fixed missing `unitMineSpeed` case in `setRule` team property handling.
+- Fixed non-existent `BasicValue` occurrences in declaration files.
+- Fixed `setWeather` incorrectly emitting the `weathersense` instruction instead of `weatherset`.
 
 - Fixed caching of operations that use values that change over time (e.g. `@tick` and `@time`)
 - Fixed labels and comments breaking line resolution.

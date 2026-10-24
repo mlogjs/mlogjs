@@ -1,0 +1,4 @@
+playmusic "game1" true
+playmusic "fine" 0
+set isPlaying:5:6 @clientMusicPlaying
+set track:6:6 @clientCurrentMusic

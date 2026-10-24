@@ -31,3 +31,6 @@ print(item !== Items.copper);
 // make sure that the ?? operator doesn't generate
 // more temp values than necessary
 print(Vars.unit.ammo ?? Vars.unit.ammoCapacity);
+
+print(10 >>> 2);
+print(pos >>> 1);

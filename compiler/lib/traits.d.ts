@@ -47,14 +47,20 @@ declare global {
     readonly powerNetOut: number;
   }> {}
 
-  interface Shooting extends WithSymbols<{
-    readonly shooting: boolean;
+  interface WithAim extends WithSymbols<{
     readonly shootX: number;
     readonly shootY: number;
-    readonly ammo: number;
-    readonly ammoCapacity: number;
-    readonly currentAmmoType?: ItemSymbol | LiquidSymbol;
   }> {}
+
+  interface Shooting
+    extends
+      WithAim,
+      WithSymbols<{
+        readonly shooting: boolean;
+        readonly ammo: number;
+        readonly ammoCapacity: number;
+        readonly currentAmmoType?: ItemSymbol | LiquidSymbol;
+      }> {}
 
   interface WithHealth extends WithSymbols<{
     readonly health: number;
@@ -231,9 +237,25 @@ declare global {
   }> {}
 
   interface WithCamera extends WithSymbols<{
+    /**
+     * The player camera X coordinate. Privileged (world) processors only;
+     * evaluates to null on standard processors.
+     */
     readonly cameraX: number;
+    /**
+     * The player camera Y coordinate. Privileged (world) processors only;
+     * evaluates to null on standard processors.
+     */
     readonly cameraY: number;
+    /**
+     * The player camera viewport width. Privileged (world) processors only;
+     * evaluates to null on standard processors.
+     */
     readonly cameraWidth: number;
+    /**
+     * The player camera viewport height. Privileged (world) processors only;
+     * evaluates to null on standard processors.
+     */
     readonly cameraHeight: number;
   }> {}
 
@@ -261,5 +283,36 @@ declare global {
 
   interface WithOperations extends WithSymbols<{
     readonly operations: number;
+  }> {}
+
+  interface WithPing extends WithSymbols<{
+    readonly pingX: number;
+    readonly pingY: number;
+    readonly pingText?: string;
+  }> {}
+
+  interface WithSelected extends WithSymbols<{
+    readonly selectedBlock?: BlockSymbol;
+    readonly selectedRotation: number;
+  }> {}
+
+  interface WithBulletTime extends WithSymbols<{
+    readonly bulletLifetime: number;
+    readonly bulletTime: number;
+  }> {}
+
+  interface WithBuild extends WithSymbols<{
+    readonly buildX: number;
+    readonly buildY: number;
+    readonly building?: BasicBuilding;
+    readonly breaking?: BasicBuilding;
+  }> {}
+
+  interface Flying extends WithSymbols<{
+    readonly flying: boolean;
+  }> {}
+
+  interface WithMaxUnits extends WithSymbols<{
+    readonly maxUnits?: number;
   }> {}
 }

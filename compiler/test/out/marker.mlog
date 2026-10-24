@@ -1,0 +1,11 @@
+makemarker shape 1 10 20 1
+setmarker world 1 1
+setmarker light 1 1
+setmarker radius 1 5
+setmarker arc 1 0 180
+packcolor &t0 1 0 0 1
+setmarker color 1 &t0
+makemarker line 2 0 0 0
+setmarker posi 2 0 5 5
+setmarker radius 1 10
+setmarker remove 1

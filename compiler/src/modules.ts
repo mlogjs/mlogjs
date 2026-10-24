@@ -9,6 +9,8 @@ import {
   MemoryBuilder,
   MlogMath,
   NamespaceMacro,
+  PVarsNamespace,
+  StatusEffectsNamespace,
   StringViewBuilder,
   Unchecked,
   VarsNamespace,
@@ -41,6 +43,7 @@ export function createGlobalScope(): IScope {
   scope.hardSet("LAccess", new NamespaceMacro());
   scope.hardSet("Blocks", new NamespaceMacro({ changeCasing: true }));
   scope.hardSet("Colors", new ColorsNamespace());
+  scope.hardSet("StatusEffects", new StatusEffectsNamespace());
 
   // helper methods
   scope.hardSet("getBuilding", new GetGlobal(EMutability.constant));
@@ -52,6 +55,7 @@ export function createGlobalScope(): IScope {
 
   scope.hardSet("Math", new MlogMath());
   scope.hardSet("Memory", new MemoryBuilder());
+  scope.hardSet("MemoryView", new MemoryBuilder());
   scope.hardSet("StringView", new StringViewBuilder());
   scope.hardSet("MutableArray", new DynamicArrayConstructor(false));
   scope.hardSet("DynamicArray", new DynamicArrayConstructor(true));
@@ -81,16 +85,18 @@ export function createGlobalScope(): IScope {
   scope.hardSet("unitControl", new commands.UnitControl());
   scope.hardSet("unitRadar", new commands.UnitRadar());
   scope.hardSet("unitLocate", new commands.UnitLocate());
+  scope.hardSet("setRate", new commands.SetRate());
 
   return scope;
 }
 
 export function createWordModule() {
   const module = new ObjectValue({
-    PVars: new NamespaceMacro(),
+    PVars: new PVarsNamespace(),
     getBlock: new commands.GetBlock(),
     setBlock: new commands.SetBlock(),
     spawnUnit: new commands.SpawnUnit(),
+    spawnBullet: new commands.SpawnBullet(),
     applyStatus: new commands.ApplyStatus(),
     spawnWave: new commands.SpawnWave(),
     setRule: new commands.SetRule(),
@@ -109,6 +115,8 @@ export function createWordModule() {
     senseWeather: new commands.WeatherSense(),
     setWeather: new commands.WeatherSet(),
     playSound: new commands.PlaySound(),
+    playMusic: new commands.PlayMusic(),
+    query: new commands.Query(),
   });
   return module;
 }

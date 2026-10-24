@@ -1,0 +1,9 @@
+playsound false @sfx-pew 1 1 0 0 0 1
+playsound true @sfx-artillery 1 1 0 10 20 0
+weathersense isRaining:19:6 @rain
+op equal &t0 isRaining:19:6 0
+weatherset @rain &t0
+set initial:22:4 100
+set lock:23:6 initial:22:4
+set lock:23:6 200
+sync lock:23:6
