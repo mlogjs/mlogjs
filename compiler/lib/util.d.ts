@@ -29,11 +29,7 @@ declare module "mlogjs:types" {
     | [TRadarFilter, TRadarFilter, TRadarFilter];
 
   export type TRadarSort =
-    | "distance"
-    | "health"
-    | "shield"
-    | "armor"
-    | "maxHealth";
+    "distance" | "health" | "shield" | "armor" | "maxHealth";
 
   export type TUnitLocateBuildingGroup =
     | "core"

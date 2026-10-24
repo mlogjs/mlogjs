@@ -1249,8 +1249,7 @@ declare global {
      * ```
      */
     function spawn<T extends BasicBuilding = AnyBuilding>():
-      | [found: false]
-      | [found: true, x: number, y: number, building: T];
+      [found: false] | [found: true, x: number, y: number, building: T];
 
     /**
      * Uses the unit bound to this processor to find a damaged ally building
@@ -1268,8 +1267,7 @@ declare global {
      * ```
      */
     function damaged<T extends BasicBuilding = AnyBuilding>():
-      | [found: false]
-      | [found: true, x: number, y: number, building: T];
+      [found: false] | [found: true, x: number, y: number, building: T];
   }
 
   /**

@@ -195,9 +195,9 @@ export interface IValueOperators {
   "!"(scope: IScope, out?: TEOutput): TValueInstructions;
   "u+"(scope: IScope, out?: TEOutput): TValueInstructions;
   "u-"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "delete"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "typeof"(scope: IScope, out?: TEOutput): TValueInstructions;
-  "void"(scope: IScope, out?: TEOutput): TValueInstructions;
+  delete(scope: IScope, out?: TEOutput): TValueInstructions;
+  typeof(scope: IScope, out?: TEOutput): TValueInstructions;
+  void(scope: IScope, out?: TEOutput): TValueInstructions;
   "~"(scope: IScope, out?: TEOutput): TValueInstructions;
 
   // update operators
