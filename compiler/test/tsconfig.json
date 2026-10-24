@@ -5,6 +5,8 @@
     "checkJs": true,
     "noLib": true,
     "noEmit": true,
+    "noImplicitAny": false,
+    "strictNullChecks": false,
     "types": [],
     "paths": {
       "mlogjs:world": ["../lib/world"]

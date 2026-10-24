@@ -1,4 +1,5 @@
-const fs = require("node:fs");
+import * as fs from "node:fs";
+
 console.log("# mkdir -p ../docs && cp -r docs/.vitepress/dist/. ../docs");
 if (!fs.existsSync("../docs"))
   fs.mkdir("../docs", err => {
