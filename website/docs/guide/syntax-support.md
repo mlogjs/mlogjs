@@ -514,3 +514,9 @@ print(globalThis.Math.abs(-5));
 ```
 
 Module-local declarations are not properties of `globalThis`.
+
+This is compiler support. The existing TypeScript declarations use `const` for
+some globals (including `Math` and `Vars`), which TypeScript does not expose on
+its intrinsic `globalThis` type. Accessing those properties in a separately
+type-checked TypeScript project still needs a type assertion; this change does
+not alter those declarations or make the built-ins writable.
