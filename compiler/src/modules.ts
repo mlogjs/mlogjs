@@ -87,6 +87,14 @@ export function createGlobalScope(): IScope {
   scope.hardSet("unitLocate", new commands.UnitLocate());
   scope.hardSet("setRate", new commands.SetRate());
 
+  // Keep built-ins reachable even when a module shadows their names.
+  const globalObject = new ObjectValue();
+  for (const name of Object.keys(scope.data)) {
+    globalObject.data[name] = scope.get(name);
+  }
+  globalObject.data.globalThis = globalObject;
+  scope.hardSet("globalThis", globalObject);
+
   return scope;
 }
 

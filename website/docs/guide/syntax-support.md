@@ -502,3 +502,15 @@ You can declare custom type aliases and interfaces. Since the compiler does not 
 ### Non null assertions
 
 Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `undefined` before using them.
+
+## Accessing shadowed globals
+
+`globalThis` exposes the compiler's built-in functions and namespaces even when
+local declarations shadow their names:
+
+```js
+const Math = 42;
+print(globalThis.Math.abs(-5));
+```
+
+Module-local declarations are not properties of `globalThis`.
