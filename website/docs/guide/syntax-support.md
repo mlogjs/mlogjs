@@ -467,6 +467,24 @@ import { explosion } from "mlogjs:world";
 import type { Foo } from "./my_module";
 ```
 
+### globalThis
+
+`globalThis` exposes the compiler's built-in functions and namespaces even when
+local declarations shadow their names:
+
+```js
+const Math = 42;
+print(globalThis.Math.abs(-5));
+```
+
+Module-local declarations are not properties of `globalThis`.
+
+This is compiler support. The existing TypeScript declarations use `const` for
+some globals (including `Math` and `Vars`), which TypeScript does not expose on
+its intrinsic `globalThis` type. Accessing those properties in a separately
+type-checked TypeScript project still needs a type assertion; this change does
+not alter those declarations or make the built-ins writable.
+
 ## Typescript
 
 ### Enums
@@ -502,21 +520,3 @@ You can declare custom type aliases and interfaces. Since the compiler does not 
 ### Non null assertions
 
 Again, this one is ignored by the compiler, use it to make typescript happy, though most of the time you should check if nullable variables are `undefined` before using them.
-
-## Accessing shadowed globals
-
-`globalThis` exposes the compiler's built-in functions and namespaces even when
-local declarations shadow their names:
-
-```js
-const Math = 42;
-print(globalThis.Math.abs(-5));
-```
-
-Module-local declarations are not properties of `globalThis`.
-
-This is compiler support. The existing TypeScript declarations use `const` for
-some globals (including `Math` and `Vars`), which TypeScript does not expose on
-its intrinsic `globalThis` type. Accessing those properties in a separately
-type-checked TypeScript project still needs a type assertion; this change does
-not alter those declarations or make the built-ins writable.
