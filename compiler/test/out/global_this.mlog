@@ -1,3 +1,5 @@
 op abs &t0 @time
 print &t0
 print "hello"
+print @duo
+print @sfx-shoot
