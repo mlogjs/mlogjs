@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+### Added
+
+- Added `globalThis` to access built-in functions and namespaces when local declarations shadow their names.
+
 ## [0.6.1] - 2026-10-24
 
 ## Fixed
