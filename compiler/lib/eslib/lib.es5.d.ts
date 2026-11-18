@@ -231,7 +231,7 @@ interface Math {
    */
   exp(x: number): number;
 }
-declare const Math: Math;
+declare var Math: Math;
 
 interface Error {}
 

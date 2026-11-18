@@ -67,7 +67,7 @@ interface Vars {
   readonly blockCount: number;
 }
 
-declare const Vars: Vars;
+declare var Vars: Vars;
 
 declare enum Align {
   left,
@@ -480,7 +480,7 @@ interface Sounds {
   readonly windhowl: number;
 }
 
-declare const Sounds: Sounds;
+declare var Sounds: Sounds;
 
 type WeatherSymbol = (typeof Weathers)[keyof typeof Weathers];
 
@@ -913,7 +913,7 @@ interface Blocks
 }
 
 type BlockSymbol = Blocks[keyof Blocks];
-declare const Blocks: Blocks;
+declare var Blocks: Blocks;
 
 declare namespace StatusEffects {
   const none: StatusEffectSymbol;

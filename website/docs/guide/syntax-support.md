@@ -467,6 +467,18 @@ import { explosion } from "mlogjs:world";
 import type { Foo } from "./my_module";
 ```
 
+### globalThis
+
+`globalThis` exposes the compiler's built-in functions and namespaces even when
+local declarations shadow their names:
+
+```js
+const Math = 42;
+print(globalThis.Math.abs(-5));
+```
+
+Module-local declarations are not properties of `globalThis`.
+
 ## Typescript
 
 ### Enums
